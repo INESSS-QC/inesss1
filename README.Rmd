@@ -1,0 +1,26 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# inesss
+
+[Institut national d'excellence en santé et en services sociaux](https://www.inesss.qc.ca/)
+
+## Installation
+
+```{r, eval=FALSE}
+if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
+remotes::install_github("INESSS-QC/inesss")
+```
+
