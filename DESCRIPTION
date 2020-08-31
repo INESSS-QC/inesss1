@@ -1,0 +1,20 @@
+Package: inesss
+Title: Institut National Excellence Sante Services Sociaux
+Version: 0.1.0
+Authors@R: 
+    person(given = "Guillaume",
+           family = "Boucher",
+           role = c("aut", "cre"),
+           email = c("guillaume.boucher@inesss.qc.ca", "guiboucher8@gmail.com"))
+Description: Ce paquet fournit des fonctionnalités pour une variétés de tâches propices au domaine de la santé et des outils pour visualiser les résultats.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.1.1
+Imports: 
+    askpass,
+    data.table,
+    DBI,
+    lubridate,
+    odbc
