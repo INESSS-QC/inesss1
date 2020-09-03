@@ -1,0 +1,103 @@
+---
+title: "SQL_usage_statistics1"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{SQL_usage_statistics1}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo=FALSE}
+library(inesss)
+fcts <- SQL_usage_statistics1_fcts_int()$sql_query_code
+```
+
+Statistiques générales d'utilisation pour une ou des années civile.
+
+### Arguments
+
+* **`years`** : Année(s) à analyser. Une ou deux valeurs à inscrire, soit le début et la fin de la période d'analyse. Une valeur implique une seule année d'analyse.
+* **`code_var`** : Sélection d'un type de variable entre `"AHFS"`, `"DC"` ou `"DIN"`.
+  + `AHFS` : Code de classe AHFS.
+  + `DC` : Code dénomination commune.
+  + `DIN` : Code d'identification du médicament.
+* **`codes`** : Code(s) à analyser.
+
+### Détails
+
+
+### Exemple `code_var = "DC"`
+
+```{r, eval=FALSE}
+SQL_usage_statistics1(..., years = c(2018, 2019),
+                      code_var = "DC",
+                      codes = c(47092, 47135))
+```
+```{r, echo=FALSE}
+cat(fcts(years = 2018:2019, code_var = "DC", codes = c(47092, 47135)))
+```
+
+### Exemple `code_var = "DIN"`
+
+```{r, eval=FALSE}
+SQL_usage_statistics1(..., years = c(2015),
+                      code_var = "DIN",
+                      codes = c("code1", "code2", "code3"))
+```
+```{r, echo=FALSE}
+cat(fcts(years = 2015, code_var = "DIN", codes = c("code1", "code2", "code3")))
+```
+
+### Exemple `code_var = "AHFS"`
+
+Code de classe seulement :
+```{r, eval=FALSE}
+SQL_usage_statistics1(..., years = c(2015, 2019),
+                      code_var = "AHFS",
+                      codes = c("04", "08", "60"))
+```
+```{r, echo=FALSE}
+cat(fcts(years = c(2015,2019), code_var = "AHFS", codes = c("04", "08", "60")))
+```
+
+Code de classe, de sous-classe et de sous-sous-classe :
+```{r, eval=FALSE}
+SQL_usage_statistics1(..., years = c(2015, 2019),
+                      code_var = "AHFS",
+                      codes = c("041208", "081208", "606054"))
+```
+```{r, echo=FALSE}
+cat(fcts(years = c(2015, 2019), code_var = "AHFS", codes = c("041208", "081208", "606054")))
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

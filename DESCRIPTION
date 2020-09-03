@@ -18,3 +18,8 @@ Imports:
     DBI,
     lubridate,
     odbc
+Suggests: 
+    testthat,
+    knitr,
+    rmarkdown
+VignetteBuilder: knitr

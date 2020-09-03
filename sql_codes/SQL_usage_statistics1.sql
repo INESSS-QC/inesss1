@@ -1,0 +1,33 @@
+SELECT
+  Extract (YEAR From SMED_DAT_SERV) AS ANNEE,
+  SMED_COD_DENOM_COMNE AS DC,
+  Count (DISTINCT SMED_NO_INDIV_BEN_BANLS) AS NBEN_Uniq,
+  Count (*) AS Rx,
+  Sum (SMED_MNT_AUTOR_MED) AS COUT,
+  Sum (SMED_MNT_AUTOR_FRAIS_SERV) AS HONOR,
+  Sum (SMED_QTE_MED) AS QTEMED,
+  Sum (SMED_NBR_JR_DUREE_TRAIT) AS DT,
+  Sum (SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) AS COUTTOT
+FROM
+  Prod.V_DEM_PAIMT_MED_CM
+WHERE
+  SMED_DAT_SERV BETWEEN '2018-01-01' AND '2019-12-31'
+  AND SMED_COD_DENOM_COMNE  IN ('47092','47135')
+  AND (SMED_COD_SERV_1 NOT = '1' OR SMED_COD_SERV_1 IS NULL)
+GROUP BY ANNEE, DC
+ORDER BY ANNEE, DC
+
+
+--------------------------------------------------------------------------------
+-- parametres a modifier --
+--------------------------------------------------------------------------------
+ANNEES
+
+SELECT
+  SMED_COD_DIN AS DIN
+  SMED_COD_CLA_AHF as AHFS
+
+WHERE
+  SMED_COD_DIN IN ('47092','47135')
+  SMED_COD_CLA_AHF IN ('47092','47135')
+
