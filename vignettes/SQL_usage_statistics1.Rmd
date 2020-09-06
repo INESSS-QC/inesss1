@@ -1,5 +1,6 @@
 ---
 title: "SQL_usage_statistics1"
+subtitle: "Tests exploratoires"
 output: rmarkdown::html_vignette
 vignette: >
   %\VignetteIndexEntry{SQL_usage_statistics1}
@@ -19,24 +20,36 @@ library(inesss)
 fcts <- SQL_usage_statistics1_fcts_int()$sql_query_code
 ```
 
-Statistiques générales d'utilisation pour une ou des années civile.
+### <mark>Notes générales de conception :</mark>
+
+1. Argument qui ajoute le nom du médicament/variable... : `TRUE`/`FALSE`.
+2. ??? Ajouter colonne DC si DIN? Si AHFS?
+3. Voir note *ATTENTION* du dernier exemple.
+
+### Description
+
+Statistiques générales d'utilisation pour une ou des années civile (1er janvier au 31 décembre).  
+Tableau de fréquence de différentes variables provenant de la vue *V_DEM_PAIMT_MED_CM*.
+
+<mark>À réviser, peut-être décrire les variables (section Résultats?).</mark>
 
 ### Arguments
 
-* **`years`** : Année(s) à analyser. Une ou deux valeurs à inscrire, soit le début et la fin de la période d'analyse. Une valeur implique une seule année d'analyse.
-* **`code_var`** : Sélection d'un type de variable entre `"AHFS"`, `"DC"` ou `"DIN"`.
-  + `AHFS` : Code de classe AHFS.
-  + `DC` : Code dénomination commune.
-  + `DIN` : Code d'identification du médicament.
-* **`codes`** : Code(s) à analyser.
+* **user** : Nom d'usager SQL.
+* **years** : Année(s) à analyser. Deux valeurs à inscrire, soit la date de début et la date de fin. Par exemple de 2015 à 2020 : `years = c(2015, 2020)`. Si seulement une année à analyser, inscrire une seule valeur : `years = 2015`.
+* **code_var** : Sélection d'un type de variable entre `"AHFS"`, `"DC"` ou `"DIN"`.
+  + AHFS : Code de classe AHFS.
+  + DC : Code dénomination commune.
+  + DIN : Code d'identification du médicament.
+* **codes** : Code(s) à analyser.
 
 ### Détails
-
+<mark>**À Faire** *AHFS : Attendre de voir comment on gère les classes AHFS. Selon les cas, à tester avec Teradata.*</mark>
 
 ### Exemple `code_var = "DC"`
 
 ```{r, eval=FALSE}
-SQL_usage_statistics1(..., years = c(2018, 2019),
+SQL_usage_statistics1(user, years = c(2018, 2019),
                       code_var = "DC",
                       codes = c(47092, 47135))
 ```
@@ -47,7 +60,7 @@ cat(fcts(years = 2018:2019, code_var = "DC", codes = c(47092, 47135)))
 ### Exemple `code_var = "DIN"`
 
 ```{r, eval=FALSE}
-SQL_usage_statistics1(..., years = c(2015),
+SQL_usage_statistics1(user, years = c(2015),
                       code_var = "DIN",
                       codes = c("code1", "code2", "code3"))
 ```
@@ -59,7 +72,7 @@ cat(fcts(years = 2015, code_var = "DIN", codes = c("code1", "code2", "code3")))
 
 Code de classe seulement :
 ```{r, eval=FALSE}
-SQL_usage_statistics1(..., years = c(2015, 2019),
+SQL_usage_statistics1(user, years = c(2015, 2019),
                       code_var = "AHFS",
                       codes = c("04", "08", "60"))
 ```
@@ -69,35 +82,12 @@ cat(fcts(years = c(2015,2019), code_var = "AHFS", codes = c("04", "08", "60")))
 
 Code de classe, de sous-classe et de sous-sous-classe :
 ```{r, eval=FALSE}
-SQL_usage_statistics1(..., years = c(2015, 2019),
+SQL_usage_statistics1(user, years = c(2015, 2019),
                       code_var = "AHFS",
                       codes = c("041208", "081208", "606054"))
 ```
 ```{r, echo=FALSE}
 cat(fcts(years = c(2015, 2019), code_var = "AHFS", codes = c("041208", "081208", "606054")))
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+<mark>**ATTENTION** : Les résultats pourraient inclure des codes AHFS de combinaisons non désirés (s'ils existent). Par exemple, les codes 601254, 601208 et 606008 seraient comptabilisés, mais pas inscrit par l'utilisateur.  
+Correction possible : Créer une colonne avec tous les caractères de classes pour créer un code unique et filtrer par la suite.</mark>

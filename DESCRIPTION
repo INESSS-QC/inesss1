@@ -15,11 +15,18 @@ RoxygenNote: 7.1.1
 Imports: 
     askpass,
     data.table,
-    DBI,
-    lubridate,
-    odbc
-Suggests: 
-    testthat,
     knitr,
-    rmarkdown
+    lubridate,
+    odbc,
+    rmarkdown,
+    shiny,
+    shinydashboard,
+    shinydashboardPlus,
+    shinyjs,
+    shinythemes,
+    shinyWidgets
+Suggests: 
+    testthat
 VignetteBuilder: knitr
+Depends: 
+    R (>= 2.10)
