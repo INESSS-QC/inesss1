@@ -3,8 +3,7 @@
 #' @import data.table
 #' @import shiny
 #' @import stringr
-#' @import plotly
-#' @import ggplot2
+#' @importFrom plotly plotlyOutput renderPlotly ggplotly
 #' @import rmarkdown
 #' @import shinyFiles
 #' @export

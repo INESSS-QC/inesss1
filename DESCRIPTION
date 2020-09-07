@@ -18,10 +18,12 @@ Imports:
     knitr,
     lubridate,
     odbc,
+    plotly,
     rmarkdown,
     shiny,
     shinydashboard,
     shinydashboardPlus,
+    shinyFiles,
     shinyjs,
     shinythemes,
     shinyWidgets
