@@ -16,7 +16,7 @@
 #' @import data.table
 #' @importFrom askpass askpass
 #' @export
-SQL_usage_statistics1 <- function(user, years, code_var, codes,
+SQL_stat_gen1_old <- function(user, years, code_var, codes,
                                   ...) {
 
   self <- SQL_usage_statistics1_fcts_int()

@@ -11,14 +11,12 @@ as_price <- function(x) {
   return(round(x, 2))
 }
 
+
 #' Utils
 #'
-#' Converti un vecteur R en code SQL
-#'
-#' @param x Vecteur
-#' @keywords internal
-#' @return c("x", "y") -> "'x','y'"
+#' @return '\\n'
 #' @export
-sql_quote <- function(x) {
-  return(paste(paste0("'",x,"'"), collapse = ","))
+nl <- function() {
+  ### nl = New line = '\n'
+  return("\n")
 }
