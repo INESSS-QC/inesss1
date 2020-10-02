@@ -13,14 +13,15 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
-    askpass,
-    data.table,
-    DBI,
-    lubridate,
-    odbc,
-    shiny,
-    shinydashboard,
-    testthat
+    askpass (>= 1.1),
+    data.table (>= 1.13.0),
+    DBI (>= 1.1.0),
+    fs (>= 1.5.0),
+    lubridate (>= 1.7.9),
+    odbc (>= 1.2.3),
+    shiny (>= 1.5.0),
+    shinydashboard (>= 0.7.1),
+    testthat (>= 2.3.2)
 VignetteBuilder: knitr
 Depends: 
     R (>= 2.10)

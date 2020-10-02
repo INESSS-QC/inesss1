@@ -4,19 +4,38 @@
 #'
 #' @import shiny
 #' @import shinydashboard
-#' @importFrom shinyFiles shinyDirButton
+#' @importFrom shinyFiles getVolumes shinyFileSave shinySaveButton
+#' @importFrom fs path_home
 #' @importFrom testthat capture_error
 #' @export
 formulaire <- function() {
 
+
+# Table des matières - conception -----------------------------------------
+
+  # UI
+  #   Header
+  #   Sidebar
+  #     Connexion - conn
+  #     Requête simple - simple_req
+  #     Requete via EXCEL
+  #   Body
+  #     Connexion - conn
+  #     Requête simple - simple_req
+  #
+
+# FCTS internal -----------------------------------------------------------
+
+
 # Interface Utilisateur ---------------------------------------------------
 
+  library(fs)
   library(shiny)
   library(shinydashboard)
   library(shinyFiles)
   library(testthat)
 
-  UI <- dashboardPage(
+  ui <- dashboardPage(
 
     ### Header
     dashboardHeader(title = "Requêtes SQL"),
@@ -118,8 +137,8 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              actionButton("go_extract", "Exécuter Requête")
-            )
+              actionButton("go_extract", "Exécuter Requête"), p()
+            ),
           ),
           fluidRow(p()), # insérer un espace entre le bouton et le tableau qui s'affiche après
           # Afficher tout ce qui n'est pas un argument de requête:
@@ -129,19 +148,23 @@ formulaire <- function() {
             column(
               width = 12, align = "left",
               dataTableOutput("tab_simple_req"),
-              verbatimTextOutput("sql_query"),
-              verbatimTextOutput("query_simple_req")
+              shinySaveButton("save_simple", "Enregistrer requête", "Enregistrer sous...",
+                              filetype = list(`Classeur Excel` = "xlsx"),
+                              viewtype = "list"), p(),
+
+              verbatimTextOutput("query_simple_req"),
+              verbatimTextOutput("test_variables")  # afficher variables voir si code bon pour extraire les arguments
             )
           )
         ),
         # Requêtes via EXCEL
         tabItem(
           tabName = "excel_req",
-          fileInput("xl_file", "Sélectionner fichier EXCEL",
-                    buttonLabel = "Sélectionner",
-                    placeholder = "Aucun fichier sélectionné"),
+          shinyFilesButton("select_xl_file", "Sélectionner fichier Excel",
+                           "Sélectionner fichier Excel", multiple = FALSE,
+                           viewtype = "detail"), p(),
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
-          actionButton("go_xl_extract", "Exécuter extraction")
+          actionButton("go_xl_extract", "Exécuter Requête(s)")
         )
 
       )
@@ -154,27 +177,31 @@ formulaire <- function() {
 # Serveur -----------------------------------------------------------------
 
 
-  SERVER <- function(input, output, session) {
+  server <- function(input, output, session) {
 
     ### Valeurs à initialiser
     Vals <- reactiveValues(
       conn = FALSE  # etat de la connexion SQL
     )
+    # Répertoire possible pour les filesButton
+    volumes <- c(`Par défaut` = path_home(),
+                 R = R.home(),
+                 getVolumes()())  # répertoires principaux (C:, E:, ...)
 
     ### Connexion SQL
     # Messages indiquant si la connexion est établie ou pas
     observeEvent(input$check_conn, {
       if (input$teradata_user == "" && input$teradata_pwd == "") {
         # Cas où aucune information n'est inscrite
-        Vals$is_conn <- "***Veuillez inscire votre identifiant et votre mot de passe"
+        Vals$is_conn <- "***Veuillez inscire numéro d'identifiant et mot de passe"
         Vals$conn <- FALSE
       } else if (is.null(capture_error(sql_conn("PEI_PRD", input$teradata_user, input$teradata_pwd)))) {
         # La connexion est établie -> aucune erreur
-        Vals$is_conn <- "Connexion établie"
+        Vals$is_conn <- "CONNEXION ÉTABLIE"
         Vals$conn <- TRUE
       } else {
         # Malgré les infos inscrites, la connexion ne s'est pas effectuée
-        Vals$is_conn <- "***Vérifier numéro d'identifiant et mot de passe."
+        Vals$is_conn <- "***Vérifier identifiant et mot de passe."
         Vals$conn <- FALSE
       }
     })
@@ -200,6 +227,15 @@ formulaire <- function() {
         }
       }
       return(tagList(dates_inputs))
+    })
+    # Répertoire de sauvegarde
+    shinyFileSave(input, "save_simple", roots = volumes, session = session)
+    simple_dir_save <- reactive({
+      if (is.integer(input$save_simple)) {
+        return(NULL)
+      } else {
+        return(parseSavePath(volumes, input$save_simple))
+      }
     })
     # Tableau à afficher
     output$tab_simple_req <- renderDataTable({
@@ -230,9 +266,25 @@ formulaire <- function() {
       "GROUP BY Annee, DC", nl(),
       "ORDER BY Annee, DC;"
     )})
+    # Vecteur DateDebut + DateFin
+    output$test_variables <- renderPrint({
+      list(`Bouton: Exécuter requête` = input$go_extract,
+           `Bouton: Enregistrer requête` = simple_dir_save()$datapath,
+           `Bouton: EXCEL` = select_xl_file()$datapath)
+    })
 
 
     ### Requête via EXCEL
+    # Sélection du fichier Excel
+    shinyFileChoose(input, "select_xl_file", roots = volumes, session = session)
+    select_xl_file <- reactive({
+      if (is.integer(input$select_xl_file)) {
+        return(NULL)
+      } else {
+        parseFilePaths(volumes, input$select_xl_file)
+      }
+    })
+    output$select_xl_file <- renderPrint({ select_xl_file() })
     # Indiquer message d'erreur
     output$xl_errors_msg <- renderText({paste0(
       "Nom Onglet 1:", nl(),
@@ -248,6 +300,6 @@ formulaire <- function() {
 
 # Exécuter Application ----------------------------------------------------
 
-  shinyApp(UI, SERVER)
+  shinyApp(ui, server)
 
 }
