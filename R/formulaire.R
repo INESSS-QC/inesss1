@@ -7,6 +7,7 @@
 #' @importFrom shinyFiles getVolumes shinyFileSave shinySaveButton
 #' @importFrom fs path_home
 #' @importFrom testthat capture_error
+#' @importFrom stringr str_replace_all str_remove_all str_split
 #' @export
 formulaire <- function() {
 
@@ -90,7 +91,7 @@ formulaire <- function() {
               width = 4,
               # Indiquer le nom de période d'étude à analyser au total
               numericInput("nbr_dates", "Nombre de périodes d'étude",
-                           value = 1, min = 1),
+                           value = 1, min = 1, max = 99),
               # Affiche le nombre de périodes d'étude indiquer dans input$nbr_dates
               uiOutput("input_mult_dates")
             ),
@@ -99,8 +100,8 @@ formulaire <- function() {
               width = 4,
               # Type de code à analyser - sélection de la variable d'analyse
               selectInput("typevar", "Type variable",
-                          choices = c("DC", "DIN", "AHFS"),
-                          selected = "DC"),
+                          choices = c("DENOM", "DIN", "AHFS"),
+                          selected = "DENOM"),
               # Codes d'analyse
               textAreaInput("codes", "Codes"),
               # Statistiques
@@ -266,11 +267,79 @@ formulaire <- function() {
       "GROUP BY Annee, DC", nl(),
       "ORDER BY Annee, DC;"
     )})
-    # Vecteur DateDebut + DateFin
+
+    # Extraire les valeurs des arguments
+    DatesDebut <- reactive({
+      vec <- c()
+      for (i in 1:input$nbr_dates) {
+        vec <- c(vec, as.character(input[[paste0("dates",i)]][1]))
+      }
+      return(vec)
+    })
+    DatesFin <- reactive({
+      vec <- c()
+      for (i in 1:input$nbr_dates) {
+        vec <- c(vec, as.character(input[[paste0("dates",i)]][2]))
+      }
+      return(vec)
+    })
+    TypeVar <- reactive({ input$typevar })
+    Codes <- reactive({
+      vec <- as.character(input$codes)
+      if (vec != "") {
+        # Séparer tous les éléments par un ";"
+        vec <- str_replace_all(vec, ",", ";")  # convertir ',' en ';'
+        vec <- str_replace_all(vec, "\n", ";")  # convertir '\n' en ';'
+        vec <- str_remove_all(vec, " ")  # supprimer espaces
+        vec <- str_split(vec, ";")[[1]]  # séparer les codes et garder vecteur
+        vec <- vec[vec != ""]  # supprimer les éléments vides
+        return(vec)
+      } else {
+        return(NULL)
+      }
+    })
+    Statistiques <- reactive({ input$stats })
+    GroupBy <- reactive({ input$groupby })
+    ExcluCodeServ <- reactive({
+      vec <- as.character(input$excl_code_serv)
+      if (vec != "") {
+        # Séparer tous les éléments par un ";"
+        vec <- str_replace_all(vec, ",", ";")  # convertir ',' en ';'
+        vec <- str_replace_all(vec, "\n", ";")  # convertir '\n' en ';'
+        vec <- str_remove_all(vec, " ")  # supprimer espaces
+        vec <- str_split(vec, ";")[[1]]  # séparer les codes et garder vecteur
+        vec <- vec[vec != ""]  # supprimer les éléments vides
+        return(unique(vec))
+      } else {
+        return(NULL)
+      }
+    })
+    CategorieListe <- reactive({
+      vec <- as.character(input$filter_cat_list)
+      if (vec != "") {
+        # Séparer tous les éléments par un ";"
+        vec <- str_replace_all(vec, ",", ";")  # convertir ',' en ';'
+        vec <- str_replace_all(vec, "\n", ";")  # convertir '\n' en ';'
+        vec <- str_remove_all(vec, " ")  # supprimer espaces
+        vec <- str_split(vec, ";")[[1]]  # séparer les codes et garder vecteur
+        vec <- vec[vec != ""]  # supprimer les éléments vides
+        return(unique(vec))
+      } else {
+        return(NULL)
+      }
+    })
+
+
+    ### À SUPPRIMER - VÉRIFIER LA VALEUR DES COMMANDES
     output$test_variables <- renderPrint({
-      list(`Bouton: Exécuter requête` = input$go_extract,
-           `Bouton: Enregistrer requête` = simple_dir_save()$datapath,
-           `Bouton: EXCEL` = select_xl_file()$datapath)
+      list(DatesDebut = DatesDebut(),
+           DatesFin = DatesFin(),
+           TypeVar = TypeVar(),
+           Codes = Codes(),
+           Statistiques = Statistiques(),
+           GroupBy = GroupBy(),
+           ExcluCodeServ = ExcluCodeServ(),
+           CategorieListe = CategorieListe())
     })
 
 
@@ -284,7 +353,6 @@ formulaire <- function() {
         parseFilePaths(volumes, input$select_xl_file)
       }
     })
-    output$select_xl_file <- renderPrint({ select_xl_file() })
     # Indiquer message d'erreur
     output$xl_errors_msg <- renderText({paste0(
       "Nom Onglet 1:", nl(),
