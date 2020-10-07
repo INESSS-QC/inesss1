@@ -100,20 +100,26 @@ formulaire <- function() {
               width = 4,
               # Type de code à analyser - sélection de la variable d'analyse
               selectInput("typevar", "Type variable",
-                          choices = c("DENOM", "DIN", "AHFS"),
+                          choices = c("DENOM", "DIN"),
                           selected = "DENOM"),
               # Codes d'analyse
               textAreaInput("codes", "Codes"),
               # Statistiques
               checkboxGroupInput(
                 "stats", "Statistiques",
-                choices = c("Cout", "CoutTotal", "DureeTx", "Honoraire",
-                            "nRx", "QteRx", "uniqID", "uniqRx")
+                choices = c("Coût" = "COUT", "Honoraire" = "HONORAIRE",
+                            "Coût total" = "COUT_TOT",
+                            "ID uniques" = "ID_UNIQUE", "Durée traitements" = "DUREE_TX",
+                            "Rx uniques" = "RX_UNIQUE", "Rx nombre" = "RX_NBRE",
+                            "Rx quantité" = "RX_QTE"),
+                selected = c("ID_UNIQUE", "RX_NBRE",
+                             "COUT", "HONORAIRE", "COUT_TOT",
+                             "RX_QTE", "DUREE_TX")
               ),
               # Ajout Information
               checkboxGroupInput(
                 "addinfo", "Ajout Information",
-                choices = c("Nom", "Type Variable", "Nom Service")
+                choices = c("Nom", "DENOM", "Nom Service")
               )
             ),
             column(
@@ -121,10 +127,12 @@ formulaire <- function() {
               # Grouper par
               checkboxGroupInput(
                 "groupby", "Grouper par",
-                choices = c("An", "Trimestre", "Code", "Format", "CodeService",
+                choices = c("Année" = "ANNEE", "Trimestre",
+                            "Codes" = "CODES", "Format",
+                            "CodeService",
                             "TypeService", "Age", "CodeSelection", "ServiceInclu",
                             "Teneur"),
-                selected = c("An", "Code")
+                selected = c("ANNEE", "CODES")
               ),
               # Exclusion Code Service
               textInput("excl_code_serv", "Exclusion Code Service",
@@ -252,21 +260,13 @@ formulaire <- function() {
       )
     })
     # SQL query à afficher
-    output$query_simple_req <- renderText({paste0(
-      "SELECT", nl(),
-      indent(), "Extract (YEAR From SMED_DAT_SERV) AS Annee,", nl(),
-      indent(), "SMED_COD_DENOM_COMNE AS DC,", nl(),
-      indent(), "Sum (SMED_MNT_AUTOR_MED) AS Cout,", nl(),
-      indent(), "Sum (SMED_MNT_AUTOR_FRAIS_SERV) AS Honor,", nl(),
-      indent(), "Sum (SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) AS CoutTot", nl(),
-      "FROM Prod.V_DEM_PAIMT_MED_CM", nl(),
-      "WHERE", nl(),
-      indent(), "SMED_DAT_SERV BETWEEN '2019-01-01' AND '2019-12-31'", nl(),
-      indent(), "AND SMED_COD_DENOM_COMNE IN ('47092','47135')", nl(),
-      indent(), "AND (SMED_COD_SERV_1 NOT = '1' OR SMED_COD_SERV_1 IS NULL)", nl(),
-      "GROUP BY Annee, DC", nl(),
-      "ORDER BY Annee, DC;"
-    )})
+    output$query_simple_req <- renderText({
+      txt <- stat_gen1_txt_query_1period(DatesDebut()[1], DatesFin()[1],
+                                         TypeVar(), Codes(),
+                                         Statistiques(), GroupBy(),
+                                         ExcluCodeServ(), CategorieListe())
+      return(txt)
+    })
 
     # Extraire les valeurs des arguments
     DatesDebut <- reactive({

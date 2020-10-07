@@ -1,3 +1,11 @@
+#' Utils
+#'
+#' FROM clause de SQL
+#'
+#' @param bd Nom de la base de données. Souvent `PROD`.
+#' @param vue Nom de la vue.
+#'
+#' @export
 from_bd.vue <- function(bd = "Prod", vue = "V_DEM_PAIMT_MED_CM") {
   ### Provenance des données
   return(paste0("from ",bd,".",vue))
@@ -41,6 +49,6 @@ indent <- function(niv = 1) {
 #' @keywords internal
 #' @return c("x", "y") -> "'x','y'"
 #' @export
-q <- function(x) {
-  return(paste(paste0("'",x,"'"), collapse = ","))
+qu <- function(x) {
+  return(paste(paste0("'",x,"'"), collapse = ", "))
 }
