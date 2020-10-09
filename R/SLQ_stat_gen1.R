@@ -4,8 +4,8 @@
 #'
 #' @param DateDebut Date de début d'étude.
 #' @param DateFin Date de fin d'étude
-#' @param TypeVar 'DENOM' ou 'DIN'.
-#' @param Codes Codes à l'étude selon `TypeVar`.
+#' @param Variable 'DENOM' ou 'DIN'.
+#' @param Codes Codes à l'étude selon `Variable`.
 #' @param Stats Vecteur indiquant les statistiques à afficher.
 #' @param GroupBy  Vecteur indiquant les *group by*, par exemple Années, Code, ...
 #' @param ExcluCodeServ Codes de service à exclure
@@ -16,64 +16,95 @@
 #' @export
 stat_gen1_txt_query_1period <- function(
   DateDebut, DateFin,
-  TypeVar, Codes, Stats, GroupBy,
+  Variable, Codes, Stats, GroupBy,
   ExcluCodeServ, CategorieListe
 ) {
 
 
 # Internal FCTS -----------------------------------------------------------
 
+  cols_dates <- function(DateDebut, DateFin) {
+    return(paste0(
+      indent(),qu(DateDebut)," as DEBUT,\n",
+      indent(),qu(DateFin)," as FIN,\n"
+    ))
+  }
   groupby_ANNEE <- function(GroupBy) {
-    if ("ANNEE" %in% GroupBy) {
+    if (!is.null(GroupBy) && "ANNEE" %in% GroupBy) {
       return(paste0(indent(),"extract(year from SMED_DAT_SERV) as ANNEE,\n"))
     } else {
       return("")
     }
   }
-  groupby_CODE <- function(GroupBy, TypeVar) {
-    if ("CODES" %in% GroupBy) {
-      if (TypeVar == "DENOM") {
+  groupby_CODES <- function(GroupBy, Variable) {
+    if (!is.null(GroupBy) && "CODES" %in% GroupBy) {
+      if (Variable == "DENOM") {
         return(paste0(indent(),"SMED_COD_DENOM_COMNE as DENOM,\n"))
-      } else if (TypeVar == "DIN") {
+      } else if (Variable == "DIN") {
         return(paste0(indent(),"SMED_COD_DIN as DIN,\n"))
       }
     } else {
       return("")
     }
   }
-  stats_COUT <- function(Stats) {
-    if ("COUT" %in% Stats) {
-      return(paste0(indent(),"sum(SMED_MNT_AUTOR_MED) as COUT,\n"))
+  stats_COHORTE <- function(Stats) {
+    if (!is.null(Stats) && "COHORTE" %in% Stats) {
+      return(paste0(indent(),"count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,\n"))
     } else {
       return("")
     }
   }
-  stats_COUT_TOT <- function(Stats) {
-    if ("COUT_TOT" %in% Stats) {
-      return(paste0(indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as COUT_TOT,\n"))
+  stats_DUREE_TX <- function(Stats) {
+    if (!is.null(Stats) && "DUREE_TX" %in% Stats) {
+      return(paste0(indent(),"sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX,\n"))
     } else {
       return("")
     }
   }
-  stats_HONORAIRE <- function(Stats) {
-    if ("HONORAIRE" %in% Stats) {
-      return(paste0(indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV) as HONORAIRE,\n"))
+  stats_MNT_MED <- function(Stats) {
+    if (!is.null(Stats) && "MNT_MED" %in% Stats) {
+      return(paste0(indent(),"sum(SMED_MNT_AUTOR_MED) as MNT_MED,\n"))
     } else {
       return("")
     }
   }
-  stats_ID_UNIQUE <- function(Stats) {
-    if ("ID_UNIQUE" %in% Stats) {
-      return(paste0(indent(),"count(distinct SMED_NO_INDIV_BEN_BANLS) as ID_UNIQUE,\n"))
+  stats_MNT_SERV <- function(Stats) {
+    if (!is.null(Stats) && "MNT_SERV" %in% Stats) {
+      return(paste0(indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n"))
     } else {
       return("")
     }
   }
-  where_codes <- function(Codes, TypeVar) {
-    if (TypeVar == "DENOM") {
-      return(paste0(indent(),"and SMED_COD_DENOM_COMNE in (",paste(Codes, collapse = ", "),")\n"))
-    } else if (TypeVar == "DIN") {
-      return(paste0(indent(),"and SMED_COD_DIN in (",paste(Codes, collapse = ", "),")\n"))
+  stats_MNT_TOT <- function(Stats) {
+    if (!is.null(Stats) && "MNT_TOT" %in% Stats) {
+      return(paste0(indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n"))
+    } else {
+      return("")
+    }
+  }
+  stats_NBRE_RX <- function(Stats) {
+    if (!is.null(Stats) && "NBRE_RX" %in% Stats) {
+      return(paste0(indent(),"count(*) as NBRE_RX,\n"))
+    } else {
+      return("")
+    }
+  }
+  stats_QTE_MED <- function(Stats) {
+    if (!is.null(Stats) && "QTE_MED" %in% Stats) {
+      return(paste0(indent(),"sum(SMED_QTE_MED) as QTE_MED,\n"))
+    } else {
+      return("")
+    }
+  }
+  where_codes <- function(Codes, Variable) {
+    if (!is.null(Codes)) {
+      if (Variable == "DENOM") {
+        return(paste0(indent(),"and SMED_COD_DENOM_COMNE in (",paste(Codes, collapse = ", "),")\n"))
+      } else if (Variable == "DIN") {
+        return(paste0(indent(),"and SMED_COD_DIN in (",paste(Codes, collapse = ", "),")\n"))
+      }
+    } else {
+      return("")
     }
   }
   where_dates_etude <- function(DateDebut, DateFin) {
@@ -84,7 +115,6 @@ stat_gen1_txt_query_1period <- function(
       DateFin <- DateDebut
       DateDebut <- DateFin_0
     }
-
     return(paste0("SMED_DAT_SERV between '",DateDebut,"' and '",DateFin,"'\n"))
   }
   where_codes_serv <- function(ExcluCodeServ) {
@@ -100,16 +130,20 @@ stat_gen1_txt_query_1period <- function(
 
   query <- paste0(
     "select", nl(),
+    cols_dates(DateDebut, DateFin),
     groupby_ANNEE(GroupBy),
-    groupby_CODE(GroupBy, TypeVar),
-    stats_ID_UNIQUE(Stats),
-    stats_COUT(Stats),
-    stats_HONORAIRE(Stats),
-    stats_COUT_TOT(Stats),
+    groupby_CODES(GroupBy, Variable),
+    stats_MNT_MED(Stats),
+    stats_MNT_SERV(Stats),
+    stats_MNT_TOT(Stats),
+    stats_COHORTE(Stats),
+    stats_NBRE_RX(Stats),
+    stats_QTE_MED(Stats),
+    stats_DUREE_TX(Stats),
     from_bd.vue("PROD", "V_DEM_PAIMT_MED_CM"),nl(),
     "where ",
     where_dates_etude(DateDebut, DateFin),
-    where_codes(Codes, TypeVar),
+    where_codes(Codes, Variable),
     where_codes_serv(ExcluCodeServ)
   )
 
@@ -121,11 +155,11 @@ stat_gen1_txt_query_1period <- function(
 
 }
 
-DateDebut = "2020-10-06"
-DateFin = "2020-10-06"
-TypeVar = "DENOM"
-Codes = "65"
-Stats = c("COUT", "HONORAIRE", "COUT_TOT", "ID_UNIQUE", "DUREE_TX", "RX_NOMBRE", "RX_QTE")
-GroupBy = c("ANNEE", "CODES")
-ExcluCodeServ = "1"
-CategorieListe = NULL
+# DateDebut = "2020-10-06"
+# DateFin = "2020-10-06"
+# Variable = "DENOM"
+# Codes = "65"
+# Stats = c("COUT", "HONORAIRE", "COUT_TOT", "ID_UNIQUE", "DUREE_TX", "RX_NOMBRE", "RX_QTE")
+# GroupBy = c("ANNEE", "CODES")
+# ExcluCodeServ = "1"
+# CategorieListe = NULL

@@ -20,3 +20,22 @@ nl <- function() {
   ### nl = New line = '\n'
   return("\n")
 }
+
+
+#' Utils
+#'
+#' Supprime les NA du vecteur. Renvoie NULL si aucune valeur.
+#'
+#' @param x Vecteur
+#'
+#' @keywords internal
+#' @export
+rmNA <- function(x) {
+  if (anyNA(x)) {
+    x <- x[!is.na(x)]
+    if (length(x) == 0) {
+      return(NULL)
+    }
+  }
+  return(x)
+}

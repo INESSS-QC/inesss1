@@ -7,7 +7,7 @@
 stat_gen1_txt_query_1period(
   DateDebut,
   DateFin,
-  TypeVar,
+  Variable,
   Codes,
   Stats,
   GroupBy,
@@ -20,9 +20,9 @@ stat_gen1_txt_query_1period(
 
 \item{DateFin}{Date de fin d'étude}
 
-\item{TypeVar}{'DENOM' ou 'DIN'.}
+\item{Variable}{'DENOM' ou 'DIN'.}
 
-\item{Codes}{Codes à l'étude selon \code{TypeVar}.}
+\item{Codes}{Codes à l'étude selon \code{Variable}.}
 
 \item{Stats}{Vecteur indiquant les statistiques à afficher.}
 
