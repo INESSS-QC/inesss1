@@ -29,22 +29,18 @@ stat_gen1_txt_query_1period <- function(
       indent(),qu(DateFin)," as FIN,\n"
     ))
   }
-  groupby_ANNEE <- function(GroupBy) {
+  select_ANNEE <- function(GroupBy) {
     if (!is.null(GroupBy) && "ANNEE" %in% GroupBy) {
       return(paste0(indent(),"extract(year from SMED_DAT_SERV) as ANNEE,\n"))
     } else {
       return("")
     }
   }
-  groupby_CODES <- function(GroupBy, Variable) {
-    if (!is.null(GroupBy) && "CODES" %in% GroupBy) {
-      if (Variable == "DENOM") {
-        return(paste0(indent(),"SMED_COD_DENOM_COMNE as DENOM,\n"))
-      } else if (Variable == "DIN") {
-        return(paste0(indent(),"SMED_COD_DIN as DIN,\n"))
-      }
-    } else {
-      return("")
+  select_CODES <- function(Variable) {
+    if (Variable == "DENOM") {
+      return(paste0(indent(),"SMED_COD_DENOM_COMNE as DENOM,\n"))
+    } else if (Variable == "DIN") {
+      return(paste0(indent(),"SMED_COD_DIN as DIN,\n"))
     }
   }
   stats_COHORTE <- function(Stats) {
@@ -124,6 +120,28 @@ stat_gen1_txt_query_1period <- function(
       return(paste0(indent(),"and (SMED_COD_SERV_1 not in (",qu(ExcluCodeServ),") or SMED_COD_SERV_1 is null)\n"))
     }
   }
+  groupby_orderby <- function(GroupBy, Variable) {
+
+    # Vérifier s'il y a une année
+    if (!is.null(GroupBy) && "ANNEE" %in% GroupBy) {
+      an <- "ANNEE, "
+    } else {
+      an <- ""
+    }
+    # Déterminer le type de variable
+    if (Variable == "DENOM") {
+      by_var <- "DENOM"
+    } else if (Variable == "DIN") {
+      by_var <- "DIN"
+    }
+
+    return(paste0(
+      "group by ", an, by_var,"\n",
+      "order by ", an, by_var
+    ))
+
+  }
+
 
 
 # Principal FCT -----------------------------------------------------------
@@ -131,8 +149,8 @@ stat_gen1_txt_query_1period <- function(
   query <- paste0(
     "select", nl(),
     cols_dates(DateDebut, DateFin),
-    groupby_ANNEE(GroupBy),
-    groupby_CODES(GroupBy, Variable),
+    select_ANNEE(GroupBy),
+    select_CODES(Variable),
     stats_MNT_MED(Stats),
     stats_MNT_SERV(Stats),
     stats_MNT_TOT(Stats),
@@ -144,7 +162,8 @@ stat_gen1_txt_query_1period <- function(
     "where ",
     where_dates_etude(DateDebut, DateFin),
     where_codes(Codes, Variable),
-    where_codes_serv(ExcluCodeServ)
+    where_codes_serv(ExcluCodeServ),
+    groupby_orderby(GroupBy, Variable)
   )
 
   # Supprimer la virgule du dernier SELECT
@@ -154,12 +173,12 @@ stat_gen1_txt_query_1period <- function(
   return(query)
 
 }
-
-# DateDebut = "2020-10-06"
-# DateFin = "2020-10-06"
-# Variable = "DENOM"
-# Codes = "65"
-# Stats = c("COUT", "HONORAIRE", "COUT_TOT", "ID_UNIQUE", "DUREE_TX", "RX_NOMBRE", "RX_QTE")
-# GroupBy = c("ANNEE", "CODES")
-# ExcluCodeServ = "1"
-# CategorieListe = NULL
+#
+DateDebut = "2020-10-06"
+DateFin = "2020-10-06"
+Variable = "DENOM"
+Codes = "65"
+Stats = c("MNT_MED", "MNT_SERV", "MNT_TOT", "COHORTE", "NBRE_RX", "DUREE_TX", "QTE_MED")
+GroupBy = c("ANNEE")
+ExcluCodeServ = "1"
+CategorieListe = NULL

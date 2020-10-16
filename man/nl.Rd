@@ -4,7 +4,10 @@
 \alias{nl}
 \title{Utils}
 \usage{
-nl()
+nl(x = 1)
+}
+\arguments{
+\item{x}{Nombre de fois que l'on répète le retour de ligne.}
 }
 \value{
 '\\n'
