@@ -16,8 +16,8 @@
 #' @export
 stat_gen1_txt_query_1period <- function(
   DateDebut, DateFin,
-  Variable, Codes, Stats, GroupBy,
-  ExcluCodeServ, CategorieListe
+  Variable = "DENOM", Codes, Stats = NULL, GroupBy = NULL,
+  ExcluCodeServ = 1, CategorieListe = NULL
 ) {
 
 
@@ -104,9 +104,9 @@ stat_gen1_txt_query_1period <- function(
     }
   }
   where_dates_etude <- function(DateDebut, DateFin) {
-    # Inverser les valeurs de debut et fin si l'utilisateur a mis la fin avant
-    # le debut
     if (DateDebut > DateFin) {
+      # Inverser les valeurs de debut et fin si l'utilisateur a mis la fin avant
+      # le debut
       DateFin_0 <- DateFin
       DateFin <- DateDebut
       DateDebut <- DateFin_0
@@ -142,8 +142,6 @@ stat_gen1_txt_query_1period <- function(
 
   }
 
-
-
 # Principal FCT -----------------------------------------------------------
 
   query <- paste0(
@@ -163,7 +161,8 @@ stat_gen1_txt_query_1period <- function(
     where_dates_etude(DateDebut, DateFin),
     where_codes(Codes, Variable),
     where_codes_serv(ExcluCodeServ),
-    groupby_orderby(GroupBy, Variable)
+    groupby_orderby(GroupBy, Variable),
+    ";"
   )
 
   # Supprimer la virgule du dernier SELECT
@@ -173,12 +172,3 @@ stat_gen1_txt_query_1period <- function(
   return(query)
 
 }
-#
-DateDebut = "2020-10-06"
-DateFin = "2020-10-06"
-Variable = "DENOM"
-Codes = "65"
-Stats = c("MNT_MED", "MNT_SERV", "MNT_TOT", "COHORTE", "NBRE_RX", "DUREE_TX", "QTE_MED")
-GroupBy = c("ANNEE")
-ExcluCodeServ = "1"
-CategorieListe = NULL

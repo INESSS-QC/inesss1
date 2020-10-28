@@ -1,7 +1,7 @@
 #' Utils
 #'
 #' Convertir une date Excel au format CHR en Date R. Soit une valeur 'AAAA-MM-JJ'
-#' ou un nombre entier, mais au format CHR (spécifié par l'utilisateur).
+#' ou un nombre entier, mais au format CHR.
 #'
 #' @param x Vecteur contenant les dates Excel au format entier.
 #' @keywords internal
@@ -13,7 +13,7 @@ as_date_excel_chr <- function(x) {
     if (nchar(x) == 10 && str_sub(x, 5, 5) == "-" && str_sub(x, 8, 8) == "-") {
       return(as_date(x))
     } else {
-      return(as_date(as.numeric(x)) - 25569)
+      return(as_date(as.numeric(x)) - 25569L)
     }
   } else {
     stop("as_date_excel_chr(): x doit être au format character.")
@@ -29,8 +29,7 @@ as_date_excel_chr <- function(x) {
 #' @keywords internal
 #' @export
 as_price <- function(x) {
-  if (!is.numeric(x))
-    x <- as.numeric(x)
+  if (!is.numeric(x)) x <- as.numeric(x)
   return(round(x, 2))
 }
 

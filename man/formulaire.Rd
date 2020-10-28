@@ -2,10 +2,10 @@
 % Please edit documentation in R/formulaire.R
 \name{formulaire}
 \alias{formulaire}
-\title{Requêtes SQL}
+\title{Formulaire Shiny}
 \usage{
 formulaire()
 }
 \description{
-Formulaire Shiny permettant d'exécuter une ou plusieurs requêtes.
+Formulaire Shiny
 }

@@ -7,12 +7,12 @@
 stat_gen1_txt_query_1period(
   DateDebut,
   DateFin,
-  Variable,
+  Variable = "DENOM",
   Codes,
-  Stats,
-  GroupBy,
-  ExcluCodeServ,
-  CategorieListe
+  Stats = NULL,
+  GroupBy = NULL,
+  ExcluCodeServ = 1,
+  CategorieListe = NULL
 )
 }
 \arguments{

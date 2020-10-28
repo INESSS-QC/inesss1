@@ -6,7 +6,7 @@
 #' @param vue Nom de la vue.
 #'
 #' @export
-from_bd.vue <- function(bd = "Prod", vue = "V_DEM_PAIMT_MED_CM") {
+from_bd.vue <- function(bd = "PROD", vue) {
   ### Provenance des données
   return(paste0("from ",bd,".",vue))
 }

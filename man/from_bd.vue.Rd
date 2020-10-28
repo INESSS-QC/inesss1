@@ -4,7 +4,7 @@
 \alias{from_bd.vue}
 \title{Utils}
 \usage{
-from_bd.vue(bd = "Prod", vue = "V_DEM_PAIMT_MED_CM")
+from_bd.vue(bd = "PROD", vue)
 }
 \arguments{
 \item{bd}{Nom de la base de données. Souvent \code{PROD}.}

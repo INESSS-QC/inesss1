@@ -11,6 +11,6 @@ as_date_excel_chr(x)
 }
 \description{
 Convertir une date Excel au format CHR en Date R. Soit une valeur 'AAAA-MM-JJ'
-ou un nombre entier, mais au format CHR (spécifié par l'utilisateur).
+ou un nombre entier, mais au format CHR.
 }
 \keyword{internal}

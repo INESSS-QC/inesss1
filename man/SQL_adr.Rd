@@ -62,3 +62,4 @@ LGEO_COD_MUNIC : Code de municipalité.\cr
 LGEO_COD_MRC : CODE MUNICIPALITES REGIONALES DE COMTE.\cr
 LGEO_COD_AIRE_DIFSN_STCAN : Code identifiant une aire de diffusion selon Statistique Canada.
 }
+\keyword{internal}
