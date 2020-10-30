@@ -601,15 +601,7 @@ formulaire_old <- function() {
     })
     # SQL query à afficher
     maj_requete <- eventReactive(input$maj_requete, {
-      stat_gen1_txt_query_1period(
-        DateDebut = find_datesX(input, "debut")[1],
-        DateFin = find_datesX(input, "fin")[1],
-        Variable = input$variable, Codes = find_codes(input),
-        Stats = c("MNT_MED", "MNT_SERV", "MNT_TOT", "COHORTE",
-                  "NBRE_RX", "DUREE_TX", "QTE_MED"),
-        GroupBy = input$groupby,
-        ExcluCodeServ = input$excl_code_serv
-      )
+      ""
     })
     output$query_simple_req <- renderText({ maj_requete() })
 

@@ -5,7 +5,8 @@
 #' @importFrom odbc dbConnect odbc
 #' @import shiny
 #' @import shinydashboard
-#' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton
+#' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath
+#' @importFrom stringr str_split
 #' @export
 formulaire <- function() {
 
@@ -15,11 +16,21 @@ formulaire <- function() {
   library(shiny)
   library(shinydashboard)
   library(shinyFiles)
-
   library(stringr)
+  library(writexl)
 
 # Fonctions ---------------------------------------------------------------
 
+  adapt_code_serv <- function(code_serv) {
+    ### Séparer des groupes de codes de service en valeurs uniques pour les
+    ### requêtes SQL
+
+    if ("L, M, M1 à M3" %in% code_serv) {
+      code_serv <- code_serv[code_serv != "L, M, M1 à M3"]
+      code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
+    }
+    return(code_serv)
+  }
   create_dt_code_list_med <- function() {
     ### Data conteant tous les codes de liste de médicament ainsi que leur
     ### description
@@ -37,7 +48,43 @@ formulaire <- function() {
     dt <- setkey(dt, code)
     return(dt)
   }
-  find_sg1_date <- function(input, method = "deb") {
+  save_EXCEL_data_args_query <- function(dt, args_list, query, save_path) {
+    ### Enregistrer au format EXCEL le tableau des résultats, ajouter les arguments
+    ### du formulaire ainsi que la requête en lien avec ces arguments.
+
+    # Déterminer le nombre de lignes que l'onglet Excel doit avoir.
+    query <- data.table(`Requête SQL` = str_split(query, "\n")[[1]]) # séparer la chaine de caractères en vecteur
+    nb_row <- max(nrow(dt), sapply(args_list, length), nrow(query))  # nbre de lignes nécessaires
+
+    # Ajouter des valeurs à tous les éléments qui ont une longueur < nb_row
+    if (nrow(dt) < nb_row) {
+      dt <- rbind(dt, data.table(DATE_DEBUT = rep(NA, nb_row - nrow(dt))), fill = TRUE)
+    }
+    for (i in 1:length(args_list)) {
+      if (length(args_list[[i]]) < nb_row) {
+        args_list[[i]] <- c(args_list[[i]], rep(NA, nb_row - length(args_list[[i]])))
+      }
+    }
+    if (nrow(query) < nb_row) {
+      query <- rbind(query, data.table(`Requête SQL` = rep(NA, nb_row - nrow(query))))
+    }
+
+    # Regrouper tous les éléments ensemble dans un même tableau
+    tab_to_export <- cbind(
+      dt,
+      data.table(v_1 = rep(NA, nb_row),  # espaces pour séparer les éléments
+                 v_2 = rep(NA, nb_row), v_3 = rep(NA, nb_row)),
+      as.data.table(args_list),
+      data.table(v_4 = rep(NA, nb_row),
+                 v_5 = rep(NA, nb_row), v_6 = rep(NA, nb_row)),
+      query
+    )
+    setnames(tab_to_export, paste0("v_",1:6), rep("", 6))  # supprimer le nom des colonnes pour espacement
+
+    write_xlsx(tab_to_export, save_path$datapath)
+
+  }
+  sg1_find_date <- function(input, method = "deb") {
     ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
     ### (method = "fin") qui se retrouvent dans input.
 
@@ -46,7 +93,7 @@ formulaire <- function() {
     } else if (method == "fin") {
       type_date <- 2L
     } else {
-      stop("formulaire.find_sg1_date(): valeurs permises de method = {'deb', 'fin'}.")
+      stop("formulaire.sg1_find_date(): valeurs permises de method = {'deb', 'fin'}.")
     }
 
     if (is.null(input$sg1_date1)) {
@@ -61,7 +108,7 @@ formulaire <- function() {
       return(vec)
     }
   }
-  find_sg1_code <- function(input) {
+  sg1_find_code <- function(input) {
     ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
     ### input.
 
@@ -88,6 +135,19 @@ formulaire <- function() {
     dt <- dt_code_serv[code %in% c("1", "A", "AD", "I", "L, M, M1 à M3", "Q", "RA")]
     dt[, ch_name := paste0(code," : ",desc), .(code)]
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+  }
+  shinyFiles_directories <- function(input_name, method) {
+    ### Créer le répertoire à partir d'un shinyFileButton
+
+    if (is.integer(input_name)) {
+      return(NULL)
+    } else if (method == "save") {
+      return(parseSavePath(Volumes_path(), input_name))
+    } else if (method == "file") {
+      return(parseFilePaths(Volumes_path(), input_name))
+    } else {
+      stop("formulaire.shinyFiles_directories() method valeur non permise.")
+    }
   }
   Volumes_path <- function() {
     ### Répertoires disponible sur l'ordinateur où l'on peut sélectionner ou
@@ -145,8 +205,7 @@ formulaire <- function() {
           actionButton("sql_conn", "Connexion"),
           # Indiquer l'état de la connexion
           h5("État de la connexion :"),
-          verbatimTextOutput("sql_is_conn", placeholder = TRUE),
-          verbatimTextOutput("test_conn", placeholder = TRUE)
+          verbatimTextOutput("sql_is_conn", placeholder = TRUE)
         ),
 
 
@@ -258,8 +317,7 @@ formulaire <- function() {
           # Tableau & Affichage extraction SQL
           fluidRow(
             dataTableOutput("sg1_table_req"),
-            verbatimTextOutput("sg1_code_req"),
-            verbatimTextOutput("test_sg1")
+            verbatimTextOutput("sg1_code_req")
           )
         )
       )
@@ -279,6 +337,7 @@ formulaire <- function() {
       msg = "",  # message d'erreur
       conn = NULL  # contient les paramètres de connexion à utiliser pour une requête
     )
+
     # Vérifier si les informations entrées sont correctes.
     # Enregistrer les valeurs dans 'conn_values' si c'est le cas.
     observeEvent(input$sql_conn, {
@@ -298,15 +357,9 @@ formulaire <- function() {
         }
       }
     })
+
     # Afficher l'état de la connexion
     output$sql_is_conn <- renderText({ conn_values$msg })
-    # TEST - CONNEXION
-    output$test_conn <- renderPrint({
-      list(uid = conn_values$uid,
-           pwd = conn_values$pwd,
-           msg = conn_values$msg,
-           conn = conn_values$conn)
-    })
 
 
 
@@ -370,31 +423,52 @@ formulaire <- function() {
       })
     })
 
-    # Enregistrer la requête - sg1_save
-    shinyFileSave(input, "sg1_save", roots = Volumes_path())
+    # Requête SQL
+    sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
+      data.table(DATE_DEBUT = "2018-01-01", DATE_FIN = "2018-12-31",
+                 DENOM = c(123, 789), MNT_COUT = c(45612.56, 956412.45),
+                 MNT_SERV = c(88512.56, 984512.12), MNT_TOT = c(45678.12, 451236.12))
+    })
+    # Afficher le tableau demandé
+    output$sg1_table_req <- renderDataTable({ sg1_requete_sql() })
 
-    # Exécuter la requête selon les arguments demandés
-    observeEvent(input$sg1_go_extract, {
-      output$sg1_table_req <- renderDataTable({
-        head(mtcars)
-      })
+    # Enregistrer le fichier au format EXCEL, doit avoir 1) tableau des résultats,
+    # 2) les arguments et 3) la requête SQL.
+    shinyFileSave(input, "sg1_save", roots = Volumes_path())  # bouton pour déterminer le répertoire
+    sg1_file_save <- reactive({  # répertoire de sauvegarde à partir de input$sg1_save
+      shinyFiles_directories(input$sg1_save, "save")
+    })
+    observeEvent(sg1_file_save(), {
+      save_EXCEL_data_args_query(
+        dt = sg1_requete_sql(),
+        args_list = list(
+          DATE_DEBUT = sg1_find_date(input, "deb"),
+          DATE_FIN = sg1_find_date(input, "fin"),
+          TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
+          CODE_RX = sg1_find_code(input),
+          CODE_SERV_FILTRE = input$sg1_code_serv_filter,
+          CODE_SERV = adapt_code_serv(input$sg1_code_serv),
+          CODE_LIST_FILTRE = input$sg1_code_list_filter,
+          CODE_LIST = input$sg1_code_list
+        ),
+        query = stat_gen1_txt_query_1period(
+          debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
+          type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
+          code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
+          code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+        ),
+        save_pat = sg1_file_save()
+      )
     })
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
     output$sg1_code_req <- eventReactive(input$sg1_maj_req, {
-      return("")
-    })
-
-    # TEST SG1
-    output$test_sg1 <- renderPrint({
-      list(debut = find_sg1_date(input, "deb"),
-           fin = find_sg1_date(input, "fin"),
-           type_code = input$sg1_type_Rx,
-           code = find_sg1_code(input),
-           code_serv_type = input$sg1_code_serv_filter,
-           code_serv = input$sg1_code_serv,
-           code_list_input = input$sg1_code_list_filter,
-           code_list = input$sg1_code_list)
+      stat_gen1_txt_query_1period(
+        debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
+        type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
+        code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
+        code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+      )
     })
 
   }

@@ -23,7 +23,7 @@ stat_gen1_txt_query_1period <- function(
       stop("stat_gen1_txt_query_1period.select_CODES() valeur non permise.")
     }
   }
-  where_type_rx <- function(type_Rx, codes) {
+  where_code_rx <- function(type_Rx, codes) {
     if (type_Rx == "DENOM") {
       return(paste0("and SMED_CODE_DENOM_COMNE in (",qu(codes),")\n"))
     } else if (type_Rx == "DIN") {
@@ -35,12 +35,7 @@ stat_gen1_txt_query_1period <- function(
   where_code_serv <- function(code_serv_filtre, code_serv) {
     if (is.null(code_serv)) {
       return("")
-    } else if ("L, M, M1 à M3" %in% code_serv) {
-      # Séparer les valeurs de L à M3
-      code_serv <- code_serv[code_serv != "L, M, M1 à M3"]
-      code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
-    }
-    if (code_serv_filtre == "Exclusion") {
+    } else if (code_serv_filtre == "Exclusion") {
       return(paste0(indent(),"and (SMED_COD_SERV_1 not in (",qu(code_serv),") or SMED_COD_SERV_1 is null)\n"))
     } else if (code_serv_filtre == "Sélection") {
       return(paste0(indent(),"and SMED_COD_SERV_1 in (",qu(code_serv),")\n"))
@@ -82,7 +77,7 @@ stat_gen1_txt_query_1period <- function(
     indent(),"sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n",
     from_bd.vue("PROD","V_DEM_PAIMT_MED_CM"),"\n",
     "where SMED_DAT_SERV between ",qu(debut)," and ",qu(fin),"\n",
-    indent(),where_type_rx(type_Rx, codes),
+    indent(),where_code_rx(type_Rx, codes),
     where_code_serv(code_serv_filtre, code_serv),
     where_code_list(code_list_filtre, code_list),
     "group by ",group_by(type_Rx),
