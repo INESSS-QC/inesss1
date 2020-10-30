@@ -5,32 +5,15 @@
 \title{Statistique générale}
 \usage{
 stat_gen1_txt_query_1period(
-  DateDebut,
-  DateFin,
-  Variable = "DENOM",
-  Codes,
-  Stats = NULL,
-  GroupBy = NULL,
-  ExcluCodeServ = 1,
-  CategorieListe = NULL
+  debut,
+  fin,
+  type_Rx,
+  codes,
+  code_serv,
+  code_serv_filtre,
+  code_list,
+  code_list_filtre
 )
-}
-\arguments{
-\item{DateDebut}{Date de début d'étude.}
-
-\item{DateFin}{Date de fin d'étude}
-
-\item{Variable}{'DENOM' ou 'DIN'.}
-
-\item{Codes}{Codes à l'étude selon \code{Variable}.}
-
-\item{Stats}{Vecteur indiquant les statistiques à afficher.}
-
-\item{GroupBy}{Vecteur indiquant les \emph{group by}, par exemple Années, Code, ...}
-
-\item{ExcluCodeServ}{Codes de service à exclure}
-
-\item{CategorieListe}{Categorie de liste à analyser (filtre)}
 }
 \description{
 Code de la requête SQL (châine de caractères)

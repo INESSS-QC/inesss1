@@ -14,16 +14,25 @@ from_bd.vue <- function(bd = "PROD", vue) {
 
 #' Utils
 #'
-#' Connexion entre R et SQL Teradata
+#' Connexion entre R et SQL Teradata.
 #'
 #' @param dsn **D**ata **S**ource **N**ame.
 #' @param uid User Identifier.
 #' @param pwd Password to use.
 #'
+#' @return Connexion Teradata, sinon `NULL`.
 #' @importFrom odbc odbc dbConnect
+#' @importFrom testthat capture_error
 #' @export
-conn <- function(dsn, uid, pwd) {
-  return(dbConnect(odbc(), dsn, uid = uid, pwd = pwd))
+sql_connexion <- function(dsn, uid, pwd, encoding = "latin1") {
+  is_error <- capture_error({  # effectuer la connexion et conserver message erreur s'il y en a
+    sql_conn <- dbConnect(odbc(), dsn, uid = uid, pwd = pwd, encoding = encoding)
+  })
+  if (is.null(is_error)) {
+    return(sql_conn)
+  } else {
+    return(NULL)
+  }
 }
 
 
@@ -36,7 +45,6 @@ conn <- function(dsn, uid, pwd) {
 #' @return Quatre (4) espaces répétés `niv` fois.
 #' @export
 indent <- function(niv = 1) {
-  #### Indentation du code
   return(paste0(rep("    ", niv)))
 }
 

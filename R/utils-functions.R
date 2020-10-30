@@ -34,6 +34,28 @@ as_price <- function(x) {
 }
 
 
+#' File status
+#'
+#' Emplacement sur le disque dur où le script est sauvegardé.
+#'
+#' Si le script n'est pas sauvegardé, retourne `NULL`.
+#'
+#' @return CHR. Emplacement du dossier qui contient le script R.
+#'
+#' @importFrom rstudioapi getActiveDocumentContext
+#' @export
+#' @examples
+#' file_directory()
+file_directory <- function(){
+  dir <- dirname(getActiveDocumentContext()$path)
+  if(dir == ""){
+    return(NULL)
+  } else {
+    return(dir)
+  }
+}
+
+
 #' Utils
 #'
 #' @param x Nombre de fois que l'on répète le retour de ligne.

@@ -1,19 +1,42 @@
 #' Formulaire Shiny
 #'
+#' @import data.table
 #' @importFrom fs path_home
+#' @importFrom odbc dbConnect odbc
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton
 #' @export
 formulaire <- function() {
 
+  library(data.table)
   library(fs)
+  library(odbc)
   library(shiny)
   library(shinydashboard)
   library(shinyFiles)
 
-# Args & Functions --------------------------------------------------------
+  library(stringr)
 
+# Fonctions ---------------------------------------------------------------
+
+  create_dt_code_list_med <- function() {
+    ### Data conteant tous les codes de liste de médicament ainsi que leur
+    ### description
+
+    dt <- PROD.V_DES_COD[TYPE_CODE == "COD_CATG_LISTE_MED", .(code = CODE, desc = CODE_DESC)]
+    return(dt)
+  }
+  create_dt_code_serv <- function() {
+    ### Data contenant la liste des codes de services et leur description
+
+    dt <- PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[, .(code = COD_SERV, desc = COD_SERV_DESC)]
+    # Codes L à M3 sont tous inclus dans le même, donc modification du data
+    dt <- dt[!code %in% c("L", "M", "M1", "M2", "M3")]
+    dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))
+    dt <- setkey(dt, code)
+    return(dt)
+  }
   find_sg1_date <- function(input, method = "deb") {
     ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
     ### (method = "fin") qui se retrouvent dans input.
@@ -54,6 +77,18 @@ formulaire <- function() {
       return(vec)
     }
   }
+  sg1_code_list_choices <- function(dt_code_list) {
+    ### Tableau indiquant les choix et les valeurs des codes de liste
+    dt <- dt_code_list[code %in% c("03", "40", "41")]
+    dt[, ch_name := paste0(code," : ",desc), .(code)]
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+  }
+  sg1_code_serv_choices <- function(dt_code_serv) {
+    ### Tableau indiquant les choix et les valeurs des codes de services
+    dt <- dt_code_serv[code %in% c("1", "A", "AD", "I", "L, M, M1 à M3", "Q", "RA")]
+    dt[, ch_name := paste0(code," : ",desc), .(code)]
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+  }
   Volumes_path <- function() {
     ### Répertoires disponible sur l'ordinateur où l'on peut sélectionner ou
     ### enregistrer un fichier.
@@ -64,6 +99,11 @@ formulaire <- function() {
       R = R.home()
     ))
   }
+
+# Datas -------------------------------------------------------------------
+
+  dt_code_list <- create_dt_code_list_med()
+  dt_code_serv <- create_dt_code_serv()
 
 # Interface Utilisateur - UI ----------------------------------------------
 
@@ -105,7 +145,8 @@ formulaire <- function() {
           actionButton("sql_conn", "Connexion"),
           # Indiquer l'état de la connexion
           h5("État de la connexion :"),
-          verbatimTextOutput("sq_is_conn", placeholder = TRUE)
+          verbatimTextOutput("sql_is_conn", placeholder = TRUE),
+          verbatimTextOutput("test_conn", placeholder = TRUE)
         ),
 
 
@@ -123,6 +164,13 @@ formulaire <- function() {
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
           # Effectuer les extractions s'il n'y a pas d'erreur
           actionButton("go_xl_extract", "Exécuter requête(s)")
+          # ---------------------------------------------------- -
+          # --- À FAIRE ---
+          # # Inscrire le ou les courriels à envoyer les résultats
+          # h5("Envoyer résultats par courriel"),
+          # textAreaInput("mails", "Courriels"),
+          # textInput("mail_obj", "Object")
+          # ---------------------------------------------------- -
         ),
 
 
@@ -139,14 +187,14 @@ formulaire <- function() {
           #     'Selection Categorie Liste', ...
           fluidRow(
             column(  # Périodes d'analyse
-              width = 4,
+              width = 3,
               # Nombre de périodes à afficher
               numericInput("sg1_nb_per", "Nombre de périodes", value = 1,
                            min = 1, max = 99),
               uiOutput("sg1_nb_per")
             ),
             column(  # Codes d'analyse
-              width = 4,
+              width = 3,
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de codes Rx", value = 1,
                            min = 1, max = 99),
@@ -156,12 +204,33 @@ formulaire <- function() {
               # Text inputs où indiquer les codes d'analyse
               uiOutput("sg1_nb_codes")
             ),
-            column(  # Autres paramètres d'analyse de la requêtes
-              width = 4
-              # Grouper Par
-              # Ajout Information
-              # Exclusion Code Service
-              # Sélection Catégorie Liste
+            column(
+              width = 3,
+              # Codes de service
+              selectInput("sg1_code_serv_filter", "Codes de Service",
+                          choices = c("Exclusion", "Sélection"),
+                          selected = "Exclusion", multiple = FALSE),
+              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+              # Codes de service
+              checkboxGroupInput(
+                "sg1_code_serv", "",
+                choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
+                choiceValues = sg1_code_serv_choices(dt_code_serv)$value,
+                selected = c("1", "AD")
+              )
+            ),
+            column(
+              width = 3,
+              # Codes liste médicaments
+              selectInput("sg1_code_list_filter", "Code Liste Médicament",
+                          choices = c("Exclusion", "Sélection"),
+                          selected = "Sélection", multiple = FALSE),
+              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+              checkboxGroupInput(
+                "sg1_code_list", "",
+                choiceNames = sg1_code_list_choices(dt_code_list)$ch_name,
+                choiceValues = sg1_code_list_choices(dt_code_list)$value
+              )
             )
           ),
 
@@ -171,17 +240,17 @@ formulaire <- function() {
           #   - Visualiser/MaJ code requête
           fluidRow(
             column(  # Bouton exécution requête
-              width = 4,
+              width = 3,
               actionButton("sg1_go_extract", "Exécuter requête")
             ),
             column(
-              width = 4,
+              width = 3,
               shinySaveButton("sg1_save", "Enregistrer requête", "Enregistrer sous...",
                               filetype = list(`Classeur EXCEL` = "xlsx"),
                               viewtype = "list")
             ),
             column(
-              width = 4,
+              width = 3,
               actionButton("sg1_maj_req", "Visualiser/MaJ code requête")
             )
           ),
@@ -189,7 +258,8 @@ formulaire <- function() {
           # Tableau & Affichage extraction SQL
           fluidRow(
             dataTableOutput("sg1_table_req"),
-            verbatimTextOutput("sg1_code_req")
+            verbatimTextOutput("sg1_code_req"),
+            verbatimTextOutput("test_sg1")
           )
         )
       )
@@ -202,9 +272,48 @@ formulaire <- function() {
 
   server <- function(input, output, session) {
 
+    #### CONNEXION SQL - tabConn
+    # Valeurs nécessaires à la connexion de teradata
+    conn_values <- reactiveValues(
+      uid = NULL, pwd = NULL,  # no utilisateur & mot de passe
+      msg = "",  # message d'erreur
+      conn = NULL  # contient les paramètres de connexion à utiliser pour une requête
+    )
+    # Vérifier si les informations entrées sont correctes.
+    # Enregistrer les valeurs dans 'conn_values' si c'est le cas.
+    observeEvent(input$sql_conn, {
+      if (input$sql_user == "" || input$sql_pwd == "") {
+        # Indiquer d'inscrire une valeur dans toutes les cases
+        conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
+      } else {
+        conn_values$conn <- sql_connexion("PEI_PRD", input$sql_user, input$sql_pwd)  # effectuer une connexion
+        if (is.null(conn_values$conn)) {
+          # Message d'erreur si la connexion ne fonctionnait pas
+          conn_values$msg <- "**Vérifier l'identifiant et le mot de passe**"
+        } else {
+          # Si pas d'erreur, on sauvegarde les paramètres de connexion
+          conn_values$uid <- toupper(input$sql_user)
+          conn_values$pwd <- input$sql_pwd
+          conn_values$msg <- paste0("Connexion : ", Sys.time())  # msg indiquant l'heure de la dernière connexion/sauvegarde
+        }
+      }
+    })
+    # Afficher l'état de la connexion
+    output$sql_is_conn <- renderText({ conn_values$msg })
+    # TEST - CONNEXION
+    output$test_conn <- renderPrint({
+      list(uid = conn_values$uid,
+           pwd = conn_values$pwd,
+           msg = conn_values$msg,
+           conn = conn_values$conn)
+    })
+
+
+
     #### REQUÊTES VIA EXCEL - tabEXCEL
     # Sélection du fichier EXCEL
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
+
 
 
     #### STATISTIQUE GENERALES - tabStatGen1
@@ -273,16 +382,19 @@ formulaire <- function() {
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
     output$sg1_code_req <- eventReactive(input$sg1_maj_req, {
-      return(stat_gen1_txt_query_1period(
-        DateDebut = find_sg1_date(input, "deb")[1],
-        DateFin = find_sg1_date(input, "fin")[1],
-        Variable = input$sg1_type_Rx, Codes = find_sg1_code(input),
-        Stats = c("MNT_MED", "MNT_SERV", "MNT_TOT",
-                  "COHORTE", "UNIQ_RX", "NBRE_RX", "QTE_MED", "DUREE_TX"),
-        GroupBy = NULL,
-        ExcluCodeServ = NULL,
-        CategorieListe = NULL
-      ))
+      return("")
+    })
+
+    # TEST SG1
+    output$test_sg1 <- renderPrint({
+      list(debut = find_sg1_date(input, "deb"),
+           fin = find_sg1_date(input, "fin"),
+           type_code = input$sg1_type_Rx,
+           code = find_sg1_code(input),
+           code_serv_type = input$sg1_code_serv_filter,
+           code_serv = input$sg1_code_serv,
+           code_list_input = input$sg1_code_list_filter,
+           code_list = input$sg1_code_list)
     })
 
   }

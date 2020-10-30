@@ -13,11 +13,14 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.1.1
 Imports:
+    askpass (>= 1.1),
     data.table (>= 1.13.2),
+    DBI (>= 1.1.0),
     fs (>= 1.5.0),
     lubridate (>= 1.7.9),
     odbc (>= 1.2.3),
     readxl (>= 1.3.1),
+    rstudioapi (>= 0.11),
     shiny (>= 1.5.0),
     shinydashboard (>= 0.7.1),
     shinyFiles (>= 0.8.0),
