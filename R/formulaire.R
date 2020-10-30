@@ -3,21 +3,46 @@
 #' @import data.table
 #' @importFrom fs path_home
 #' @importFrom odbc dbConnect odbc
+#' @importFrom readxl excel_sheets read_excel
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath
 #' @importFrom stringr str_split
+#' @importFrom writexl write_xlsx
 #' @export
 formulaire <- function() {
 
   library(data.table)
   library(fs)
   library(odbc)
+  library(readxl)
   library(shiny)
   library(shinydashboard)
   library(shinyFiles)
   library(stringr)
   library(writexl)
+
+# Variables ---------------------------------------------------------------
+
+  cols_EXCEL_file <- function() {
+    ### Colonnes nécessaires pour chaque méthode dans les
+    return(list(
+      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX",
+              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
+    ))
+  }
+  values_EXCEL_file <- function() {
+    ### Valeurs permises dans les colonnes de cols_EXCEL_file()
+    return(list(
+      sg1 = list(
+        TYPE_RX = c("DENOM", "DIN"),
+        CODE_SERV_FILTRE = c("Exclusion", "Sélection"),
+        CODE_SERV = c("1", "A", "AD", "I", "L", "M", "M1", "M2", "M3", "Q", "RA"),
+        CODE_LIST_FILTRE = c("Exclusion", "Sélection"),
+        CODE_LIST = c("03", "40", "41")
+      )
+    ))
+  }
 
 # Fonctions ---------------------------------------------------------------
 
@@ -47,6 +72,17 @@ formulaire <- function() {
     dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))
     dt <- setkey(dt, code)
     return(dt)
+  }
+  format_xl_err_nl <- function(l = 30) {
+    ### Répétition de '=' collé 'l' fois. Souvent utilisé pour une nouvelle
+    ### section
+
+    return(paste(rep("=", l), collapse = ""))
+  }
+  format_xl_err_sh <- function(name) {
+    ### Indiquer le nom de l'onglet dans les messages d'erreur = 'sh : '
+
+    return(paste0(name," :\n"))
   }
   save_EXCEL_data_args_query <- function(dt, args_list, query, save_path) {
     ### Enregistrer au format EXCEL le tableau des résultats, ajouter les arguments
@@ -149,6 +185,40 @@ formulaire <- function() {
       stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
   }
+  verif_sg1 <- function(dt, sh, msg_error) {
+    ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
+
+    cols <- cols_EXCEL_file()$sg1  # colonnes nécessaires
+    vals <- values_EXCEL_file()$sg1  # valeurs possible des colonnes
+    new_error <- TRUE  # nouvelle erreur -> indiquer nom onglet
+    init_msg_error <- msg_error  # comparer a la fin pour déterminer s'il y a une erreur
+
+    # Vérifier la présence de chaque colonne
+    for (col in cols) {
+      if (!col %in% names(dt)) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error," -  La colonne ",col," est absente.\n")
+      }
+    }
+
+    # Vérifier la valeur dans chaque colonne (celles nécessaires)
+    # DATE_DEBUT
+    if ("DATE_DEBUT" %in% names(dt)) {
+      date_deb <- rmNA(dt$DATE_DEBUT)
+      if (length(date_deb)) {
+
+      } else {
+        msg_error <- paste0(msg_error,
+          sh, " :\n",
+          " -  La colonne DATE_DEBUT ne contient pas de valeurs.\n"
+        )
+      }
+    }
+
+  }
   Volumes_path <- function() {
     ### Répertoires disponible sur l'ordinateur où l'on peut sélectionner ou
     ### enregistrer un fichier.
@@ -222,7 +292,7 @@ formulaire <- function() {
           # Indiquer les erreurs de chaque onglet s'il y a lieu
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
           # Effectuer les extractions s'il n'y a pas d'erreur
-          actionButton("go_xl_extract", "Exécuter requête(s)")
+          actionButton("go_xl_extract", "Exécuter requête(s)"),
           # ---------------------------------------------------- -
           # --- À FAIRE ---
           # # Inscrire le ou les courriels à envoyer les résultats
@@ -230,6 +300,7 @@ formulaire <- function() {
           # textAreaInput("mails", "Courriels"),
           # textInput("mail_obj", "Object")
           # ---------------------------------------------------- -
+          verbatimTextOutput("test_tabEXCEL")
         ),
 
 
@@ -366,6 +437,54 @@ formulaire <- function() {
     #### REQUÊTES VIA EXCEL - tabEXCEL
     # Sélection du fichier EXCEL
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
+    select_xl_file <- reactive({  # select_xl_file()datapath indique répertoire + nom du fichier à importer
+      shinyFiles_directories(input$select_xl_file, "file")
+    })
+
+    # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
+    xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
+
+      file <- "C:/Users/bogu5550/Desktop/Rx_stat_gen1 - Copie.xlsx" # Remplace select_xl_file()$datapath
+      sheets <- excel_sheets(file) # select_xl_file()$datapath
+      msg_error <- ""
+
+      sh = sheets[2]
+
+      # Importer chaque feuille et inscrire les messages d'erreur
+      for (sh in sheets) {
+        dt <- read_excel(file, sheet = sh, col_types = "text")
+        if (!"METHOD" %in% names(dt)) {
+          msg_error <- paste0(msg_error,
+            sh, " :\n",
+            " -  La colonne METHOD est absente.\n\n",
+            format_xl_err_nl(), "\n\n"
+          )
+        } else {
+
+        }
+      }
+
+      if (msg_error == "") {
+        return("Aucune error, exécution des requêtes possible.")
+      } else {
+        return(msg_error)
+      }
+    })
+    output$xl_errors_msg <- renderText({
+      if (is.null(select_xl_file())) {
+        return("**Importer un fichier EXCEL**")
+      } else {
+        return("TO DO")
+      }
+    })
+
+    # TEST - VOIR VALEURS
+    output$test_tabEXCEL <- renderPrint({
+      list(
+        go_button = input$go_xl_extract,
+        file_selected = select_xl_file()
+      )
+    })
 
 
 
