@@ -25,7 +25,7 @@ stat_gen1_txt_query_1period <- function(
   }
   where_code_rx <- function(type_Rx, codes) {
     if (type_Rx == "DENOM") {
-      return(paste0("and SMED_CODE_DENOM_COMNE in (",qu(codes),")\n"))
+      return(paste0("and SMED_COD_DENOM_COMNE in (",qu(codes),")\n"))
     } else if (type_Rx == "DIN") {
       return(paste0("and SMED_COD_DIN in (",paste(codes, collapse = ", "),")\n"))
     } else {
