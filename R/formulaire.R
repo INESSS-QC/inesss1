@@ -2,7 +2,7 @@
 #'
 #' @import data.table
 #' @importFrom fs path_home
-#' @importFrom odbc dbConnect odbc
+#' @importFrom odbc odbc dbConnect dbGetQuery
 #' @importFrom readxl excel_sheets read_excel
 #' @import shiny
 #' @import shinydashboard
@@ -78,7 +78,7 @@ formulaire <- function() {
     dt <- setkey(dt, code)
     return(dt)
   }
-  format_xl_err_nl <- function(l = 30) {
+  format_xl_err_nl <- function(l = 60) {
     ### Répétition de '=' collé 'l' fois. Souvent utilisé pour une nouvelle
     ### section
 
@@ -324,7 +324,7 @@ formulaire <- function() {
       if (col %in% names(dt)) {
         vec <- str_remove_all(rmNA(dt[[col]]), " ")  # extraire la valeur du tableau
         if (length(vec) == 1) {
-          if (!col %in% vals[[col]]) {
+          if (!all(vec %in% vals[[col]])) {
             if (new_error) {
               msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
               new_error <- FALSE
@@ -362,7 +362,7 @@ formulaire <- function() {
       if (col %in% names(dt)) {
         vec <- str_remove_all(rmNA(dt[[col]]), " ")
         if (length(vec)) {
-          if (!col %in% vals[[col]]) {
+          if (!all(vec %in% vals[[col]])) {
             if (new_error) {
               msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
               new_error <- FALSE
@@ -613,26 +613,40 @@ formulaire <- function() {
     # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
 
+      file <- select_xl_file()$datapath
+      # file = "Rx_stat_gen1 - Copie.xlsx"
+      sheets <- excel_sheets(file)
+      msg_error <- ""
+      # sh = sheets[3]
+
       # Importer chaque feuille et inscrire les messages d'erreur
       for (sh in sheets) {
         dt <- read_excel(file, sheet = sh, col_types = "text")
-        if (!"METHOD" %in% names(dt)) {
-          msg_error <- paste0(msg_error,
-            sh, " :\n",
-            " -  La colonne METHOD est absente.\n\n",
-            format_xl_err_nl()
-          )
-        } else {
+        if ("METHOD" %in% names(dt)) {
           method <- str_remove_all(rmNA(dt$METHOD), " ")
           if (length(method) == 1) {
-
+            if (method %in% methods_EXCEL_file()) {
+              msg_error <- verif_method()[[method]](dt, sh, msg_error)
+            } else {
+              msg_error <- paste0(msg_error,
+                sh, " :\n",
+                " -  METHOD ne contient pas une valeur permise.\n",
+                format_xl_err_nl()
+              )
+            }
           } else {
             msg_error <- paste0(msg_error,
               sh, " :\n",
-              " -  La colonne METHOD doit contenir une valeur.\n\n",
+              " -  METHOD doit contenir une valeur.\n",
               format_xl_err_nl()
             )
           }
+        } else {
+          msg_error <- paste0(msg_error,
+            sh, " :\n",
+            " -  METHOD est absente.\n",
+            format_xl_err_nl()
+          )
         }
       }
 
@@ -646,7 +660,7 @@ formulaire <- function() {
       if (is.null(select_xl_file())) {
         return("**Importer un fichier EXCEL**")
       } else {
-        return("TO DO")
+        return(xl_errors_msg())
       }
     })
 
