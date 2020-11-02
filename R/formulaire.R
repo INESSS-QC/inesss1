@@ -6,21 +6,11 @@
 #' @importFrom readxl excel_sheets read_excel
 #' @import shiny
 #' @import shinydashboard
-#' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath
+#' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath getVolumes
 #' @importFrom stringr str_split str_remove_all
 #' @importFrom writexl write_xlsx
 #' @export
 formulaire <- function() {
-
-  library(data.table)
-  library(fs)
-  library(odbc)
-  library(readxl)
-  library(shiny)
-  library(shinydashboard)
-  library(shinyFiles)
-  library(stringr)
-  library(writexl)
 
 # Variables ---------------------------------------------------------------
 

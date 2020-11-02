@@ -44,6 +44,7 @@ as_price <- function(x) {
 #'
 #' @return CHR. Emplacement du dossier qui contient le script R.
 #'
+#' @keywords internal
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @export
 #' @examples
@@ -62,6 +63,7 @@ file_directory <- function(){
 #'
 #' @param x Nombre de fois que l'on répète le retour de ligne.
 #' @return '\\n'
+#' @keywords internal
 #' @export
 nl <- function(x = 1) {
   ### nl = New line = '\n'

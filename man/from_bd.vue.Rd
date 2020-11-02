@@ -11,6 +11,10 @@ from_bd.vue(bd = "PROD", vue)
 
 \item{vue}{Nom de la vue.}
 }
+\value{
+"from \code{bd}.\code{vue}"
+}
 \description{
 FROM clause de SQL
 }
+\keyword{internal}

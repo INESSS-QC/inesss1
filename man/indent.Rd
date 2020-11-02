@@ -15,3 +15,4 @@ Quatre (4) espaces répétés \code{niv} fois.
 \description{
 Indentation du code
 }
+\keyword{internal}

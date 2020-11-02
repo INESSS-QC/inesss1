@@ -18,3 +18,4 @@ Si le script n'est pas sauvegardé, retourne \code{NULL}.
 \examples{
 file_directory()
 }
+\keyword{internal}
