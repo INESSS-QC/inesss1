@@ -1,12 +1,12 @@
 Package: inesss
 Title: Institut National Excellence Sante Services Sociaux
-Version: 1.0.0
+Version: 0.9.0
 Authors@R: 
     person(given = "Guillaume",
            family = "Boucher",
            role = c("aut", "cre"),
            email = "guillaume.boucher@inesss.qc.ca")
-Description: Ce paquet fournit des fonctionnalités pour une variétés de tâches propices au domaine de la santé et des outils pour visualiser les résultats.
+Description: Cette librairie fournit des fonctionnalités pour une variétés de tâches propices au domaine de la santé et des outils pour visualiser les résultats.
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
