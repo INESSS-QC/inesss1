@@ -31,6 +31,7 @@
 #' @param save_ext Extension du fichier à enregistrer. `"rds"`, `"csv"` ou `"txt"`.
 #'
 #' @import data.table
+#' @keywords internal
 #' @export
 SQL_adr <- function(
   user,
