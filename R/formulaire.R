@@ -26,9 +26,9 @@ formulaire <- function() {
     return(list(
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
-        CODE_SERV_FILTRE = c("Exclusion", "Sélection"),
-        CODE_SERV = c("1", "A", "AD", "I", "L", "M", "M1", "M2", "M3", "Q", "RA"),
-        CODE_LIST_FILTRE = c("Exclusion", "Sélection"),
+        CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
+        CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
+        CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
         CODE_LIST = c("03", "40", "41")
       )
     ))
@@ -50,6 +50,16 @@ formulaire <- function() {
       code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
     }
     return(code_serv)
+  }
+  cols_select_from_method <- function(dt, method) {
+    ### Puisque l'onglet Excel peut contenir des colonnes facultatives pour le
+    ### formulaire, on doit les supprimer après l'avoir importé.
+    ### Possible de le faire rapidement grâce à cols_EXCEL_file()
+    if (method == "stat_gen1") {
+      cols <- names(dt)[names(dt) %in% c("METHOD", cols_EXCEL_file()$sg1)]
+    }
+    dt <- dt[, ..cols]
+    return(dt)
   }
   create_dt_code_list_med <- function() {
     ### Data conteant tous les codes de liste de médicament ainsi que leur
@@ -356,6 +366,9 @@ formulaire <- function() {
       if (col %in% names(dt)) {
         vec <- str_remove_all(rmNA(dt[[col]]), " ")
         if (length(vec)) {
+          if (col == "CODE_SERV") {
+            vec <- adapt_code_serv(vec)
+          }
           if (!all(vec %in% vals[[col]])) {
             if (new_error) {
               msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
@@ -377,7 +390,7 @@ formulaire <- function() {
     return(msg_error)
 
   }
-  verif_method <- function(method) {
+  verif_method <- function() {
     ### Détermine la fonction vérification à utiliser selon la méthode
 
     return(list(stat_gen1 = verif_sg1))
@@ -502,7 +515,7 @@ formulaire <- function() {
               width = 3,
               # Codes de service
               selectInput("sg1_code_serv_filter", "Codes de Service",
-                          choices = c("Exclusion", "Sélection"),
+                          choices = c("Exclusion", "Inclusion"),
                           selected = "Exclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               # Codes de service
@@ -517,8 +530,8 @@ formulaire <- function() {
               width = 3,
               # Codes liste médicaments
               selectInput("sg1_code_list_filter", "Code Liste Médicament",
-                          choices = c("Exclusion", "Sélection"),
-                          selected = "Sélection", multiple = FALSE),
+                          choices = c("Exclusion", "Inclusion"),
+                          selected = "Inclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               checkboxGroupInput(
                 "sg1_code_list", "",
@@ -576,6 +589,7 @@ formulaire <- function() {
     # Vérifier si les informations entrées sont correctes.
     # Enregistrer les valeurs dans 'conn_values' si c'est le cas.
     observeEvent(input$sql_conn, {
+      showNotification("Connexion en cours...", id = "sql_conn", type = "message", duration = NULL)
       if (input$sql_user == "" || input$sql_pwd == "") {
         # Indiquer d'inscrire une valeur dans toutes les cases
         conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
@@ -591,6 +605,7 @@ formulaire <- function() {
           conn_values$msg <- paste0("Connexion : ", Sys.time())  # msg indiquant l'heure de la dernière connexion/sauvegarde
         }
       }
+      removeNotification("sql_conn")
     })
 
     # Afficher l'état de la connexion
@@ -607,20 +622,21 @@ formulaire <- function() {
 
     # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
+      showNotification("Vérification en cours...", id = "xl_errors_msg", type = "message", duration = NULL)
 
       file <- select_xl_file()$datapath
-      # file = "Rx_stat_gen1 - Copie.xlsx"
       sheets <- excel_sheets(file)
       msg_error <- ""
-      # sh = sheets[3]
-
       # Importer chaque feuille et inscrire les messages d'erreur
       for (sh in sheets) {
-        dt <- read_excel(file, sheet = sh, col_types = "text")
+        suppressMessages(suppressWarnings({  # supprime avertissements puisque les tableaux sont irréguliers
+          dt <- as.data.table(read_excel(file, sheet = sh, col_types = "text"))
+        }))
         if ("METHOD" %in% names(dt)) {
           method <- str_remove_all(rmNA(dt$METHOD), " ")
           if (length(method) == 1) {
             if (method %in% methods_EXCEL_file()) {
+              dt <- cols_select_from_method(dt, method)
               msg_error <- verif_method()[[method]](dt, sh, msg_error)
             } else {
               msg_error <- paste0(msg_error,
@@ -645,109 +661,110 @@ formulaire <- function() {
         }
       }
 
+      removeNotification("xl_errors_msg")
       if (msg_error == "") {
-        return("Aucune error, exécution des requêtes possible.")
+        return("Aucune error, exécution possible.")
       } else {
         return(msg_error)
       }
     })
-    output$xl_errors_msg <- renderText({
-      if (is.null(select_xl_file())) {
-        return("**Importer un fichier EXCEL**")
-      } else {
-        return(xl_errors_msg())
-      }
-    })
+    output$xl_errors_msg <- renderText({ xl_errors_msg() })
 
     # Bouton pour enregistrer les requêtes via fichier EXCEL
     shinyFileSave(input, "save_xl_file", roots = Volumes_path())  # bouton pour déterminer le répertoire
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
     # Enregistrer les requêtes dans un fichier EXCEL
     observeEvent(save_xl_file(), {
+      if (xl_errors_msg() == "Aucune error, exécution possible.") {
+        showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
+        file <- select_xl_file()$datapath
+        sheets <- excel_sheets(file)
+        excel_requetes <- vector("list", length(sheets))  # contiendra les tableaux à insérer dans un EXCEL
+        conn <- conn_values$conn
 
-      file <- select_xl_file()$datapath
-      sheets <- excel_sheets(file)
-      excel_requetes <- vector("list", length(sheets))  # contiendra les tableaux à insérer dans un EXCEL
-      conn <- conn_values$conn
+        # Effectuer la requête de chaque onglet
+        for (sh in 1:length(sheets)) {
+          suppressMessages(suppressWarnings({
+            dt <- read_excel(file, sheet = sheets[sh])
+          }))
+          method <- str_remove_all(rmNA(dt$METHOD), " ")
+          if (method == "stat_gen1") {
+            nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
+            nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
+            dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
+            dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
+            type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
+            code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+            code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
+            code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
+            code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
+            code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
+            if (!length(code_serv)) code_serv <- NULL
+            if (!length(code_list)) code_list <- NULL
+            DT <- data.table()
+            for (i in 1:length(dates_debut)) {
+              dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
+                conn = conn,  # connexion faite à partir de l'onglet connexion
+                statement = stat_gen1_txt_query_1period(
+                  debut = dates_debut[i], fin = dates_fin[i],
+                  type_Rx = type_rx, codes = code_rx,
+                  code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+                  code_list = code_list, code_list_filtre = code_list_filtre
+                )
+              ))
+              dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
+                         MNT_SERV = as_price(MNT_SERV),
+                         MNT_TOT = as_price(MNT_TOT))]
 
-      # Effectuer la requête de chaque onglet
-      for (sh in 1:length(sheets)) {
-        dt <- read_excel(file, sheet = sheets[sh])
-        method <- str_remove_all(rmNA(dt$METHOD), " ")
-        if (method == "stat_gen1") {
-          nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-          nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
-          dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
-          dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
-          type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
-          code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-          code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
-          code_serv <- sort(str_remove_all(rmNA(dt$CODE_SERV), " "))
-          code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
-          code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
-          if (!length(code_serv)) code_serv <- NULL
-          if (!length(code_list)) code_list <- NULL
-          DT <- data.table()
-          for (i in 1:length(dates_debut)) {
-            dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
-              conn = conn,  # connexion faite à partir de l'onglet connexion
-              statement = stat_gen1_txt_query_1period(
-                debut = dates_debut[i], fin = dates_fin[i],
-                type_Rx = type_rx, codes = code_rx,
-                code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-                code_list = code_list, code_list_filtre = code_list_filtre
-              )
-            ))
-            dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
-                       MNT_SERV = as_price(MNT_SERV),
-                       MNT_TOT = as_price(MNT_TOT))]
+              # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
+              if (type_rx == "DENOM") {
+                dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
+                  DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+                  .(DENOM, NOM_DENOM)
+                ][
+                  dt, on = .(DENOM)
+                ]
+              } else if (type_rx == "DIN") {
+                dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
+                  DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+                  .(DIN, NOM_MARQ_COMRC)
+                ][
+                  dt, on = .(DIN)
+                ]
+              }
+              DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
 
-            # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
-            if (type_rx == "DENOM") {
-              dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
-                DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-                .(DENOM, NOM_DENOM)
-              ][
-                dt, on = .(DENOM)
-              ]
-            } else if (type_rx == "DIN") {
-              dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
-                DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-                .(DIN, NOM_MARQ_COMRC)
-              ][
-                dt, on = .(DIN)
-              ]
             }
-            DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
-
+            # Ordre des colonnes
+            setcolorder(DT, c(
+              "DATE_DEBUT", "DATE_FIN",
+              type_rx, nom_type_rx(type_rx),
+              "MNT_MED", "MNT_SERV", "MNT_TOT",
+              "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
+            ))
+            # Ordre des données
+            setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
           }
-          # Ordre des colonnes
-          setcolorder(DT, c(
-            "DATE_DEBUT", "DATE_FIN",
-            type_rx, nom_type_rx(type_rx),
-            "MNT_MED", "MNT_SERV", "MNT_TOT",
-            "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
-          ))
-          # Ordre des données
-          setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
-        }
-        excel_requetes[[sh]] <- create_dt_data_args_query(
-          dt = copy(DT),
-          args_list = list(METHOD = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-            TYPE_RX = type_rx, CODE_RX = code_rx,
-            CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
-            CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
-          ),
-          query = stat_gen1_txt_query_1period(
-            debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
-            code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-            code_list = code_list, code_list_filtre = code_list_filtre
+          excel_requetes[[sh]] <- create_dt_data_args_query(
+            dt = copy(DT),
+            args_list = list(METHOD = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+                             TYPE_RX = type_rx, CODE_RX = code_rx,
+                             CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
+                             CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+            ),
+            query = stat_gen1_txt_query_1period(
+              debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
+              code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+              code_list = code_list, code_list_filtre = code_list_filtre
+            )
           )
-        )
+        }
+        names(excel_requetes) <- sheets
+        write_xlsx(excel_requetes, save_xl_file()$datapath)
+        removeNotification("save_xl_file")
+      } else {
+        showNotification("Exécution impossible.")
       }
-      names(excel_requetes) <- sheets
-      write_xlsx(excel_requetes, save_xl_file()$datapath)
-
     })
 
 
@@ -807,7 +824,12 @@ formulaire <- function() {
     })
 
     # Requête SQL
-    sg1_requete_sql <- eventReactive(input$sg1_go_extract, { sg1_dbGetQuery(input, conn_values$conn) })
+    sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
+      showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
+      DT <- sg1_dbGetQuery(input, conn_values$conn)
+      removeNotification("sg1_go_extract")
+      return(DT)
+    })
     # Afficher le tableau demandé
     output$sg1_table_req <- renderDataTable({
       DT <- copy(sg1_requete_sql())
@@ -845,7 +867,7 @@ formulaire <- function() {
             CODE_LIST = input$sg1_code_list
           ),
           query = stat_gen1_txt_query_1period(
-            debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
+            debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
             type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
             code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
             code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
@@ -872,32 +894,3 @@ formulaire <- function() {
   shinyApp(ui, server)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
