@@ -37,7 +37,7 @@ stat_gen1_txt_query_1period <- function(
       return("")
     } else if (code_serv_filtre == "Exclusion") {
       return(paste0(indent(),"and (SMED_COD_SERV_1 not in (",qu(code_serv),") or SMED_COD_SERV_1 is null)\n"))
-    } else if (code_serv_filtre == "Sélection") {
+    } else if (code_serv_filtre == "Inclusion") {
       return(paste0(indent(),"and SMED_COD_SERV_1 in (",qu(code_serv),")\n"))
     } else {
       stop("stat_gen1_txt_query_1period.where_code_serv() code_serv_filtre valeur non permise")
@@ -48,7 +48,7 @@ stat_gen1_txt_query_1period <- function(
       return("")
     } else if (code_list_filtre == "Exclusion") {
       return(paste0(indent(),"and (SMED_COD_CATG_LISTE_MED not in (",qu(code_list),") or SMED_COD_CATG_LISTE_MED is null)\n"))
-    } else if (code_list_filtre == "Sélection") {
+    } else if (code_list_filtre == "Inclusion") {
       return(paste0(indent(),"and SMED_COD_CATG_LISTE_MED in (",qu(code_list),")\n"))
     } else {
       stop("stat_gen1_txt_query_1period.where_code_list() code_list_filtre valeur non permise")
