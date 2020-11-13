@@ -65,13 +65,13 @@ formulaire <- function() {
     ### Data conteant tous les codes de liste de médicament ainsi que leur
     ### description
 
-    dt <- PROD.V_DES_COD[TYPE_CODE == "COD_CATG_LISTE_MED", .(code = CODE, desc = CODE_DESC)]
+    dt <- inesss::PROD.V_DES_COD[TYPE_CODE == "COD_CATG_LISTE_MED", .(code = CODE, desc = CODE_DESC)]
     return(dt)
   }
   create_dt_code_serv <- function() {
     ### Data contenant la liste des codes de services et leur description
 
-    dt <- PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[, .(code = COD_SERV, desc = COD_SERV_DESC)]
+    dt <- inesss::PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[, .(code = COD_SERV, desc = COD_SERV_DESC)]
     # Codes L à M3 sont tous inclus dans le même, donc modification du data
     dt <- dt[!code %in% c("L", "M", "M1", "M2", "M3")]
     dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))

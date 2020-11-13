@@ -1,0 +1,4 @@
+Name: Formulaire
+Description: Démarrage du formulaire avec Shiny.
+Binding: formulaire_addin
+Interactive: true
