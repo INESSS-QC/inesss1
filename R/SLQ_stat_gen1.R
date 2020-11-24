@@ -1,6 +1,6 @@
-#' Statistique générale
+#' Statistiques générales
 #'
-#' Code de la requête SQL (châine de caractères)
+#' Code de la requête SQL - chaîne de caractères.
 #'
 #' @keywords internal
 #' @importFrom stringr str_locate str_sub

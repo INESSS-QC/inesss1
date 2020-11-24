@@ -1,5 +1,7 @@
 #' Formulaire Shiny
 #'
+#' @keywords internal
+#'
 #' @import data.table
 #' @importFrom fs path_home
 #' @importFrom odbc odbc dbConnect dbGetQuery

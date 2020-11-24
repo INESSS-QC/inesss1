@@ -9,3 +9,4 @@ formulaire()
 \description{
 Formulaire Shiny
 }
+\keyword{internal}

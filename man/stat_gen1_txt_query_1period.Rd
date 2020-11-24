@@ -2,7 +2,7 @@
 % Please edit documentation in R/SLQ_stat_gen1.R
 \name{stat_gen1_txt_query_1period}
 \alias{stat_gen1_txt_query_1period}
-\title{Statistique générale}
+\title{Statistiques générales}
 \usage{
 stat_gen1_txt_query_1period(
   debut,
@@ -16,6 +16,6 @@ stat_gen1_txt_query_1period(
 )
 }
 \description{
-Code de la requête SQL (châine de caractères)
+Code de la requête SQL - chaîne de caractères.
 }
 \keyword{internal}
