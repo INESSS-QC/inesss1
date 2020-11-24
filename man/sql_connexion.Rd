@@ -24,3 +24,10 @@ Connexion entre R et SQL Teradata.
 \details{
 Voir \code{\link[odbc]{dbConnect}}.
 }
+\examples{
+\dontrun{
+conn <- sql_connexion("ms045")
+conn <- sql_connexion(uid = "ms045", pwd = "MonMotDePasse",
+                      dsn = "PEI_PRD", encoding = "latin1")
+}
+}
