@@ -160,7 +160,8 @@ formulaire <- function() {
 
     if (is.null(input$sg1_date1)) {
       # Cette condition est utilisée seulement au lancement du shiny, c'est pour
-      # éviter des messages d'avertissements
+      # éviter des messages d'avertissements. Pourrait être géré autrement avec
+      # des ordres de priorité.
       return(as.character(Sys.Date()))
     } else {
       vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
@@ -194,7 +195,8 @@ formulaire <- function() {
   }
   sg1_code_serv_choices <- function(dt_code_serv) {
     ### Tableau indiquant les choix et les valeurs des codes de services
-    dt <- dt_code_serv[code %in% c("1", "A", "AD", "I", "L, M, M1 à M3", "Q", "RA")]
+    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]
+    # dt <- dt_code_serv[code %in% c("1", "A", "AD", "I", "L, M, M1 à M3", "Q", "RA")]  # anciennes valeurs proposées par Michèle Paré
     dt[, ch_name := paste0(code," : ",desc), .(code)]
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
   }
@@ -205,8 +207,8 @@ formulaire <- function() {
     ### @param conn : Variable de connexion créé par sql_connecion
 
     DT <- data.table()  # tableau contenant la ou les requêtes
-    nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-    nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
+    nom_denom <- copy(inesss::PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
+    nom_marq_comrc <- inesss::PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
 
     # Extraire les arguments souvent utilisés des input
     dates_debut <- sg1_find_date(input, "deb")
@@ -215,7 +217,7 @@ formulaire <- function() {
     codes_serv <- adapt_code_serv(input$sg1_code_serv)
 
     # Effectuer une requête par période d'étude et joindre les tableaux
-    for (i in 1:length(sg1_find_date(input, "deb"))) {
+    for (i in 1:length(dates_debut)) {
 
       dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
         conn = conn,  # connexion faite à partir de l'onglet connexion
@@ -496,8 +498,7 @@ formulaire <- function() {
             column(  # Périodes d'analyse
               width = 3,
               # Nombre de périodes à afficher
-              numericInput("sg1_nb_per", "Nombre de périodes", value = 1,
-                           min = 1, max = 99),
+              numericInput("sg1_nb_per", "Nombre de périodes", value = 1, min = 1, max = 99),
               uiOutput("sg1_nb_per")
             ),
             column(  # Codes d'analyse
@@ -505,6 +506,12 @@ formulaire <- function() {
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de codes Rx", value = 1,
                            min = 1, max = 99),
+              # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
+              div(style = "margin-top:-20px"),
+              checkboxGroupInput("sg1_group_periode", "",
+                                 choiceNames = c("Grouper par période"),
+                                 choiceValues = c("period")),
+              div(style = "margin-top:-5px"),
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -541,30 +548,44 @@ formulaire <- function() {
             )
           ),
 
-          # Boutons d'exécutions :
-          #   - Exécuter requête
-          #   - Enregistrer requête
-          #   - Visualiser/MaJ code requête
+
           fluidRow(
-            column(  # Bouton exécution requête
+            column(
               width = 3,
-              actionButton("sg1_go_extract", "Exécuter requête")
+              # Exécution de la requête SQL
+              actionButton("sg1_go_extract", "Exécuter Requête",
+                           style = "background-color: #b3d9ff")  # couleur du bouton
             ),
             column(
               width = 3,
-              shinySaveButton("sg1_save", "Enregistrer requête", "Enregistrer sous...",
-                              filetype = list(`Classeur EXCEL` = "xlsx"),
-                              viewtype = "list")
-            ),
-            column(
-              width = 3,
-              actionButton("sg1_maj_req", "Visualiser/MaJ code requête")
+              # Sauvegarder les résultats de la requête
+              shinySaveButton("sg1_save", "Sauvegarder Résultats en EXCEL",
+                              "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                              filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
+                              viewtype = "list",
+                              style = "background-color: #b3d9ff")  # couleur du bouton
             )
           ),
 
           # Tableau & Affichage extraction SQL
           fluidRow(
             dataTableOutput("sg1_table_req"),
+            p(),  # espacement avec la suite
+          ),
+          fluidRow(
+            column(
+              width = 3,
+              actionButton("sg1_maj_req", "Afficher Code Requête",
+                           style = "background-color: #c6ecc6")
+            ),
+            column(
+              width = 3,
+              actionButton("sg1_erase_req", "Effacer Code Requête",
+                           style = "background-color: #ffc2b3")
+            )
+          ),
+          fluidRow(
+            p(),
             verbatimTextOutput("sg1_code_req")
           )
         )
@@ -878,13 +899,29 @@ formulaire <- function() {
     })
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
-    output$sg1_code_req <- eventReactive(input$sg1_maj_req, {
-      stat_gen1_txt_query_1period(
+    sg1_show_query <- reactiveValues(
+      show = FALSE,  # afficher la requête ou pas
+      query = NULL  # message à afficher. NULL = même pas une case où afficher du texte.
+    )
+    observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
+      sg1_show_query$show <- TRUE
+      sg1_show_query$query <- stat_gen1_txt_query_1period(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
+    })
+    observeEvent(input$sg1_erase_req, {  # si on veut effacer la requête
+      sg1_show_query$show <- FALSE
+      sg1_show_query$query <- NULL
+    })
+    output$sg1_code_req <- reactive({
+      if (sg1_show_query$show) {
+        return(sg1_show_query$query)
+      } else {
+        return(NULL)
+      }
     })
 
   }
