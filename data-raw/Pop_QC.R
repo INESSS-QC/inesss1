@@ -23,11 +23,11 @@ cols <- c(  # colonnes à conserver
 dt <- DT[, ..cols]  # sélection des colonnes
 
 # Arrangement des données
-# SEXE = Total
+# SEXE = Total -> à supprimer
 dt <- dt[SEXE != "Total"]
-# Code GEO Quebec = 99
+# Code GEO Quebec = 99 -> supprimer code
 dt[GEO == "Québec", CODE := NA]
-# Type de données
+# Statut des données
 dt[STATUT == "r", STATUT := "Révisée"][STATUT == "p", STATUT := "Provisoire"]
 # M=Masculin, F=Féminin
 dt[SEXE == "Masculin", SEXE := "M"][SEXE == "Féminin", SEXE := "F"]
