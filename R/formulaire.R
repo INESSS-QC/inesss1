@@ -478,6 +478,7 @@ formulaire <- function() {
           # ---------------------------------------------------- -
           # --- À FAIRE ---
           # # Inscrire le ou les courriels à envoyer les résultats
+          # # Peut-être remplacer les résultats par un message
           # h5("Envoyer résultats par courriel"),
           # textAreaInput("mails", "Courriels"),
           # textInput("mail_obj", "Object")
@@ -508,12 +509,13 @@ formulaire <- function() {
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de codes Rx", value = 1,
                            min = 1, max = 99),
-              # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
-              div(style = "margin-top:-20px"),
-              checkboxGroupInput("sg1_group_periode", "",
-                                 choiceNames = c("Grouper par période"),
-                                 choiceValues = c("period")),
-              div(style = "margin-top:-5px"),
+              # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
+              # div(style = "margin-top:-20px"),
+              # checkboxGroupInput("sg1_group_periode", "",
+              #                    choiceNames = c("Grouper par période"),
+              #                    choiceValues = c("period")),
+              # div(style = "margin-top:-5px"),
+
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -522,6 +524,9 @@ formulaire <- function() {
             ),
             column(
               width = 3,
+              checkboxGroupInput("sg1_group_periode", "Grouper par",
+                                 choiceNames = c("Périodes"),
+                                 choiceValues = c("period")),
               # Codes de service
               selectInput("sg1_code_serv_filter", "Codes de Service",
                           choices = c("Exclusion", "Inclusion"),
