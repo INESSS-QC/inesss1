@@ -266,6 +266,23 @@ formulaire <- function() {
 
     return(DT)
   }
+  sg1_table_format <- function(dt) {
+    ### Format visuel des colonnes pour meilleure présentation du data créé par
+    ### la requête
+
+    dt <- copy(dt)
+    dt[  # formatage des résultats pour présentation
+      , `:=` (MNT_MED = paste(format_price(MNT_MED), "$"),
+              MNT_SERV = paste(format_price(MNT_SERV), "$"),
+              MNT_TOT = paste(format_price(MNT_TOT), "$"),
+              COHORTE = formatC(COHORTE, big.mark = " "),
+              NBRE_RX = formatC(NBRE_RX, big.mark = " "),
+              QTE_MED = formatC(QTE_MED, format = "f", digits = 3,
+                                big.mark = " ", decimal.mark = ","),
+              DUREE_TX = formatC(DUREE_TX, big.mark = " "))
+    ]
+    return(dt)
+  }
   shinyFiles_directories <- function(input_name, method) {
     ### Créer le répertoire à partir d'un shinyFileButton
 
@@ -622,7 +639,7 @@ formulaire <- function() {
         # Indiquer d'inscrire une valeur dans toutes les cases
         conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
       } else {
-        conn_values$conn <- sql_connexion("PEI_PRD", input$sql_user, input$sql_pwd)  # effectuer une connexion
+        conn_values$conn <- sql_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
         if (is.null(conn_values$conn)) {
           # Message d'erreur si la connexion ne fonctionnait pas
           conn_values$msg <- "**Vérifier l'identifiant et le mot de passe**"
@@ -644,9 +661,7 @@ formulaire <- function() {
     #### REQUÊTES VIA EXCEL - tabEXCEL
     # Sélection du fichier EXCEL
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
-    select_xl_file <- reactive({  # select_xl_file()datapath indique répertoire + nom du fichier à importer
-      shinyFiles_directories(input$select_xl_file, "file")
-    })
+    select_xl_file <- reactive({ shinyFiles_directories(input$select_xl_file, "file") })  # select_xl_file()datapath indique répertoire + nom du fichier à importer
 
     # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
@@ -703,7 +718,9 @@ formulaire <- function() {
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
     # Enregistrer les requêtes dans un fichier EXCEL
     observeEvent(save_xl_file(), {
-      if (xl_errors_msg() == "Aucune error, exécution possible.") {
+      if (is.null(conn_values$conn)) {
+        showNotification("Exécution impossible. Connexion requise.")
+      } else if (xl_errors_msg() == "Aucune error, exécution possible.") {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
         file <- select_xl_file()$datapath
         sheets <- excel_sheets(file)
@@ -853,33 +870,22 @@ formulaire <- function() {
 
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
-      DT <- sg1_dbGetQuery(input, conn_values$conn)
-      removeNotification("sg1_go_extract")
-      return(DT)
+      if (is.null(conn_values$conn)) {
+        showNotification("Exécution impossible. Connexion requise.")
+      } else {
+        showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
+        DT <- sg1_dbGetQuery(input, conn_values$conn)
+        removeNotification("sg1_go_extract")
+        return(DT)
+      }
     })
     # Afficher le tableau demandé
-    output$sg1_table_req <- renderDataTable({
-      DT <- copy(sg1_requete_sql())
-      DT[  # formatage des résultats pour présentation
-        , `:=` (MNT_MED = paste(format_price(MNT_MED), "$"),
-                MNT_SERV = paste(format_price(MNT_SERV), "$"),
-                MNT_TOT = paste(format_price(MNT_TOT), "$"),
-                COHORTE = formatC(COHORTE, big.mark = " "),
-                NBRE_RX = formatC(NBRE_RX, big.mark = " "),
-                QTE_MED = formatC(QTE_MED, format = "f", digits = 3,
-                                  big.mark = " ", decimal.mark = ","),
-                DUREE_TX = formatC(DUREE_TX, big.mark = " "))
-      ]
-      return(DT)
-    })
+    output$sg1_table_req <- renderDataTable({ sg1_table_format(sg1_requete_sql()) })
 
     # Enregistrer le fichier au format EXCEL, doit avoir 1) tableau des résultats,
     # 2) les arguments et 3) la requête SQL.
     shinyFileSave(input, "sg1_save", roots = Volumes_path())  # bouton pour déterminer le répertoire
-    sg1_file_save <- reactive({  # répertoire de sauvegarde à partir de input$sg1_save
-      shinyFiles_directories(input$sg1_save, "save")
-    })
+    sg1_file_save <- reactive({ shinyFiles_directories(input$sg1_save, "save") })
     observeEvent(sg1_file_save(), {
       save_EXCEL(
         dt = create_dt_data_args_query(
