@@ -9,6 +9,7 @@ stat_gen1_txt_query_1period(
   fin,
   type_Rx,
   codes,
+  groupby,
   code_serv,
   code_serv_filtre,
   code_list,

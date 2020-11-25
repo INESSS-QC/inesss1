@@ -3,11 +3,12 @@
 #' Code de la requête SQL - chaîne de caractères.
 #'
 #' @keywords internal
-#' @importFrom stringr str_locate str_sub
+#' @importFrom stringr str_locate str_sub str_detect
 #' @export
 stat_gen1_txt_query_1period <- function(
   debut, fin,
   type_Rx, codes,
+  groupby,
   code_serv, code_serv_filtre,
   code_list, code_list_filtre
 ) {
@@ -54,12 +55,18 @@ stat_gen1_txt_query_1period <- function(
       stop("stat_gen1_txt_query_1period.where_code_list() code_list_filtre valeur non permise")
     }
   }
-  group_by <- function(type_Rx) {
-    if (type_Rx == "DENOM") {
-      return("DENOM")
-    } else if (type_Rx == "DIN") {
-      return("DIN")
+  group_by <- function(groupby, type_Rx) {
+    if (is.null(groupby)) {
+      txt_grpby <- "group by "
+      if (type_Rx == "DENOM") {
+        txt_grpby <- paste0(txt_grpby, "DENOM")
+      } else if (type_Rx == "DIN") {
+        txt_grpby <- paste0(txt_grpby, "DIN")
+      }
+    } else if ("period" %in% groupby) {
+      txt_grpby <- ""
     }
+    return(txt_grpby)
   }
 
 # Principal FCT -----------------------------------------------------------
@@ -80,9 +87,13 @@ stat_gen1_txt_query_1period <- function(
     indent(),where_code_rx(type_Rx, codes),
     where_code_serv(code_serv_filtre, code_serv),
     where_code_list(code_list_filtre, code_list),
-    "group by ",group_by(type_Rx),
+    group_by(groupby, type_Rx),
     ";"
   )
+
+  if (str_detect(query, "\n;")) {  # supprimer retour de ligne (\n) si la commande est terminée (;)
+    str_sub(query, nchar(query) - 1, nchar(query) - 1) <- ""  # supprime '\n' qui est compté comme 1 seul char
+  }
 
   return(query)
 

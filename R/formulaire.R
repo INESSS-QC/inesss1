@@ -283,6 +283,7 @@ formulaire <- function() {
         statement = stat_gen1_txt_query_1period(
           debut = dates_debut[i], fin = dates_fin[i],
           type_Rx = input$sg1_type_Rx, codes = codes_rx,
+          groupby = input$sg1_group_by,
           code_serv = codes_serv, code_serv_filtre = input$sg1_code_serv_filter,
           code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
         )
@@ -588,7 +589,7 @@ formulaire <- function() {
                            min = 1, max = 99),
               # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
               # div(style = "margin-top:-20px"),
-              # checkboxGroupInput("sg1_group_periode", "",
+              # checkboxGroupInput("sg1_group_by", "",
               #                    choiceNames = c("Grouper par période"),
               #                    choiceValues = c("period")),
               # div(style = "margin-top:-5px"),
@@ -601,7 +602,7 @@ formulaire <- function() {
             ),
             column(
               width = 3,
-              checkboxGroupInput("sg1_group_periode", "Grouper par",
+              checkboxGroupInput("sg1_group_by", "Grouper par",
                                  choiceNames = c("Périodes"),
                                  choiceValues = c("period")),
               # Codes de service
@@ -764,6 +765,7 @@ formulaire <- function() {
             dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
             type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
             code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+            grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
             code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
             code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
             code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
@@ -777,6 +779,7 @@ formulaire <- function() {
                 statement = stat_gen1_txt_query_1period(
                   debut = dates_debut[i], fin = dates_fin[i],
                   type_Rx = type_rx, codes = code_rx,
+                  groupby = grpby,
                   code_serv = code_serv, code_serv_filtre = code_serv_filtre,
                   code_list = code_list, code_list_filtre = code_list_filtre
                 )
@@ -819,11 +822,13 @@ formulaire <- function() {
             dt = copy(DT),
             args_list = list(METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
                              TYPE_RX = type_rx, CODE_RX = code_rx,
+                             GROUPER_PAR = grpby,
                              CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
                              CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
             ),
             query = stat_gen1_txt_query_1period(
               debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
+              groupby = grpby,
               code_serv = code_serv, code_serv_filtre = code_serv_filtre,
               code_list = code_list, code_list_filtre = code_list_filtre
             )
@@ -928,6 +933,7 @@ formulaire <- function() {
           query = stat_gen1_txt_query_1period(
             debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
             type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
+            groupby = input$sg1_group_by,
             code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
             code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
           )
@@ -946,6 +952,7 @@ formulaire <- function() {
       sg1_show_query$query <- stat_gen1_txt_query_1period(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
+        groupby = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
