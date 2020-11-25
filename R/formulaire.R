@@ -17,7 +17,8 @@ formulaire <- function() {
 # Variables ---------------------------------------------------------------
 
   cols_EXCEL_file <- function() {
-    ### Colonnes nécessaires pour chaque méthode dans les
+    ### Colonnes nécessaires pour chaque méthode
+
     return(list(
       sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX",
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
@@ -25,6 +26,7 @@ formulaire <- function() {
   }
   values_EXCEL_file <- function() {
     ### Valeurs permises dans les colonnes de cols_EXCEL_file()
+
     return(list(
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
@@ -36,6 +38,8 @@ formulaire <- function() {
     ))
   }
   methods_EXCEL_file <- function() {
+    ### Liste des méthodes existantes
+
     return(c(
       "stat_gen1"
     ))
@@ -57,8 +61,9 @@ formulaire <- function() {
     ### Puisque l'onglet Excel peut contenir des colonnes facultatives pour le
     ### formulaire, on doit les supprimer après l'avoir importé.
     ### Possible de le faire rapidement grâce à cols_EXCEL_file()
+
     if (method == "stat_gen1") {
-      cols <- names(dt)[names(dt) %in% c("METHOD", cols_EXCEL_file()$sg1)]
+      cols <- names(dt)[names(dt) %in% c("METHODE", cols_EXCEL_file()$sg1)]
     }
     dt <- dt[, ..cols]
     return(dt)
@@ -131,6 +136,58 @@ formulaire <- function() {
     ### c'est zéro (0)
 
     return(sapply(x, formatC, digits = 2, format = "f", big.mark = " ", decimal.mark = ","))
+  }
+  msg_error_from_xlfile <- function(file) {
+    ### À partir d'un fichier EXCEL, vérifie chaque onglet et renvoie les
+    ### messages d'erreur s'il y en a. Utilisé dans la section Requêtes via EXCEL
+
+    sheets <- excel_sheets(file)  # nom des onglets du fichier importé
+    msg_error <- ""  # contiendra les messages d'erreur
+
+    for (sh in sheets) {
+      # Importation du data
+      suppressMessages(suppressWarnings({  # supprime avertissements puisque les tableaux sont irréguliers
+        dt <- as.data.table(read_excel(file, sheet = sh, col_types = "text"))
+      }))
+
+      if ("METHODE" %in% names(dt)) {
+        method <- str_remove_all(rmNA(dt$METHODE), " ")  # méthode à utiliser
+        # Gérer les erreurs selon le cas
+        if (length(method) == 1) {
+          if (method %in% methods_EXCEL_file()) {
+            dt <- cols_select_from_method(dt, method)  # sélection des colonnes en lien avec la méthode
+            msg_error <- verif_method()[[method]](dt, sh, msg_error)  # vérifications selon méthode
+          } else {
+            msg_error <- paste0(  # erreur si la méthode est inconnue
+              msg_error,
+              sh, " :\n",
+              " -  METHODE ne contient pas une valeur permise.\n",
+              format_xl_err_nl()
+            )
+          }
+        } else {
+          msg_error <- paste0(  # si la méthode contient plusieurs valeurs ou aucune
+            msg_error,
+            sh, " :\n",
+            " -  METHODE doit contenir une valeur.\n",
+            format_xl_err_nl()
+          )
+        }
+      } else {
+        msg_error <- paste0(  # si la colonne METHODE
+          msg_error,
+          sh, " :\n",
+          " -  METHODE est absente.\n",
+          format_xl_err_nl()
+        )
+      }
+    }
+
+    if (msg_error == "") {
+      return(NULL)
+    } else {
+      return(msg_error)
+    }
   }
   nom_type_rx <- function(type_rx) {
     ### Indique le nom de la colonne indiquant le nom du type de Rx dans un data
@@ -295,6 +352,9 @@ formulaire <- function() {
     } else {
       stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
+  }
+  sql_xl_file_queries_method <- function(method) {
+
   }
   verif_sg1 <- function(dt, sh, msg_error) {
     ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
@@ -666,46 +726,9 @@ formulaire <- function() {
     # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
       showNotification("Vérification en cours...", id = "xl_errors_msg", type = "message", duration = NULL)
-
-      file <- select_xl_file()$datapath
-      sheets <- excel_sheets(file)
-      msg_error <- ""
-      # Importer chaque feuille et inscrire les messages d'erreur
-      for (sh in sheets) {
-        suppressMessages(suppressWarnings({  # supprime avertissements puisque les tableaux sont irréguliers
-          dt <- as.data.table(read_excel(file, sheet = sh, col_types = "text"))
-        }))
-        if ("METHOD" %in% names(dt)) {
-          method <- str_remove_all(rmNA(dt$METHOD), " ")
-          if (length(method) == 1) {
-            if (method %in% methods_EXCEL_file()) {
-              dt <- cols_select_from_method(dt, method)
-              msg_error <- verif_method()[[method]](dt, sh, msg_error)
-            } else {
-              msg_error <- paste0(msg_error,
-                sh, " :\n",
-                " -  METHOD ne contient pas une valeur permise.\n",
-                format_xl_err_nl()
-              )
-            }
-          } else {
-            msg_error <- paste0(msg_error,
-              sh, " :\n",
-              " -  METHOD doit contenir une valeur.\n",
-              format_xl_err_nl()
-            )
-          }
-        } else {
-          msg_error <- paste0(msg_error,
-            sh, " :\n",
-            " -  METHOD est absente.\n",
-            format_xl_err_nl()
-          )
-        }
-      }
-
+      msg_error <- msg_error_from_xlfile(select_xl_file()$datapath)
       removeNotification("xl_errors_msg")
-      if (msg_error == "") {
+      if (is.null(msg_error)) {
         return("Aucune error, exécution possible.")
       } else {
         return(msg_error)
@@ -732,7 +755,8 @@ formulaire <- function() {
           suppressMessages(suppressWarnings({
             dt <- read_excel(file, sheet = sheets[sh])
           }))
-          method <- str_remove_all(rmNA(dt$METHOD), " ")
+          method <- str_remove_all(rmNA(dt$METHODE), " ")
+
           if (method == "stat_gen1") {
             nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
             nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
@@ -790,9 +814,10 @@ formulaire <- function() {
             # Ordre des données
             setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
           }
+
           excel_requetes[[sh]] <- create_dt_data_args_query(
             dt = copy(DT),
-            args_list = list(METHOD = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+            args_list = list(METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
                              TYPE_RX = type_rx, CODE_RX = code_rx,
                              CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
                              CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
@@ -891,7 +916,7 @@ formulaire <- function() {
         dt = create_dt_data_args_query(
           dt = sg1_requete_sql(),
           args_list = list(
-            METHOD = "stat_gen1",
+            METHODE = "stat_gen1",
             DATE_DEBUT = sg1_find_date(input, "deb"),
             DATE_FIN = sg1_find_date(input, "fin"),
             TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
