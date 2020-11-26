@@ -232,7 +232,7 @@ formulaire <- function() {
   }
   sg1_find_code <- function(input) {
     ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
-    ### input.
+    ### input. Si aucune valeur inscrite, retourne ""
 
     if (is.null(input$sg1_code1)) {
       # Cette condition est utilisée seulement au lancement du shiny, c'est pour
@@ -554,9 +554,8 @@ formulaire <- function() {
           # Indiquer les erreurs de chaque onglet s'il y a lieu
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
           # Effectuer les extractions s'il n'y a pas d'erreur
-          shinySaveButton("save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
-                          filetype = list(`Classeur EXCEL` = "xlsx"),
-                          viewtype = "list")
+          uiOutput("save_xl_file")
+
           # ---------------------------------------------------- -
           # --- À FAIRE ---
           # # Inscrire le ou les courriels à envoyer les résultats
@@ -591,6 +590,7 @@ formulaire <- function() {
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de codes Rx", value = 1,
                            min = 1, max = 99),
+
               # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
               # div(style = "margin-top:-20px"),
               # checkboxGroupInput("sg1_group_by", "",
@@ -660,13 +660,11 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 3,
-              actionButton("sg1_maj_req", "Afficher Code Requête",
-                           style = "background-color: #c6ecc6")
+              uiOutput("sg1_maj_req")
             ),
             column(
               width = 3,
-              actionButton("sg1_erase_req", "Effacer Code Requête",
-                           style = "background-color: #ffc2b3")
+              uiOutput("sg1_erase_req")
             )
           ),
           fluidRow(
@@ -689,7 +687,7 @@ formulaire <- function() {
     conn_values <- reactiveValues(
       uid = NULL, pwd = NULL,  # no utilisateur & mot de passe
       msg = "",  # message d'erreur
-      conn = NULL  # contient les paramètres de connexion à utiliser pour une requête
+      conn = FALSE  # paramètres de connexion. FALSE au lieu de NULL pour éviter des messages d'erreur lors du démarrage
     )
 
     # Vérifier si les informations entrées sont correctes.
@@ -699,6 +697,7 @@ formulaire <- function() {
       if (input$sql_user == "" || input$sql_pwd == "") {
         # Indiquer d'inscrire une valeur dans toutes les cases
         conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
+        conn_values$conn <- NULL  # aucune connexion
       } else {
         conn_values$conn <- sql_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
         if (is.null(conn_values$conn)) {
@@ -719,6 +718,8 @@ formulaire <- function() {
 
 
 
+
+
     #### REQUÊTES VIA EXCEL - tabEXCEL
     # Sélection du fichier EXCEL
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
@@ -730,7 +731,7 @@ formulaire <- function() {
       msg_error <- msg_error_from_xlfile(select_xl_file()$datapath)
       removeNotification("xl_errors_msg")
       if (is.null(msg_error)) {
-        return("Aucune error, exécution possible.")
+        return("Aucune erreur, exécution possible.")
       } else {
         return(msg_error)
       }
@@ -738,12 +739,23 @@ formulaire <- function() {
     output$xl_errors_msg <- renderText({ xl_errors_msg() })
 
     # Bouton pour enregistrer les requêtes via fichier EXCEL
+    output$save_xl_file <- renderUI({
+      if (xl_errors_msg() == "Aucune erreur, exécution possible.") {
+        return(shinySaveButton(
+          "save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
+          filetype = list(`Classeur EXCEL` = "xlsx"),
+          viewtype = "list", style = "background-color: #b3d9ff"
+        ))
+      } else {
+        return(NULL)
+      }
+    })
     shinyFileSave(input, "save_xl_file", roots = Volumes_path())  # bouton pour déterminer le répertoire
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
     # Enregistrer les requêtes dans un fichier EXCEL
     observeEvent(save_xl_file(), {
       if (is.null(conn_values$conn)) {
-        showNotification("Exécution impossible. Connexion requise.")
+        showNotification("Exécution impossible. Connexion requise.", type = "error")
       } else if (xl_errors_msg() == "Aucune error, exécution possible.") {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
         file <- select_xl_file()$datapath
@@ -838,13 +850,21 @@ formulaire <- function() {
         write_xlsx(excel_requetes, save_xl_file()$datapath)
         removeNotification("save_xl_file")
       } else {
-        showNotification("Exécution impossible.")
+        showNotification("Exécution impossible.", type = "error")
       }
     })
 
 
 
+
+
     #### STATISTIQUE GENERALES - tabStatGen1
+    # Variables réactives pour sg1
+    sg1_val <- reactiveValues(
+      show_query = FALSE,  # afficher la requête ou pas
+      query = NULL  # message à afficher. NULL = même pas une case où afficher du texte.
+    )
+
     # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
     # de input$sg1_nb_per
     output$sg1_nb_per <- renderUI({
@@ -900,22 +920,24 @@ formulaire <- function() {
 
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      if (is.null(conn_values$conn)) {
-        showNotification("Exécution impossible. Connexion requise.")
-        return(NULL)
-      } else {
+      if (sg1_find_code(input) == "") {
+        showNotification("Inscrire au moins un Code Rx", type = "error")
+      } else if (!is.null(conn_values$conn)) {
         showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
         DT <- sg1_dbGetQuery(input, conn_values$conn)
+        sg1_val$is_extract <<- TRUE  # il y a une extraction d'affichée
         removeNotification("sg1_go_extract")
         return(DT)
+      } else {
+        showNotification("Exécution impossible. Connexion requise.", type = "error")
+        return(NULL)
       }
     })
     # Afficher le tableau demandé
     output$sg1_table_req <- renderDataTable({ sg1_table_format(sg1_requete_sql()) })
 
-    # Enregistrer le fichier au format EXCEL, doit avoir 1) tableau des résultats,
-    # 2) les arguments et 3) la requête SQL.
-    output$sg1_save <- renderUI({
+    # Enregistrer le fichier au format EXCEL
+    output$sg1_save <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
       if (is.null(sg1_requete_sql())) {
         return(NULL)
       } else {
@@ -928,9 +950,9 @@ formulaire <- function() {
         )
       }
     })
-    shinyFileSave(input, "sg1_save", roots = Volumes_path())  # bouton pour déterminer le répertoire
+    shinyFileSave(input, "sg1_save", roots = Volumes_path())  # détermine les répertoires à afficher pour le bouton sg1_save
     sg1_file_save <- reactive({ shinyFiles_directories(input$sg1_save, "save") })
-    observeEvent(sg1_file_save(), {
+    observeEvent(sg1_file_save(), {  # sauvegarde de la requête en Excel
       save_EXCEL(
         dt = create_dt_data_args_query(
           dt = sg1_requete_sql(),
@@ -957,13 +979,9 @@ formulaire <- function() {
     })
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
-    sg1_show_query <- reactiveValues(
-      show = FALSE,  # afficher la requête ou pas
-      query = NULL  # message à afficher. NULL = même pas une case où afficher du texte.
-    )
     observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
-      sg1_show_query$show <- TRUE
-      sg1_show_query$query <- stat_gen1_txt_query_1period(
+      sg1_val$show_query <- TRUE
+      sg1_val$query <- stat_gen1_txt_query_1period(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
         groupby = input$sg1_group_by,
@@ -972,14 +990,36 @@ formulaire <- function() {
       )
     })
     observeEvent(input$sg1_erase_req, {  # si on veut effacer la requête
-      sg1_show_query$show <- FALSE
-      sg1_show_query$query <- NULL
+      sg1_val$show_query <- FALSE
+      sg1_val$query <- NULL
     })
-    output$sg1_code_req <- reactive({
-      if (sg1_show_query$show) {
-        return(sg1_show_query$query)
+    output$sg1_code_req <- reactive({  # code de la requête à afficher
+      if (sg1_val$show_query) {
+        return(sg1_val$query)
       } else {
         return(NULL)
+      }
+    })
+    # Boutons pour afficher la requête ou l'effacer
+    output$sg1_maj_req <- renderUI({  # Affiche ou MaJ du code de la requête
+      if (sg1_val$show_query) {
+        return(actionButton(
+          "sg1_maj_req", "MaJ Code Requête",
+          style = "background-color: #c6ecc6"
+        ))
+      } else {
+        return(actionButton(
+          "sg1_maj_req", "Afficher Code Requête",
+          style = "background-color: #c6ecc6"
+        ))
+      }
+    })
+    output$sg1_erase_req <- renderUI({  # effacer le code de la requête
+      if (sg1_val$show_query) {  # s'il y a du code affiché
+        return(actionButton(
+          "sg1_erase_req", "Effacer Code Requête",
+          style = "background-color: #ffc2b3"
+        ))
       }
     })
 
