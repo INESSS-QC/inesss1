@@ -328,18 +328,22 @@ formulaire <- function() {
     ### Format visuel des colonnes pour meilleure présentation du data créé par
     ### la requête
 
-    dt <- copy(dt)
-    dt[  # formatage des résultats pour présentation
-      , `:=` (MNT_MED = paste(format_price(MNT_MED), "$"),
-              MNT_SERV = paste(format_price(MNT_SERV), "$"),
-              MNT_TOT = paste(format_price(MNT_TOT), "$"),
-              COHORTE = formatC(COHORTE, big.mark = " "),
-              NBRE_RX = formatC(NBRE_RX, big.mark = " "),
-              QTE_MED = formatC(QTE_MED, format = "f", digits = 3,
-                                big.mark = " ", decimal.mark = ","),
-              DUREE_TX = formatC(DUREE_TX, big.mark = " "))
-    ]
-    return(dt)
+    if (is.null(dt)) {
+      return(NULL)
+    } else {
+      dt <- copy(dt)
+      dt[  # formatage des résultats pour présentation
+        , `:=` (MNT_MED = paste(format_price(MNT_MED), "$"),
+                MNT_SERV = paste(format_price(MNT_SERV), "$"),
+                MNT_TOT = paste(format_price(MNT_TOT), "$"),
+                COHORTE = formatC(COHORTE, big.mark = " "),
+                NBRE_RX = formatC(NBRE_RX, big.mark = " "),
+                QTE_MED = formatC(QTE_MED, format = "f", digits = 3,
+                                  big.mark = " ", decimal.mark = ","),
+                DUREE_TX = formatC(DUREE_TX, big.mark = " "))
+      ]
+      return(dt)
+    }
   }
   shinyFiles_directories <- function(input_name, method) {
     ### Créer le répertoire à partir d'un shinyFileButton
@@ -902,6 +906,7 @@ formulaire <- function() {
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
       if (is.null(conn_values$conn)) {
         showNotification("Exécution impossible. Connexion requise.")
+        return(NULL)
       } else {
         showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
         DT <- sg1_dbGetQuery(input, conn_values$conn)
