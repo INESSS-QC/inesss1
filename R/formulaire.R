@@ -648,11 +648,7 @@ formulaire <- function() {
             column(
               width = 3,
               # Sauvegarder les résultats de la requête
-              shinySaveButton("sg1_save", "Sauvegarder Résultats en EXCEL",
-                              "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
-                              filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
-                              viewtype = "list",
-                              style = "background-color: #b3d9ff")  # couleur du bouton
+              uiOutput("sg1_save")
             )
           ),
 
@@ -919,6 +915,19 @@ formulaire <- function() {
 
     # Enregistrer le fichier au format EXCEL, doit avoir 1) tableau des résultats,
     # 2) les arguments et 3) la requête SQL.
+    output$sg1_save <- renderUI({
+      if (is.null(sg1_requete_sql())) {
+        return(NULL)
+      } else {
+        return(
+          shinySaveButton("sg1_save", "Sauvegarder Résultats en EXCEL",
+                          "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                          filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
+                          viewtype = "list",
+                          style = "background-color: #b3d9ff")  # couleur du bouton
+        )
+      }
+    })
     shinyFileSave(input, "sg1_save", roots = Volumes_path())  # bouton pour déterminer le répertoire
     sg1_file_save <- reactive({ shinyFiles_directories(input$sg1_save, "save") })
     observeEvent(sg1_file_save(), {
