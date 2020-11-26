@@ -51,9 +51,9 @@ formulaire <- function() {
     ### Séparer des groupes de codes de service en valeurs uniques pour les
     ### requêtes SQL
 
-    if ("L, M, M1 à M3" %in% code_serv) {
-      code_serv <- code_serv[code_serv != "L, M, M1 à M3"]
-      code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
+    if ("L, M, M1 à M3" %in% code_serv) {  # valeurs inscrites dans les formulaires/gabarits
+      code_serv <- code_serv[code_serv != "L, M, M1 à M3"]  # effacer cette valeur
+      code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))  # ajouter chaque valeur individuellement
     }
     return(code_serv)
   }
@@ -62,23 +62,31 @@ formulaire <- function() {
     ### formulaire, on doit les supprimer après l'avoir importé.
     ### Possible de le faire rapidement grâce à cols_EXCEL_file()
 
-    if (method == "stat_gen1") {
+    # Colonnes à sélectionner
+    if (method == "stat_gen1") {  # méthode statistiques générales 1
       cols <- names(dt)[names(dt) %in% c("METHODE", cols_EXCEL_file()$sg1)]
     }
-    dt <- dt[, ..cols]
+
+    dt <- dt[, ..cols]  # sélection des colonnes
     return(dt)
   }
   create_dt_code_list_med <- function() {
-    ### Data conteant tous les codes de liste de médicament ainsi que leur
+    ### Data contenant tous les codes de liste de médicament ainsi que leur
     ### description
 
-    dt <- inesss::PROD.V_DES_COD[TYPE_CODE == "COD_CATG_LISTE_MED", .(code = CODE, desc = CODE_DESC)]
+    dt <- inesss::PROD.V_DES_COD[
+      TYPE_CODE == "COD_CATG_LISTE_MED",  # sélection des code catégorie liste médicament
+      .(code = CODE, desc = CODE_DESC)  # colonnes code + description
+    ]
     return(dt)
   }
   create_dt_code_serv <- function() {
     ### Data contenant la liste des codes de services et leur description
 
-    dt <- inesss::PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[, .(code = COD_SERV, desc = COD_SERV_DESC)]
+    dt <- inesss::PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[
+      , .(code = COD_SERV, desc = COD_SERV_DESC)  # colonnes code + description
+    ]
+
     # Codes L à M3 sont tous inclus dans le même, donc modification du data
     dt <- dt[!code %in% c("L", "M", "M1", "M2", "M3")]
     dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))
@@ -205,6 +213,126 @@ formulaire <- function() {
 
     write_xlsx(dt, save_path$datapath)
   }
+  save_xl_file_queries_method <- function(conn, filepath, savepath) {
+    ### Effectuer la requête de chaque onglet du fichier EXCEL contenant les
+    ### arguments de chacune d'elles.
+
+    sheets <- excel_sheets(filepath)  # nom des onglets du fichier excel
+    excel_requetes <- vector("list", length(sheets))  # contiendra les tableaux résultats
+
+    for (sh in 1:length(sheets)) {
+
+      suppressMessages(suppressWarnings({  # supprimer messages d'avertissements
+        dt <- read_excel(file, sheet = sheets[sh])  # importer les arguments
+      }))
+      method <- str_remove_all(rmNA(dt$METHODE), " ")  # détecter la méthode
+      # Tableau des résultats selon la méthode à utiliser
+      if (method == "stat_gen1") {
+        excel_requetes[[sh]] <- save_xl_file_queries_sg1(dt, conn)
+      }
+
+    }
+
+    write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en EXCEL sur le poste
+
+  }
+  save_xl_file_queries_sg1 <- function(dt, conn) {
+    ### Référence à save_xl_file_queries_method() lorsque la méthode est "stat_gen1"
+
+    # Arguments selon les valeurs du tableau dt
+    nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
+    nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
+    dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
+    dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
+    type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
+    code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+    grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+    code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
+    code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
+    if (!length(code_serv)) code_serv <- NULL
+    code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
+    code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
+    if (!length(code_list)) code_list <- NULL
+
+    DT <- data.table()  # contiendra les résultats de toutes les périodes
+    for (i in 1:length(dates_debut)) {
+      dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
+        conn = conn,  # connexion faite à partir de l'onglet connexion
+        statement = stat_gen1_txt_query_1period(
+          debut = dates_debut[i], fin = dates_fin[i],
+          type_Rx = type_rx, codes = code_rx,
+          groupby = grpby,
+          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+          code_list = code_list, code_list_filtre = code_list_filtre
+        )
+      ))
+      dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
+                 MNT_SERV = as_price(MNT_SERV),
+                 MNT_TOT = as_price(MNT_TOT))]
+
+      if (any(c("DENOM", "DIN") %in% names(dt))) {
+
+        # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
+        if (type_rx == "DENOM") {
+          dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
+            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+            .(DENOM, NOM_DENOM)
+          ][
+            dt, on = .(DENOM)
+          ]
+        } else if (type_rx == "DIN") {
+          dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
+            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+            .(DIN, NOM_MARQ_COMRC)
+          ][
+            dt, on = .(DIN)
+          ]
+        }
+
+        colorder <- c(
+          "DATE_DEBUT", "DATE_FIN",
+          type_rx, nom_type_rx(type_rx),
+          "MNT_MED", "MNT_SERV", "MNT_TOT",
+          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
+        )
+        orderv <- c("DATE_DEBUT", "DATE_FIN", type_rx)
+      } else {
+        dt[, CODES_RX := paste(code_rx, collapse = "; ")]  # colonnes indiquant tous les codes demandés
+        colorder <- c(  # ordre des colonnes souhaitées si pas de codes
+          "DATE_DEBUT", "DATE_FIN",
+          "MNT_MED", "MNT_SERV", "MNT_TOT",
+          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
+          "CODES_RX"
+        )
+        orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
+      }
+
+      DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
+
+    }
+
+    # Ordre des colonnes et des données
+    setcolorder(DT, colorder)
+    setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
+
+
+    return(create_dt_data_args_query(
+      dt = copy(DT),
+      args_list = list(METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+                       TYPE_RX = type_rx, CODE_RX = code_rx,
+                       GROUPER_PAR = grpby,
+                       CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
+                       CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+      ),
+      query = stat_gen1_txt_query_1period(
+        debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
+        groupby = grpby,
+        code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+        code_list = code_list, code_list_filtre = code_list_filtre
+      )
+    ))
+
+  }
   sg1_find_date <- function(input, method = "deb") {
     ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
     ### (method = "fin") qui se retrouvent dans input.
@@ -247,16 +375,17 @@ formulaire <- function() {
     }
   }
   sg1_code_list_choices <- function(dt_code_list) {
-    ### Tableau indiquant les choix et les valeurs des codes de liste
-    dt <- dt_code_list[code %in% c("03", "40", "41")]
-    dt[, ch_name := paste0(code," : ",desc), .(code)]
+    ### Valeurs utilisées pour le choix des codes de liste de médicaments
+
+    dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
   }
   sg1_code_serv_choices <- function(dt_code_serv) {
-    ### Tableau indiquant les choix et les valeurs des codes de services
-    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]
-    # dt <- dt_code_serv[code %in% c("1", "A", "AD", "I", "L, M, M1 à M3", "Q", "RA")]  # anciennes valeurs proposées par Michèle Paré
-    dt[, ch_name := paste0(code," : ",desc), .(code)]
+    ### Valeurs utilisées pour le choix des codes de service
+
+    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
   }
   sg1_dbGetQuery <- function(input, conn) {
@@ -269,7 +398,7 @@ formulaire <- function() {
     nom_denom <- copy(inesss::PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
     nom_marq_comrc <- inesss::PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
 
-    # Extraire les arguments souvent utilisés des input
+    # Extraire les arguments des input
     dates_debut <- sg1_find_date(input, "deb")
     dates_fin <- sg1_find_date(input, "fin")
     codes_rx <- sort(sg1_find_code(input))
@@ -292,35 +421,52 @@ formulaire <- function() {
                  MNT_SERV = as_price(MNT_SERV),
                  MNT_TOT = as_price(MNT_TOT))]
 
-      # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
-      if (input$sg1_type_Rx == "DENOM") {
-        dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
-          DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-          .(DENOM, NOM_DENOM)
-        ][
-          dt, on = .(DENOM)
-        ]
-      } else if (input$sg1_type_Rx == "DIN") {
-        dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
-          DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-          .(DIN, NOM_MARQ_COMRC)
-        ][
-          dt, on = .(DIN)
-        ]
+      if (any(c("DENOM", "DIN") %in% names(dt))) {
+
+        # Ajouter le nom du Code Rx
+        if (input$sg1_type_Rx == "DENOM") {
+          dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
+            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+            .(DENOM, NOM_DENOM)
+          ][
+            dt, on = .(DENOM)
+          ]
+        } else if (input$sg1_type_Rx == "DIN") {
+          dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
+            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
+            .(DIN, NOM_MARQ_COMRC)
+          ][
+            dt, on = .(DIN)
+          ]
+        }
+
+        colorder <- c(  # ordre des colonnes souhaitées
+          "DATE_DEBUT", "DATE_FIN",
+          input$sg1_type_Rx, nom_type_rx(input$sg1_type_Rx),
+          "MNT_MED", "MNT_SERV", "MNT_TOT",
+          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
+        )
+        orderv <- c("DATE_DEBUT", "DATE_FIN", input$sg1_type_Rx)  # ordre des données
+
+      } else {
+
+        dt[, CODES_RX := paste(sg1_find_code(input), collapse = "; ")]  # colonnes indiquant tous les codes demandés
+        colorder <- c(  # ordre des colonnes souhaitées si pas de codes
+          "DATE_DEBUT", "DATE_FIN",
+          "MNT_MED", "MNT_SERV", "MNT_TOT",
+          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
+          "CODES_RX"
+        )
+        orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
       }
+
       DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
 
     }
 
-    # Ordre des colonnes
-    setcolorder(DT, c(
-      "DATE_DEBUT", "DATE_FIN",
-      input$sg1_type_Rx, nom_type_rx(input$sg1_type_Rx),
-      "MNT_MED", "MNT_SERV", "MNT_TOT",
-      "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
-    ))
-    # Ordre des données
-    setorderv(DT, c("DATE_DEBUT", "DATE_FIN", input$sg1_type_Rx))
+    # Ordre des colonnes et des données
+    setcolorder(DT, colorder)
+    setorderv(DT, orderv)
 
     return(DT)
   }
@@ -357,9 +503,6 @@ formulaire <- function() {
     } else {
       stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
-  }
-  sql_xl_file_queries_method <- function(method) {
-
   }
   verif_sg1 <- function(dt, sh, msg_error) {
     ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
@@ -609,12 +752,12 @@ formulaire <- function() {
               checkboxGroupInput("sg1_group_by", "Grouper par",
                                  choiceNames = c("Périodes"),
                                  choiceValues = c("period")),
-              # Codes de service
+
+              # Codes de services
               selectInput("sg1_code_serv_filter", "Codes de Service",
                           choices = c("Exclusion", "Inclusion"),
                           selected = "Exclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
-              # Codes de service
               checkboxGroupInput(
                 "sg1_code_serv", "",
                 choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
@@ -641,19 +784,24 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 3,
-              # Exécution de la requête SQL
-              actionButton("sg1_go_extract", "Exécuter Requête",
-                           style = "background-color: #b3d9ff")  # couleur du bouton
+              actionButton(  # Exécution de la requête SQL
+                "sg1_go_extract", "Exécuter Requête",
+                style = "background-color: #b3d9ff"  # couleur du bouton
+              )
             ),
             column(
               width = 3,
-              # Sauvegarder les résultats de la requête
-              uiOutput("sg1_save")
+              uiOutput("sg1_erase_tab")  # bouton effacer la requête
+            ),
+            column(
+              width = 3,
+              uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
             )
           ),
 
           # Tableau & Affichage extraction SQL
           fluidRow(
+            p(),
             dataTableOutput("sg1_table_req"),
             p(),  # espacement avec la suite
           ),
@@ -758,96 +906,10 @@ formulaire <- function() {
         showNotification("Exécution impossible. Connexion requise.", type = "error")
       } else if (xl_errors_msg() == "Aucune error, exécution possible.") {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
-        file <- select_xl_file()$datapath
-        sheets <- excel_sheets(file)
-        excel_requetes <- vector("list", length(sheets))  # contiendra les tableaux à insérer dans un EXCEL
-        conn <- conn_values$conn
-
-        # Effectuer la requête de chaque onglet
-        for (sh in 1:length(sheets)) {
-          suppressMessages(suppressWarnings({
-            dt <- read_excel(file, sheet = sheets[sh])
-          }))
-          method <- str_remove_all(rmNA(dt$METHODE), " ")
-
-          if (method == "stat_gen1") {
-            nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-            nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
-            dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
-            dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
-            type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
-            code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-            grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
-            code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
-            code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
-            code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
-            code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
-            if (!length(code_serv)) code_serv <- NULL
-            if (!length(code_list)) code_list <- NULL
-            DT <- data.table()
-            for (i in 1:length(dates_debut)) {
-              dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
-                conn = conn,  # connexion faite à partir de l'onglet connexion
-                statement = stat_gen1_txt_query_1period(
-                  debut = dates_debut[i], fin = dates_fin[i],
-                  type_Rx = type_rx, codes = code_rx,
-                  groupby = grpby,
-                  code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-                  code_list = code_list, code_list_filtre = code_list_filtre
-                )
-              ))
-              dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
-                         MNT_SERV = as_price(MNT_SERV),
-                         MNT_TOT = as_price(MNT_TOT))]
-
-              # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
-              if (type_rx == "DENOM") {
-                dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
-                  DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-                  .(DENOM, NOM_DENOM)
-                ][
-                  dt, on = .(DENOM)
-                ]
-              } else if (type_rx == "DIN") {
-                dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
-                  DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-                  .(DIN, NOM_MARQ_COMRC)
-                ][
-                  dt, on = .(DIN)
-                ]
-              }
-              DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
-
-            }
-            # Ordre des colonnes
-            setcolorder(DT, c(
-              "DATE_DEBUT", "DATE_FIN",
-              type_rx, nom_type_rx(type_rx),
-              "MNT_MED", "MNT_SERV", "MNT_TOT",
-              "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
-            ))
-            # Ordre des données
-            setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
-          }
-
-          excel_requetes[[sh]] <- create_dt_data_args_query(
-            dt = copy(DT),
-            args_list = list(METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-                             TYPE_RX = type_rx, CODE_RX = code_rx,
-                             GROUPER_PAR = grpby,
-                             CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
-                             CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
-            ),
-            query = stat_gen1_txt_query_1period(
-              debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
-              groupby = grpby,
-              code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-              code_list = code_list, code_list_filtre = code_list_filtre
-            )
-          )
-        }
-        names(excel_requetes) <- sheets
-        write_xlsx(excel_requetes, save_xl_file()$datapath)
+        save_xl_file_queries_method(  # effectuer les requêtes pour chaque onglet du fichier
+          conn = conn_values$conn,
+          filepath = select_xl_file()$datapath, savepath = save_xl_file()$datapath
+        )
         removeNotification("save_xl_file")
       } else {
         showNotification("Exécution impossible.", type = "error")
@@ -862,7 +924,8 @@ formulaire <- function() {
     # Variables réactives pour sg1
     sg1_val <- reactiveValues(
       show_query = FALSE,  # afficher la requête ou pas
-      query = NULL  # message à afficher. NULL = même pas une case où afficher du texte.
+      query = NULL,  # message à afficher. NULL = même pas une case où afficher du texte
+      show_tab = FALSE  # contient le tableau de la requête/résultats
     )
 
     # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
@@ -920,34 +983,61 @@ formulaire <- function() {
 
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      if (sg1_find_code(input) == "") {
+      if (sg1_find_code(input)[1] == "") {
+        sg1_val$show_tab <- FALSE
         showNotification("Inscrire au moins un Code Rx", type = "error")
+        return(NULL)
       } else if (!is.null(conn_values$conn)) {
         showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
+        sg1_val$show_tab <- TRUE
         DT <- sg1_dbGetQuery(input, conn_values$conn)
-        sg1_val$is_extract <<- TRUE  # il y a une extraction d'affichée
         removeNotification("sg1_go_extract")
         return(DT)
       } else {
+        sg1_val$show_tab <- FALSE
         showNotification("Exécution impossible. Connexion requise.", type = "error")
         return(NULL)
       }
     })
     # Afficher le tableau demandé
-    output$sg1_table_req <- renderDataTable({ sg1_table_format(sg1_requete_sql()) })
+    output$sg1_table_req <- renderDataTable({
+
+      DT <- sg1_table_format(sg1_requete_sql())
+      if (sg1_val$show_tab) {
+        return(DT)
+      } else {
+        return(NULL)
+      }
+
+      },
+      options = list(scrollX = TRUE)  # scrolling si le tableau est plus large que la fenêtre
+    )
+
+    # Effacer le tableau des résultats
+    output$sg1_erase_tab <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
+      if (sg1_val$show_tab) {
+        return(actionButton("sg1_erase_tab", "Effacer Requête",
+                            style = "background-color: #ffc2b3"))
+      } else {
+        return(NULL)
+      }
+    })
+    observeEvent(input$sg1_erase_tab, {
+      sg1_val$show_tab <- FALSE  # ne pas afficher de tableau
+    })
 
     # Enregistrer le fichier au format EXCEL
     output$sg1_save <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
-      if (is.null(sg1_requete_sql())) {
-        return(NULL)
+      if (sg1_val$show_tab) {
+        return(shinySaveButton(
+          "sg1_save", "Sauvegarder Résultats en EXCEL",
+          "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+          filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
+          viewtype = "list",
+          style = "background-color: #b3d9ff"
+        ))
       } else {
-        return(
-          shinySaveButton("sg1_save", "Sauvegarder Résultats en EXCEL",
-                          "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
-                          filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
-                          viewtype = "list",
-                          style = "background-color: #b3d9ff")  # couleur du bouton
-        )
+        return(NULL)
       }
     })
     shinyFileSave(input, "sg1_save", roots = Volumes_path())  # détermine les répertoires à afficher pour le bouton sg1_save
@@ -989,11 +1079,11 @@ formulaire <- function() {
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
     })
-    observeEvent(input$sg1_erase_req, {  # si on veut effacer la requête
+    observeEvent(input$sg1_erase_req, {  # modification des valeurs pour effacer le code requête
       sg1_val$show_query <- FALSE
       sg1_val$query <- NULL
     })
-    output$sg1_code_req <- reactive({  # code de la requête à afficher
+    output$sg1_code_req <- reactive({  # afficher le code de la requête
       if (sg1_val$show_query) {
         return(sg1_val$query)
       } else {
