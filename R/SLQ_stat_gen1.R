@@ -15,13 +15,17 @@ stat_gen1_txt_query_1period <- function(
 
 # Internal FCTS -----------------------------------------------------------
 
-  select_type_rx <- function(type_Rx) {
-    if (type_Rx == "DENOM") {
-      return("SMED_COD_DENOM_COMNE as DENOM,\n")
-    } else if (type_Rx == "DIN") {
-      return("SMED_COD_DIN as DIN,\n")
+  select_type_rx <- function(groupby, type_Rx) {
+    if (is.null(groupby)) {
+      if (type_Rx == "DENOM") {
+        return(paste0(indent(),"SMED_COD_DENOM_COMNE as DENOM,\n"))
+      } else if (type_Rx == "DIN") {
+        return(paste0(indent(),"SMED_COD_DIN as DIN,\n"))
+      } else {
+        stop("stat_gen1_txt_query_1period.select_CODES() valeur non permise.")
+      }
     } else {
-      stop("stat_gen1_txt_query_1period.select_CODES() valeur non permise.")
+      return("")
     }
   }
   where_code_rx <- function(type_Rx, codes) {
@@ -74,7 +78,7 @@ stat_gen1_txt_query_1period <- function(
   query <- paste0(
     "select ",qu(debut)," as DATE_DEBUT,\n",
     indent(),qu(fin)," as DATE_FIN,\n",
-    indent(),select_type_rx(type_Rx),
+             select_type_rx(groupby, type_Rx),
     indent(),"sum(SMED_MNT_AUTOR_MED) as MNT_MED,\n",
     indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n",
     indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n",
