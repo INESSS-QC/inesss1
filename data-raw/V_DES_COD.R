@@ -3,6 +3,7 @@ library(odbc)
 library(data.table)
 library(askpass)
 library(inesss)
+library(lubridate)
 # conn <- sql_connexion(askpass("User"))
 
 fct <- function(need_conn = FALSE) {
@@ -21,6 +22,10 @@ fct <- function(need_conn = FALSE) {
     order by CODE_NOM_COD asc, CODE_VAL_COD asc;"
 
   DT <- as.data.table(dbGetQuery(conn, query))
+
+  # Modifier les dates aberrantes > date actuelle
+  DT[CODE_DF_DES_COD > Sys.Date(), CODE_DF_DES_COD := as_date(paste0(year(Sys.Date()),"12-31"))]
+
   setkey(DT, TYPE_CODE, CODE)
   attr(DT, "Date") <- Sys.Date()
   return(DT)
