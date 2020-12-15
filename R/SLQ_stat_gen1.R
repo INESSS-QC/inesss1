@@ -1,3 +1,40 @@
+#' Title
+#'
+#' @param user Identifiant SQL Teradata.
+#' @param pwd Mot de passe associé au compte (`user`) Teradata.
+#' @param date_debut,date_fin Dates au format `"AAAA-MM-JJ"`. Dates de début et de fin de la période d'analyse, de la période d'étude.
+#' @param type_rx Type des codes Rx.
+#' @param code_rx Codes Rx à analyser.
+#' @param grouper_par
+#' @param code_serv_filtre
+#' @param code_serv
+#' @param code_list_filtre
+#' @param code_list
+#'
+#' @return
+#' @import data.table
+#' @importFrom askpass askpass
+#' @export
+#'
+#' @examples
+SQL_stat_gen1 <- function(
+  user, pwd = NULL,
+  date_debut, date_fin,
+  type_rx, code_rx, grouper_par,
+  code_serv_filtre, code_serv,
+  code_list_filtre, code_list
+) {
+
+  # Demander le mot de passe s'il n'a pas été inscrit
+  if (is.null(pwd)) {
+    pwd <- askpass("Mot de passe :")
+  }
+
+
+
+
+}
+
 #' Statistiques générales
 #'
 #' Code de la requête SQL - chaîne de caractères.
@@ -67,7 +104,7 @@ stat_gen1_txt_query_1period <- function(
       } else if (type_Rx == "DIN") {
         txt_grpby <- paste0(txt_grpby, "DIN")
       }
-    } else if ("period" %in% groupby) {
+    } else if ("Périodes" %in% groupby) {
       txt_grpby <- ""
     }
     return(txt_grpby)
@@ -96,7 +133,9 @@ stat_gen1_txt_query_1period <- function(
   )
 
   if (str_detect(query, "\n;")) {  # supprimer retour de ligne (\n) si la commande est terminée (;)
-    str_sub(query, nchar(query) - 1, nchar(query) - 1) <- ""  # supprime '\n' qui est compté comme 1 seul char
+    substr(query, nchar(query) - 1, nchar(query) - 1) <- ""  # supprime '\n' qui est compté comme 1 seul char
+    # *** NOTE : stringr::str_sub() ne fonctionne pas, la fonction n'était pas
+    #            disponible malgré le importFrom stringr str_sub.
   }
 
   return(query)
