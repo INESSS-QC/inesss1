@@ -224,7 +224,7 @@ formulaire <- function() {
     for (sh in 1:length(sheets)) {
 
       suppressMessages(suppressWarnings({  # supprimer messages d'avertissements
-        dt <- read_excel(file, sheet = sheets[sh])  # importer les arguments
+        dt <- read_excel(filepath, sheet = sheets[sh])  # importer les arguments
       }))
       method <- str_remove_all(rmNA(dt$METHODE), " ")  # détecter la méthode
       # Tableau des résultats selon la méthode à utiliser
@@ -234,6 +234,7 @@ formulaire <- function() {
 
     }
 
+    names(excel_requetes) <- sheets  # conserver le nom initial des onglets
     write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en EXCEL sur le poste
 
   }
@@ -248,6 +249,7 @@ formulaire <- function() {
     type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
     code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
     grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+    if (!length(grpby)) grpby <- NULL
     code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
     code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
     if (!length(code_serv)) code_serv <- NULL
@@ -314,7 +316,7 @@ formulaire <- function() {
 
     # Ordre des colonnes et des données
     setcolorder(DT, colorder)
-    setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx))
+    setorderv(DT, orderv)
 
 
     return(create_dt_data_args_query(
@@ -555,8 +557,8 @@ formulaire <- function() {
 
     # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
     if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
-      lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT)))  # nombre de valeurs
-      lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN)))
+      lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
+      lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
       if (lng_deb != lng_fin) {  # si le nbre de valeurs est différent
         if (new_error) {
           msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
@@ -663,9 +665,9 @@ formulaire <- function() {
     ### enregistrer un fichier.
 
     return(c(
-      getVolumes()(),
       `Par défaut` = path_home(),
-      R = R.home()
+      R = R.home(),
+      getVolumes()()
     ))
   }
 
@@ -935,17 +937,16 @@ formulaire <- function() {
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
     # Enregistrer les requêtes dans un fichier EXCEL
     observeEvent(save_xl_file(), {
-      if (is.null(conn_values$conn)) {
-        showNotification("Exécution impossible. Connexion requise.", type = "error")
-      } else if (xl_errors_msg() == "Aucune error, exécution possible.") {
+      if (xl_errors_msg() == "Aucune erreur, exécution possible." && !is.null(conn_values$conn)) {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
         save_xl_file_queries_method(  # effectuer les requêtes pour chaque onglet du fichier
           conn = conn_values$conn,
-          filepath = select_xl_file()$datapath, savepath = save_xl_file()$datapath
+          filepath = select_xl_file()$datapath,
+          savepath = save_xl_file()$datapath
         )
         removeNotification("save_xl_file")
       } else {
-        showNotification("Exécution impossible.", type = "error")
+        showNotification("Exécution impossible. Vérifier la connexion ou corriger les erreurs.")
       }
     })
 
@@ -1020,7 +1021,12 @@ formulaire <- function() {
         sg1_val$show_tab <- FALSE
         showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
         return(NULL)
-      } else if (conn_values$conn) {
+      } else if (!is.null(conn_values$conn)) {
+        if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
+          sg1_val$show_tab <- FALSE
+          showNotification("Exécution impossible. Connexion requise.", type = "error")
+          return(NULL)
+        }
         showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
         sg1_val$show_tab <- TRUE
         DT <- sg1_dbGetQuery(input, conn_values$conn)
