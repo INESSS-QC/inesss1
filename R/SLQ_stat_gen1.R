@@ -30,9 +30,6 @@ SQL_stat_gen1 <- function(
     pwd <- askpass("Mot de passe :")
   }
 
-
-
-
 }
 
 #' Statistiques générales
@@ -128,14 +125,14 @@ stat_gen1_txt_query_1period <- function(
     indent(),where_code_rx(type_Rx, codes),
     where_code_serv(code_serv_filtre, code_serv),
     where_code_list(code_list_filtre, code_list),
-    group_by(groupby, type_Rx),
-    ";"
+    group_by(groupby, type_Rx),";"
   )
 
   if (str_detect(query, "\n;")) {  # supprimer retour de ligne (\n) si la commande est terminée (;)
-    substr(query, nchar(query) - 1, nchar(query) - 1) <- ""  # supprime '\n' qui est compté comme 1 seul char
+    substr(query, nchar(query) - 1, nchar(query) - 1) <- " "  # supprime '\n' qui est compté comme 1 seul char
     # *** NOTE : stringr::str_sub() ne fonctionne pas, la fonction n'était pas
     #            disponible malgré le importFrom stringr str_sub.
+    #            De plus, "" ne fonctionne pas non plus dans certains cas... insertion d'un espace
   }
 
   return(query)
