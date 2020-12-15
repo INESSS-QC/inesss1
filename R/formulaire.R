@@ -9,7 +9,7 @@
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath getVolumes
-#' @importFrom stringr str_split str_remove_all
+#' @importFrom stringr str_split str_remove_all str_sub
 #' @importFrom writexl write_xlsx
 #' @export
 formulaire <- function() {
@@ -20,7 +20,7 @@ formulaire <- function() {
     ### Colonnes nécessaires pour chaque méthode
 
     return(list(
-      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX",
+      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
     ))
   }
@@ -30,6 +30,7 @@ formulaire <- function() {
     return(list(
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
+        GROUPER_PAR = c("Périodes"),
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
@@ -74,7 +75,7 @@ formulaire <- function() {
     ### Data contenant tous les codes de liste de médicament ainsi que leur
     ### description
 
-    dt <- inesss::PROD.V_DES_COD[
+    dt <- inesss::V_DES_COD[
       TYPE_CODE == "COD_CATG_LISTE_MED",  # sélection des code catégorie liste médicament
       .(code = CODE, desc = CODE_DESC)  # colonnes code + description
     ]
@@ -83,7 +84,7 @@ formulaire <- function() {
   create_dt_code_serv <- function() {
     ### Data contenant la liste des codes de services et leur description
 
-    dt <- inesss::PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV[
+    dt <- inesss::V_DEM_PAIMT_MED_CM.SMED_COD_SERV[
       , .(code = COD_SERV, desc = COD_SERV_DESC)  # colonnes code + description
     ]
 
@@ -240,8 +241,8 @@ formulaire <- function() {
     ### Référence à save_xl_file_queries_method() lorsque la méthode est "stat_gen1"
 
     # Arguments selon les valeurs du tableau dt
-    nom_denom <- copy(PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-    nom_marq_comrc <- PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
+    nom_denom <- copy(V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
+    nom_marq_comrc <- V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
     dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
     dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
     type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
@@ -395,8 +396,8 @@ formulaire <- function() {
     ### @param conn : Variable de connexion créé par sql_connecion
 
     DT <- data.table()  # tableau contenant la ou les requêtes
-    nom_denom <- copy(inesss::PROD.V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-    nom_marq_comrc <- inesss::PROD.V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
+    nom_denom <- copy(inesss::V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
+    nom_marq_comrc <- inesss::V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
 
     # Extraire les arguments des input
     dates_debut <- sg1_find_date(input, "deb")
@@ -590,6 +591,23 @@ formulaire <- function() {
         )
       }
     }
+
+    # GROUPER_PAR
+    if ("GROUPER_PAR" %in% names(dt)) {
+      grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+      if (length(grpby)) {
+        if (!all(grpby %in% vals$GROUPER_PAR)) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+            " -  GROUPER_PAR ne contient pas une valeur permise.\n"
+          )
+        }
+      }
+    }
+
     # CODE_SERV, CODE_LIST
     for (col in c("CODE_SERV", "CODE_LIST")) {
       if (col %in% names(dt)) {
@@ -750,8 +768,7 @@ formulaire <- function() {
             column(
               width = 3,
               checkboxGroupInput("sg1_group_by", "Grouper par",
-                                 choiceNames = c("Périodes"),
-                                 choiceValues = c("period")),
+                                 choices = "Périodes"),
 
               # Codes de services
               selectInput("sg1_code_serv_filter", "Codes de Service",
@@ -1001,7 +1018,6 @@ formulaire <- function() {
     })
     # Afficher le tableau demandé
     output$sg1_table_req <- renderDataTable({
-
       DT <- sg1_table_format(sg1_requete_sql())
       if (sg1_val$show_tab) {
         return(DT)
@@ -1043,6 +1059,7 @@ formulaire <- function() {
     shinyFileSave(input, "sg1_save", roots = Volumes_path())  # détermine les répertoires à afficher pour le bouton sg1_save
     sg1_file_save <- reactive({ shinyFiles_directories(input$sg1_save, "save") })
     observeEvent(sg1_file_save(), {  # sauvegarde de la requête en Excel
+      showNotification("Sauvegarde en cours.", id = "sg1_file_save", type = "message", duration = NULL)
       save_EXCEL(
         dt = create_dt_data_args_query(
           dt = sg1_requete_sql(),
@@ -1051,6 +1068,7 @@ formulaire <- function() {
             DATE_DEBUT = sg1_find_date(input, "deb"),
             DATE_FIN = sg1_find_date(input, "fin"),
             TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
+            GROUPER_PAR = input$sg1_group_by,
             CODE_SERV_FILTRE = input$sg1_code_serv_filter,
             CODE_SERV = adapt_code_serv(input$sg1_code_serv),
             CODE_LIST_FILTRE = input$sg1_code_list_filter,
@@ -1066,6 +1084,7 @@ formulaire <- function() {
         ),
         save_path = sg1_file_save()
       )
+      removeNotification("sg1_file_save")
     })
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
