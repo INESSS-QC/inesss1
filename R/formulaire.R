@@ -494,7 +494,6 @@ formulaire <- function() {
   }
   shinyFiles_directories <- function(input_name, method) {
     ### Créer le répertoire à partir d'un shinyFileButton
-
     if (is.integer(input_name)) {
       return(NULL)
     } else if (method == "save") {
@@ -553,6 +552,22 @@ formulaire <- function() {
         }
       }
     }
+
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
+      lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT)))  # nombre de valeurs
+      lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN)))
+      if (lng_deb != lng_fin) {  # si le nbre de valeurs est différent
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+          " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
+        )
+      }
+    }
+
     # TYPE_RX, CODE_SERV_FILTRE, CODE_LIST_FILTRE
     for (col in c("TYPE_RX", "CODE_SERV_FILTRE", "CODE_LIST_FILTRE")) {
       if (col %in% names(dt)) {
@@ -578,6 +593,7 @@ formulaire <- function() {
         }
       }
     }
+
     # CODE_RX
     if ("CODE_RX" %in% names(dt)) {
       code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
@@ -1000,11 +1016,11 @@ formulaire <- function() {
 
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      if (sg1_find_code(input)[1] == "") {
+      if (any("" %in% str_remove_all(sg1_find_code(input), " "))) {
         sg1_val$show_tab <- FALSE
-        showNotification("Inscrire au moins un Code Rx", type = "error")
+        showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
         return(NULL)
-      } else if (!is.null(conn_values$conn)) {
+      } else if (conn_values$conn) {
         showNotification("Exécution en cours...", id = "sg1_go_extract", type = "message", duration = NULL)
         sg1_val$show_tab <- TRUE
         DT <- sg1_dbGetQuery(input, conn_values$conn)
@@ -1059,32 +1075,34 @@ formulaire <- function() {
     shinyFileSave(input, "sg1_save", roots = Volumes_path())  # détermine les répertoires à afficher pour le bouton sg1_save
     sg1_file_save <- reactive({ shinyFiles_directories(input$sg1_save, "save") })
     observeEvent(sg1_file_save(), {  # sauvegarde de la requête en Excel
-      showNotification("Sauvegarde en cours.", id = "sg1_file_save", type = "message", duration = NULL)
-      save_EXCEL(
-        dt = create_dt_data_args_query(
-          dt = sg1_requete_sql(),
-          args_list = list(
-            METHODE = "stat_gen1",
-            DATE_DEBUT = sg1_find_date(input, "deb"),
-            DATE_FIN = sg1_find_date(input, "fin"),
-            TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
-            GROUPER_PAR = input$sg1_group_by,
-            CODE_SERV_FILTRE = input$sg1_code_serv_filter,
-            CODE_SERV = adapt_code_serv(input$sg1_code_serv),
-            CODE_LIST_FILTRE = input$sg1_code_list_filter,
-            CODE_LIST = input$sg1_code_list
+      if (nrow(sg1_file_save())) {  # car à la base table de 0 ligne 4 colonnes, 1 ligne si on sélectionne un répertoire
+        showNotification("Sauvegarde en cours.", id = "sg1_file_save", type = "message", duration = NULL)
+        save_EXCEL(
+          dt = create_dt_data_args_query(
+            dt = sg1_requete_sql(),
+            args_list = list(
+              METHODE = "stat_gen1",
+              DATE_DEBUT = sg1_find_date(input, "deb"),
+              DATE_FIN = sg1_find_date(input, "fin"),
+              TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
+              GROUPER_PAR = input$sg1_group_by,
+              CODE_SERV_FILTRE = input$sg1_code_serv_filter,
+              CODE_SERV = adapt_code_serv(input$sg1_code_serv),
+              CODE_LIST_FILTRE = input$sg1_code_list_filter,
+              CODE_LIST = input$sg1_code_list
+            ),
+            query = stat_gen1_txt_query_1period(
+              debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
+              type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
+              groupby = input$sg1_group_by,
+              code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
+              code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+            )
           ),
-          query = stat_gen1_txt_query_1period(
-            debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-            type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
-            groupby = input$sg1_group_by,
-            code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
-            code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
-          )
-        ),
-        save_path = sg1_file_save()
-      )
-      removeNotification("sg1_file_save")
+          save_path = sg1_file_save()
+        )
+        removeNotification("sg1_file_save")
+      }
     })
 
     # Afficher code de la requête SQL généré par les arguments du formulaire
