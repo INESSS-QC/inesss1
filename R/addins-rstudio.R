@@ -4,5 +4,5 @@
 #' @keywords internal
 #' @export
 formulaire_addin <- function() {
-  inesss::formulaire()
+  return(formulaire())
 }
