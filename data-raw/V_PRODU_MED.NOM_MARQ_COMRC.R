@@ -2,16 +2,16 @@ library(usethis)
 library(odbc)
 library(data.table)
 library(askpass)
-# conn <- sql_connexion("PEI_PRD", askpass("Identifiant ?"), askpass("Mot de passe?"), "latin1")
+library(inesss)
+# conn <- sql_connexion(askpass("User"))
 
 fct <- function(need_conn = FALSE) {
 
   if (need_conn) {
-    conn <- sql_connexion("PEI_PRD", askpass("Identifiant ?"), askpass("Mot de passe?"), "latin1")
+    conn <- sql_connexion(askpass("User"))
   }
 
-  DT <- as.data.table(dbGetQuery(
-    conn,
+  query <-
     "select distinct NMED_COD_DENOM_COMNE as DENOM,
 				NMED_COD_DIN as DIN,
 				NMED_NOM_MARQ_COMRC as NOM_MARQ_COMRC,
@@ -19,7 +19,8 @@ fct <- function(need_conn = FALSE) {
 				NMED_DF_PRODU_MED as DATE_FIN
     from PROD.V_PRODU_MED
     order by NMED_COD_DENOM_COMNE, NMED_COD_DIN, NMED_DD_PRODU_MED;"
-  ))
+
+  DT <- as.data.table(dbGetQuery(conn, query))
   setkey(DT, DENOM, DIN, DATE_DEBUT)
 
   # Regrouper les périodes qui se chevauche
@@ -42,5 +43,5 @@ fct <- function(need_conn = FALSE) {
 }
 
 
-PROD.V_PRODU_MED.NOM_MARQ_COMRC <- fct()
-use_data(PROD.V_PRODU_MED.NOM_MARQ_COMRC, overwrite = TRUE)
+V_PRODU_MED.NOM_MARQ_COMRC <- fct()
+use_data(V_PRODU_MED.NOM_MARQ_COMRC, overwrite = TRUE)

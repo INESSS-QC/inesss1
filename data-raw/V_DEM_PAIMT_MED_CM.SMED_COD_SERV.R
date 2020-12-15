@@ -3,11 +3,12 @@ library(odbc)
 library(data.table)
 library(askpass)
 library(stringr)
-# conn <- sql_connexion("PEI_PRD", askpass("Identifiant ?"), askpass("Mot de passe?"), "latin1")
+library(inesss)
+# conn <- sql_connexion(askpass("User"))
 
 fct <- function(need_conn = FALSE) {
   if (need_conn) {
-    conn <- sql_connexion("PEI_PRD", askpass("Identifiant ?"), askpass("Mot de passe?"), "latin1")
+    conn <- sql_connexion(askpass("User"))
   }
 
   # Extraire les valeurs de COD_SERV_X pour chaque année de 1996 à aujourd'hui
@@ -61,5 +62,5 @@ fct <- function(need_conn = FALSE) {
 }
 
 
-PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV <- fct()
-use_data(PROD.V_DEM_PAIMT_MED_CM.SMED_COD_SERV, overwrite = TRUE)
+V_DEM_PAIMT_MED_CM.SMED_COD_SERV <- fct()
+use_data(V_DEM_PAIMT_MED_CM.SMED_COD_SERV, overwrite = TRUE)
