@@ -5,8 +5,6 @@ output:
     toc: true
     toc_float: true
     toc_depth: 2
-  pdf_document:
-    toc: false
 ---
 
 ```{r setup, include=FALSE}
@@ -17,6 +15,16 @@ library(knitr)
 ```
 
 [inesss v.`r as.character(packageVersion('inesss'))`](https://github.com/INESSS-QC/inesss1){target="_blank"}
+
+# Démarrer le formulaire
+À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.  
+![](images/formulaire-addin.png){ width=70% }
+
+
+<p style="page-break-before: always"> <!-- nouvelle page ou espacement -->
+<p style="margin-bottom:3cm">
+
+
 
 # Connexion
 Établir une connexion entre *R* et *Teradata*.
@@ -30,30 +38,43 @@ library(knitr)
 
 
 
-```{r}
-if (is_html_output()) {
-  cat('<p style="page-break-before: always">')
-  cat('<p style="margin-bottom:3cm">')
-} else {
-  cat("\\pagebreak")
-}
-```
+<p style="page-break-before: always"> <!-- nouvelle page ou espacement -->
+<p style="margin-bottom:3cm">
 
 
 
 # Requêtes via EXCEL
 Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet correspond à un tableau contenant les arguments d'une méthode.  
-Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits de chaque méthode disponibles à partir du fichier *Gabarits-formulaire.xlsx*.
+Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits disponibles à partir du fichier *Gabarits-formulaire.xlsx*.
 
 1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes.
 2. Le programme vérifie si chaque onglet contient un tableau et si la structure de chaque colonne correspond à la méthode utilisée.
 3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message contient toutes les erreurs à corriger, regroupés par onglet.
 4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire et le nom du fichier à sauvegarder. Lorsque c'est fait, le programme exécute la requête associé aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
-5. Le fichier sauvegarder présente les résultats de la manière suivante :
+5. Le fichier sauvegardé présente les résultats de la manière suivante :
     + Les onglets possèdent le même nom que ceux du fichier initial contenant les arguments.
     + À gauche se trouve le tableau des résultats.
-    + Au milieu, un tableau rappelant les arguments utilisés.
-    + À droite, le code SQL de la première période d'analyse généré par les arguments et utilisé dans Teradata pour créer le tableau des résultats.
+    + Au milieu, le tableau rappelant les arguments utilisés.
+    + À droite, un exemple de code SQL, celui de la première période d'analyse, utilisé dans Teradata pour créer le tableau des résultats.
+
+## Statistiques générales
+Un onglet du fichier EXCEL dédié aux statistiques générales doit contenir les colonnes suivantes :
+
+* **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
+* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_FIN`.
+* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_DEBUT`.
+* **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
+* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser.
+* **`GROUPER_PAR` :** Grouper les résultats par :
+    + `Périodes` : Additionne les montants de tous les codes d'analyse pour une même période. Ajoute la colonne `CODES_RX` au tableau des résultats rappelant les codes analysés.
+* **`CODE_SERV_FILTRE` :** `Inclusion` ou `Exclusion` des codes de services. Par défaut `Exclusion`. Pour aucun filtre, laisser la colonne `CODE_SERV` vide.
+* **`CODE_SERV` : ** Le ou les codes de service à inclure ou à exclure (sinon laisser vide). Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+* **`CODE_LIST_SERV` :** `Inclusion` ou `Exclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Pour aucun filtre, laisser la colonne `CODE_LIST` vide.
+* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à inclure ou exclure (sinon laisser vide). Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+
+
+
+
 
 
 
