@@ -21,7 +21,7 @@ Tableau de 8 variables et 2 595 320 observations :
 \href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population.}
 }
 \usage{
-Pop_QC
+data("Pop_QC") / MaVariable <- Pop_QC.
 }
 \description{
 Tableau de la population québécoise par niveau géographique.\cr\cr
