@@ -22,6 +22,8 @@
 #'   \item{POP}{Population}
 #' }
 #'
+#' @usage data("Pop_QC") / MaVariable <- Pop_QC.
+#'
 #' @source \href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population.}
 "Pop_QC"
 
@@ -40,6 +42,8 @@
 #'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10.}
 #' }
 #'
+#' @usage data("RLS_convert") / MaVariable <- RLS_convert.
+#'
 #' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10.}
 "RLS_convert"
 
@@ -49,4 +53,6 @@
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utilisées lors d'analyse : 1001, 1701, 1801.
 #'
 #' @format Vecteur `integer` de 96 nombres.
+#'
+#' @usage data("RLS_list") / MaVariable <- RLS_list.
 "RLS_list"

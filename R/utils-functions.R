@@ -73,6 +73,29 @@ nl <- function(x = 1) {
 
 #' Utils
 #'
+#' Indique le nom de la colonne indiquant le nom du type de Rx dans un data
+#'
+#' @param type_rx Type de code, "DENOM", "DIN", ...
+#'
+#' @keywords internal
+#' @return `"DENOM"` : `"NOM_DENOM"`.\cr
+#' `"DIN"` = `"NOM_MARQ_COMRC`.
+#' @export
+nom_type_rx <- function(type_rx) {
+  ###
+
+  if (type_rx == "DENOM") {
+    return("NOM_DENOM")
+  } else if (type_rx == "DIN") {
+    return("NOM_MARQ_COMRC")
+  } else {
+    stop("nom_type_rx() valeur non permise.")
+  }
+}
+
+
+#' Utils
+#'
 #' Supprime les NA du vecteur. Renvoie NULL si aucune valeur.
 #'
 #' @param x Vecteur
@@ -87,4 +110,19 @@ rmNA <- function(x) {
     }
   }
   return(x)
+}
+
+
+#' Utils
+#'
+#' Combinaison de `sort()` et `unique()`.
+#'
+#' @param x Vecteur à trier et supprimer doublons.
+#' @param decreasing Ordre décroissant = `TRUE`, sinon `FALSE`.
+#' @param na.last Afficher les `NA` à la fin = `TRUE`, sinon `FALSE`. `NA` n'affiche pas les valeurs `NA`.
+#'
+#' @keywords internal
+#' @export
+sunique <- function(x, decreasing = FALSE, na.last = FALSE) {
+  return(sort(unique(x), decreasing = decreasing, na.last = na.last))
 }

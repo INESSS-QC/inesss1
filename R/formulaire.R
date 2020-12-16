@@ -198,17 +198,6 @@ formulaire <- function() {
       return(msg_error)
     }
   }
-  nom_type_rx <- function(type_rx) {
-    ### Indique le nom de la colonne indiquant le nom du type de Rx dans un data
-
-    if (type_rx == "DENOM") {
-      return("NOM_DENOM")
-    } else if (type_rx == "DIN") {
-      return("NOM_MARQ_COMRC")
-    } else {
-      stop("formulaire.nom_type_rx() valeur non permise.")
-    }
-  }
   save_EXCEL <- function(dt, save_path) {
     ### Enregistrer au format EXCEL
 
@@ -242,8 +231,6 @@ formulaire <- function() {
     ### Référence à save_xl_file_queries_method() lorsque la méthode est "stat_gen1"
 
     # Arguments selon les valeurs du tableau dt
-    nom_denom <- copy(V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-    nom_marq_comrc <- V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques
     dates_debut <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_DEBUT), " "))
     dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
     type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
@@ -257,77 +244,29 @@ formulaire <- function() {
     code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
     if (!length(code_list)) code_list <- NULL
 
-    DT <- data.table()  # contiendra les résultats de toutes les périodes
-    for (i in 1:length(dates_debut)) {
-      dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
-        conn = conn,  # connexion faite à partir de l'onglet connexion
-        statement = stat_gen1_txt_query_1period(
-          debut = dates_debut[i], fin = dates_fin[i],
-          type_Rx = type_rx, codes = code_rx,
-          groupby = grpby,
-          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-          code_list = code_list, code_list_filtre = code_list_filtre
-        )
-      ))
-      dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
-                 MNT_SERV = as_price(MNT_SERV),
-                 MNT_TOT = as_price(MNT_TOT))]
+    # Tableau des résultats
+    DT <- sql_stat_gen1(
+      conn = conn,
+      debut = dates_debut, fin = dates_fin,
+      type_Rx = type_rx, codes = code_rx, groupby = grpby,
+      code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+      code_list = code_list, code_list_filtre = code_list_filtre
+    )
 
-      if (any(c("DENOM", "DIN") %in% names(dt))) {
-
-        # Ajouter le nom du DENOM ou le nom de la marque commerciale (DIN)
-        if (type_rx == "DENOM") {
-          dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
-            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-            .(DENOM, NOM_DENOM)
-          ][
-            dt, on = .(DENOM)
-          ]
-        } else if (type_rx == "DIN") {
-          dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
-            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-            .(DIN, NOM_MARQ_COMRC)
-          ][
-            dt, on = .(DIN)
-          ]
-        }
-
-        colorder <- c(
-          "DATE_DEBUT", "DATE_FIN",
-          type_rx, nom_type_rx(type_rx),
-          "MNT_MED", "MNT_SERV", "MNT_TOT",
-          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
-        )
-        orderv <- c("DATE_DEBUT", "DATE_FIN", type_rx)
-      } else {
-        dt[, CODES_RX := paste(code_rx, collapse = "; ")]  # colonnes indiquant tous les codes demandés
-        colorder <- c(  # ordre des colonnes souhaitées si pas de codes
-          "DATE_DEBUT", "DATE_FIN",
-          "MNT_MED", "MNT_SERV", "MNT_TOT",
-          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
-          "CODES_RX"
-        )
-        orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
-      }
-
-      DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
-
-    }
-
-    # Ordre des colonnes et des données
-    setcolorder(DT, colorder)
-    setorderv(DT, orderv)
-
-
+    # Mettre sur une page
+    #   - Tableau des résultats
+    #   - Arguments
+    #   - Exemple de code SQL de la première période d'étude
     return(create_dt_data_args_query(
-      dt = copy(DT),
-      args_list = list(METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-                       TYPE_RX = type_rx, CODE_RX = code_rx,
-                       GROUPER_PAR = grpby,
-                       CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
-                       CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+      dt = DT,  # tableau des résultats
+      args_list = list(  # liste des arguments
+        METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+        TYPE_RX = type_rx, CODE_RX = code_rx,
+        GROUPER_PAR = grpby,
+        CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
+        CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
       ),
-      query = stat_gen1_txt_query_1period(
+      query = stat_gen1_txt_query_1period(  # code SQL de la 1ere période d'étude
         debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
         groupby = grpby,
         code_serv = code_serv, code_serv_filtre = code_serv_filtre,
@@ -395,83 +334,17 @@ formulaire <- function() {
     ### Effectue la ou les requêtes de statistiques générales selon les arguments
     ### @param input : Équivalent à une liste. Les éléments doivent avoir les
     ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
-    ### @param conn : Variable de connexion créé par sql_connecion
+    ### @param conn_values : Variable de connexion créé dans la section SERVER
 
-    DT <- data.table()  # tableau contenant la ou les requêtes
-    nom_denom <- copy(inesss::V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE)  # data nom des denom
-    nom_marq_comrc <- inesss::V_PRODU_MED.NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC, DATE_DEBUT, DATE_FIN)]  # data nom marques commerciales
-
-    # Extraire les arguments des input
-    dates_debut <- sg1_find_date(input, "deb")
-    dates_fin <- sg1_find_date(input, "fin")
-    codes_rx <- sort(sg1_find_code(input))
-    codes_serv <- adapt_code_serv(input$sg1_code_serv)
-
-    # Effectuer une requête par période d'étude et joindre les tableaux
-    for (i in 1:length(dates_debut)) {
-
-      dt <- as.data.table(dbGetQuery(  # requête pour la ième période d'étude
-        conn = conn,  # connexion faite à partir de l'onglet connexion
-        statement = stat_gen1_txt_query_1period(
-          debut = dates_debut[i], fin = dates_fin[i],
-          type_Rx = input$sg1_type_Rx, codes = codes_rx,
-          groupby = input$sg1_group_by,
-          code_serv = codes_serv, code_serv_filtre = input$sg1_code_serv_filter,
-          code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
-        )
-      ))
-      dt[, `:=` (MNT_MED = as_price(MNT_MED),  # s'assurer que les prix ont deux décimales
-                 MNT_SERV = as_price(MNT_SERV),
-                 MNT_TOT = as_price(MNT_TOT))]
-
-      if (any(c("DENOM", "DIN") %in% names(dt))) {
-
-        # Ajouter le nom du Code Rx
-        if (input$sg1_type_Rx == "DENOM") {
-          dt <- nom_denom[  # ajouter le nom des DENOM à la date de départ de la période
-            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-            .(DENOM, NOM_DENOM)
-          ][
-            dt, on = .(DENOM)
-          ]
-        } else if (input$sg1_type_Rx == "DIN") {
-          dt <- nom_marq_comrc[  # ajouter le nom des DIN à la date de départ de la période
-            DATE_DEBUT <= dates_debut[i] & dates_debut[i] <= DATE_FIN,
-            .(DIN, NOM_MARQ_COMRC)
-          ][
-            dt, on = .(DIN)
-          ]
-        }
-
-        colorder <- c(  # ordre des colonnes souhaitées
-          "DATE_DEBUT", "DATE_FIN",
-          input$sg1_type_Rx, nom_type_rx(input$sg1_type_Rx),
-          "MNT_MED", "MNT_SERV", "MNT_TOT",
-          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
-        )
-        orderv <- c("DATE_DEBUT", "DATE_FIN", input$sg1_type_Rx)  # ordre des données
-
-      } else {
-
-        dt[, CODES_RX := paste(sg1_find_code(input), collapse = "; ")]  # colonnes indiquant tous les codes demandés
-        colorder <- c(  # ordre des colonnes souhaitées si pas de codes
-          "DATE_DEBUT", "DATE_FIN",
-          "MNT_MED", "MNT_SERV", "MNT_TOT",
-          "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
-          "CODES_RX"
-        )
-        orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
-      }
-
-      DT <- rbind(DT, dt)  # ajouter cette période aux précédentes
-
-    }
-
-    # Ordre des colonnes et des données
-    setcolorder(DT, colorder)
-    setorderv(DT, orderv)
-
+    DT <- sql_stat_gen1(
+      conn = conn,
+      debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
+      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), groupby = input$sg1_group_by,
+      code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
+      code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+    )
     return(DT)
+
   }
   sg1_table_format <- function(dt) {
     ### Format visuel des colonnes pour meilleure présentation du data créé par
