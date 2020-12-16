@@ -8,7 +8,7 @@
 Vecteur \code{integer} de 96 nombres.
 }
 \usage{
-RLS_list
+data("RLS_list") / MaVariable <- RLS_list.
 }
 \description{
 Vecteur contenant la liste des 93 RLS plus 3 valeurs utilisées lors d'analyse : 1001, 1701, 1801.
