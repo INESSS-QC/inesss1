@@ -15,7 +15,7 @@ Tableau de 2 variables et 84 observations :
 \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10.}
 }
 \usage{
-RLS_convert
+data("RLS_convert") / MaVariable <- RLS_convert.
 }
 \description{
 Établir la correspondance des RLS avant et après l'adoption de la loi 10.
