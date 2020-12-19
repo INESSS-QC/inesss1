@@ -4,20 +4,24 @@ output:
   html_document:
     toc: true
     toc_float: true
-    toc_depth: 2
+    toc_depth: 3
+    number_sections: true
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results = "asis")
 library(inesss)
+library(data.table)
 library(kableExtra)
 library(knitr)
+conn <- sql_connexion("ms045", "SQLpwd003/")
 ```
 
 [inesss v.`r as.character(packageVersion('inesss'))`](https://github.com/INESSS-QC/inesss1){target="_blank"}
 
 # Démarrer le formulaire
-À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.  
+À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
+
 ![](images/formulaire-addin.png){ width=70% }
 
 
@@ -30,11 +34,11 @@ library(knitr)
 Établir une connexion entre *R* et *Teradata*.
 
 1. Inscrire le nom d'utilisateur (commence généralement par *MS*) ainsi que le mot de passe.
-2. Cliquer sur le bouton *Connexion* pour établir la connexion.
+2. Cliquer sur le bouton *Connexion* pour établir la connexion. S'il n'y a pas d'erreur, le mot *Connexion* suivi de la date et l'heure sera affiché. Modifier l'identifiant ou le mot de passe au besoin.
 
 **Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière plan**. Sélectionner cette fenêtre à partir de la barre des tâches, puis entrer le nouveau mot de passe.
 
-### Exemple
+![](images/formulaire-connexion.png){ width=70% }
 
 
 
@@ -47,9 +51,9 @@ library(knitr)
 Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet correspond à un tableau contenant les arguments d'une méthode.  
 Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits disponibles à partir du fichier *Gabarits-formulaire.xlsx*.
 
-1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes.
-2. Le programme vérifie si chaque onglet contient un tableau et si la structure de chaque colonne correspond à la méthode utilisée.
-3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message contient toutes les erreurs à corriger, regroupés par onglet.
+1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes à exécuter.
+2. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
+3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupés par onglet.
 4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire et le nom du fichier à sauvegarder. Lorsque c'est fait, le programme exécute la requête associé aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
 5. Le fichier sauvegardé présente les résultats de la manière suivante :
     + Les onglets possèdent le même nom que ceux du fichier initial contenant les arguments.
@@ -58,19 +62,85 @@ Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits
     + À droite, un exemple de code SQL, celui de la première période d'analyse, utilisé dans Teradata pour créer le tableau des résultats.
 
 ## Statistiques générales
-Un onglet du fichier EXCEL dédié aux statistiques générales doit contenir les colonnes suivantes :
+Statistiques tiré de la vue *V_DEM_PAIMT_MED_CM*.
 
+### Arguments {#sg1_arguments}
 * **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
 * **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_FIN`.
 * **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_DEBUT`.
 * **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
-* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser.
+* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
 * **`GROUPER_PAR` :** Grouper les résultats par :
     + `Périodes` : Additionne les montants de tous les codes d'analyse pour une même période. Ajoute la colonne `CODES_RX` au tableau des résultats rappelant les codes analysés.
 * **`CODE_SERV_FILTRE` :** `Inclusion` ou `Exclusion` des codes de services. Par défaut `Exclusion`. Pour aucun filtre, laisser la colonne `CODE_SERV` vide.
-* **`CODE_SERV` : ** Le ou les codes de service à inclure ou à exclure (sinon laisser vide). Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+* **`CODE_SERV` : ** Le ou les codes de service à inclure ou à exclure (sinon laisser vide).  
+Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
 * **`CODE_LIST_SERV` :** `Inclusion` ou `Exclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Pour aucun filtre, laisser la colonne `CODE_LIST` vide.
-* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à inclure ou exclure (sinon laisser vide). Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à inclure ou exclure (sinon laisser vide).  
+Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+
+### Résultats
+
+#### Tableau des résultats
+* **`DATE_DEBUT` :** Indique la date de début de la période d'étude.
+* **`DATE_FIN` :** Indique la date de fin de la période d'étude.
+* **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude. Si les résultats sont groupés par période d'étude, cette colonne se situera à la fin du tableau.
+* **`NOM_DENOM / NOM_MARQ_COMRC` :** Indique le nom de la dénomination commune si c'est un `DENOM` ou le nom de la marque de commerce si c'est un `DIN`.
+* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier (`sum(SMED_MNT_AUTOR_MED) as MNT_MED`).
+* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service (`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`).
+* **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+* **`COHORTE` :** Nombre d'individus unique (`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`).
+* **`NBRE_RX` :** Nombre de demandes de paiement (`count(*) as NBRE_RX`).
+* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés (`sum(SMED_QTE_MED) as QTE_MED`).
+* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours.
+
+#### Tableau des arguments
+Table rappelant les arguments fournis par l'utilisateur à la section [*Arguments*](#sg1_arguments)
+
+#### Code SQL
+Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affichée.
+
+### Exemple 1 - DENOM
+
+**Arguments :**
+```{r}
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)), by = "")
+kable(stat_gen1_args, "html") %>% kable_styling() %>% scroll_box(width = "100%")
+```
+<br>
+**Résultats :**
+```{r}
+ll <- list(METHODE = "stat_gen1",
+           DATE_DEBUT = c("2018-01-01", "2019-01-01"),
+           DATE_FIN = c("2018-12-31", "2019-12-31"),
+           TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
+           GROUPER_PAR = NULL,
+           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
+stat_gen1_result <- replace_NA_in_dt(create_dt_data_args_query(
+  dt = sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                     type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, code_serv = ll$CODE_SERV),
+  args_list = ll,
+  query = stat_gen1_txt_query_1period(
+    debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1], type_Rx = ll$TYPE_RX,
+    codes = ll$CODE_RX, groupby = ll$GROUPER_PAR,
+    code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE,
+    code_list = ll$CODE_LIST, code_list_filtre = ll$CODE_LIST_FILTRE
+  )
+), by = "")
+kable(stat_gen1_result, "html") %>% kable_styling() %>% scroll_box(width = "100%")
+```
+
+
+
+
+
 
 
 

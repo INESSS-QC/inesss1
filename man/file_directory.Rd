@@ -2,7 +2,7 @@
 % Please edit documentation in R/utils-functions.R
 \name{file_directory}
 \alias{file_directory}
-\title{File status}
+\title{Utils}
 \usage{
 file_directory()
 }

@@ -169,7 +169,7 @@ sql_stat_gen1 <- function(
           "where SMED_DAT_SERV between '",debut[i],"' and '",fin[i],"'\n",
           "  and SMED_COD_DENOM_COMNE in (",qu(codes),");"
         )
-        dt[, CODES_RX := paste(as.integer(dbGetQuery(conn, query_codes_exist)$CODES), collapse = "; ")]
+        dt[, (type_Rx) := paste(as.integer(dbGetQuery(conn, query_codes_exist)$CODES), collapse = "; ")]
       }
 
       DT <- rbind(DT, dt)
@@ -200,7 +200,7 @@ sql_stat_gen1 <- function(
         "DATE_DEBUT", "DATE_FIN",
         "MNT_MED", "MNT_SERV", "MNT_TOT",
         "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
-        "CODES_RX"
+        type_Rx
       )
       orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
     }
@@ -329,9 +329,8 @@ stat_gen1_txt_query_1period <- function(
 
   if (str_detect(query, "\n;")) {  # supprimer retour de ligne (\n) si la commande est terminée (;)
     substr(query, nchar(query) - 1, nchar(query) - 1) <- " "  # supprime '\n' qui est compté comme 1 seul char
-    # *** NOTE : stringr::str_sub() ne fonctionne pas, la fonction n'était pas
-    #            disponible malgré le importFrom stringr str_sub.
-    #            De plus, "" ne fonctionne pas non plus dans certains cas... insertion d'un espace
+    # *** NOTE : stringr::str_sub() ne fonctionne pas, la fonction n'était pas disponible malgré le importFrom stringr str_sub.
+    #            De plus, "" ne fonctionne pas dans certains cas -> insertion d'un espace
   }
 
   return(query)
