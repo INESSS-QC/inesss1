@@ -605,7 +605,7 @@ formulaire <- function() {
             column(  # Codes d'analyse
               width = 3,
               # Nombre de codes à afficher pour l'analyse
-              numericInput("sg1_nb_codes", "Nombre de codes Rx", value = 1,
+              numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1,
                            min = 1, max = 99),
 
               # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
@@ -616,7 +616,7 @@ formulaire <- function() {
               # div(style = "margin-top:-5px"),
 
               # Sélection du type de code Rx
-              selectInput("sg1_type_Rx", "Type de code Rx",
+              selectInput("sg1_type_Rx", "Type de Code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
               # Text inputs où indiquer les codes d'analyse
               uiOutput("sg1_nb_codes")
