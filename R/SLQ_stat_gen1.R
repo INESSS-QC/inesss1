@@ -169,7 +169,7 @@ sql_stat_gen1 <- function(
           "where SMED_DAT_SERV between '",debut[i],"' and '",fin[i],"'\n",
           "  and SMED_COD_DENOM_COMNE in (",qu(codes),");"
         )
-        dt[, (type_Rx) := paste(as.integer(dbGetQuery(conn, query_codes_exist)$CODES), collapse = "; ")]
+        dt[, CODES_RX := paste(sort(as.integer(dbGetQuery(conn, query_codes_exist)$CODES)), collapse = "; ")]
       }
 
       DT <- rbind(DT, dt)
@@ -194,24 +194,30 @@ sql_stat_gen1 <- function(
         "MNT_MED", "MNT_SERV", "MNT_TOT",
         "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX"
       )
-      orderv <- c("DATE_DEBUT", "DATE_FIN", type_Rx)  # ordre des données
+      orderv <- c(`1` = "DATE_DEBUT",
+                  `-1` = "DATE_FIN",
+                  `1` = type_Rx)  # ordre des données
     } else {
       colorder <- c(  # ordre des colonnes souhaitées si pas de codes
         "DATE_DEBUT", "DATE_FIN",
         "MNT_MED", "MNT_SERV", "MNT_TOT",
         "COHORTE", "NBRE_RX", "QTE_MED", "DUREE_TX",
-        type_Rx
+        "CODES_RX"
       )
-      orderv <- c("DATE_DEBUT", "DATE_FIN")  # ordre des données
+      orderv <- c(`1` = "DATE_DEBUT",  # 1 = croissant, -1 = décroissant
+                  `-1` = "DATE_FIN")
     }
 
     # Ordre des colonnes et des données
     setcolorder(DT, colorder)
-    setorderv(DT, orderv)
+    setorderv(DT, orderv, order = as.integer(names(orderv)))
 
     # Codes au format integer
     if ("DENOM" %in% names(DT)) {
       DT[, DENOM := as.integer(DENOM)]
+    }
+    if ("CODES_RX" %in% names(DT)) {
+      setnames(DT, "CODES_RX", type_Rx)  # remplacer CODES_RX par le type de code
     }
 
     return(DT)

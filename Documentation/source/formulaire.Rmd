@@ -1,12 +1,19 @@
 ---
 title: "Formulaire"
+subtitle: '[inesss v.`r as.character(packageVersion("inesss"))`](https://github.com/INESSS-QC/inesss1){target="_blank"}'
 output:
-  html_document:
-    toc: true
-    toc_float: true
+  pdf_document:
     toc_depth: 3
     number_sections: true
+classoption: landscape
+geometry: "left=1.5cm,right=1.5cm,top=2.3cm,bottom=1.5cm"
+url_color: blue
+header-includes:
+  - \usepackage{fancyhdr}
 ---
+
+\pagestyle{fancy}
+\fancyhead[RE,RO]{\leftmark}
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results = "asis")
@@ -14,19 +21,29 @@ library(inesss)
 library(data.table)
 library(kableExtra)
 library(knitr)
+library(stringr)
 conn <- sql_connexion("ms045", "SQLpwd003/")
+
+kable_tab <- function(x, lng_tab = FALSE, scale_down = TRUE) {
+  p <- kable(x, "latex", booktabs = TRUE, row.names = FALSE, longtable = lng_tab,
+             escape = FALSE, linesep = "", align = "r",
+             col.names = linebreak(names(x), align = "c")) %>%
+    kable_styling(latex_options = rmNA(c("hold_position", "repeat_header",
+                                         ifelse(scale_down, "scale_down", NA))),
+                  position = "center", repeat_header_text = "")
+  return(cat(p))
+}
 ```
 
-[inesss v.`r as.character(packageVersion('inesss'))`](https://github.com/INESSS-QC/inesss1){target="_blank"}
 
 # Démarrer le formulaire
 À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
 
-![](images/formulaire-addin.png){ width=70% }
+![](images/formulaire-addin.png){ width=50% }
 
 
-<p style="page-break-before: always"> <!-- nouvelle page ou espacement -->
-<p style="margin-bottom:3cm">
+
+\pagebreak
 
 
 
@@ -38,12 +55,11 @@ conn <- sql_connexion("ms045", "SQLpwd003/")
 
 **Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière plan**. Sélectionner cette fenêtre à partir de la barre des tâches, puis entrer le nouveau mot de passe.
 
-![](images/formulaire-connexion.png){ width=70% }
+![](images/formulaire-connexion.png){ width=50% }
 
 
 
-<p style="page-break-before: always"> <!-- nouvelle page ou espacement -->
-<p style="margin-bottom:3cm">
+\pagebreak
 
 
 
@@ -61,8 +77,10 @@ Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits
     + Au milieu, le tableau rappelant les arguments utilisés.
     + À droite, un exemple de code SQL, celui de la première période d'analyse, utilisé dans Teradata pour créer le tableau des résultats.
 
+\pagebreak
+
 ## Statistiques générales
-Statistiques tiré de la vue *V_DEM_PAIMT_MED_CM*.
+Statistiques tirées de la vue *V_DEM_PAIMT_MED_CM*.
 
 ### Arguments {#sg1_arguments}
 * **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
@@ -71,7 +89,7 @@ Statistiques tiré de la vue *V_DEM_PAIMT_MED_CM*.
 * **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
 * **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
 * **`GROUPER_PAR` :** Grouper les résultats par :
-    + `Périodes` : Additionne les montants de tous les codes d'analyse pour une même période. Ajoute la colonne `CODES_RX` au tableau des résultats rappelant les codes analysés.
+    + `Périodes` : Additionne les montants de tous les codes d'analyse pour une même période. Ajoute une colonne à la fin du tableau des résultats rappelant les codes analysés (`DENOM` ou `DIN`) durant chaque période.
 * **`CODE_SERV_FILTRE` :** `Inclusion` ou `Exclusion` des codes de services. Par défaut `Exclusion`. Pour aucun filtre, laisser la colonne `CODE_SERV` vide.
 * **`CODE_SERV` : ** Le ou les codes de service à inclure ou à exclure (sinon laisser vide).  
 Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
@@ -80,27 +98,30 @@ Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
 Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
 
 ### Résultats
+L'onglet contient trois (3) éléments :
 
 #### Tableau des résultats
 * **`DATE_DEBUT` :** Indique la date de début de la période d'étude.
 * **`DATE_FIN` :** Indique la date de fin de la période d'étude.
 * **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude. Si les résultats sont groupés par période d'étude, cette colonne se situera à la fin du tableau.
 * **`NOM_DENOM / NOM_MARQ_COMRC` :** Indique le nom de la dénomination commune si c'est un `DENOM` ou le nom de la marque de commerce si c'est un `DIN`.
-* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier (`sum(SMED_MNT_AUTOR_MED) as MNT_MED`).
-* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service (`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`).
+* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
 * **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
-* **`COHORTE` :** Nombre d'individus unique (`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`).
-* **`NBRE_RX` :** Nombre de demandes de paiement (`count(*) as NBRE_RX`).
-* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés (`sum(SMED_QTE_MED) as QTE_MED`).
-* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours.
+* **`COHORTE` :** Nombre d'individus unique [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+* **`NBRE_RX` :** Nombre de demandes de paiement [`count(*) as NBRE_RX`].
+* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés [`sum(SMED_QTE_MED) as QTE_MED`].
+* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
 
 #### Tableau des arguments
-Table rappelant les arguments fournis par l'utilisateur à la section [*Arguments*](#sg1_arguments)
+* Table rappelant les arguments fournis par l'utilisateur à la section [*Arguments*](#sg1_arguments)
 
 #### Code SQL
-Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affichée.
+* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affichée.
 
-### Exemple 1 - DENOM
+\pagebreak
+
+### Exemple 1 --- DENOM
 
 **Arguments :**
 ```{r}
@@ -111,48 +132,259 @@ stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
 )), by = "")
-kable(stat_gen1_args, "html") %>% kable_styling() %>% scroll_box(width = "100%")
+names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
+stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
+kable_tab(stat_gen1_args)
 ```
-<br>
-**Résultats :**
+
+**Tableau des résultats :**
 ```{r}
 ll <- list(METHODE = "stat_gen1",
            DATE_DEBUT = c("2018-01-01", "2019-01-01"),
            DATE_FIN = c("2018-12-31", "2019-12-31"),
-           TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
-           GROUPER_PAR = NULL,
+           TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NULL,
            CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
            CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
-stat_gen1_result <- replace_NA_in_dt(create_dt_data_args_query(
-  dt = sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                     type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, code_serv = ll$CODE_SERV),
-  args_list = ll,
-  query = stat_gen1_txt_query_1period(
-    debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1], type_Rx = ll$TYPE_RX,
-    codes = ll$CODE_RX, groupby = ll$GROUPER_PAR,
-    code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE,
-    code_list = ll$CODE_LIST, code_list_filtre = ll$CODE_LIST_FILTRE
-  )
-), by = "")
-kable(stat_gen1_result, "html") %>% kable_styling() %>% scroll_box(width = "100%")
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+                         code_serv = ll$CODE_SERV)
+names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+kable_tab(tab_res)
 ```
 
+**Code SQL :**
+Seule la première période est affichée.
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DENOM;
+```
 
+\pagebreak
 
+### Exemple 2 --- DIN
 
+**Arguments :**
+```{r}
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)), by = "")
+names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
+stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
+kable_tab(stat_gen1_args)
+```
 
+**Tableau des résultats :**
+```{r}
+ll <- list(METHODE = "stat_gen1",
+           DATE_DEBUT = c("2018-01-01", "2019-01-01"),
+           DATE_FIN = c("2018-12-31", "2019-12-31"),
+           TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = NULL,
+           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+                         code_serv = ll$CODE_SERV)
+names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+kable_tab(tab_res)
+```
 
+**Code SQL :**
+Seule la première période est affichée.
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DIN as DIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DIN;
+```
 
+\pagebreak
 
+### Exemple 3 --- Chevauchement des périodes d'étude
+Il est possible d'inscrire des périodes d'étude qui se chevauchent dans le temps comme par exemple une année civile et ses trimestres.
 
+**Arguments :**
+```{r}
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2018-01-01", "2018-04-01", "2018-07-01", "2018-10-01"),
+  DATE_FIN = c("2018-12-31", "2018-03-31", "2018-06-30", "2018-10-30", "2018-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)), by = "")
+names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
+stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
+kable_tab(stat_gen1_args)
+```
 
+**Tableau des résultats :**
+```{r}
+ll <- list(METHODE = "stat_gen1",
+           DATE_DEBUT = c("2018-01-01", "2018-01-01", "2018-04-01", "2018-07-01", "2018-10-01"),
+           DATE_FIN = c("2018-12-31", "2018-03-31", "2018-06-30", "2018-09-30", "2018-12-31"),
+           TYPE_RX = "DENOM", CODE_RX = c(47092), GROUPER_PAR = NULL,
+           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+                         code_serv = ll$CODE_SERV)
+names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+kable_tab(tab_res)
+```
 
+**Code SQL :**
+Seule la première période est affichée.
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DENOM;
+```
 
+\pagebreak
 
+### Exemple 4 --- GROUPER PAR Périodes
+Indiquer la somme des montants de tous les codes d'analyse par période d'étude.
 
+**Arguments :**
+```{r}
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135, 48222), GROUPER_PAR = "Périodes",
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)), by = "")
+names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
+stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
+kable_tab(stat_gen1_args)
+```
 
+**Tableau des résultats :**
+```{r}
+ll <- list(METHODE = "stat_gen1",
+           DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-01-31", "2019-01-31"),
+           TYPE_RX = "DENOM", CODE_RX = c(47092, 47135, 48222), GROUPER_PAR = "Périodes",
+           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
+                         codes = ll$CODE_RX, code_serv = ll$CODE_SERV)
+names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+kable_tab(tab_res)
+```
 
+**Code SQL :**
+Seule la première période est affichée.
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('47092', '47135', '48222')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null) ;
+```
 
+\pagebreak
+
+### Exemple 5 --- Services et Catégories de listes de médicaments
+`"Exclusion"` (ou `"Inclusion"`) des codes de services (`SMED_COD_SERV_1`) et `"Inclusion"` (ou `"Exclusion"`) des codes de catégorie de listes de médicaments (`SMED_COD_CATG_LISTE_MED`).
+
+**Arguments :**
+```{r}
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01"), DATE_FIN = c("2018-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NULL,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41")
+)), by = "")
+names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
+stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+ll <- list(METHODE = "stat_gen1",
+           DATE_DEBUT = c("2018-01-01"), DATE_FIN = c("2018-12-31"),
+           TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NULL,
+           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
+           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41"))
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
+                         codes = ll$CODE_RX, code_serv = ll$CODE_SERV,
+                         code_serv_filtre = ll$CODE_SERV_FILTRE, code_list_filtre = ll$CODE_LIST_FILTRE)
+names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD', 'L', 'M', 'M1', 'M2', 'M3') or SMED_COD_SERV_1 is null)
+    and SMED_COD_CATG_LISTE_MED in ('03', '40', '41')
+group by DENOM;
+```
 
 
 
