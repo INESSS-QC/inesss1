@@ -1,5 +1,3 @@
-<a href="https://www.inesss.qc.ca/" target="_blank">Institut national d’excellence en santé et en services sociaux</a>
-
 Installation
 ============
 
@@ -19,10 +17,16 @@ Démarrer le formulaire
 Notes de création
 =================
 
-R version 4.0.3 (2020-10-10)<br> `askpass` version 1.1<br> `data.table`
-version 1.13.4<br> `DBI` version 1.1.0<br> `fs` version 1.5.0<br>
-`lubridate` version 1.7.9.2<br> `miniUI` version 0.1.1.1<br> `odbc`
-version 1.3.0<br> `readxl` version 1.3.1<br> `rstudioapi` version
-0.13<br> `shiny` version 1.5.0<br> `shinydashboard` version 0.7.1<br>
-`shinyFiles` version 0.9.0<br> `stringr` version 1.4.0<br> `testthat`
-version 3.0.1<br> `writexl` version 1.3.1
+R
+-
+
+R version 4.0.3 (2020-10-10)
+
+Librairies
+----------
+
+`askpass` v.1.1<br> `data.table` v.1.13.4<br> `DBI` v.1.1.0<br> `fs`
+v.1.5.0<br> `lubridate` v.1.7.9.2<br> `miniUI` v.0.1.1.1<br> `odbc`
+v.1.3.0<br> `readxl` v.1.3.1<br> `rstudioapi` v.0.13<br> `shiny`
+v.1.5.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
+`stringr` v.1.4.0<br> `testthat` v.3.0.1<br> `writexl` v.1.3.1

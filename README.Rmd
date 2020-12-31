@@ -17,16 +17,14 @@ knitr::opts_chunk$set(
   comment = "#>",
   fig.path = "man/figures/README-",
   out.width = "100%",
-  echo = TRUE
+  echo = FALSE, results = "asis"
 )
 library(knitr)
 ```
 
-[Institut national d'excellence en santé et en services sociaux](https://www.inesss.qc.ca/){target="_blank"}
-
 # Installation
 Copier les lignes suivantes dans la console pour installer la librairie *inesss*.
-```{r, eval=FALSE}
+```{r, eval=FALSE, echo=TRUE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_github("INESSS-QC/inesss")
 ```
@@ -34,27 +32,43 @@ remotes::install_github("INESSS-QC/inesss")
 # Démarrer le formulaire
 ![](Documentation/source/images/formulaire-addin.png)
 
+
+
+```{r}
+if (is_latex_output()) {
+  cat("\\pagebreak")
+}
+```
+
+
+
 # Notes de création
-```{r, results="asis", echo=FALSE}
-packages <- c(
-  "askpass",
-  "data.table", "DBI",
-  "fs",
-  "lubridate",
-  "miniUI",
-  "odbc",
-  "readxl", "rstudioapi",
-  "shiny", "shinydashboard", "shinyFiles", "stringr",
-  "testthat",
-  "writexl"
-)
-txt <- c(base::R.version$version.string)
+
+## R
+```{r}
+cat(base::R.version$version.string)
+```
+
+## Librairies
+```{r}
+packages <- unlist(stringr::str_split(packageDescription("inesss")$Imports, ",\n"))
+i_max <- length(packages)
+i = 1L
 for (pk in packages) {
-  if (is_html_output()) {
-    txt <- paste0(txt, "<br>\n`",pk,"` version ", as.character(packageVersion(pk)))
+  if (i > 1L) {
+    if (is_html_output()) {
+      txt <- paste0(txt, "<br>\n`",pk,"` v.", as.character(packageVersion(pk)))
+    } else {
+      txt <- paste0(txt, "\\newline\n`",pk,"` v.", as.character(packageVersion(pk)))
+    }
   } else {
-    txt <- paste0(txt, "\\newline\n`",pk,"` version ", as.character(packageVersion(pk)))
+    if (is_html_output()) {
+      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
+    } else {
+      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
+    }
   }
+  i <- i + 1L
 }
 cat(txt)
 ```

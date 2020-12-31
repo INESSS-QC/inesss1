@@ -1,6 +1,7 @@
 ---
 title: "Formulaire"
 subtitle: '[inesss v.`r as.character(packageVersion("inesss"))`](https://github.com/INESSS-QC/inesss1){target="_blank"}'
+date: "`r Sys.Date()`"
 output:
   pdf_document:
     toc_depth: 3
@@ -10,6 +11,9 @@ geometry: "left=1.5cm,right=1.5cm,top=2.5cm,bottom=1.5cm"
 urlcolor: blue
 header-includes:
   - \usepackage{fancyhdr}
+  - \usepackage{booktabs}
+params:
+  conn: ""
 ---
 
 \pagestyle{fancy}
@@ -22,16 +26,38 @@ library(data.table)
 library(kableExtra)
 library(knitr)
 library(stringr)
-conn <- sql_connexion("ms045", "SQLpwd003/")
+conn <- params$conn
+# conn <- sql_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 
-kable_tab <- function(x, lng_tab = FALSE, scale_down = TRUE) {
-  p <- kable(x, "latex", booktabs = TRUE, row.names = FALSE, longtable = lng_tab,
-             escape = FALSE, linesep = "", align = "r",
-             col.names = linebreak(names(x), align = "c")) %>%
+# Afficher un tableau grâce à kableExtra
+kable_tab <- function(x, scale_down = FALSE) {
+  p <- kable(x, "latex", booktabs = TRUE, row.names = FALSE, linesep = "",
+             align = "r") %>%
     kable_styling(latex_options = rmNA(c("hold_position", "repeat_header",
-                                         ifelse(scale_down, "scale_down", NA))),
-                  position = "center", repeat_header_text = "")
+                                         ifelse(scale_down, "scale_down", NA))))
   return(cat(p))
+}
+# Formats
+price_format <- function(x) {  # format prix
+  return(sapply(x, function(x) {
+    formatC(x, digits = 2, format = "f", big.mark = " ", decimal.mark = ",")
+  }))
+}
+number_format <- function(x, digi = 0) {  # nombre en général
+  return(sapply(x, function(x) {
+    formatC(x, digits = digi, format = "f", big.mark = " ", decimal.mark = ",")
+  }))
+}
+
+# Automatic format table
+sg1_format_table <- function(dt) {
+  dt[, `:=` (MNT_MED = price_format(MNT_MED),
+             MNT_SERV = price_format(MNT_SERV),
+             MNT_TOT = price_format(MNT_TOT),
+             COHORTE = number_format(COHORTE),
+             NBRE_RX = number_format(NBRE_RX),
+             QTE_MED = number_format(QTE_MED, digi = 3),
+             DUREE_TX = number_format(DUREE_TX))]
 }
 ```
 
@@ -39,7 +65,7 @@ kable_tab <- function(x, lng_tab = FALSE, scale_down = TRUE) {
 # Démarrer le formulaire
 À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
 
-![](images/formulaire-addin.png){ width=50% }
+![](images/formulaire-addin.png){ width=60% }
 
 
 
@@ -55,7 +81,7 @@ kable_tab <- function(x, lng_tab = FALSE, scale_down = TRUE) {
 
 **Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière plan**. Sélectionner cette fenêtre à partir de la barre des tâches, puis entrer le nouveau mot de passe.
 
-![](images/formulaire-connexion.png){ width=50% }
+![](images/formulaire-connexion.png){ width=80% }
 
 
 
@@ -72,10 +98,10 @@ Pour éviter des erreurs de structure, il est conseillé d'utiliser les gabarits
 3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupés par onglet.
 4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire et le nom du fichier à sauvegarder. Lorsque c'est fait, le programme exécute la requête associé aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
 5. Le fichier sauvegardé présente les résultats de la manière suivante :
-    + Les onglets possèdent le même nom que ceux du fichier initial contenant les arguments.
+    + Les onglets possèdent les mêmes noms que ceux du fichier contenant les arguments.
     + À gauche se trouve le tableau des résultats.
-    + Au milieu, le tableau rappelant les arguments utilisés.
-    + À droite, un exemple de code SQL, celui de la première période d'analyse, utilisé dans Teradata pour créer le tableau des résultats.
+    + Au milieu, un rappel des arguments utilisés.
+    + À droite, un exemple de code SQL utilisé dans Teradata pour créer le tableau des résultats (uniquement celui de la première période d'étude).
 
 \pagebreak
 
@@ -125,17 +151,28 @@ L'onglet contient trois (3) éléments :
 
 **Arguments :**
 ```{r}
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
-  METHODE = "stat_gen1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
-)), by = "")
-names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
-stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
-kable_tab(stat_gen1_args)
+# stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+#   METHODE = "stat_gen1",
+#   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+#   TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
+#   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+#   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+# )), by = "")
+# kable_tab(stat_gen1_args)
 ```
+\begin{table}[!h]
+\centering
+\begin{tabular}{rrrrrrrrrr}
+\toprule
+METHODE & DATE\_DEBUT & DATE\_FIN & TYPE\_RX & CODE\_RX & GROUPER\_PAR & CODE\_SERV\_FILTRE & CODE\_SERV & CODE\_LIST\_FILTRE & CODE\_LIST\\
+\midrule
+stat\_gen1 & 2018-01-01 & 2018-12-31 & DENOM & 39 &  & Exclusion & 1 & Inclusion & \\
+ & 2019-01-01 & 2019-12-31 &  & 47092 &  &  & AD &  & \\
+ &  &  &  & 47135 &  &  &  &  & \\
+\bottomrule
+\end{tabular}
+\end{table}
+
 
 **Tableau des résultats :**
 ```{r}
@@ -148,7 +185,8 @@ ll <- list(METHODE = "stat_gen1",
 tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
                          type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
                          code_serv = ll$CODE_SERV)
-names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+sg1_format_table(tab_res)
+# names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
 kable_tab(tab_res)
 ```
 
@@ -172,6 +210,8 @@ where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
 group by DENOM;
 ```
 
+
+
 \pagebreak
 
 ### Exemple 2 --- DIN
@@ -185,8 +225,6 @@ stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
 )), by = "")
-names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
-stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
 kable_tab(stat_gen1_args)
 ```
 
@@ -201,7 +239,7 @@ ll <- list(METHODE = "stat_gen1",
 tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
                          type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
                          code_serv = ll$CODE_SERV)
-names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```
 
@@ -239,8 +277,6 @@ stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
 )), by = "")
-names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
-stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
 kable_tab(stat_gen1_args)
 ```
 
@@ -254,7 +290,7 @@ ll <- list(METHODE = "stat_gen1",
 tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
                          groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
                          codes = ll$CODE_RX, code_serv = ll$CODE_SERV)
-names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```
 
@@ -290,8 +326,6 @@ stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41")
 )), by = "")
-names(stat_gen1_args) <- str_replace_all(names(stat_gen1_args), "_", "\\\\_")
-stat_gen1_args$METHODE <- str_replace_all(stat_gen1_args$METHODE, "_", "\\\\_")
 kable_tab(stat_gen1_args)
 ```
 
@@ -306,7 +340,7 @@ tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
                          groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
                          codes = ll$CODE_RX, code_serv = ll$CODE_SERV,
                          code_serv_filtre = ll$CODE_SERV_FILTRE, code_list_filtre = ll$CODE_LIST_FILTRE)
-names(tab_res) <- str_replace_all(names(tab_res), "_", "\\\\_")
+sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```
 
@@ -362,31 +396,3 @@ Formulaire interactif permettant l'inscription d'arguments, l'exécution de la r
 * **Sauvegarder Résultats en EXCEL :** Ouvre une fenêtre permettant de sauvegarder au format EXCEL le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
 * **Afficher Code Requête/MaJ Code Requête :** Affiche ou met à jour le code SQL généré à partir des arguments sélectionnés. Prendre note qu'il y a seulement le code de la première période d'étude qui est affiché.
 * **Effacer Code Requête :** Masque le code SQL.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
