@@ -1,5 +1,14 @@
 ---
-output: github_document
+title: "INESSS"
+subtitle: "`r paste0('v.',as.character(packageVersion('inesss')))`"
+date: "`r Sys.Date()`"
+output:
+  md_document:
+    variant: markdown_github
+  pdf_document:
+    toc_depth: 2
+    highlight: default
+urlcolor: blue
 ---
 
 ```{r, include = FALSE}
@@ -7,22 +16,25 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  echo = TRUE
 )
+library(knitr)
 ```
-
-# inesss
 
 [Institut national d'excellence en santé et en services sociaux](https://www.inesss.qc.ca/){target="_blank"}
 
-## Installation
+# Installation
 Copier les lignes suivantes dans la console pour installer la librairie *inesss*.
 ```{r, eval=FALSE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_github("INESSS-QC/inesss")
 ```
 
-## Notes de création
+# Démarrer le formulaire
+![](Documentation/source/images/formulaire-addin.png)
+
+# Notes de création
 ```{r, results="asis", echo=FALSE}
 packages <- c(
   "askpass",
@@ -38,7 +50,11 @@ packages <- c(
 )
 txt <- c(base::R.version$version.string)
 for (pk in packages) {
-  txt <- paste0(txt, "<br>\n", pk, " version ", as.character(packageVersion(pk)))
+  if (is_html_output()) {
+    txt <- paste0(txt, "<br>\n`",pk,"` version ", as.character(packageVersion(pk)))
+  } else {
+    txt <- paste0(txt, "\\newline\n`",pk,"` version ", as.character(packageVersion(pk)))
+  }
 }
 cat(txt)
 ```
