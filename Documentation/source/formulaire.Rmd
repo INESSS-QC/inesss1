@@ -151,12 +151,17 @@ L'onglet contient trois (3) éléments :
 
 **Arguments :**
 ```{r}
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
   TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = ll$METHODE, DATE_DEBUT = ll$DATE_DEBUT, DATE_FIN = ll$DATE_FIN,
+  TYPE_RX = ll$TYPE_RX, CODE_RX = ll$CODE_RX,
+  CODE_SERV_FILTRE = ll$CODE_SERV_FILTRE, CODE_SERV = ll$CODE_SERV
 )), by = "")
 kable_tab(stat_gen1_args)
 ```
@@ -164,12 +169,6 @@ kable_tab(stat_gen1_args)
 
 **Tableau des résultats :**
 ```{r}
-ll <- list(METHODE = "stat_gen1",
-           DATE_DEBUT = c("2018-01-01", "2019-01-01"),
-           DATE_FIN = c("2018-12-31", "2019-12-31"),
-           TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NULL,
-           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
 tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
                          type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
                          code_serv = ll$CODE_SERV)
@@ -206,27 +205,29 @@ group by DENOM;
 
 **Arguments :**
 ```{r}
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+ll <- list(
   METHODE = "stat_gen1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"),
+  DATE_FIN = c("2018-12-31", "2019-12-31"),
   TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = NA,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = ll$METHODE, DATE_DEBUT = ll$DATE_DEBUT, DATE_FIN = ll$DATE_FIN,
+  TYPE_RX = ll$TYPE_RX, CODE_RX = ll$CODE_RX,
+  CODE_SERV_FILTRE = ll$CODE_SERV_FILTRE, CODE_SERV = ll$CODE_SERV
 )), by = "")
 kable_tab(stat_gen1_args)
 ```
 
 **Tableau des résultats :**
 ```{r}
-ll <- list(METHODE = "stat_gen1",
-           DATE_DEBUT = c("2018-01-01", "2019-01-01"),
-           DATE_FIN = c("2018-12-31", "2019-12-31"),
-           TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = NULL,
-           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
-tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
-                         code_serv = ll$CODE_SERV)
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE
+)
 sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```
@@ -258,26 +259,30 @@ Indiquer la somme des montants de tous les codes d'analyse par période d'étude
 
 **Arguments :**
 ```{r}
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+ll <- list(
   METHODE = "stat_gen1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  DATE_DEBUT = c("2017-01-01", "2018-01-01", "2019-01-01"),
+  DATE_FIN = c("2017-12-31", "2018-12-31", "2019-12-31"),
   TYPE_RX = "DENOM", CODE_RX = c(47092, 47135, 48222), GROUPER_PAR = "Périodes",
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = ll$METHODE, DATE_DEBUT = ll$DATE_DEBUT, DATE_FIN = ll$DATE_FIN,
+  TYPE_RX = ll$TYPE_RX, CODE_RX = ll$CODE_RX, GROUPER_PAR = ll$GROUPER_PAR,
+  CODE_SERV_FILTRE = ll$CODE_SERV_FILTRE, CODE_SERV = ll$CODE_SERV,
+  CODE_LIST_FILTRE = ll$CODE_LIST_FILTRE, CODE_LIST = ll$CODE_LIST
 )), by = "")
 kable_tab(stat_gen1_args)
 ```
 
 **Tableau des résultats :**
 ```{r}
-ll <- list(METHODE = "stat_gen1",
-           DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-01-31", "2019-01-31"),
-           TYPE_RX = "DENOM", CODE_RX = c(47092, 47135, 48222), GROUPER_PAR = "Périodes",
-           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NULL)
-tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
-                         codes = ll$CODE_RX, code_serv = ll$CODE_SERV)
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
+  codes = ll$CODE_RX, code_serv = ll$CODE_SERV
+)
 sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```
@@ -285,8 +290,8 @@ kable_tab(tab_res)
 **Code SQL :**
 Seule la première période est affichée.
 ```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
+select '2017-01-01' as DATE_DEBUT,
+       '2017-12-31' as DATE_FIN,
        sum(SMED_MNT_AUTOR_MED) as MNT_MED,
        sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
        sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
@@ -307,27 +312,30 @@ where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
 
 **Arguments :**
 ```{r}
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01"), DATE_FIN = c("2018-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NULL,
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NA,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41")
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(list(
+  METHODE = ll$METHODE, DATE_DEBUT = ll$DATE_DEBUT, DATE_FIN = ll$DATE_FIN,
+  TYPE_RX = ll$TYPE_RX, CODE_RX = ll$CODE_RX,
+  CODE_SERV_FILTRE = ll$CODE_SERV_FILTRE, CODE_SERV = ll$CODE_SERV,
+  CODE_LIST_FILTRE = ll$CODE_LIST_FILTRE, CODE_LIST = ll$CODE_LIST
 )), by = "")
 kable_tab(stat_gen1_args)
 ```
 
 **Tableau des résultats :**
 ```{r}
-ll <- list(METHODE = "stat_gen1",
-           DATE_DEBUT = c("2018-01-01"), DATE_FIN = c("2018-12-31"),
-           TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NULL,
-           CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
-           CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41"))
-tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
-                         codes = ll$CODE_RX, code_serv = ll$CODE_SERV,
-                         code_serv_filtre = ll$CODE_SERV_FILTRE, code_list_filtre = ll$CODE_LIST_FILTRE)
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = ll$CODE_LIST, code_list_filtre = ll$CODE_LIST_FILTRE
+)
 sg1_format_table(tab_res)
 kable_tab(tab_res)
 ```

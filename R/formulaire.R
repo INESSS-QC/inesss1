@@ -56,6 +56,12 @@ formulaire <- function() {
       code_serv <- code_serv[code_serv != "L, M, M1 à M3"]  # effacer cette valeur
       code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))  # ajouter chaque valeur individuellement
     }
+    # Effectuer les mêmes étapes que précédemment, mais sans espace. Permet de
+    # gérer les cas où on importe la colonne avec la fonction str_replace_all(x, " ", "")
+    if ("L,M,M1àM3" %in% code_serv) {
+      code_serv <- code_serv[code_serv != "L,M,M1àM3"]
+      code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
+    }
     return(code_serv)
   }
   cols_select_from_method <- function(dt, method) {
