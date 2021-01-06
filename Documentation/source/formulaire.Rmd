@@ -99,7 +99,7 @@ NULL_if_NA <- function(x) {
 
 
 # Requêtes via EXCEL
-Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser les gabarits disponibles à partir du fichier *Gabarits-formulaire.xlsx*.
+Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser les gabarits disponibles à partir du fichier [*Gabarits-formulaire.xlsx*](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).
 
 1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes à exécuter.
 2. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
