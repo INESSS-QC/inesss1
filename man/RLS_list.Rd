@@ -11,6 +11,6 @@ Vecteur \code{integer} de 96 nombres.
 data("RLS_list") / MaVariable <- RLS_list.
 }
 \description{
-Vecteur contenant la liste des 93 RLS plus 3 valeurs utilisées lors d'analyse : 1001, 1701, 1801.
+Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 }
 \keyword{datasets}
