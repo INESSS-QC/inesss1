@@ -28,6 +28,23 @@ render(
 )
 
 
+# Registre Versions -------------------------------------------------------
+render(
+  input = "NEWS.Rmd",
+  output_format = "md_document",
+  output_file = "NEWS.md",
+  output_dir = getwd(),
+  envir = new.env()
+)
+render(  # pdf_document
+  input = "NEWS.Rmd",
+  output_format = "pdf_document",
+  output_file = "inesss-REGISTRE-VERSION.pdf",
+  output_dir = "Documentation",
+  envir = new.env()
+)
+
+
 # Formulaire --------------------------------------------------------------
 render(
   input = "Documentation/source/formulaire.Rmd",

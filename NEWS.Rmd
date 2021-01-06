@@ -1,0 +1,34 @@
+---
+output:
+  md_document:
+    variant: markdown_github
+  pdf_document:
+    toc_depth: 2
+    highlight: default
+urlcolor: blue
+---
+  
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%",
+  echo = FALSE, results = "asis"
+)
+```
+
+## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
+
+### [v0.2.0](https://github.com/INESSS-QC/inesss1/pull/4)
+* Fonction `formulaire()`.
+* Fonction `sql_connexion()`.
+* Fonction `sql_stat_gen1()`.
+* Création du fichier *AIDE-FORMULAIRE_2021-01-06.pdf*.
+* Création du fichier *LISEZ-MOI_2021-01-06.pdf*.
+* Création du fichier *R_RTOOLS_INSTALLATION_2021-01-06.pdf*.
+* Exemples au format Excel. Voir fichiers *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx* et *AIDE-FORMULAIRES-EXEMPLES-RÉSULTATS.xlsx*.
+* Démarrage du formulaire via les *Addins* de *RStudio*.
+
+### [v0.1.1.9000](https://github.com/INESSS-QC/inesss1/pull/3)
+* Documentation des datas *Pop_QC*, *RLS_convert* et *RLS_list*.

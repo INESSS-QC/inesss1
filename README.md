@@ -3,8 +3,10 @@ Support
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
 conception, écrire un courriel à l’adresse
-`guillaume.boucher@inesss.qc.ca` et indiquer l’object
-`librairie inesss`.
+`guillaume.boucher@inesss.qc.ca` et indiquer l’objet
+`librairie inesss`.  
+La documentation de la librairie est disponible
+[ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
 
 Installation
 ============
