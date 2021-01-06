@@ -23,7 +23,7 @@ library(knitr)
 ```
 
 # Installation
-Copier les lignes suivantes dans la console pour installer la librairie *inesss*.
+Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
 ```{r, eval=FALSE, echo=TRUE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_github("INESSS-QC/inesss")
@@ -53,6 +53,9 @@ cat(base::R.version$version.string)
 ```{r}
 packages <- unlist(stringr::str_split(packageDescription("inesss")$Imports, ",\n"))
 i_max <- length(packages)
+for (i in 1:i_max) {
+  packages[[i]] <- str_sub(packages[[i]], 1, str_locate_all(packages[[i]], " \\(>=")[[1]][1]-1)
+}
 i = 1L
 for (pk in packages) {
   if (i > 1L) {

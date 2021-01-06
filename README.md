@@ -1,8 +1,8 @@
 Installation
 ============
 
-Copier les lignes suivantes dans la console pour installer la librairie
-*inesss*.
+Copier les lignes suivantes dans la console de *RStudio* pour installer
+la librairie *inesss*.
 
 ``` r
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
