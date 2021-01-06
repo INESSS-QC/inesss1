@@ -593,12 +593,16 @@ formulaire <- function() {
         ),
 
 
+
+
+
         ### Statistiques générales - tabStatGen1
         ### Exécuter une requête simple à partir des arguments disponibles dans
         ### le formulaire.
         tabItem(
           tabName = "tabStatGen1",
 
+          # ARGUMENTS SECTION
           fluidRow(
             h4(HTML("&nbsp;&nbsp;"), "Arguments"),
             style = "color: #ffffff; background-color: #0086b3;"
@@ -658,7 +662,6 @@ formulaire <- function() {
               )
             )
           ),
-
           fluidRow(
             column(
               width = 3,
@@ -671,19 +674,25 @@ formulaire <- function() {
             )
           ),
 
-          uiOutput("sg1_html_result_section"),
 
-          # Tableau & Affichage extraction SQL
+          # RESULTATS SECTION
+          uiOutput("sg1_html_result_section"),  # En-tête
+          fluidRow(
+            p(),
+            dataTableOutput("sg1_table_req"),  # tableau des résultats
+            p()
+          ),
           fluidRow(
             column(
               width = 3,
               uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
             )
           ),
+
+
+          # CODE SQL SECTION
           fluidRow(
-            p(),
-            dataTableOutput("sg1_table_req"),
-            p()  # espacement avec la suite
+            uiOutput("sg1_html_SQL_section")
           )
         )
       )
@@ -946,6 +955,22 @@ formulaire <- function() {
           save_path = sg1_file_save()
         )
         removeNotification("sg1_file_save")
+      }
+    })
+
+    # En-tête SQL - Apparaît seulement s'il y a eu une requête
+    output$sg1_html_SQL_section <- renderUI({
+      if (sg1_val$show_tab) {
+        return(tagList(
+          div(style = "margin-top:15px"),
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), "Requête SQL"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px")
+        ))
+      } else {
+        return(NULL)
       }
     })
 
