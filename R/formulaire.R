@@ -603,7 +603,7 @@ formulaire <- function() {
             h4(HTML("&nbsp;&nbsp;"), "Arguments"),
             style = "color: #ffffff; background-color: #0086b3;"
           ),
-          div(style = "margin-top:15px"),
+          div(style = "margin-top:10px"),
           # Afficher sur la première ligne
           #   - Nombre de périodes d'analyse
           #   - Nombre de codes Rx à analyser
@@ -668,18 +668,22 @@ formulaire <- function() {
                                "background-color: #006600;",
                                "border-color: #000000;")
               )
-            ),
+            )
+          ),
+
+          uiOutput("sg1_html_result_section"),
+
+          # Tableau & Affichage extraction SQL
+          fluidRow(
             column(
               width = 3,
               uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
             )
           ),
-
-          # Tableau & Affichage extraction SQL
           fluidRow(
             p(),
             dataTableOutput("sg1_table_req"),
-            p(),  # espacement avec la suite
+            p()  # espacement avec la suite
           )
         )
       )
@@ -845,6 +849,21 @@ formulaire <- function() {
       })
     })
 
+    # En-tête Résultats - Apparaît seulement s'il y a eu une requête
+    output$sg1_html_result_section <- renderUI({
+      if (sg1_val$show_tab) {
+        return(tagList(
+          div(style = "margin-top:15px"),
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
       if (any("" %in% str_remove_all(sg1_find_code(input), " "))) {
