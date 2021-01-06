@@ -1,14 +1,17 @@
 library(inesss)
 library(askpass)
 
+conn <- sql_connexion(askpass("User"))  # connexion teradata
+
 package_wd <- getwd()  # project wd
 setwd(file_directory())  # répertoire du fichier = wd
 
 files <- list.files()
-files <- files[files != "0 - create all.R"]
-
-conn <- sql_connexion(dsn = "PEI_PRD", uid = askpass("Identifiant"),
-                      pwd = askpass("Mot de passe"), encoding = "latin1")
+files <- files[
+  !files %in% c("0 - create all.R",
+                "Pop_QC.R",
+                "RLS_convert.R", "RLS_list.R")
+]
 
 t1 <- Sys.time()
 for (f in files) {

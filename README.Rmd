@@ -1,5 +1,14 @@
 ---
-output: github_document
+title: "INESSS"
+subtitle: "`r paste0('v.',as.character(packageVersion('inesss')))`"
+date: "`r Sys.Date()`"
+output:
+  md_document:
+    variant: markdown_github
+  pdf_document:
+    toc_depth: 2
+    highlight: default
+urlcolor: blue
 ---
 
 ```{r, include = FALSE}
@@ -7,38 +16,66 @@ knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
   fig.path = "man/figures/README-",
-  out.width = "100%"
+  out.width = "100%",
+  echo = FALSE, results = "asis"
 )
+library(knitr)
+library(stringr)
 ```
 
-# inesss
+# Support
+Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'object `librairie inesss`.
 
-[Institut national d'excellence en santé et en services sociaux](https://www.inesss.qc.ca/){target="_blank"}
-
-## Installation
-Copier les lignes suivantes dans la console pour installer la librairie *inesss*.
-```{r, eval=FALSE}
+# Installation
+Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
+```{r, eval=FALSE, echo=TRUE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_github("INESSS-QC/inesss")
 ```
 
-## Notes de création
-```{r, results="asis", echo=FALSE}
-packages <- c(
-  "askpass",
-  "data.table", "DBI",
-  "fs",
-  "lubridate",
-  "miniUI",
-  "odbc",
-  "readxl", "rstudioapi",
-  "shiny", "shinydashboard", "shinyFiles", "stringr",
-  "testthat",
-  "writexl"
-)
-txt <- c(base::R.version$version.string)
+# Démarrer le formulaire
+![](Documentation/source/images/formulaire-addin.png)
+
+
+
+```{r}
+if (is_latex_output()) {
+  cat("\\pagebreak")
+}
+```
+
+
+
+# Notes de création
+
+## R
+```{r}
+cat(base::R.version$version.string)
+```
+
+## Librairies
+```{r}
+packages <- unlist(stringr::str_split(packageDescription("inesss")$Imports, ",\n"))
+i_max <- length(packages)
+for (i in 1:i_max) {
+  packages[[i]] <- str_sub(packages[[i]], 1, str_locate_all(packages[[i]], " \\(>=")[[1]][1]-1)
+}
+i = 1L
 for (pk in packages) {
-  txt <- paste0(txt, "<br>\n", pk, " version ", as.character(packageVersion(pk)))
+  if (i > 1L) {
+    if (is_html_output()) {
+      txt <- paste0(txt, "<br>\n`",pk,"` v.", as.character(packageVersion(pk)))
+    } else {
+      txt <- paste0(txt, "\\newline\n`",pk,"` v.", as.character(packageVersion(pk)))
+    }
+  } else {
+    if (is_html_output()) {
+      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
+    } else {
+      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
+    }
+  }
+  i <- i + 1L
 }
 cat(txt)
 ```

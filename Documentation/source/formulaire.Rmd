@@ -1,0 +1,423 @@
+---
+title: "Formulaire"
+subtitle: '[inesss v.`r as.character(packageVersion("inesss"))`](https://github.com/INESSS-QC/inesss1){target="_blank"}'
+date: "`r Sys.Date()`"
+output:
+  pdf_document:
+    toc_depth: 3
+    number_sections: true
+classoption: landscape
+geometry: "left=1.5cm,right=1.5cm,top=2.5cm,bottom=1.5cm"
+urlcolor: blue
+header-includes:
+  - \usepackage{fancyhdr}
+  - \usepackage{booktabs}
+params:
+  conn: ""
+---
+
+\pagestyle{fancy}
+\fancyhead[RE,RO]{\leftmark}
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, results = "asis")
+library(inesss)
+library(data.table)
+library(kableExtra)
+library(knitr)
+library(stringr)
+conn <- params$conn
+# conn <- sql_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+
+# Afficher un tableau grâce à kableExtra
+kable_tab <- function(x, scale_down = TRUE) {
+  p <- kable(x, "latex", booktabs = TRUE, row.names = FALSE, linesep = "",
+             align = "r") %>%
+    kable_styling(latex_options = rmNA(c("hold_position", "repeat_header",
+                                         ifelse(scale_down, "scale_down", NA))))
+  return(cat(p))
+}
+# Formats
+price_format <- function(x) {  # format prix
+  return(sapply(x, function(x) {
+    formatC(x, digits = 2, format = "f", big.mark = " ", decimal.mark = ",")
+  }))
+}
+number_format <- function(x, digi = 0) {  # nombre en général
+  return(sapply(x, function(x) {
+    formatC(x, digits = digi, format = "f", big.mark = " ", decimal.mark = ",")
+  }))
+}
+
+# Automatic format table
+sg1_format_table <- function(dt) {
+  dt[, `:=` (MNT_MED = price_format(MNT_MED),
+             MNT_SERV = price_format(MNT_SERV),
+             MNT_TOT = price_format(MNT_TOT),
+             COHORTE = number_format(COHORTE),
+             NBRE_RX = number_format(NBRE_RX),
+             QTE_MED = number_format(QTE_MED, digi = 3),
+             DUREE_TX = number_format(DUREE_TX))]
+}
+
+# NULL if NA
+NULL_if_NA <- function(x) {
+  if (all(is.na(x))) {
+    return(NULL)
+  } else {
+    return(x)
+  }
+}
+```
+
+
+# Démarrer le formulaire
+À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
+
+![](images/formulaire-addin.png){ width=60% }
+
+
+
+\pagebreak
+
+
+
+# Connexion
+Établir une connexion entre *R* et *Teradata*.
+
+1. Inscrire le nom d'utilisateur (commence généralement par *MS*) et le mot de passe.
+2. Cliquer sur le bouton *Connexion*. S'il n'y a pas d'erreur, le mot *Connexion* suivi de la date et l'heure s'affichera. Modifier l'identifiant ou le mot de passe au besoin.
+
+**Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière-plan**. Sélectionner cette fenêtre et entrer le nouveau mot de passe.
+
+![](images/formulaire-connexion.png){ width=80% }
+
+
+
+\pagebreak
+
+
+
+# Requêtes via EXCEL
+Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser les gabarits disponibles à partir du fichier *Gabarits-formulaire.xlsx*.
+
+1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes à exécuter.
+2. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
+3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupées par onglet.
+4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la requête associée aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
+5. Le fichier sauvegardé présente les résultats de la manière suivante :
+    + Les noms des onglets sont les mêmes que ceux du fichier contenant les arguments.
+    + À gauche se trouve le tableau des résultats.
+    + Au milieu, un rappel des arguments utilisés.
+    + À droite, un exemple de code SQL utilisé dans Teradata pour créer le tableau des résultats (uniquement celui de la première période d'étude).
+
+\pagebreak
+
+## Statistiques générales
+Statistiques descriptives tirées de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+
+### Arguments {#sg1_arguments}
+* **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
+* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
+* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
+* **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
+* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
+* **`GROUPER_PAR` :** Grouper les résultats par :
+    + `Périodes` : Additionne les montants de tous les codes d'analyse pour une même période. Ajoute une colonne à la fin du tableau des résultats rappelant les codes analysés (`DENOM` ou `DIN`) durant chaque période.
+* **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
+* **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide).  
+Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+* **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
+* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide).  
+Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+
+### Résultats
+L'onglet contient trois (3) éléments :
+
+#### Tableau des résultats
+* **`DATE_DEBUT` :** Indique la date de début de la période d'étude.
+* **`DATE_FIN` :** Indique la date de fin de la période d'étude.
+* **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude. Si les résultats sont groupés par période d'étude, cette colonne se situera à la fin du tableau.
+* **`NOM_DENOM / NOM_MARQ_COMRC` :** Indique le nom de la dénomination commune si c'est un `DENOM` ou le nom de la marque de commerce si c'est un `DIN`.
+* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+* **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+* **`COHORTE` :** Nombre d'individus unique [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+* **`NBRE_RX` :** Nombre de demandes de paiement [`count(*) as NBRE_RX`].
+* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés [`sum(SMED_QTE_MED) as QTE_MED`].
+* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
+
+#### Tableau des arguments
+* Table rappelant les arguments fournis par l'utilisateur à la section [*Arguments*](#sg1_arguments)
+
+#### Code SQL
+* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
+
+\pagebreak
+
+### Exemple 1 --- DENOM
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+
+**Tableau des résultats :**
+```{r}
+tab_res <- sql_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+                         code_serv = ll$CODE_SERV)
+sg1_format_table(tab_res)
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(stat_gen1_txt_query_1period(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  groupby = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DENOM;
+```
+
+
+
+\pagebreak
+
+### Exemple 2 --- DIN
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"),
+  DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args, scale_down = FALSE)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE
+)
+sg1_format_table(tab_res)
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(stat_gen1_txt_query_1period(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  groupby = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DIN as DIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DIN;
+```
+
+\pagebreak
+
+### Exemple 3 --- GROUPER PAR : Périodes
+Indiquer la somme des montants de tous les codes d'analyse par période d'étude.
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2017-01-01", "2018-01-01", "2019-01-01"),
+  DATE_FIN = c("2017-12-31", "2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135, 48222), GROUPER_PAR = "Périodes",
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  groupby = ll$GROUPER_PAR, type_Rx = ll$TYPE_RX,
+  codes = ll$CODE_RX, code_serv = ll$CODE_SERV
+)
+sg1_format_table(tab_res)
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(stat_gen1_txt_query_1period(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  groupby = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select '2017-01-01' as DATE_DEBUT,
+       '2017-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2017-01-01' and '2017-12-31'
+    and SMED_COD_DENOM_COMNE in ('47092', '47135', '48222')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null) ;
+```
+
+\pagebreak
+
+### Exemple 4 --- Services et Catégories de listes de médicaments
+`"Exclusion"`/`"Inclusion"` des codes de services (`SMED_COD_SERV`) et `"Inclusion"`/`"Exclusion"` des codes de catégorie de listes de médicaments (`SMED_COD_CATG_LISTE_MED`).
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01"), DATE_FIN = c("2018-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = NA,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD", "L, M, M1 à M3"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40", "41")
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- sql_stat_gen1(
+  conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  code_serv = ll$CODE_SERV, code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = ll$CODE_LIST, code_list_filtre = ll$CODE_LIST_FILTRE
+)
+sg1_format_table(tab_res)
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(stat_gen1_txt_query_1period(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  groupby = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD', 'L, M, M1 à M3') or SMED_COD_SERV_1 is null)
+    and SMED_COD_CATG_LISTE_MED in ('03', '40', '41')
+group by DENOM;
+```
+
+
+\pagebreak
+
+
+# Statistiques générales
+Formulaire interactif permettant l'inscription d'arguments, l'exécution de la requête et la sauvegarde des résultats à partir de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+
+![](images/sg1-all.PNG){ height=90% }
+\pagebreak
+
+## Arguments
+
+* **`Nombre de périodes` :** Nombre entier. Indique le nombre de périodes d'étude désiré.
+* **`Période X` :** Sélectionner ou inscrire manuellement la date de début et de fin de la période d'étude *X*.
+* **`Nombre de Codes Rx` :** Nombre entier. Indique le nombre de `Code Rx` à analyser.
+* **`Type de Code Rx` :** `DENOM` ou `DIN`. Indique le type de `Code Rx` à analyser.
+  + `DENOM` : Code dénomination commune ([SMED_COD_DENOM_COMNE](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233))
+  + `DIN` : Code d'identification du médicament ([SMED_COD_DIN](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265)).
+* **`Code Rx X` :** Le(s) code(s) de médicament à analyser. Inscrire les codes sous la forme d'un nombre entier.
+* **`Grouper par` :**
+  + `Périodes` : Groupe les résultats de tous les codes de médicament par période d'étude.
+* **`Codes de Service` :** Exclusion ou inclusion des [codes de services](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295) sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée.
+* **`Code Liste Médicament` :** Exclusion ou inclusion des [codes de catégories de listes de médicaments](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245) sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée.
+
+## Boutons
+
+* **Exécuter Requête :** Exécution d'une requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous le bouton.
+* **Effacer Requête :** Efface le tableau des résultats.
+* **Sauvegarder Résultats en EXCEL :** Ouvre une fenêtre permettant de sauvegarder au format EXCEL le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
+* **Afficher Code Requête/MaJ Code Requête :** Affiche ou met à jour le code SQL généré à partir des arguments sélectionnés. Prendre note qu'il y a seulement le code de la première période d'étude qui est affiché.
+* **Effacer Code Requête :** Masque le code SQL.

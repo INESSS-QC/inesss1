@@ -2,11 +2,14 @@
 % Please edit documentation in R/formulaire.R
 \name{formulaire}
 \alias{formulaire}
-\title{Formulaire Shiny}
+\title{Formulaire Interactif}
 \usage{
 formulaire()
 }
 \description{
-Formulaire Shiny
+Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire est disponible \href{}{ici}.
 }
-\keyword{internal}
+\details{
+\strong{Requêtes via EXCEL :}\cr
+Il est conseillé d'utiliser les gabarits pour éviter des erreurs de structures dans les tableaux d'arguments. Le fichier Excel est disponible \href{https://github.com/INESSS-QC/inesss1/blob/master/gabarits/Gabarits-formulaire.xlsx}{ici}.
+}

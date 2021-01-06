@@ -18,10 +18,11 @@ Tableau de 8 variables et 2 595 320 observations :
 }
 }
 \source{
-\href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population.}
+\href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population}.\cr
+\href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/EstimationProjectionComparable_1996_2041_20200424.xlsx}{Fichier Excel utilisé}.
 }
 \usage{
-Pop_QC
+data("Pop_QC") / MaVariable <- Pop_QC.
 }
 \description{
 Tableau de la population québécoise par niveau géographique.\cr\cr

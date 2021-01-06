@@ -16,8 +16,8 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' conn <- sql_connexion("ms045")
-#' conn <- sql_connexion(uid = "ms045", pwd = "MonMotDePasse",
+#' conn <- sql_connexion("abc007")
+#' conn <- sql_connexion(uid = "abc007", pwd = "MonMotDePasse",
 #'                       dsn = "PEI_PRD", encoding = "latin1")
 #' }
 sql_connexion <- function(uid, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1") {
