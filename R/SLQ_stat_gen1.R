@@ -257,9 +257,9 @@ stat_gen1_txt_query_1period <- function(
   select_type_rx <- function(groupby, type_Rx) {
     if (is.null(groupby)) {
       if (type_Rx == "DENOM") {
-        return(paste0(indent(),"SMED_COD_DENOM_COMNE as DENOM,\n"))
+        return(paste0(indent("select"),"SMED_COD_DENOM_COMNE as DENOM,\n"))
       } else if (type_Rx == "DIN") {
-        return(paste0(indent(),"SMED_COD_DIN as DIN,\n"))
+        return(paste0(indent("select"),"SMED_COD_DIN as DIN,\n"))
       } else {
         stop("stat_gen1_txt_query_1period.select_CODES() valeur non permise.")
       }
@@ -316,15 +316,15 @@ stat_gen1_txt_query_1period <- function(
 
   query <- paste0(
     "select ",qu(debut)," as DATE_DEBUT,\n",
-    indent(),qu(fin)," as DATE_FIN,\n",
-             select_type_rx(groupby, type_Rx),
-    indent(),"sum(SMED_MNT_AUTOR_MED) as MNT_MED,\n",
-    indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n",
-    indent(),"sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n",
-    indent(),"count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,\n",
-    indent(),"count(*) as NBRE_RX,\n",
-    indent(),"sum(SMED_QTE_MED) as QTE_MED,\n",
-    indent(),"sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n",
+    indent("select"),qu(fin)," as DATE_FIN,\n",
+                     select_type_rx(groupby, type_Rx),
+    indent("select"),"sum(SMED_MNT_AUTOR_MED) as MNT_MED,\n",
+    indent("select"),"sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n",
+    indent("select"),"sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n",
+    indent("select"),"count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,\n",
+    indent("select"),"count(*) as NBRE_RX,\n",
+    indent("select"),"sum(SMED_QTE_MED) as QTE_MED,\n",
+    indent("select"),"sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n",
     from_bd.vue("PROD","V_DEM_PAIMT_MED_CM"),"\n",
     "where SMED_DAT_SERV between ",qu(debut)," and ",qu(fin),"\n",
     indent(),where_code_rx(type_Rx, codes),

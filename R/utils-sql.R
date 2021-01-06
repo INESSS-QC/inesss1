@@ -24,7 +24,11 @@ from_bd.vue <- function(bd = "PROD", vue) {
 #' @keywords internal
 #' @export
 indent <- function(niv = 1) {
-  return(paste0(rep("    ", niv)))
+  if (niv == "select") {
+    return("       ")
+  } else {
+    return(paste0(rep("    ", niv)))
+  }
 }
 
 
