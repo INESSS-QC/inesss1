@@ -599,6 +599,11 @@ formulaire <- function() {
         tabItem(
           tabName = "tabStatGen1",
 
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Arguments"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:15px"),
           # Afficher sur la première ligne
           #   - Nombre de périodes d'analyse
           #   - Nombre de codes Rx à analyser
@@ -616,14 +621,6 @@ formulaire <- function() {
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1,
                            min = 1, max = 99),
-
-              # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
-              # div(style = "margin-top:-20px"),
-              # checkboxGroupInput("sg1_group_by", "",
-              #                    choiceNames = c("Grouper par période"),
-              #                    choiceValues = c("period")),
-              # div(style = "margin-top:-5px"),
-
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de Code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -631,10 +628,13 @@ formulaire <- function() {
               uiOutput("sg1_nb_codes")
             ),
             column(
-              width = 3,
+              width = 2,
+              # Grouper par
               checkboxGroupInput("sg1_group_by", "Grouper par",
                                  choices = "Périodes"),
-
+            ),
+            column(
+              width = 4,
               # Codes de services
               selectInput("sg1_code_serv_filter", "Codes de Service",
                           choices = c("Exclusion", "Inclusion"),
@@ -645,10 +645,7 @@ formulaire <- function() {
                 choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
                 choiceValues = sg1_code_serv_choices(dt_code_serv)$value,
                 selected = c("1", "AD")
-              )
-            ),
-            column(
-              width = 3,
+              ),
               # Codes liste médicaments
               selectInput("sg1_code_list_filter", "Code Liste Médicament",
                           choices = c("Exclusion", "Inclusion"),
@@ -662,18 +659,15 @@ formulaire <- function() {
             )
           ),
 
-
           fluidRow(
             column(
               width = 3,
               actionButton(  # Exécution de la requête SQL
                 "sg1_go_extract", "Exécuter Requête",
-                style = "background-color: #b3d9ff"  # couleur du bouton
+                style = paste0("color: #ffffff;",
+                               "background-color: #006600;",
+                               "border-color: #000000;")
               )
-            ),
-            column(
-              width = 3,
-              uiOutput("sg1_erase_tab")  # bouton effacer la requête
             ),
             column(
               width = 3,
@@ -686,20 +680,6 @@ formulaire <- function() {
             p(),
             dataTableOutput("sg1_table_req"),
             p(),  # espacement avec la suite
-          ),
-          fluidRow(
-            column(
-              width = 3,
-              uiOutput("sg1_maj_req")
-            ),
-            column(
-              width = 3,
-              uiOutput("sg1_erase_req")
-            )
-          ),
-          fluidRow(
-            p(),
-            verbatimTextOutput("sg1_code_req")
           )
         )
       )
@@ -774,7 +754,10 @@ formulaire <- function() {
         return(shinySaveButton(
           "save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
           filetype = list(`Classeur EXCEL` = "xlsx"),
-          viewtype = "list", style = "background-color: #b3d9ff"
+          viewtype = "list",
+          style = paste0("color: #ffffff;",
+                         "background-color: #006600;",
+                         "border-color: #000000;")
         ))
       } else {
         return(NULL)
@@ -898,19 +881,6 @@ formulaire <- function() {
       options = list(scrollX = TRUE)  # scrolling si le tableau est plus large que la fenêtre
     )
 
-    # Effacer le tableau des résultats
-    output$sg1_erase_tab <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
-      if (sg1_val$show_tab) {
-        return(actionButton("sg1_erase_tab", "Effacer Requête",
-                            style = "background-color: #ffc2b3"))
-      } else {
-        return(NULL)
-      }
-    })
-    observeEvent(input$sg1_erase_tab, {
-      sg1_val$show_tab <- FALSE  # ne pas afficher de tableau
-    })
-
     # Enregistrer le fichier au format EXCEL
     output$sg1_save <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
       if (sg1_val$show_tab) {
@@ -919,7 +889,9 @@ formulaire <- function() {
           "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
           filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
           viewtype = "list",
-          style = "background-color: #b3d9ff"
+          style = paste0("color: #ffffff;",
+                         "background-color: #006600;",
+                         "border-color: #000000;")
         ))
       } else {
         return(NULL)
@@ -958,50 +930,50 @@ formulaire <- function() {
       }
     })
 
-    # Afficher code de la requête SQL généré par les arguments du formulaire
-    observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
-      sg1_val$show_query <- TRUE
-      sg1_val$query <- stat_gen1_txt_query_1period(
-        debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-        type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
-        groupby = input$sg1_group_by,
-        code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
-        code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
-      )
-    })
-    observeEvent(input$sg1_erase_req, {  # modification des valeurs pour effacer le code requête
-      sg1_val$show_query <- FALSE
-      sg1_val$query <- NULL
-    })
-    output$sg1_code_req <- reactive({  # afficher le code de la requête
-      if (sg1_val$show_query) {
-        return(sg1_val$query)
-      } else {
-        return(NULL)
-      }
-    })
-    # Boutons pour afficher la requête ou l'effacer
-    output$sg1_maj_req <- renderUI({  # Affiche ou MaJ du code de la requête
-      if (sg1_val$show_query) {
-        return(actionButton(
-          "sg1_maj_req", "MaJ Code Requête",
-          style = "background-color: #c6ecc6"
-        ))
-      } else {
-        return(actionButton(
-          "sg1_maj_req", "Afficher Code Requête",
-          style = "background-color: #c6ecc6"
-        ))
-      }
-    })
-    output$sg1_erase_req <- renderUI({  # effacer le code de la requête
-      if (sg1_val$show_query) {  # s'il y a du code affiché
-        return(actionButton(
-          "sg1_erase_req", "Effacer Code Requête",
-          style = "background-color: #ffc2b3"
-        ))
-      }
-    })
+    # # Afficher code de la requête SQL généré par les arguments du formulaire
+    # observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
+    #   sg1_val$show_query <- TRUE
+    #   sg1_val$query <- stat_gen1_txt_query_1period(
+    #     debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
+    #     type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
+    #     groupby = input$sg1_group_by,
+    #     code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
+    #     code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
+    #   )
+    # })
+    # observeEvent(input$sg1_erase_req, {  # modification des valeurs pour effacer le code requête
+    #   sg1_val$show_query <- FALSE
+    #   sg1_val$query <- NULL
+    # })
+    # output$sg1_code_req <- reactive({  # afficher le code de la requête
+    #   if (sg1_val$show_query) {
+    #     return(sg1_val$query)
+    #   } else {
+    #     return(NULL)
+    #   }
+    # })
+    # # Boutons pour afficher la requête ou l'effacer
+    # output$sg1_maj_req <- renderUI({  # Affiche ou MaJ du code de la requête
+    #   if (sg1_val$show_query) {
+    #     return(actionButton(
+    #       "sg1_maj_req", "MaJ Code Requête",
+    #       style = "background-color: #c6ecc6"
+    #     ))
+    #   } else {
+    #     return(actionButton(
+    #       "sg1_maj_req", "Afficher Code Requête",
+    #       style = "background-color: #c6ecc6"
+    #     ))
+    #   }
+    # })
+    # output$sg1_erase_req <- renderUI({  # effacer le code de la requête
+    #   if (sg1_val$show_query) {  # s'il y a du code affiché
+    #     return(actionButton(
+    #       "sg1_erase_req", "Effacer Code Requête",
+    #       style = "background-color: #ffc2b3"
+    #     ))
+    #   }
+    # })
 
   }
 
