@@ -20,7 +20,7 @@ knitr::opts_chunk$set(echo = TRUE)
 * Ouvrir le fichier téléchargé.
 * Choisir la langue utilisée par l'assistant d'installation, puis cliquer sur *OK*.
 * **Information** : Une note apparaît indiquant que vous devez avoir les privilèges d'administrateurs. Ignorer cet avertissement et cliquer sur *Suivant*.
-* **Information** : Une note sur la license et les droits d'utilisation de R apparaît. Cliquer sur *Suivant*.
+* **Information** : Une note sur la licence et les droits d'utilisation de R apparaît. Cliquer sur *Suivant*.
 * **Dossier de destination** : Choisir un répertoire où vous avez les droits d'écriture. Le répertoire par défaut `C:\Users\msXXX\Documents\R\R-4.0.3` est un bon choix. Cliquer sur *Suivant*.
 * **Composants à installer** : Installer tous les composants. Cliquer sur *Suivant*.
 * **Options de démarrage** : Choisir *Non (accepter les valeurs par défaut)*.

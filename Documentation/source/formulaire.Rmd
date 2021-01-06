@@ -88,7 +88,7 @@ NULL_if_NA <- function(x) {
 1. Inscrire le nom d'utilisateur (commence généralement par *MS*) et le mot de passe.
 2. Cliquer sur le bouton *Connexion*. S'il n'y a pas d'erreur, le mot *Connexion* suivi de la date et l'heure s'affichera. Modifier l'identifiant ou le mot de passe au besoin.
 
-**Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière plan**. Sélectionner cette fenêtre et entrer le nouveau mot de passe.
+**Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière-plan**. Sélectionner cette fenêtre et entrer le nouveau mot de passe.
 
 ![](images/formulaire-connexion.png){ width=80% }
 
@@ -103,10 +103,10 @@ Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL.
 
 1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes à exécuter.
 2. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
-3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupés par onglet.
-4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la requête associé aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
+3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupées par onglet.
+4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la requête associée aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
 5. Le fichier sauvegardé présente les résultats de la manière suivante :
-    + Les noms des onglets sont les mêmes que ceux du fichiers contenant les arguments.
+    + Les noms des onglets sont les mêmes que ceux du fichier contenant les arguments.
     + À gauche se trouve le tableau des résultats.
     + Au milieu, un rappel des arguments utilisés.
     + À droite, un exemple de code SQL utilisé dans Teradata pour créer le tableau des résultats (uniquement celui de la première période d'étude).
@@ -118,8 +118,8 @@ Statistiques descriptives tirées de la vue [V_DEM_PAIMT_MED_CM](http://intranet
 
 ### Arguments {#sg1_arguments}
 * **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
-* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_FIN`.
-* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Doit contenir le même nombre de valeurs que `DATE_DEBUT`.
+* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
+* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
 * **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
 * **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
 * **`GROUPER_PAR` :** Grouper les résultats par :
@@ -151,7 +151,7 @@ L'onglet contient trois (3) éléments :
 * Table rappelant les arguments fournis par l'utilisateur à la section [*Arguments*](#sg1_arguments)
 
 #### Code SQL
-* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affichée.
+* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
 
 \pagebreak
 
@@ -416,7 +416,7 @@ Formulaire interactif permettant l'inscription d'arguments, l'exécution de la r
 
 ## Boutons
 
-* **Exécuter Requête :** Exécution d'une requête SQL à partir des arguments sélectionnés. Une fois complétée, le tableau des résultats s'affiche sous le bouton.
+* **Exécuter Requête :** Exécution d'une requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous le bouton.
 * **Effacer Requête :** Efface le tableau des résultats.
 * **Sauvegarder Résultats en EXCEL :** Ouvre une fenêtre permettant de sauvegarder au format EXCEL le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
 * **Afficher Code Requête/MaJ Code Requête :** Affiche ou met à jour le code SQL généré à partir des arguments sélectionnés. Prendre note qu'il y a seulement le code de la première période d'étude qui est affiché.
