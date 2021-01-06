@@ -24,7 +24,7 @@ library(stringr)
 ```
 
 # Support
-Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'object `librairie inesss`.
+Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.
 
 # Installation
 Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
