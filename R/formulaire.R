@@ -692,7 +692,8 @@ formulaire <- function() {
 
           # CODE SQL SECTION
           fluidRow(
-            uiOutput("sg1_html_SQL_section")
+            uiOutput("sg1_html_SQL_section"),
+            uiOutput("sg1_html_code_SQL")
           )
         )
       )
@@ -974,50 +975,23 @@ formulaire <- function() {
       }
     })
 
-    # # Afficher code de la requête SQL généré par les arguments du formulaire
-    # observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
-    #   sg1_val$show_query <- TRUE
-    #   sg1_val$query <- stat_gen1_txt_query_1period(
-    #     debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-    #     type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
-    #     groupby = input$sg1_group_by,
-    #     code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
-    #     code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
-    #   )
-    # })
-    # observeEvent(input$sg1_erase_req, {  # modification des valeurs pour effacer le code requête
-    #   sg1_val$show_query <- FALSE
-    #   sg1_val$query <- NULL
-    # })
-    # output$sg1_code_req <- reactive({  # afficher le code de la requête
-    #   if (sg1_val$show_query) {
-    #     return(sg1_val$query)
-    #   } else {
-    #     return(NULL)
-    #   }
-    # })
-    # # Boutons pour afficher la requête ou l'effacer
-    # output$sg1_maj_req <- renderUI({  # Affiche ou MaJ du code de la requête
-    #   if (sg1_val$show_query) {
-    #     return(actionButton(
-    #       "sg1_maj_req", "MaJ Code Requête",
-    #       style = "background-color: #c6ecc6"
-    #     ))
-    #   } else {
-    #     return(actionButton(
-    #       "sg1_maj_req", "Afficher Code Requête",
-    #       style = "background-color: #c6ecc6"
-    #     ))
-    #   }
-    # })
-    # output$sg1_erase_req <- renderUI({  # effacer le code de la requête
-    #   if (sg1_val$show_query) {  # s'il y a du code affiché
-    #     return(actionButton(
-    #       "sg1_erase_req", "Effacer Code Requête",
-    #       style = "background-color: #ffc2b3"
-    #     ))
-    #   }
-    # })
+    # Code SQL en lien avec les résultats
+    output$sg1_code_SQL <- renderText({  # code sql de la requête selon les arguments
+      stat_gen1_txt_query_1period(
+        debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
+        type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
+        groupby = input$sg1_group_by,
+        code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
+        code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
+      )
+    })
+    output$sg1_html_code_SQL <- renderUI({  # section affichant le code SQL de la requête
+      if (sg1_val$show_tab) {
+        verbatimTextOutput("sg1_code_SQL")
+      } else {
+        return(NULL)
+      }
+    })
 
   }
 
