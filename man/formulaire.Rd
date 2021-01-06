@@ -7,7 +7,7 @@
 formulaire()
 }
 \description{
-Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire ,\emph{AIDE_FORMULAIRE_DATE.pdf}, est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
+Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire, \emph{AIDE_FORMULAIRE_DATE.pdf}, est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
 }
 \details{
 \strong{Requêtes via EXCEL :}\cr
