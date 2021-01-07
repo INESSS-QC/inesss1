@@ -1,14 +1,14 @@
 Librairie [`inesss` v.0.2.1](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.2.1
+### [v0.2.1](https://github.com/INESSS-QC/inesss1/pull/5/files)
 
 -   Nouvelle interface du formulaire, section *Statistiques générales*
     : 1) Diviser en trois section distinctes; 2) Le code SQL s’affiche
     en même temps que le tableau des résultats; 3) Bouton qui
     réinitialise les arguments.
 
-### [v0.2.0](https://github.com/INESSS-QC/inesss1/pull/4)
+### [v0.2.0](https://github.com/INESSS-QC/inesss1/pull/4/files)
 
 -   Fonction `formulaire()`.
 -   Fonction `sql_connexion()`.
@@ -21,6 +21,6 @@ Librairie [`inesss` v.0.2.1](https://github.com/INESSS-QC/inesss1)
     *AIDE-FORMULAIRES-EXEMPLES-RÉSULTATS.xlsx*.
 -   Démarrage du formulaire via les *Addins* de *RStudio*.
 
-### [v0.1.1.9000](https://github.com/INESSS-QC/inesss1/pull/3)
+### v0.1.1.9000
 
 -   Documentation des datas *Pop\_QC*, *RLS\_convert* et *RLS\_list*.

@@ -20,10 +20,10 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
-### v0.2.1
+### [v0.2.1](https://github.com/INESSS-QC/inesss1/pull/5/files)
 * Nouvelle interface du formulaire, section *Statistiques générales* : 1) Diviser en trois section distinctes; 2) Le code SQL s'affiche en même temps que le tableau des résultats; 3) Bouton qui réinitialise les arguments.
 
-### [v0.2.0](https://github.com/INESSS-QC/inesss1/pull/4)
+### [v0.2.0](https://github.com/INESSS-QC/inesss1/pull/4/files)
 * Fonction `formulaire()`.
 * Fonction `sql_connexion()`.
 * Fonction `sql_stat_gen1()`.
@@ -33,5 +33,5 @@ knitr::opts_chunk$set(
 * Exemples au format Excel. Voir fichiers *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx* et *AIDE-FORMULAIRES-EXEMPLES-RÉSULTATS.xlsx*.
 * Démarrage du formulaire via les *Addins* de *RStudio*.
 
-### [v0.1.1.9000](https://github.com/INESSS-QC/inesss1/pull/3)
+### v0.1.1.9000
 * Documentation des datas *Pop_QC*, *RLS_convert* et *RLS_list*.

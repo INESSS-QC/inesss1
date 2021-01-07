@@ -25,7 +25,7 @@ library(stringr)
 
 ```{r}
 if (is_html_output()) {
-  cat(paste0("inesss v.",as.character(packageVersion("inesss"))))
+  cat(paste0("**inesss v.",as.character(packageVersion("inesss")),"**"))
 }
 ```
 
