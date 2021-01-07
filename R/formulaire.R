@@ -2,7 +2,7 @@
 #'
 #' Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire, *AIDE_FORMULAIRE_DATE.pdf*, est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
 #'
-#' **Requêtes via EXCEL :**\cr
+#' **Requêtes via Excel :**\cr
 #' Il est conseillé d'utiliser les gabarits pour éviter des erreurs de structures dans les tableaux d'arguments. Le fichier Excel *Gabarits-formulaire.xlsx* est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
 #'
 #' @import data.table
@@ -19,7 +19,7 @@ formulaire <- function() {
 
 # Variables ---------------------------------------------------------------
 
-  cols_EXCEL_file <- function() {
+  cols_Excel_file <- function() {
     ### Colonnes nécessaires pour chaque méthode
 
     return(list(
@@ -27,8 +27,8 @@ formulaire <- function() {
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
     ))
   }
-  values_EXCEL_file <- function() {
-    ### Valeurs permises dans les colonnes de cols_EXCEL_file()
+  values_Excel_file <- function() {
+    ### Valeurs permises dans les colonnes de cols_Excel_file()
 
     return(list(
       sg1 = list(
@@ -41,7 +41,7 @@ formulaire <- function() {
       )
     ))
   }
-  methods_EXCEL_file <- function() {
+  methods_Excel_file <- function() {
     ### Liste des méthodes existantes
 
     return(c(
@@ -70,11 +70,11 @@ formulaire <- function() {
   cols_select_from_method <- function(dt, method) {
     ### Puisque l'onglet Excel peut contenir des colonnes facultatives pour le
     ### formulaire, on doit les supprimer après l'avoir importé.
-    ### Possible de le faire rapidement grâce à cols_EXCEL_file()
+    ### Possible de le faire rapidement grâce à cols_Excel_file()
 
     # Colonnes à sélectionner
     if (method == "stat_gen1") {  # méthode statistiques générales 1
-      cols <- names(dt)[names(dt) %in% c("METHODE", cols_EXCEL_file()$sg1)]
+      cols <- names(dt)[names(dt) %in% c("METHODE", cols_Excel_file()$sg1)]
     }
 
     dt <- dt[, ..cols]  # sélection des colonnes
@@ -121,8 +121,8 @@ formulaire <- function() {
     return(sapply(x, formatC, digits = 2, format = "f", big.mark = " ", decimal.mark = ","))
   }
   msg_error_from_xlfile <- function(file) {
-    ### À partir d'un fichier EXCEL, vérifie chaque onglet et renvoie les
-    ### messages d'erreur s'il y en a. Utilisé dans la section Requêtes via EXCEL
+    ### À partir d'un fichier Excel, vérifie chaque onglet et renvoie les
+    ### messages d'erreur s'il y en a. Utilisé dans la section Requêtes via Excel
 
     sheets <- excel_sheets(file)  # nom des onglets du fichier importé
     msg_error <- ""  # contiendra les messages d'erreur
@@ -137,7 +137,7 @@ formulaire <- function() {
         method <- str_remove_all(rmNA(dt$METHODE), " ")  # méthode à utiliser
         # Gérer les erreurs selon le cas
         if (length(method) == 1) {
-          if (method %in% methods_EXCEL_file()) {
+          if (method %in% methods_Excel_file()) {
             dt <- cols_select_from_method(dt, method)  # sélection des colonnes en lien avec la méthode
             msg_error <- verif_method()[[method]](dt, sh, msg_error)  # vérifications selon méthode
           } else {
@@ -172,13 +172,13 @@ formulaire <- function() {
       return(msg_error)
     }
   }
-  save_EXCEL <- function(dt, save_path) {
-    ### Enregistrer au format EXCEL
+  save_Excel <- function(dt, save_path) {
+    ### Enregistrer au format Excel
 
     write_xlsx(dt, save_path$datapath)
   }
   save_xl_file_queries_method <- function(conn, filepath, savepath) {
-    ### Effectuer la requête de chaque onglet du fichier EXCEL contenant les
+    ### Effectuer la requête de chaque onglet du fichier Excel contenant les
     ### arguments de chacune d'elles.
 
     sheets <- excel_sheets(filepath)  # nom des onglets du fichier excel
@@ -198,7 +198,7 @@ formulaire <- function() {
     }
 
     names(excel_requetes) <- sheets  # conserver le nom initial des onglets
-    write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en EXCEL sur le poste
+    write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en Excel sur le poste
 
   }
   save_xl_file_queries_sg1 <- function(dt, conn) {
@@ -355,10 +355,10 @@ formulaire <- function() {
   }
   verif_sg1 <- function(dt, sh, msg_error) {
     ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
-    ### lorsque les arguments sont inscrit dans un fichier EXCEL
+    ### lorsque les arguments sont inscrit dans un fichier Excel
 
-    cols <- cols_EXCEL_file()$sg1  # colonnes nécessaires
-    vals <- values_EXCEL_file()$sg1  # valeurs possible des colonnes
+    cols <- cols_Excel_file()$sg1  # colonnes nécessaires
+    vals <- values_Excel_file()$sg1  # valeurs possible des colonnes
     new_error <- TRUE  # nouvelle erreur -> indiquer nom onglet
     init_msg_error <- msg_error  # comparer a la fin pour déterminer s'il y a une erreur
 
@@ -537,10 +537,10 @@ formulaire <- function() {
         ## Indique si la connexion SQL vers Teradata est faite
         menuItem("Connexion", tabName = "tabConn"),
 
-        ## Requêtes EXCEL - tabEXCEL
+        ## Requêtes Excel - tabExcel
         ## ffectuer une ou des requêtes à partir d'un fichier
         ## Excel où chaque onglet est un tableau résultat.
-        menuItem("Requêtes via EXCEL", tabName = "tabEXCEL"),
+        menuItem("Requêtes via Excel", tabName = "tabExcel"),
 
         ## Statistiques Gérales - tabStatGen1
         ## Utiliser les arguments du formulaire shiny pour effectuer une requête
@@ -567,14 +567,14 @@ formulaire <- function() {
         ),
 
 
-        ### Requêtes via EXCEL - tabEXCEL
-        ### Importer un fichier EXCEL contenant les arguments et exécuter les
+        ### Requêtes via Excel - tabExcel
+        ### Importer un fichier Excel contenant les arguments et exécuter les
         ### requêtes, soit chaque onglet
         tabItem(
-          tabName = "tabEXCEL",
+          tabName = "tabExcel",
           shinyFilesButton(  # bouton pour sélectionner le fichier Excel
-            "select_xl_file", "Sélectionner fichier EXCEL",
-            "Sélectionner fichier EXCEL", multiple = FALSE,
+            "select_xl_file", "Sélectionner fichier Excel",
+            "Sélectionner fichier Excel", multiple = FALSE,
             viewtype = "detail"
           ), p(),  # espace entre le bouton et ce qui suit
           # Indiquer les erreurs de chaque onglet s'il y a lieu
@@ -593,12 +593,21 @@ formulaire <- function() {
         ),
 
 
+
+
+
         ### Statistiques générales - tabStatGen1
         ### Exécuter une requête simple à partir des arguments disponibles dans
         ### le formulaire.
         tabItem(
           tabName = "tabStatGen1",
 
+          # ARGUMENTS SECTION
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Arguments"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px"),
           # Afficher sur la première ligne
           #   - Nombre de périodes d'analyse
           #   - Nombre de codes Rx à analyser
@@ -616,14 +625,6 @@ formulaire <- function() {
               # Nombre de codes à afficher pour l'analyse
               numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1,
                            min = 1, max = 99),
-
-              # # Grouper par période d'analyse - regroupe tous les codes ensemble pour les résultats
-              # div(style = "margin-top:-20px"),
-              # checkboxGroupInput("sg1_group_by", "",
-              #                    choiceNames = c("Grouper par période"),
-              #                    choiceValues = c("period")),
-              # div(style = "margin-top:-5px"),
-
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de Code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -631,12 +632,15 @@ formulaire <- function() {
               uiOutput("sg1_nb_codes")
             ),
             column(
-              width = 3,
+              width = 2,
+              # Grouper par
               checkboxGroupInput("sg1_group_by", "Grouper par",
                                  choices = "Périodes"),
-
+            ),
+            column(
+              width = 4,
               # Codes de services
-              selectInput("sg1_code_serv_filter", "Codes de Service",
+              selectInput("sg1_code_serv_filter", "Codes de Services",
                           choices = c("Exclusion", "Inclusion"),
                           selected = "Exclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
@@ -645,12 +649,9 @@ formulaire <- function() {
                 choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
                 choiceValues = sg1_code_serv_choices(dt_code_serv)$value,
                 selected = c("1", "AD")
-              )
-            ),
-            column(
-              width = 3,
+              ),
               # Codes liste médicaments
-              selectInput("sg1_code_list_filter", "Code Liste Médicament",
+              selectInput("sg1_code_list_filter", "Codes Liste Médicament",
                           choices = c("Exclusion", "Inclusion"),
                           selected = "Inclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
@@ -661,45 +662,47 @@ formulaire <- function() {
               )
             )
           ),
-
-
           fluidRow(
             column(
               width = 3,
               actionButton(  # Exécution de la requête SQL
                 "sg1_go_extract", "Exécuter Requête",
-                style = "background-color: #b3d9ff"  # couleur du bouton
+                style = paste0("color: #ffffff;",
+                               "background-color: #006600;",
+                               "border-color: #000000;")
               )
             ),
             column(
               width = 3,
-              uiOutput("sg1_erase_tab")  # bouton effacer la requête
-            ),
+              actionButton(  # Réinitialiser les codes Rx
+                "sg1_reset_args", "Réinitialiser Arguments",
+                style = paste0("color: #ffffff;",
+                               "background-color: #990000;",
+                               "border-color: #000000;")
+              )
+            )
+          ),
+
+
+          # RESULTATS SECTION
+          uiOutput("sg1_html_result_section"),  # En-tête
+          fluidRow(
+            p(),
+            dataTableOutput("sg1_table_req"),  # tableau des résultats
+            p()
+          ),
+          fluidRow(
             column(
               width = 3,
               uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
             )
           ),
 
-          # Tableau & Affichage extraction SQL
+
+          # CODE SQL SECTION
           fluidRow(
-            p(),
-            dataTableOutput("sg1_table_req"),
-            p(),  # espacement avec la suite
-          ),
-          fluidRow(
-            column(
-              width = 3,
-              uiOutput("sg1_maj_req")
-            ),
-            column(
-              width = 3,
-              uiOutput("sg1_erase_req")
-            )
-          ),
-          fluidRow(
-            p(),
-            verbatimTextOutput("sg1_code_req")
+            uiOutput("sg1_html_SQL_section"),
+            uiOutput("sg1_html_code_SQL")
           )
         )
       )
@@ -750,13 +753,13 @@ formulaire <- function() {
 
 
 
-    #### REQUÊTES VIA EXCEL - tabEXCEL
-    # Sélection du fichier EXCEL
+    #### REQUÊTES VIA Excel - tabExcel
+    # Sélection du fichier Excel
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
     select_xl_file <- reactive({ shinyFiles_directories(input$select_xl_file, "file") })  # select_xl_file()datapath indique répertoire + nom du fichier à importer
 
-    # Indiquer les messages d'erreurs une fois le fichier EXCEL importé
-    xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier EXCEL une fois importé
+    # Indiquer les messages d'erreurs une fois le fichier Excel importé
+    xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier Excel une fois importé
       showNotification("Vérification en cours...", id = "xl_errors_msg", type = "message", duration = NULL)
       msg_error <- msg_error_from_xlfile(select_xl_file()$datapath)
       removeNotification("xl_errors_msg")
@@ -768,13 +771,16 @@ formulaire <- function() {
     })
     output$xl_errors_msg <- renderText({ xl_errors_msg() })
 
-    # Bouton pour enregistrer les requêtes via fichier EXCEL
+    # Bouton pour enregistrer les requêtes via fichier Excel
     output$save_xl_file <- renderUI({
       if (xl_errors_msg() == "Aucune erreur, exécution possible.") {
         return(shinySaveButton(
           "save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
-          filetype = list(`Classeur EXCEL` = "xlsx"),
-          viewtype = "list", style = "background-color: #b3d9ff"
+          filetype = list(`Classeur Excel` = "xlsx"),
+          viewtype = "list",
+          style = paste0("color: #ffffff;",
+                         "background-color: #006600;",
+                         "border-color: #000000;")
         ))
       } else {
         return(NULL)
@@ -782,7 +788,7 @@ formulaire <- function() {
     })
     shinyFileSave(input, "save_xl_file", roots = Volumes_path())  # bouton pour déterminer le répertoire
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
-    # Enregistrer les requêtes dans un fichier EXCEL
+    # Enregistrer les requêtes dans un fichier Excel
     observeEvent(save_xl_file(), {
       if (xl_errors_msg() == "Aucune erreur, exécution possible." && !is.null(conn_values$conn)) {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
@@ -840,10 +846,10 @@ formulaire <- function() {
 
     # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
     # de input$sg1_nb_codes
-    output$sg1_nb_codes <- renderUI({
+    sg1_nb_codes <- reactive({
       n <- input$sg1_nb_codes  # nb codes & déclenche réactivité
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-                 # dans le textInput sans qu'il y ait de réactivité
+        # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
         # Créer des textInput. Possible de conserver les valeurs précédentes
         # si input$sg1_nb_codes diminue
@@ -861,7 +867,23 @@ formulaire <- function() {
         return(tagList(codes_input))
       })
     })
+    output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
 
+    # En-tête Résultats - Apparaît seulement s'il y a eu une requête
+    output$sg1_html_result_section <- renderUI({
+      if (sg1_val$show_tab) {
+        return(tagList(
+          div(style = "margin-top:15px"),
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
       if (any("" %in% str_remove_all(sg1_find_code(input), " "))) {
@@ -898,28 +920,17 @@ formulaire <- function() {
       options = list(scrollX = TRUE)  # scrolling si le tableau est plus large que la fenêtre
     )
 
-    # Effacer le tableau des résultats
-    output$sg1_erase_tab <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
-      if (sg1_val$show_tab) {
-        return(actionButton("sg1_erase_tab", "Effacer Requête",
-                            style = "background-color: #ffc2b3"))
-      } else {
-        return(NULL)
-      }
-    })
-    observeEvent(input$sg1_erase_tab, {
-      sg1_val$show_tab <- FALSE  # ne pas afficher de tableau
-    })
-
-    # Enregistrer le fichier au format EXCEL
+    # Enregistrer le fichier au format Excel
     output$sg1_save <- renderUI({  # faire apparaître bouton de sauvegarde s'il y a eu une extraction
       if (sg1_val$show_tab) {
         return(shinySaveButton(
-          "sg1_save", "Sauvegarder Résultats en EXCEL",
+          "sg1_save", "Sauvegarder Résultats en Excel",
           "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
-          filetype = list(`Classeur EXCEL` = "xlsx"),  # type de fichier permis
+          filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
           viewtype = "list",
-          style = "background-color: #b3d9ff"
+          style = paste0("color: #ffffff;",
+                         "background-color: #006600;",
+                         "border-color: #000000;")
         ))
       } else {
         return(NULL)
@@ -930,7 +941,7 @@ formulaire <- function() {
     observeEvent(sg1_file_save(), {  # sauvegarde de la requête en Excel
       if (nrow(sg1_file_save())) {  # car à la base table de 0 ligne 4 colonnes, 1 ligne si on sélectionne un répertoire
         showNotification("Sauvegarde en cours.", id = "sg1_file_save", type = "message", duration = NULL)
-        save_EXCEL(
+        save_Excel(
           dt = create_dt_data_args_query(
             dt = sg1_requete_sql(),
             args_list = list(
@@ -958,10 +969,25 @@ formulaire <- function() {
       }
     })
 
-    # Afficher code de la requête SQL généré par les arguments du formulaire
-    observeEvent(input$sg1_maj_req, {  # si on veut afficher/mettre à jour le code de la requête
-      sg1_val$show_query <- TRUE
-      sg1_val$query <- stat_gen1_txt_query_1period(
+    # En-tête SQL - Apparaît seulement s'il y a eu une requête
+    output$sg1_html_SQL_section <- renderUI({
+      if (sg1_val$show_tab) {
+        return(tagList(
+          div(style = "margin-top:15px"),
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"), "Requête SQL"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+
+    # Code SQL en lien avec les résultats
+    output$sg1_code_SQL <- renderText({  # code sql de la requête selon les arguments
+      stat_gen1_txt_query_1period(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
         groupby = input$sg1_group_by,
@@ -969,38 +995,34 @@ formulaire <- function() {
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
     })
-    observeEvent(input$sg1_erase_req, {  # modification des valeurs pour effacer le code requête
-      sg1_val$show_query <- FALSE
-      sg1_val$query <- NULL
-    })
-    output$sg1_code_req <- reactive({  # afficher le code de la requête
-      if (sg1_val$show_query) {
-        return(sg1_val$query)
+    output$sg1_html_code_SQL <- renderUI({  # section affichant le code SQL de la requête
+      if (sg1_val$show_tab) {
+        verbatimTextOutput("sg1_code_SQL")
       } else {
         return(NULL)
       }
     })
-    # Boutons pour afficher la requête ou l'effacer
-    output$sg1_maj_req <- renderUI({  # Affiche ou MaJ du code de la requête
-      if (sg1_val$show_query) {
-        return(actionButton(
-          "sg1_maj_req", "MaJ Code Requête",
-          style = "background-color: #c6ecc6"
-        ))
-      } else {
-        return(actionButton(
-          "sg1_maj_req", "Afficher Code Requête",
-          style = "background-color: #c6ecc6"
-        ))
+
+    # Réinitialiser les arguments
+    observeEvent(input$sg1_reset_args, {
+      # Supprimer les codes Rx inscrits
+      n <- input$sg1_nb_codes
+      codes_input <- vector("list", length = n)
+      for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
+        updateTextInput(session, inputId = paste0("sg1_code",i),
+                        label = paste("Code Rx", i), value = "")
       }
-    })
-    output$sg1_erase_req <- renderUI({  # effacer le code de la requête
-      if (sg1_val$show_query) {  # s'il y a du code affiché
-        return(actionButton(
-          "sg1_erase_req", "Effacer Code Requête",
-          style = "background-color: #ffc2b3"
-        ))
-      }
+      # Mettre à jour les checkboxGroup
+      updateCheckboxGroupInput(session, inputId = "sg1_group_by",
+                               selected = character(0))
+      updateSelectInput(session, inputId = "sg1_code_serv_filter",
+                        selected = "Exclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
+                               selected = c("1", "AD"))
+      updateSelectInput(session, inputId = "sg1_code_list_filter",
+                        selected = "Inclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_list",
+                               selected = character(0))
     })
 
   }
