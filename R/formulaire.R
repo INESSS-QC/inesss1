@@ -675,17 +675,7 @@ formulaire <- function() {
             column(
               width = 3,
               actionButton(  # Réinitialiser les codes Rx
-                "sg1_reset_codes", "Réinitialiser Codes Rx",
-                style = paste0("color: #ffffff;",
-                               "background-color: #990000;",
-                               "border-color: #000000;")
-              )
-            ),
-            column(width = 2),
-            column(
-              width = 4,
-              actionButton(  # Réinitialiser autres codes
-                "sg1_reset_args", "Réinitialiser autres Codes",
+                "sg1_reset_args", "Réinitialiser Arguments",
                 style = paste0("color: #ffffff;",
                                "background-color: #990000;",
                                "border-color: #000000;")
@@ -1014,16 +1004,17 @@ formulaire <- function() {
     })
 
     # Réinitialiser les arguments
-    observeEvent(input$sg1_reset_codes, {
-      # Supprimer les codes à analyser inscrits
+    observeEvent(input$sg1_reset_args, {
+      # Supprimer les codes Rx inscrits
       n <- input$sg1_nb_codes
       codes_input <- vector("list", length = n)
       for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
         updateTextInput(session, inputId = paste0("sg1_code",i),
                         label = paste("Code Rx", i), value = "")
       }
-    })
-    observeEvent(input$sg1_reset_args, {
+      # Mettre à jour les checkboxGroup
+      updateCheckboxGroupInput(session, inputId = "sg1_group_by",
+                               selected = character(0))
       updateSelectInput(session, inputId = "sg1_code_serv_filter",
                         selected = "Exclusion")
       updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
