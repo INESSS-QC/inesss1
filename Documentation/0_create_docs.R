@@ -53,14 +53,14 @@ render(
   params = list(conn = conn),
   envir = new.env()
 )
-
-
-# Supprimer les fichiers superflu -----------------------------------------
-files_2_delete <- c(
-  paste0("AIDE-FORMULAIRE_",Sys.Date(),".log")
-)
-for (fil in files_2_delete) {
-  if (fil %in% list.files("Documentation/source")) {
-    unlink(paste0("Documentation/source/", fil), recursive = TRUE)
-  }
+if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
+  unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
 }
+
+
+# Build Manual ------------------------------------------------------------
+devtools::build_manual()
+file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
+          paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
+          overwrite = TRUE)
+file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))

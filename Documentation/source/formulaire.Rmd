@@ -98,10 +98,10 @@ NULL_if_NA <- function(x) {
 
 
 
-# Requêtes via EXCEL
-Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier EXCEL. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser les gabarits disponibles à partir du fichier [*Gabarits-formulaire.xlsx*](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).
+# Requêtes via Excel
+Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser les gabarits disponibles à partir du fichier [*Gabarits-formulaire.xlsx*](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).
 
-1. Cliquer sur le bouton *Sélectionner fichier EXCEL* pour sélectionner le fichier EXCEL contenant la ou les requêtes à exécuter.
+1. Cliquer sur le bouton *Sélectionner fichier Excel* pour sélectionner le fichier Excel contenant la ou les requêtes à exécuter.
 2. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
 3. Si la structure est acceptée, le message `Aucune erreur, exécution possible.` s'affiche. Sinon, le message affiche toutes les erreurs à corriger, regroupées par onglet.
 4. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la requête associée aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
@@ -391,16 +391,19 @@ group by DENOM;
 ```
 
 
+
 \pagebreak
+
 
 
 # Statistiques générales
 Formulaire interactif permettant l'inscription d'arguments, l'exécution de la requête et la sauvegarde des résultats à partir de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
-![](images/sg1-all.PNG){ height=90% }
+![](images/sg1-all.PNG){ height=85% }
 \pagebreak
 
 ## Arguments
+Inscription des arguments de la requête SQL par l'utilisateur.
 
 * **`Nombre de périodes` :** Nombre entier. Indique le nombre de périodes d'étude désiré.
 * **`Période X` :** Sélectionner ou inscrire manuellement la date de début et de fin de la période d'étude *X*.
@@ -414,10 +417,13 @@ Formulaire interactif permettant l'inscription d'arguments, l'exécution de la r
 * **`Codes de Service` :** Exclusion ou inclusion des [codes de services](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295) sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée.
 * **`Code Liste Médicament` :** Exclusion ou inclusion des [codes de catégories de listes de médicaments](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245) sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée.
 
-## Boutons
+* **Bouton Exécuter Requête :** Exécution d'une requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous la section *Résultats*.
+* **Bouton Réinitialiser Arguments :** Efface les `Codes Rx` inscrits (conserve les boîtes de saisie de texte) et force les paramètres par défaut (exclusion des codes de services `1` et `AD`).
 
-* **Exécuter Requête :** Exécution d'une requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous le bouton.
-* **Effacer Requête :** Efface le tableau des résultats.
-* **Sauvegarder Résultats en EXCEL :** Ouvre une fenêtre permettant de sauvegarder au format EXCEL le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
-* **Afficher Code Requête/MaJ Code Requête :** Affiche ou met à jour le code SQL généré à partir des arguments sélectionnés. Prendre note qu'il y a seulement le code de la première période d'étude qui est affiché.
-* **Effacer Code Requête :** Masque le code SQL.
+## Résultats
+Tableau des résultats en fonction des arguments sélectionnés.
+
+* **Bouton Sauvegarder Résultats en Excel :** Ouvre une fenêtre permettant de sauvegarder au format Excel le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
+
+## Requête SQL
+Code SQL qui a été utilisé pour créer le tableau des résultats en fonction des arguments sélectionnés. Seul le code de la première période est affiché.
