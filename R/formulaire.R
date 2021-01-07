@@ -640,7 +640,7 @@ formulaire <- function() {
             column(
               width = 4,
               # Codes de services
-              selectInput("sg1_code_serv_filter", "Codes de Service",
+              selectInput("sg1_code_serv_filter", "Codes de Services",
                           choices = c("Exclusion", "Inclusion"),
                           selected = "Exclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
@@ -651,7 +651,7 @@ formulaire <- function() {
                 selected = c("1", "AD")
               ),
               # Codes liste médicaments
-              selectInput("sg1_code_list_filter", "Code Liste Médicament",
+              selectInput("sg1_code_list_filter", "Codes Liste Médicament",
                           choices = c("Exclusion", "Inclusion"),
                           selected = "Inclusion", multiple = FALSE),
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
@@ -675,7 +675,17 @@ formulaire <- function() {
             column(
               width = 3,
               actionButton(  # Réinitialiser les codes Rx
-                "sg1_reset_args", "Réinitialiser les Codes Rx",
+                "sg1_reset_codes", "Réinitialiser Codes Rx",
+                style = paste0("color: #ffffff;",
+                               "background-color: #990000;",
+                               "border-color: #000000;")
+              )
+            ),
+            column(width = 2),
+            column(
+              width = 4,
+              actionButton(  # Réinitialiser autres codes
+                "sg1_reset_args", "Réinitialiser autres Codes",
                 style = paste0("color: #ffffff;",
                                "background-color: #990000;",
                                "border-color: #000000;")
@@ -1004,7 +1014,7 @@ formulaire <- function() {
     })
 
     # Réinitialiser les arguments
-    observeEvent(input$sg1_reset_args, {
+    observeEvent(input$sg1_reset_codes, {
       # Supprimer les codes à analyser inscrits
       n <- input$sg1_nb_codes
       codes_input <- vector("list", length = n)
@@ -1012,6 +1022,16 @@ formulaire <- function() {
         updateTextInput(session, inputId = paste0("sg1_code",i),
                         label = paste("Code Rx", i), value = "")
       }
+    })
+    observeEvent(input$sg1_reset_args, {
+      updateSelectInput(session, inputId = "sg1_code_serv_filter",
+                        selected = "Exclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
+                               selected = c("1", "AD"))
+      updateSelectInput(session, inputId = "sg1_code_list_filter",
+                        selected = "Inclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_list",
+                               selected = character(0))
     })
 
   }
