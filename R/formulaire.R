@@ -671,6 +671,15 @@ formulaire <- function() {
                                "background-color: #006600;",
                                "border-color: #000000;")
               )
+            ),
+            column(
+              width = 3,
+              actionButton(  # Réinitialiser les codes Rx
+                "sg1_reset_args", "Réinitialiser les Codes Rx",
+                style = paste0("color: #ffffff;",
+                               "background-color: #990000;",
+                               "border-color: #000000;")
+              )
             )
           ),
 
@@ -837,10 +846,10 @@ formulaire <- function() {
 
     # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
     # de input$sg1_nb_codes
-    output$sg1_nb_codes <- renderUI({
+    sg1_nb_codes <- reactive({
       n <- input$sg1_nb_codes  # nb codes & déclenche réactivité
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-                 # dans le textInput sans qu'il y ait de réactivité
+        # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
         # Créer des textInput. Possible de conserver les valeurs précédentes
         # si input$sg1_nb_codes diminue
@@ -858,6 +867,7 @@ formulaire <- function() {
         return(tagList(codes_input))
       })
     })
+    output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
 
     # En-tête Résultats - Apparaît seulement s'il y a eu une requête
     output$sg1_html_result_section <- renderUI({
@@ -990,6 +1000,17 @@ formulaire <- function() {
         verbatimTextOutput("sg1_code_SQL")
       } else {
         return(NULL)
+      }
+    })
+
+    # Réinitialiser les arguments
+    observeEvent(input$sg1_reset_args, {
+      # Supprimer les codes à analyser inscrits
+      n <- input$sg1_nb_codes
+      codes_input <- vector("list", length = n)
+      for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
+        updateTextInput(session, inputId = paste0("sg1_code",i),
+                        label = paste("Code Rx", i), value = "")
       }
     })
 
