@@ -23,6 +23,13 @@ library(knitr)
 library(stringr)
 ```
 
+```{r}
+if (is_html_output()) {
+  cat(paste0("inesss v.",as.character(packageVersion("inesss"))))
+}
+```
+
+
 # Support
 Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
 La documentation de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
@@ -70,11 +77,7 @@ for (pk in packages) {
       txt <- paste0(txt, "\\newline\n`",pk,"` v.", as.character(packageVersion(pk)))
     }
   } else {
-    if (is_html_output()) {
-      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
-    } else {
-      txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
-    }
+    txt <- paste0("`",pk,"` v.", as.character(packageVersion(pk)))
   }
   i <- i + 1L
 }
