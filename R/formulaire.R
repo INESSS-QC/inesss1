@@ -715,6 +715,9 @@ formulaire <- function() {
 
   server <- function(input, output, session) {
 
+    #### Fermer l'application lorsque clic sur bouton ou le X de la fenêtre
+    session$onSessionEnded(function() {stopApp()})
+
     #### CONNEXION SQL - tabConn
     # Valeurs nécessaires à la connexion de teradata
     conn_values <- reactiveValues(
