@@ -559,8 +559,11 @@ formulaire <- function() {
           # Informations nécessaires à la connexion
           textInput("sql_user", "Identifiant", value = ""),  # no identifiant
           passwordInput("sql_pwd", "Mot de passe", value = ""),  # mot de passe
-          # Établir la connexion
-          actionButton("sql_conn", "Connexion"),
+          # Établir la connexion ou se déconnecter
+          fluidRow(
+            column(2, actionButton("sql_conn", "Connexion")),
+            column(2, actionButton("sql_deconn", "Déconnexion"))
+          ),
           # Indiquer l'état de la connexion
           h5(strong("État de la connexion :")),
           verbatimTextOutput("sql_is_conn", placeholder = TRUE)
@@ -747,6 +750,16 @@ formulaire <- function() {
         }
       }
       removeNotification("sql_conn")
+    })
+
+    # Déconnexion à Teradata
+    observeEvent(input$sql_deconn, {
+      conn_values$conn <- NULL  # aucune connexion
+      conn_values$msg <- NULL
+      conn_values$uid <- NULL
+      conn_values$pwd <- NULL
+      updateTextInput(session, "sql_user", value = "")
+      updateTextInput(session, "sql_pwd", value = "")
     })
 
     # Afficher l'état de la connexion
