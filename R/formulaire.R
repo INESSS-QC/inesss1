@@ -620,14 +620,13 @@ formulaire <- function() {
             column(  # Périodes d'analyse
               width = 3,
               # Nombre de périodes à afficher
-              numericInput("sg1_nb_per", "Nombre de périodes", value = 1, min = 1, max = 99),
+              numericInput("sg1_nb_per", "Nombre de périodes", value = 1),
               uiOutput("sg1_nb_per")
             ),
             column(  # Codes d'analyse
               width = 3,
               # Nombre de codes à afficher pour l'analyse
-              numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1,
-                           min = 1, max = 99),
+              numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1),
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de Code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -835,6 +834,9 @@ formulaire <- function() {
     # de input$sg1_nb_per
     output$sg1_nb_per <- renderUI({
       n <- input$sg1_nb_per  # nb périodes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "sg1_nb_per", value = 1)
+      }
       isolate({  # voir commentaire 'output$sg1_nb_codes'
         dates_input <- vector("list", length = n)
         # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
@@ -860,10 +862,14 @@ formulaire <- function() {
       })
     })
 
+
     # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
     # de input$sg1_nb_codes
     sg1_nb_codes <- reactive({
       n <- input$sg1_nb_codes  # nb codes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "sg1_nb_codes", value = 1)
+      }
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
         # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
@@ -884,6 +890,7 @@ formulaire <- function() {
       })
     })
     output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
+
 
     # En-tête Résultats - Apparaît seulement s'il y a eu une requête
     output$sg1_html_result_section <- renderUI({
@@ -1019,15 +1026,19 @@ formulaire <- function() {
       }
     })
 
-    # Réinitialiser les arguments
+    # Réinitialiser les arguments comme initialement
     observeEvent(input$sg1_reset_args, {
-      # Supprimer les codes Rx inscrits
+      # Effacer périodes sauf la 1ere
+      updateNumericInput(session, "sg1_nb_per", value = 1)
+
+      # Effacer code et remettre à 1
       n <- input$sg1_nb_codes
-      codes_input <- vector("list", length = n)
       for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
         updateTextInput(session, inputId = paste0("sg1_code",i),
                         label = paste("Code Rx", i), value = "")
       }
+      updateNumericInput(session, "sg1_nb_codes", value = 1)
+
       # Mettre à jour les checkboxGroup
       updateCheckboxGroupInput(session, inputId = "sg1_group_by",
                                selected = character(0))
@@ -1039,6 +1050,9 @@ formulaire <- function() {
                         selected = "Inclusion")
       updateCheckboxGroupInput(session, inputId = "sg1_code_list",
                                selected = character(0))
+
+      # Effacer section Résultats et Requête SQL
+      sg1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
     })
 
   }
