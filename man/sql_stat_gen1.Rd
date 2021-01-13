@@ -36,9 +36,9 @@ sql_stat_gen1(
 
 \item{result_by}{Afficher les résultats par :
 \itemize{
-\item \strong{\code{"Période"}} : Analyse de tous les \code{codes} pour une même période (somme des montants de tous les codes analysés).
+\item \strong{\code{"Période"}} : Résultats par période d'étude. Somme des montants de tous les \code{codes} analysés.
 \item \strong{\code{"Teneur"}} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}).
-\item \strong{\code{"Format"}} : Résultats par format d'acquisition du médicament.
+\item \strong{\code{"Format"}} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}).
 }}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service à exclure ou à inclure, sinon inscrire \code{NULL}.}
