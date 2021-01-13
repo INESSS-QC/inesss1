@@ -671,8 +671,10 @@ formulaire <- function() {
             column(
               width = 2,
               # Grouper par
-              checkboxGroupInput("sg1_group_by", "Résultats par",
-                                 choices = c("Périodes", "Teneur", "Format"),
+              checkboxGroupInput(
+                "sg1_group_by", "Résultats par",
+                choices = c("Périodes", "Teneur", "Format")
+              )
             ),
             column(
               width = 4,
