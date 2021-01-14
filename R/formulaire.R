@@ -3,7 +3,7 @@
 #' Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire, *AIDE_FORMULAIRE_DATE.pdf*, est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
 #'
 #' **Requêtes via Excel :**\cr
-#' Il est conseillé d'utiliser les gabarits pour éviter des erreurs de structures dans les tableaux d'arguments. Le fichier Excel *Gabarits-formulaire.xlsx* est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
+#' Il est conseillé d'utiliser les gabarits Excel pour éviter des erreurs de structures dans les tableaux d'arguments. Les fichier Excel sont disponibles \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits}{ici}.
 #'
 #' @import data.table
 #' @importFrom fs path_home
@@ -12,7 +12,7 @@
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath getVolumes
-#' @importFrom stringr str_split str_remove_all str_sub
+#' @importFrom stringr str_split str_remove_all
 #' @importFrom writexl write_xlsx
 #' @export
 formulaire <- function() {
@@ -23,7 +23,7 @@ formulaire <- function() {
     ### Colonnes nécessaires pour chaque méthode
 
     return(list(
-      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
+      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "RESULTATS_PAR",
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
     ))
   }
@@ -33,11 +33,11 @@ formulaire <- function() {
     return(list(
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
-        GROUPER_PAR = c("Périodes"),
+        RESULTATS_PAR = c("Périodes", "Teneur", "Format"),
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
-        CODE_LIST = c("03", "40", "41")
+        CODE_LIST = c("3", "03", "40", "41")
       )
     ))
   }
@@ -64,6 +64,15 @@ formulaire <- function() {
     if ("L,M,M1àM3" %in% code_serv) {
       code_serv <- code_serv[code_serv != "L,M,M1àM3"]
       code_serv <- sort(c(code_serv, "L", "M", "M1", "M2", "M3"))
+    }
+    return(code_serv)
+  }
+  desadapt_code_serv <- function(code_serv) {
+    ### Contraire à la fonction adapt_code_serv()
+
+    if (all(c("L", "M", "M1", "M2", "M3") %in% code_serv)) {
+      code_serv <- code_serv[!code_serv %in% c("L", "M", "M1", "M2", "M3")]
+      code_serv <- sort(c(code_serv, "L, M, M1 à M3"))
     }
     return(code_serv)
   }
@@ -126,6 +135,7 @@ formulaire <- function() {
 
     sheets <- excel_sheets(file)  # nom des onglets du fichier importé
     msg_error <- ""  # contiendra les messages d'erreur
+    at_least_1 <- FALSE  # doit y avoir au moins un onglet qui contient des arguments
 
     for (sh in sheets) {
       # Importation du data
@@ -139,7 +149,13 @@ formulaire <- function() {
         if (length(method) == 1) {
           if (method %in% methods_Excel_file()) {
             dt <- cols_select_from_method(dt, method)  # sélection des colonnes en lien avec la méthode
+            if (is.null(rmNA(dt$DATE_DEBUT)) && is.null(rmNA(dt$DATE_FIN))) {
+              next
+            }
             msg_error <- verif_method()[[method]](dt, sh, msg_error)  # vérifications selon méthode
+            if (!at_least_1) {
+              at_least_1 <- TRUE
+            }
           } else {
             msg_error <- paste0(  # erreur si la méthode est inconnue
               msg_error,
@@ -147,6 +163,9 @@ formulaire <- function() {
               " -  METHODE ne contient pas une valeur permise.\n",
               format_xl_err_nl()
             )
+            if (!at_least_1) {
+              at_least_1 <- TRUE
+            }
           }
         } else {
           msg_error <- paste0(  # si la méthode contient plusieurs valeurs ou aucune
@@ -155,6 +174,9 @@ formulaire <- function() {
             " -  METHODE doit contenir une valeur.\n",
             format_xl_err_nl()
           )
+          if (!at_least_1) {
+            at_least_1 <- TRUE
+          }
         }
       } else {
         msg_error <- paste0(  # si la colonne METHODE
@@ -163,11 +185,18 @@ formulaire <- function() {
           " -  METHODE est absente.\n",
           format_xl_err_nl()
         )
+        if (!at_least_1) {
+          at_least_1 <- TRUE
+        }
       }
     }
 
     if (msg_error == "") {
-      return(NULL)
+      if (!at_least_1) {
+        return("Aucun onglet ne semble contenir des arguments.")
+      } else {
+        return(NULL)
+      }
     } else {
       return(msg_error)
     }
@@ -182,22 +211,27 @@ formulaire <- function() {
     ### arguments de chacune d'elles.
 
     sheets <- excel_sheets(filepath)  # nom des onglets du fichier excel
-    excel_requetes <- vector("list", length(sheets))  # contiendra les tableaux résultats
+    excel_requetes <- list()  # contiendra les tableaux résultats
 
+    i <- 1L
     for (sh in 1:length(sheets)) {
-
       suppressMessages(suppressWarnings({  # supprimer messages d'avertissements
         dt <- read_excel(filepath, sheet = sheets[sh])  # importer les arguments
       }))
       method <- str_remove_all(rmNA(dt$METHODE), " ")  # détecter la méthode
       # Tableau des résultats selon la méthode à utiliser
-      if (method == "stat_gen1") {
-        excel_requetes[[sh]] <- save_xl_file_queries_sg1(dt, conn)
+      if (is.null(rmNA(dt$DATE_DEBUT)) && is.null(rmNA(dt$DATE_FIN))) {
+        next
+      } else {
+        if (method == "stat_gen1") {
+          excel_requetes[[i]] <- save_xl_file_queries_sg1(dt, conn)
+        }
+        names(excel_requetes)[i] <- sheets[sh]  # conserver le nom initial des onglets
+        i <- i + 1L
       }
 
     }
 
-    names(excel_requetes) <- sheets  # conserver le nom initial des onglets
     write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en Excel sur le poste
 
   }
@@ -209,8 +243,8 @@ formulaire <- function() {
     dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
     type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
     code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-    grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
-    if (!length(grpby)) grpby <- NULL
+    resultby <- str_remove_all(rmNA(dt$RESULTATS_PAR), " ")
+    if (!length(resultby)) resultby <- NULL
     code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
     code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
     if (!length(code_serv)) code_serv <- NULL
@@ -219,10 +253,10 @@ formulaire <- function() {
     if (!length(code_list)) code_list <- NULL
 
     # Tableau des résultats
-    DT <- sql_stat_gen1(
+    DT <- SQL_stat_gen1(
       conn = conn,
       debut = dates_debut, fin = dates_fin,
-      type_Rx = type_rx, codes = code_rx, groupby = grpby,
+      type_Rx = type_rx, codes = code_rx, result_by = resultby,
       code_serv = code_serv, code_serv_filtre = code_serv_filtre,
       code_list = code_list, code_list_filtre = code_list_filtre
     )
@@ -236,13 +270,13 @@ formulaire <- function() {
       args_list = list(  # liste des arguments
         METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
         TYPE_RX = type_rx, CODE_RX = code_rx,
-        GROUPER_PAR = grpby,
-        CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
+        RESULTATS_PAR = resultby,
+        CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
         CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
       ),
-      query = stat_gen1_txt_query_1period(  # code SQL de la 1ere période d'étude
+      query = stat_gen1_query(  # code SQL de la 1ere période d'étude
         debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
-        groupby = grpby,
+        result_by = resultby,
         code_serv = code_serv, code_serv_filtre = code_serv_filtre,
         code_list = code_list, code_list_filtre = code_list_filtre
       )
@@ -310,10 +344,10 @@ formulaire <- function() {
     ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
     ### @param conn_values : Variable de connexion créé dans la section SERVER
 
-    DT <- sql_stat_gen1(
+    DT <- SQL_stat_gen1(
       conn = conn,
       debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
-      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), groupby = input$sg1_group_by,
+      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), result_by = input$sg1_group_by,
       code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
       code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
     )
@@ -457,17 +491,17 @@ formulaire <- function() {
       }
     }
 
-    # GROUPER_PAR
-    if ("GROUPER_PAR" %in% names(dt)) {
-      grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
-      if (length(grpby)) {
-        if (!all(grpby %in% vals$GROUPER_PAR)) {
+    # RESULTATS_PAR
+    if ("RESULTATS_PAR" %in% names(dt)) {
+      resultby <- str_remove_all(rmNA(dt$RESULTATS_PAR), " ")
+      if (length(resultby)) {
+        if (!all(resultby %in% vals$RESULTATS_PAR)) {
           if (new_error) {
             msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
             new_error <- FALSE
           }
           msg_error <- paste0(msg_error,
-            " -  GROUPER_PAR ne contient pas une valeur permise.\n"
+            " -  RESULTATS_PAR ne contient pas une valeur permise.\n"
           )
         }
       }
@@ -512,6 +546,7 @@ formulaire <- function() {
     ### enregistrer un fichier.
 
     return(c(
+      `Bureau` = paste0("C:/Users/",Sys.info()[["login"]],"/Desktop"),
       `Par défaut` = path_home(),
       R = R.home(),
       getVolumes()()
@@ -559,8 +594,11 @@ formulaire <- function() {
           # Informations nécessaires à la connexion
           textInput("sql_user", "Identifiant", value = ""),  # no identifiant
           passwordInput("sql_pwd", "Mot de passe", value = ""),  # mot de passe
-          # Établir la connexion
-          actionButton("sql_conn", "Connexion"),
+          # Établir la connexion ou se déconnecter
+          fluidRow(
+            column(2, actionButton("sql_conn", "Connexion")),
+            column(2, actionButton("sql_deconn", "Déconnexion"))
+          ),
           # Indiquer l'état de la connexion
           h5(strong("État de la connexion :")),
           verbatimTextOutput("sql_is_conn", placeholder = TRUE)
@@ -577,19 +615,12 @@ formulaire <- function() {
             "Sélectionner fichier Excel", multiple = FALSE,
             viewtype = "detail"
           ), p(),  # espace entre le bouton et ce qui suit
+          # Indiquer le fichier qui a été sélectionné (répertoire complet)
+          textOutput("xl_file_path"),
           # Indiquer les erreurs de chaque onglet s'il y a lieu
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
           # Effectuer les extractions s'il n'y a pas d'erreur
           uiOutput("save_xl_file")
-
-          # ---------------------------------------------------- -
-          # --- À FAIRE ---
-          # # Inscrire le ou les courriels à envoyer les résultats
-          # # Peut-être remplacer les résultats par un message
-          # h5("Envoyer résultats par courriel"),
-          # textAreaInput("mails", "Courriels"),
-          # textInput("mail_obj", "Object")
-          # ---------------------------------------------------- -
         ),
 
 
@@ -617,14 +648,13 @@ formulaire <- function() {
             column(  # Périodes d'analyse
               width = 3,
               # Nombre de périodes à afficher
-              numericInput("sg1_nb_per", "Nombre de périodes", value = 1, min = 1, max = 99),
+              numericInput("sg1_nb_per", "Nombre de périodes", value = 1),
               uiOutput("sg1_nb_per")
             ),
             column(  # Codes d'analyse
               width = 3,
               # Nombre de codes à afficher pour l'analyse
-              numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1,
-                           min = 1, max = 99),
+              numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1),
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de Code Rx",
                           choices = c("DENOM", "DIN"), selected = "DENOM"),
@@ -634,8 +664,10 @@ formulaire <- function() {
             column(
               width = 2,
               # Grouper par
-              checkboxGroupInput("sg1_group_by", "Grouper par",
-                                 choices = "Périodes"),
+              checkboxGroupInput(
+                "sg1_group_by", "Résultats par",
+                choices = c("Périodes", "Teneur", "Format")
+              )
             ),
             column(
               width = 4,
@@ -715,6 +747,13 @@ formulaire <- function() {
 
   server <- function(input, output, session) {
 
+    #### Fermer l'application lorsque la fenêtre se ferme
+    session$onSessionEnded(function() {stopApp()})
+
+
+
+
+
     #### CONNEXION SQL - tabConn
     # Valeurs nécessaires à la connexion de teradata
     conn_values <- reactiveValues(
@@ -732,7 +771,7 @@ formulaire <- function() {
         conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
         conn_values$conn <- NULL  # aucune connexion
       } else {
-        conn_values$conn <- sql_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
+        conn_values$conn <- SQL_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
         if (is.null(conn_values$conn)) {
           # Message d'erreur si la connexion ne fonctionnait pas
           conn_values$msg <- "**Vérifier l'identifiant et le mot de passe**"
@@ -746,6 +785,16 @@ formulaire <- function() {
       removeNotification("sql_conn")
     })
 
+    # Déconnexion à Teradata
+    observeEvent(input$sql_deconn, {
+      conn_values$conn <- NULL  # aucune connexion
+      conn_values$msg <- NULL
+      conn_values$uid <- NULL
+      conn_values$pwd <- NULL
+      updateTextInput(session, "sql_user", value = "")
+      updateTextInput(session, "sql_pwd", value = "")
+    })
+
     # Afficher l'état de la connexion
     output$sql_is_conn <- renderText({ conn_values$msg })
 
@@ -757,6 +806,15 @@ formulaire <- function() {
     # Sélection du fichier Excel
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
     select_xl_file <- reactive({ shinyFiles_directories(input$select_xl_file, "file") })  # select_xl_file()datapath indique répertoire + nom du fichier à importer
+
+    # Indiquer le fichier sélectionner (répertoire complet)
+    output$xl_file_path <- renderText({
+      if (is.null(select_xl_file)) {
+        return(NULL)
+      } else {
+        return(select_xl_file()$datapath)
+      }
+    })
 
     # Indiquer les messages d'erreurs une fois le fichier Excel importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier Excel une fois importé
@@ -819,6 +877,9 @@ formulaire <- function() {
     # de input$sg1_nb_per
     output$sg1_nb_per <- renderUI({
       n <- input$sg1_nb_per  # nb périodes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "sg1_nb_per", value = 1)
+      }
       isolate({  # voir commentaire 'output$sg1_nb_codes'
         dates_input <- vector("list", length = n)
         # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
@@ -844,10 +905,14 @@ formulaire <- function() {
       })
     })
 
+
     # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
     # de input$sg1_nb_codes
     sg1_nb_codes <- reactive({
       n <- input$sg1_nb_codes  # nb codes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "sg1_nb_codes", value = 1)
+      }
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
         # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
@@ -868,6 +933,7 @@ formulaire <- function() {
       })
     })
     output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
+
 
     # En-tête Résultats - Apparaît seulement s'il y a eu une requête
     output$sg1_html_result_section <- renderUI({
@@ -949,16 +1015,16 @@ formulaire <- function() {
               DATE_DEBUT = sg1_find_date(input, "deb"),
               DATE_FIN = sg1_find_date(input, "fin"),
               TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
-              GROUPER_PAR = input$sg1_group_by,
+              RESULTATS_PAR = input$sg1_group_by,
               CODE_SERV_FILTRE = input$sg1_code_serv_filter,
               CODE_SERV = adapt_code_serv(input$sg1_code_serv),
               CODE_LIST_FILTRE = input$sg1_code_list_filter,
               CODE_LIST = input$sg1_code_list
             ),
-            query = stat_gen1_txt_query_1period(
+            query = stat_gen1_query(
               debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
               type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
-              groupby = input$sg1_group_by,
+              result_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
               code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
             )
@@ -986,15 +1052,17 @@ formulaire <- function() {
     })
 
     # Code SQL en lien avec les résultats
-    output$sg1_code_SQL <- renderText({  # code sql de la requête selon les arguments
-      stat_gen1_txt_query_1period(
+    sg1_code_SQL <- eventReactive(input$sg1_go_extract, {
+      # Code SQL associé à la requête demandée
+      stat_gen1_query(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
-        groupby = input$sg1_group_by,
+        result_by = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
     })
+    output$sg1_code_SQL <- renderText({ sg1_code_SQL() })
     output$sg1_html_code_SQL <- renderUI({  # section affichant le code SQL de la requête
       if (sg1_val$show_tab) {
         verbatimTextOutput("sg1_code_SQL")
@@ -1003,15 +1071,19 @@ formulaire <- function() {
       }
     })
 
-    # Réinitialiser les arguments
+    # Réinitialiser les arguments comme initialement
     observeEvent(input$sg1_reset_args, {
-      # Supprimer les codes Rx inscrits
+      # Effacer périodes sauf la 1ere
+      updateNumericInput(session, "sg1_nb_per", value = 1)
+
+      # Effacer code et remettre à 1
       n <- input$sg1_nb_codes
-      codes_input <- vector("list", length = n)
       for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
         updateTextInput(session, inputId = paste0("sg1_code",i),
                         label = paste("Code Rx", i), value = "")
       }
+      updateNumericInput(session, "sg1_nb_codes", value = 1)
+
       # Mettre à jour les checkboxGroup
       updateCheckboxGroupInput(session, inputId = "sg1_group_by",
                                selected = character(0))
@@ -1023,6 +1095,9 @@ formulaire <- function() {
                         selected = "Inclusion")
       updateCheckboxGroupInput(session, inputId = "sg1_code_list",
                                selected = character(0))
+
+      # Effacer section Résultats et Requête SQL
+      sg1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
     })
 
   }

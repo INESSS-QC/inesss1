@@ -12,8 +12,8 @@ Tableau de 8 variables et 2 595 320 observations :
 \item{AN}{Année.}
 \item{TYPE}{Type de données : Estimations ou Projections.}
 \item{STATUT}{Donnée révisée ou provisoire. \code{NA} indique que la donnée n'a pas été changée depuis la dernière publication.}
-\item{SEXE}
-\item{AGE}
+\item{SEXE}{}
+\item{AGE}{}
 \item{POP}{Population}
 }
 }

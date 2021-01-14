@@ -1,5 +1,13 @@
-Librairie [`inesss` v.0.2.1](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.3.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.3.0
+
+-   Le formulaire, section *Requêtes via Excel*, indique le répertoire
+    du fichier sélectionné.
+-   Statistiques générales (`stat_gen1`) permet d’afficher les résultats
+    par `Teneur` et `Format`.
+-   Mise à jour de la documentation : 2021-01-14.
 
 ### [v0.2.1](https://github.com/INESSS-QC/inesss1/pull/5/files)
 

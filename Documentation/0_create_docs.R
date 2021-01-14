@@ -1,9 +1,39 @@
 library(inesss)
 library(rmarkdown)
-conn <- sql_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+library(stringr)
+conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+
+
+# Accents dans les .Rd ----------------------------------------------------
+### À appliquer après avoir documenté le package devtools::document
+
+files <- list.files("man")  # fichiers à analyser
+for (file in files) {
+  txt <- readLines(paste0("man/",file))  # chaque ligne du fichier est un élément du vecteur
+  err <- FALSE
+  for (i in 1:length(txt)) {
+    if (str_detect(txt[[i]], "Ã©")) {  # sétection des "é"
+      txt[[i]] <- str_replace_all(txt[[i]], "Ã©", "é")
+      if (!err) {
+        err <- TRUE  # indique qu'il y a eu au moins une erreur
+      }
+    }
+  }
+  if (err) {
+    writeLines(txt, paste0("man/",file))  # réécrire le fichier complet
+  }
+}
+
+# Build Manual ------------------------------------------------------------
+devtools::build_manual()
+file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
+          paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
+          overwrite = TRUE)
+file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))
 
 
 
+options(encoding = "native.enc")
 # README ------------------------------------------------------------------
 render(  # github_document
   input = "README.Rmd",
@@ -58,9 +88,7 @@ if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/
 }
 
 
-# Build Manual ------------------------------------------------------------
-devtools::build_manual()
-file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
-          paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
-          overwrite = TRUE)
-file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))
+# ----------------------------------------------------------------------- #
+
+
+options(encoding = "UTF-8")

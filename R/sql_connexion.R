@@ -20,7 +20,7 @@
 #' conn <- sql_connexion(uid = "abc007", pwd = "MonMotDePasse",
 #'                       dsn = "PEI_PRD", encoding = "latin1")
 #' }
-sql_connexion <- function(uid, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1") {
+SQL_connexion <- function(uid, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1") {
 
   if (is.null(pwd)) {  # demander le mot de passe s'il n'est pas inscrit
     pwd <- askpass("Mot de passe")

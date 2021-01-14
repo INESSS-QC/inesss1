@@ -11,5 +11,5 @@ Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La 
 }
 \details{
 \strong{Requêtes via Excel :}\cr
-Il est conseillé d'utiliser les gabarits pour éviter des erreurs de structures dans les tableaux d'arguments. Le fichier Excel \emph{Gabarits-formulaire.xlsx} est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
+Il est conseillé d'utiliser les gabarits Excel pour éviter des erreurs de structures dans les tableaux d'arguments. Les fichier Excel sont disponibles \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits}{ici}.
 }
