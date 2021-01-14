@@ -1,7 +1,7 @@
 Librairie [`inesss` v.0.3.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.3.0
+### [v0.3.0](https://github.com/INESSS-QC/inesss1/pull/6/files)
 
 -   Le formulaire, section *Requêtes via Excel*, indique le répertoire
     du fichier sélectionné.

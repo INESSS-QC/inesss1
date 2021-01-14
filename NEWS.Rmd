@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
-### v0.3.0
+### [v0.3.0](https://github.com/INESSS-QC/inesss1/pull/6/files)
 * Le formulaire, section *Requêtes via Excel*, indique le répertoire du fichier sélectionné.
 * Statistiques générales (`stat_gen1`) permet d'afficher les résultats par `Teneur` et `Format`.
 * Mise à jour de la documentation : 2021-01-14.
