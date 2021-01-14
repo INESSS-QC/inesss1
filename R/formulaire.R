@@ -3,7 +3,7 @@
 #' Permet d'exécuter des requêtes Excel à partir d'un formulaire interactif. La documentation complète du formulaire, *AIDE_FORMULAIRE_DATE.pdf*, est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
 #'
 #' **Requêtes via Excel :**\cr
-#' Il est conseillé d'utiliser les gabarits pour éviter des erreurs de structures dans les tableaux d'arguments. Le fichier Excel *Gabarits-formulaire.xlsx* est disponible \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation}{ici}.
+#' Il est conseillé d'utiliser les gabarits Excel pour éviter des erreurs de structures dans les tableaux d'arguments. Les fichier Excel sont disponibles \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits}{ici}.
 #'
 #' @import data.table
 #' @importFrom fs path_home
@@ -12,7 +12,7 @@
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath getVolumes
-#' @importFrom stringr str_split str_remove_all str_sub
+#' @importFrom stringr str_split str_remove_all
 #' @importFrom writexl write_xlsx
 #' @export
 formulaire <- function() {
@@ -37,7 +37,7 @@ formulaire <- function() {
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
-        CODE_LIST = c("03", "40", "41")
+        CODE_LIST = c("3", "03", "40", "41")
       )
     ))
   }
@@ -253,7 +253,7 @@ formulaire <- function() {
     if (!length(code_list)) code_list <- NULL
 
     # Tableau des résultats
-    DT <- sql_stat_gen1(
+    DT <- SQL_stat_gen1(
       conn = conn,
       debut = dates_debut, fin = dates_fin,
       type_Rx = type_rx, codes = code_rx, result_by = resultby,
@@ -344,7 +344,7 @@ formulaire <- function() {
     ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
     ### @param conn_values : Variable de connexion créé dans la section SERVER
 
-    DT <- sql_stat_gen1(
+    DT <- SQL_stat_gen1(
       conn = conn,
       debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
       type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), result_by = input$sg1_group_by,
@@ -615,19 +615,12 @@ formulaire <- function() {
             "Sélectionner fichier Excel", multiple = FALSE,
             viewtype = "detail"
           ), p(),  # espace entre le bouton et ce qui suit
+          # Indiquer le fichier qui a été sélectionné (répertoire complet)
+          textOutput("xl_file_path"),
           # Indiquer les erreurs de chaque onglet s'il y a lieu
           verbatimTextOutput("xl_errors_msg", placeholder = TRUE),
           # Effectuer les extractions s'il n'y a pas d'erreur
           uiOutput("save_xl_file")
-
-          # ---------------------------------------------------- -
-          # --- À FAIRE ---
-          # # Inscrire le ou les courriels à envoyer les résultats
-          # # Peut-être remplacer les résultats par un message
-          # h5("Envoyer résultats par courriel"),
-          # textAreaInput("mails", "Courriels"),
-          # textInput("mail_obj", "Object")
-          # ---------------------------------------------------- -
         ),
 
 
@@ -778,7 +771,7 @@ formulaire <- function() {
         conn_values$msg <- "**Inscrire le numéro d'identifiant ainsi que le mot de passe**"
         conn_values$conn <- NULL  # aucune connexion
       } else {
-        conn_values$conn <- sql_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
+        conn_values$conn <- SQL_connexion(input$sql_user, input$sql_pwd)  # effectuer une connexion
         if (is.null(conn_values$conn)) {
           # Message d'erreur si la connexion ne fonctionnait pas
           conn_values$msg <- "**Vérifier l'identifiant et le mot de passe**"
@@ -813,6 +806,15 @@ formulaire <- function() {
     # Sélection du fichier Excel
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
     select_xl_file <- reactive({ shinyFiles_directories(input$select_xl_file, "file") })  # select_xl_file()datapath indique répertoire + nom du fichier à importer
+
+    # Indiquer le fichier sélectionner (répertoire complet)
+    output$xl_file_path <- renderText({
+      if (is.null(select_xl_file)) {
+        return(NULL)
+      } else {
+        return(select_xl_file()$datapath)
+      }
+    })
 
     # Indiquer les messages d'erreurs une fois le fichier Excel importé
     xl_errors_msg <- eventReactive(select_xl_file(), {  # vérifier le contenu du fichier Excel une fois importé
@@ -1050,7 +1052,8 @@ formulaire <- function() {
     })
 
     # Code SQL en lien avec les résultats
-    output$sg1_code_SQL <- renderText({  # code sql de la requête selon les arguments
+    sg1_code_SQL <- eventReactive(input$sg1_go_extract, {
+      # Code SQL associé à la requête demandée
       stat_gen1_query(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
         type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
@@ -1059,6 +1062,7 @@ formulaire <- function() {
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
     })
+    output$sg1_code_SQL <- renderText({ sg1_code_SQL() })
     output$sg1_html_code_SQL <- renderUI({  # section affichant le code SQL de la requête
       if (sg1_val$show_tab) {
         verbatimTextOutput("sg1_code_SQL")

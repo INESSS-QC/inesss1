@@ -11,10 +11,11 @@
 #' @inheritParams stat_gen1_query
 #'
 #' @return `data.table`
+#' @encoding UTF-8
 #' @import data.table
 #' @importFrom lubridate as_date
 #' @importFrom odbc dbGetQuery
-#' @importFrom stringr str_remove_all
+#' @importFrom stringr str_detect str_pad str_remove_all
 #' @export
 #' @examples
 #' \dontrun{
@@ -23,7 +24,7 @@
 #'                       pwd = askpass::askpass("Mot de passe"))
 #'
 #' # DENOM
-#' dt1 <- sql_stat_gen1(
+#' dt1 <- SQL_stat_gen1(
 #'   conn = conn,
 #'   debut = c("2017-01-01", "2018-01-01"),
 #'   fin = c("2017-12-31", "2018-12-31"),
@@ -31,15 +32,15 @@
 #' )
 #'
 #' # DIN
-#' dt2 <- sql_stat_gen1(
+#' dt2 <- SQL_stat_gen1(
 #'   conn = conn,
 #'   debut = c("2017-01-01", "2018-01-01"),
 #'   fin = c("2017-12-31", "2018-12-31"),
 #'   type_Rx = "DIN", codes = c(30848, 585092)
 #' )
 #'
-#' # Résultats par Période
-#' dt3 <- sql_stat_gen1(
+#' # Résultats par Périodes
+#' dt3 <- SQL_stat_gen1(
 #'   conn = conn,
 #'   debut = c("2017-01-01", "2018-01-01"),
 #'   fin = c("2017-12-31", "2018-12-31"),
@@ -47,7 +48,7 @@
 #'   result_by = "Périodes"
 #' )
 #' # Résultats par Teneur et Format
-#' dt4 <- sql_stat_gen1(
+#' dt4 <- SQL_stat_gen1(
 #'   conn = conn,
 #'   debut = c("2017-01-01", "2018-01-01"),
 #'   fin = c("2017-12-31", "2018-12-31"),
@@ -56,7 +57,7 @@
 #' )
 #'
 #' # Exclusion et Inclusion des codes de services et des codes de listes de médicaments
-#' dt5 <- sql_stat_gen1(
+#' dt5 <- SQL_stat_gen1(
 #'   conn = conn,
 #'   debut = c("2017-01-01", "2018-01-01"),
 #'   fin = c("2017-12-31", "2018-12-31"),
@@ -65,7 +66,7 @@
 #'   code_list = c("40", "41"), code_list_filtre = "Inclusion"
 #' )
 #' }
-sql_stat_gen1 <- function(
+SQL_stat_gen1 <- function(
   conn = NULL, user = NULL, pwd = NULL,
   debut, fin,
   type_Rx = "DENOM", codes, result_by = NULL,
@@ -75,7 +76,72 @@ sql_stat_gen1 <- function(
 
   # Fonctions ---------------------------------------------------------------
 
-  verif_args <- function(conn, user, pwd, debut, fin, type_Rx, codes, result_by, code_serv, code_serv_filtre, code_list, code_list_filtre) {
+  codes_in_period <- function(conn, dt, query, result_by) {
+    ### Ajouter la colonne CODES_RX qui indique tous les codes analysés lorsque
+    ### les résultats sont présentés par période, et peut-être autre.
+
+    dt_codes <- as.data.table(dbGetQuery(conn, query))
+    dt_by <- names(dt_codes)[!names(dt_codes) %in% "CODES"]
+    if (length(dt_by)) {
+      dt_codes <- dt_codes[, .(CODES_RX = paste(CODES, collapse = "; ")), keyby = dt_by]
+      dt <- dt_codes[dt, on = dt_by]
+    } else {
+      dt[, CODES_RX := paste(sort(as.integer(dbGetQuery(conn, query)$CODES)), collapse = "; ")]
+    }
+    return(dt)
+
+  }
+  query_result_by_period <- function(result_by, type_Rx, codes, deb, fin) {
+    ### Query SQL permettant de connaître les codes associés aux résultats
+
+    if (length(result_by) == 1 && "Périodes" %in% result_by) {
+      query <- paste0(
+        "select distinct(",sql_select_type_rx_var(type_Rx),") as CODES\n",
+        from_bd.vue("PROD", "V_DEM_PAIMT_MED_CM"),"\n",
+        "where SMED_DAT_SERV between '",deb,"' and '",fin,"'\n",
+        indent(),"and ",sql_select_type_rx_var(type_Rx)," in (",
+            ifelse(type_Rx == "DENOM", qu(codes), paste(codes, collapse = ", ")),
+            ");"
+      )
+    } else if (length(result_by) > 1 && "Périodes" %in% result_by) {
+      query <- paste0("select distinct(",sql_select_type_rx_var(type_Rx),") as CODES,\n")
+      if ("Teneur" %in% result_by) {
+        query <- paste0(query,
+                        indent("select"),"SMED_COD_TENR_MED as TENEUR,\n")
+      }
+      if ("Format" %in% result_by) {
+        query <- paste0(query,
+                        indent("select"),"SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ,\n")
+      }
+      query <- paste0(
+        query,
+        from_bd.vue("PROD", "V_DEM_PAIMT_MED_CM"),"\n",
+        "where ",sql_select_type_rx_var(type_Rx)," in (",ifelse(type_Rx == "DENOM", qu(codes), paste(codes, collapse = ", ")),")\n",
+        indent(),"and SMED_DAT_SERV between '",deb,"' and '",fin,"'\n",
+        "order by CODES;"
+      )
+
+      # Supprimer virgule si c'est le dernier select avant le from
+      if (str_detect(query, ",\nfrom")) {
+        stringr::str_sub(query, str_locate(query, ",\nfrom")[1,][[1]], str_locate(query, ",\nfrom")[1,][[1]]) <- ""
+        str_locate(query, ",\nfrom")[1,][[1]]
+      }
+    }
+    return(query)
+  }
+  sql_select_type_rx_var <- function(type_Rx) {
+    ### Déterminer le nom de la variable dans SQL selon le type de code Rx
+
+    if (type_Rx == "DENOM") {
+      return("SMED_COD_DENOM_COMNE")
+    } else if (type_Rx == "DIN") {
+      return("SMED_COD_DIN")
+    } else {
+      stop("SQL_stat_gen1.sql_select_type_rx_var() : type_Rx non permi.")
+    }
+  }
+  verif_args <- function(conn, user, pwd, debut, fin, type_Rx, codes, result_by,
+                         code_serv, code_serv_filtre, code_list, code_list_filtre) {
 
     check <- newArgCheck()
 
@@ -191,6 +257,7 @@ sql_stat_gen1 <- function(
       if (type_Rx == "DENOM") {
         nom_denom <- inesss::V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE  # data nom des denom
         nom_denom <- nom_denom[DENOM %in% codes]
+        # S'assurer que chaque médicament a un nom pour une période (exemple si commence en décembre, on change pour janvier)
         idx <- rmNA(nom_denom[, .I[.N == 1], .(DENOM)]$V1)
         if (length(idx)) {
           nom_denom[idx, `:=` (DATE_DEBUT = as_date(paste0(year(DATE_DEBUT),"-01-01")),
@@ -221,13 +288,8 @@ sql_stat_gen1 <- function(
       ))
 
       if ("Périodes" %in% result_by) {
-        query_codes_exist <- paste0(
-          "select distinct(SMED_COD_DENOM_COMNE) as CODES\n",
-          "from V_DEM_PAIMT_MED_CM\n",
-          "where SMED_DAT_SERV between '",debut[i],"' and '",fin[i],"'\n",
-          "  and SMED_COD_DENOM_COMNE in (",qu(codes),");"
-        )
-        dt[, CODES_RX := paste(sort(as.integer(dbGetQuery(conn, query_codes_exist)$CODES)), collapse = "; ")]
+        query <- query_result_by_period(result_by, type_Rx, codes, debut[i], fin[i])
+        dt <- codes_in_period(conn, dt, query, result_by)
       }
 
       DT <- rbind(DT, dt)
@@ -235,7 +297,7 @@ sql_stat_gen1 <- function(
     }
 
     # Ajouter les noms des médicaments
-    if (any(c("DENOM", "DIN") %in% names(dt))) {
+    if (any(c("DENOM", "DIN") %in% names(DT))) {
       if (type_Rx == "DENOM") {
         DT <- nom_denom[DENOM %in% codes & DATE_DEBUT <= debut[i] & debut[i] <= DATE_FIN, .(DENOM, NOM_DENOM)][
           DT, on = .(DENOM)
@@ -294,12 +356,12 @@ sql_stat_gen1 <- function(
 
 #' Statistiques générales
 #'
-#' Code de la requête SQL - chaîne de caractères.
+#' Générateur de requêtes SQL (texte) pour la méthode `stat_gen1`.
 #'
 #' **debut, fin :** Doivent contenir le même nombre de valeurs.
 #'
-#' @param debut Date de début de la période d'étude au format `"AAAA-MM-JJ"`.
-#' @param fin Date de fin de la période d'étude au format `"AAAA-MM-JJ"`.
+#' @param debut Date de début de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
+#' @param fin Date de fin de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
 #' @param type_Rx `"DENOM"` ou `"DIN"`. Indique le type de code analysé.
 #' @param codes Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.
 #' @param result_by Afficher les résultats par :
@@ -311,7 +373,8 @@ sql_stat_gen1 <- function(
 #' @param code_list Vecteur de type `character` comprenant le ou les codes de catégories de liste de médicaments à exclure ou à inclure, sinon inscrire `NULL`.
 #' @param code_list_filtre `"Inclusion"` ou `"Exclusion"` des codes de catégories de liste de médicaments `code_list`, sinon inscrire `NULL`.
 #'
-#' @importFrom stringr str_locate str_sub str_detect str_pad
+#' @encoding UTF-8
+#' @importFrom stringr str_detect str_locate str_pad
 #' @export
 #' @examples
 #' ## Avantage d'utiliser cat() si c'est pour afficher dans la console :
@@ -426,7 +489,7 @@ stat_gen1_query <- function(
   }
   resultby <- function(result_by, type_Rx) {
     if ("Périodes" %in% result_by) {
-      txt <- ""
+      txt <- NULL
     } else {
       txt <- type_Rx
     }
@@ -437,7 +500,7 @@ stat_gen1_query <- function(
       txt <- c(txt, "FORMAT_ACQ")
     }
 
-    if (length(txt) == 1 && txt == "") {
+    if (is.null(txt)) {
       return("")
     } else {
       return(paste0("group by ",paste(txt, collapse = ", ")))
@@ -445,6 +508,13 @@ stat_gen1_query <- function(
   }
 
   # Principal FCT -----------------------------------------------------------
+
+  if (type_Rx == "DENOM") {  # les codes DENOM sont des CHR de longeur 5
+    codes <- str_pad(codes, 5, "left", "0")
+  }
+  if (!is.null(code_list)) {
+    code_list <- str_pad(code_list, 2, "left", "0")
+  }
 
   query <- paste0(
     "select ",qu(debut)," as DATE_DEBUT,\n",
@@ -468,9 +538,7 @@ stat_gen1_query <- function(
   )
 
   if (str_detect(query, "\n;")) {  # supprimer retour de ligne (\n) si la commande est terminée (;)
-    substr(query, nchar(query) - 1, nchar(query) - 1) <- " "  # supprime '\n' qui est compté comme 1 seul char
-    # *** NOTE : stringr::str_sub() ne fonctionne pas, la fonction n'était pas disponible malgré le importFrom stringr str_sub.
-    #            De plus, "" ne fonctionne pas dans certains cas -> insertion d'un espace
+    stringr::str_sub(query, nchar(query) - 1, nchar(query) - 1) <- ""
   }
 
   return(query)

@@ -1,4 +1,4 @@
-**inesss v.0.2.1**
+**inesss v.0.3.0**
 
 Support
 =======
