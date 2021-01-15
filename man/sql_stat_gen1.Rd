@@ -82,15 +82,15 @@ dt2 <- SQL_stat_gen1(
   type_Rx = "DIN", codes = c(30848, 585092)
 )
 
-# Résultats par Périodes
+# RÃ©sultats par PÃ©riodes
 dt3 <- SQL_stat_gen1(
   conn = conn,
   debut = c("2017-01-01", "2018-01-01"),
   fin = c("2017-12-31", "2018-12-31"),
   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
-  result_by = "Périodes"
+  result_by = "PÃ©riodes"
 )
-# Résultats par Teneur et Format
+# RÃ©sultats par Teneur et Format
 dt4 <- SQL_stat_gen1(
   conn = conn,
   debut = c("2017-01-01", "2018-01-01"),
@@ -99,7 +99,7 @@ dt4 <- SQL_stat_gen1(
   result_by = c("Teneur", "Format")
 )
 
-# Exclusion et Inclusion des codes de services et des codes de listes de médicaments
+# Exclusion et Inclusion des codes de services et des codes de listes de mÃ©dicaments
 dt5 <- SQL_stat_gen1(
   conn = conn,
   debut = c("2017-01-01", "2018-01-01"),

@@ -64,12 +64,12 @@ stat_gen1_query(
   code_list = NULL, code_list_filtre = "Inclusion"
 )
 
-## Résultats par
-# Périodes
+## RÃ©sultats par
+# PÃ©riodes
 cat(stat_gen1_query(
   debut = "2020-01-01", fin = "2020-12-31",
   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
-  result_by = "Périodes",
+  result_by = "PÃ©riodes",
   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
   code_list = NULL, code_list_filtre = "Inclusion"
 ))
@@ -82,7 +82,7 @@ cat(stat_gen1_query(
   code_list = NULL, code_list_filtre = "Inclusion"
 ))
 
-## Exclusion VS Inclusion des codes de service ou des codes de liste de médicaments
+## Exclusion VS Inclusion des codes de service ou des codes de liste de mÃ©dicaments
 cat(stat_gen1_query(
   debut = "2020-01-01", fin = "2020-12-31",
   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
