@@ -5,6 +5,7 @@
 #'
 #' @param x Vecteur contenant les dates Excel au format entier.
 #' @keywords internal
+#' @encoding UTF-8
 #' @importFrom lubridate as_date
 #' @importFrom stringr str_sub
 #' @export
@@ -28,6 +29,7 @@ as_date_excel_chr <- function(x) {
 #' Force les deux décimales, car `x` est un prix/cout.
 #'
 #' @param x Vecteur prix/cout
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 as_price <- function(x) {
@@ -45,6 +47,7 @@ as_price <- function(x) {
 #' @param query Requête SQL.
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @import data.table
 #' @importFrom stringr str_split
 #' @export
@@ -94,6 +97,7 @@ create_dt_data_args_query <- function(dt, args_list, query) {
 #' @return CHR. Emplacement du dossier qui contient le script R.
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @importFrom rstudioapi getActiveDocumentContext
 #' @export
 #' @examples
@@ -115,6 +119,7 @@ file_directory <- function(){
 #' @param List Liste à convertir en data.table
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @importFrom data.table as.data.table
 #' @export
 list_as_dt_no_recycled <- function(List) {
@@ -139,6 +144,7 @@ list_as_dt_no_recycled <- function(List) {
 #' @param x Nombre de fois que l'on répète le retour de ligne.
 #' @return '\\n'
 #' @keywords internal
+#' @encoding UTF-8
 #' @export
 nl <- function(x = 1) {
   ### nl = New line = '\n'
@@ -153,6 +159,7 @@ nl <- function(x = 1) {
 #' @param type_rx Type de code, "DENOM", "DIN", ...
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @return `"DENOM"` : `"NOM_DENOM"`.\cr
 #' `"DIN"` = `"NOM_MARQ_COMRC`.
 #' @export
@@ -177,6 +184,7 @@ nom_type_rx <- function(type_rx) {
 #' @param by Valeur de remplacement.
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @export
 replace_NA_in_dt <- function(dt, by) {
   dt <- as.data.table(dt)
@@ -200,6 +208,7 @@ replace_NA_in_dt <- function(dt, by) {
 #' @param x Vecteur
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @export
 rmNA <- function(x) {
   if (anyNA(x)) {
@@ -221,6 +230,7 @@ rmNA <- function(x) {
 #' @param na.last Afficher les `NA` à la fin = `TRUE`, sinon `FALSE`. `NA` n'affiche pas les valeurs `NA`.
 #'
 #' @keywords internal
+#' @encoding UTF-8
 #' @export
 sunique <- function(x, decreasing = FALSE, na.last = FALSE) {
   return(sort(unique(x), decreasing = decreasing, na.last = na.last))

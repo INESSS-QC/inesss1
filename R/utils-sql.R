@@ -5,6 +5,7 @@
 #' @param bd Nom de la base de données. Souvent `PROD`.
 #' @param vue Nom de la vue.
 #'
+#' @encoding UTF-8
 #' @return "from `bd`.`vue`"
 #' @keywords internal
 #' @export
@@ -20,6 +21,7 @@ from_bd.vue <- function(bd = "PROD", vue) {
 #'
 #' @param niv Niveau d'indentation.
 #'
+#' @encoding UTF-8
 #' @return Quatre (4) espaces répétés `niv` fois.
 #' @keywords internal
 #' @export
@@ -38,6 +40,7 @@ indent <- function(niv = 1) {
 #'
 #' @param x Vecteur
 #' @keywords internal
+#' @encoding UTF-8
 #' @return c("x", "y") -> "'x','y'"
 #' @export
 qu <- function(x) {

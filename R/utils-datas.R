@@ -24,6 +24,8 @@
 #'
 #' @usage data("Pop_QC") / MaVariable <- Pop_QC.
 #'
+#' @encoding UTF-8
+#'
 #' @source \href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/EstimationProjectionComparable_1996_2041_20200424.xlsx}{Fichier Excel utilisé}.
 "Pop_QC"
@@ -45,6 +47,8 @@
 #'
 #' @usage data("RLS_convert") / MaVariable <- RLS_convert.
 #'
+#' @encoding UTF-8
+#'
 #' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
 "RLS_convert"
@@ -55,6 +59,8 @@
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 #'
 #' @format Vecteur `integer` de 96 nombres.
+#'
+#' @encoding UTF-8
 #'
 #' @usage data("RLS_list") / MaVariable <- RLS_list.
 "RLS_list"

@@ -12,7 +12,7 @@ for (file in files) {
   txt <- readLines(paste0("man/",file))  # chaque ligne du fichier est un élément du vecteur
   err <- FALSE
   for (i in 1:length(txt)) {
-    if (str_detect(txt[[i]], "Ã©")) {  # sétection des "é"
+    if (str_detect(txt[[i]], "é")) {  # sétection des "é"
       txt[[i]] <- str_replace_all(txt[[i]], "Ã©", "é")
       if (!err) {
         err <- TRUE  # indique qu'il y a eu au moins une erreur
@@ -25,7 +25,8 @@ for (file in files) {
 }
 
 # Build Manual ------------------------------------------------------------
-devtools::build_manual()
+# ATTENTION : INSTALLER LE PACKAGE AVANT DE FAIRE CE CODE
+devtools::build_manual(path = "Documentation")
 file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
           paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
           overwrite = TRUE)
@@ -33,8 +34,9 @@ file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))
 
 
 
-options(encoding = "native.enc")
+
 # README ------------------------------------------------------------------
+options(encoding = "native.enc")
 render(  # github_document
   input = "README.Rmd",
   output_file = "README.md",
@@ -47,18 +49,20 @@ render(  # pdf_document
   output_dir = "Documentation",
   envir = new.env()
 )
-
+options(encoding = "UTF-8")
 
 # R-Rtools-installation ---------------------------------------------------
+options(encoding = "native.enc")
 render(
   input = "Documentation/source/R-Rtools-installation.Rmd",
   output_file = paste0("R_RTOOLS_INSTALLATION_",Sys.Date(),".pdf"),
   output_dir = "Documentation",
   envir = new.env()
 )
-
+options(encoding = "UTF-8")
 
 # Registre Versions -------------------------------------------------------
+options(encoding = "native.enc")
 render(
   input = "NEWS.Rmd",
   output_format = "md_document",
@@ -73,9 +77,10 @@ render(  # pdf_document
   output_dir = "Documentation",
   envir = new.env()
 )
-
+options(encoding = "UTF-8")
 
 # Formulaire --------------------------------------------------------------
+options(encoding = "native.enc")
 render(
   input = "Documentation/source/formulaire.Rmd",
   output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
@@ -86,9 +91,9 @@ render(
 if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
   unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
 }
-
+options(encoding = "UTF-8")
 
 # ----------------------------------------------------------------------- #
 
 
-options(encoding = "UTF-8")
+

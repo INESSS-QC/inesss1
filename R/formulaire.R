@@ -5,6 +5,7 @@
 #' **Requêtes via Excel :**\cr
 #' Il est conseillé d'utiliser les gabarits Excel pour éviter des erreurs de structures dans les tableaux d'arguments. Les fichier Excel sont disponibles \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits}{ici}.
 #'
+#' @encoding UTF-8
 #' @import data.table
 #' @importFrom fs path_home
 #' @importFrom odbc odbc dbConnect dbGetQuery
