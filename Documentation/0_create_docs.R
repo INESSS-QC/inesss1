@@ -18,6 +18,10 @@ for (file in files) {
         err <- TRUE  # indique qu'il y a eu au moins une erreur
       }
     }
+    if (file == "RLS_convert.Rd" && txt[[i]] == "\\describe {") {
+      txt[[i]] <- "\\describe{"
+      err <- TRUE
+    }
   }
   if (err) {
     writeLines(txt, paste0("man/",file))  # réécrire le fichier complet
