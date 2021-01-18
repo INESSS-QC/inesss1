@@ -59,9 +59,9 @@ while (age == verif_age) {
   verif_age <- i  # Valeur recherchée
   i <- i + 1L
 }
-c(`Trouvé` = age, `Recherché` = verif_age)
+c(`Trouvée` = age, `Recherchée` = verif_age)
 ```
 L'âge serait de 1506 ans alors qu'on devrait avoir 1505 ans.
 
 # Conclusion
-Diviser par 365 est la méthode la plus facile à comprendre et la plus efficace lorsqu'on veut calculer l'âge d'une personne vivante ou 1505 ans et moins...  
+Diviser par 365 est la méthode la plus facile à comprendre et la plus efficace lorsqu'on veut calculer l'âge d'une personne ayant 1505 ans et moins...
