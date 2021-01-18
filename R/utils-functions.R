@@ -8,7 +8,6 @@
 #' @encoding UTF-8
 #' @importFrom lubridate as_date
 #' @importFrom stringr str_sub
-#' @export
 as_date_excel_chr <- function(x) {
   if (is.character(x)) {
     return(sapply(x, function(x) {
@@ -31,7 +30,6 @@ as_date_excel_chr <- function(x) {
 #' @param x Vecteur prix/cout
 #' @encoding UTF-8
 #' @keywords internal
-#' @export
 as_price <- function(x) {
   if (!is.numeric(x)) x <- as.numeric(x)
   return(round(x, 2))
@@ -50,7 +48,6 @@ as_price <- function(x) {
 #' @encoding UTF-8
 #' @import data.table
 #' @importFrom stringr str_split
-#' @export
 create_dt_data_args_query <- function(dt, args_list, query) {
   ### Tableau des résultats, ajouter les arguments ainsi que la requête créée
   ### à partir des arguments.
@@ -99,7 +96,6 @@ create_dt_data_args_query <- function(dt, args_list, query) {
 #' @keywords internal
 #' @encoding UTF-8
 #' @importFrom rstudioapi getActiveDocumentContext
-#' @export
 #' @examples
 #' file_directory()
 file_directory <- function(){
@@ -121,7 +117,6 @@ file_directory <- function(){
 #' @keywords internal
 #' @encoding UTF-8
 #' @importFrom data.table as.data.table
-#' @export
 list_as_dt_no_recycled <- function(List) {
 
   nval_tot <- max(sapply(List, length))  # nombre de valeurs max
@@ -145,7 +140,6 @@ list_as_dt_no_recycled <- function(List) {
 #' @return '\\n'
 #' @keywords internal
 #' @encoding UTF-8
-#' @export
 nl <- function(x = 1) {
   ### nl = New line = '\n'
   return(paste(rep("\n", x), collapse = ""))
@@ -162,7 +156,6 @@ nl <- function(x = 1) {
 #' @encoding UTF-8
 #' @return `"DENOM"` : `"NOM_DENOM"`.\cr
 #' `"DIN"` = `"NOM_MARQ_COMRC`.
-#' @export
 nom_type_rx <- function(type_rx) {
   ###
 
@@ -185,7 +178,6 @@ nom_type_rx <- function(type_rx) {
 #'
 #' @keywords internal
 #' @encoding UTF-8
-#' @export
 replace_NA_in_dt <- function(dt, by) {
   dt <- as.data.table(dt)
   if (is.character(by)) {
@@ -209,7 +201,6 @@ replace_NA_in_dt <- function(dt, by) {
 #'
 #' @keywords internal
 #' @encoding UTF-8
-#' @export
 rmNA <- function(x) {
   if (anyNA(x)) {
     x <- x[!is.na(x)]
@@ -231,7 +222,6 @@ rmNA <- function(x) {
 #'
 #' @keywords internal
 #' @encoding UTF-8
-#' @export
 sunique <- function(x, decreasing = FALSE, na.last = FALSE) {
   return(sort(unique(x), decreasing = decreasing, na.last = na.last))
 }
