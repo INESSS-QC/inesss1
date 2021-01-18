@@ -4,28 +4,78 @@
 #'
 #' **Méthode `stat_gen1` :**\cr
 #' Statistiques descriptives tirées de la vue `V_DEM_PAIMT_MED_CM`.\cr\cr
-#' **`group_by` :** Revient à utiliser la commande `group by` dans le code SQL.
+#' **`group_by` :** Revient à utiliser la commande `group by` dans le code SQL.\cr\cr
+#' **`code_serv_filtre`, `code_list_filtre` :**\cr
+#' `"Exclusion"` : Inclus les `NULL`, `"Inclusion"` exclus les `NULL`.
 #'
 #' @param debut Date de début de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
 #' @param fin Date de fin de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
-#' @param type_Rx `"DENOM"` ou `"DIN"`. Indique le type de code analysé.
+#' @param type_Rx Indique le type de code analysé :
+#' * `"DENOM"` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
+#' * `"DIN"` : Code d'identification du médicament (`SMED_COD_DIN`).
 #' @param codes Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.
 #' @param group_by Regrouper (aggréger) les résultats par :
-#' * **`Codes`** : Résultats par code analysé.
-#' * **`Teneur`** : Résultats par teneur de médicament (`SMED_COD_TENR_MED`) incluant les valeurs absentes.
-#' * **`Format`** : Résultats par format d'acquisition du médicament (`SMED_COD_FORMA_ACQ_MED`) inclouant les valeurs absentes.
+#' * `"Codes"` : Résultats par code analysé.
+#' * `"Teneur"` : Résultats par teneur de médicament (`SMED_COD_TENR_MED`) incluant les valeurs absentes.
+#' * `"Format"` : Résultats par format d'acquisition du médicament (`SMED_COD_FORMA_ACQ_MED`) inclouant les valeurs absentes.
 #' @param code_serv Vecteur de type `character` comprenant le ou les codes de service (`SMED_COD_SERV_1`) à exclure ou à inclure, sinon inscrire `NULL`.
-#' @param code_serv_filtre `"Inclusion"` ou `"Exclusion"` des codes de service `code_serv`, sinon inscrire `NULL`.
+#' @param code_serv_filtre `"Inclusion"` ou `"Exclusion"` des codes de service `code_serv`. Inscrire `code_serv = NULL` s'il n'y a pas de filtre à appliquer.
 #' @param code_list Vecteur de type `character` comprenant le ou les codes de catégories de liste de médicaments (`SMED_COD_CATG_LISTE_MED`) à exclure ou à inclure, sinon inscrire `NULL`.
-#' @param code_list_filtre `"Inclusion"` ou `"Exclusion"` des codes de catégories de liste de médicaments `code_list`, sinon inscrire `NULL`.
+#' @param code_list_filtre `"Inclusion"` ou `"Exclusion"` des codes de catégories de liste de médicaments `code_list`. Inscrire `code_list = NULL` s'il n'y a pas de filtre à appliquer.
 #'
 #' @return Chaîne de caractères à utiliser dans une requête SQL.
 #' @encoding UTF-8
 #' @export
+#' @examples
+#' ### Avantages d'utiliser cat() si c'est pour afficher du code dans la console.
+#' # Avec cat()
+#' cat(query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222), group_by = "Codes",
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#' ))
+#' # Sans cat()
+#' query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222), group_by = "Codes",
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#' )
+#'
+#' ### GROUP_BY
+#' # group_by = NULL : resultats par periode d'etude.
+#' cat(query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   group_by = NULL,
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#' ))
+#' # group_by = "Codes" : resultats par code d'analyse.
+#' cat(query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   group_by = "Codes",
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#' ))
+#' # group_by = c("Teneur", "Format") : resultats par teneur et format.
+#' cat(query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   group_by = c("Teneur", "Format"),
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#' ))
+#'
+#' ### Exclusion VS Inclusion
+#' cat(query_stat_gen1(
+#'   debut = "2020-01-01", fin = "2020-12-31",
+#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   group_by = NULL,
+#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
+#'   code_list = c("40", "41"), code_list_filtre = "Inclusion"
+#' ))
 query_stat_gen1 <- function(
   debut, fin,
   type_Rx = "DENOM", codes,
-  group_by = NULL,
+  group_by = "Codes",
   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
   code_list = NULL, code_list_filtre = "Inclusions",
   ...
@@ -33,7 +83,10 @@ query_stat_gen1 <- function(
 
   ### Vérification des arguments
   dot_args <- list(...)
-  if ("verif" %in% names(dot_args) && dot_args$verif) {
+  if (!"verif" %in% names(dot_args)) {  # créer dot_args$verif si n'existe pas
+    dot_args$verif <- TRUE  # vérification par défaut
+  }
+  if (dot_args$verif) {  # effectuer la vérification
     query_stat_gen1.verif_args(debut, fin, type_Rx, codes, group_by,
                                code_serv, code_serv_filtre,
                                code_list, code_list_filtre)
@@ -92,21 +145,64 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
                                        code_serv, code_serv_filtre,
                                        code_list, code_list_filtre) {
   ### Vérifier les arguments d'entrée
+
+  check <- newArgCheck()
+  vals <- inesss:::fct_values$query_stat_gen1  # Possible values
+  vals <- fct_values$query_stat_gen1  # Possible values
+
+  # debut & fin
+  for (val in c("debut", "fin")) {
+    if (length(get(val)) != 1) {
+      addError(paste(val, "doit être de longueur 1."), check)
+    }
+    if (is.na(suppressWarnings(lubridate::as_date(get(val))))) {
+      addError(paste(val, "n'est pas au format 'AAAA-MM-JJ'."), check)
+    }
+  }
+
+  # type_Rx
+  if (length(type_Rx) == 1) {
+    if (!type_Rx %in% vals$type_Rx) {
+      addError("type_Rx n'est pas une valeur permise.", check)
+    }
+  } else {
+    addError("type_Rx doit être de longueur 1.", check)
+  }
+
+  # group_by
+  if (!is.null(group_by) && !all(group_by %in% vals$group_by)) {
+    if (length(group_by) == 1) {
+      addError("group_by ne contient pas une valeur permise.", check)
+    } else {
+      addError("group_by contient au moins une valeur non permise.", check)
+    }
+  }
+
+  # code_serv_filtre & code_list_filtre
+  for (val in c("code_serv_filtre", "code_list_filtre")) {
+    if (length(get(val)) != 1) {
+      addError(paste(val, "doit être de longueur 1."), check)
+    }
+    if (!get(val) %in% vals[[val]]) {
+      addError(paste(val, "n'est pas une valeur permise."), check)
+    }
+  }
+
+  finishArgCheck(check)
+
 }
-
-
 query_stat_gen1.sel_debut <- function(debut) {
   ### Sélection de la date de début dans le code SQL.
 
   return(paste0("'",debut,"' as DATE_DEBUT,\n"))
-}
 
+}
 query_stat_gen1.sel_fin <- function(fin) {
   ### Sélection de la date de fin dans le code SQL.
 
   return(paste0("'",fin,"' as DATE_FIN,\n"))
-}
 
+}
 query_stat_gen1.sel_code <- function(group_by, type_Rx) {
   ### Sélection des codes dans le code SQL
 
@@ -121,7 +217,6 @@ query_stat_gen1.sel_code <- function(group_by, type_Rx) {
   }
 
 }
-
 query_stat_gen1.sel_teneur <- function(group_by) {
   ### Sélection de la teneur du médicament dans le code SQL.
 
@@ -132,7 +227,6 @@ query_stat_gen1.sel_teneur <- function(group_by) {
   }
 
 }
-
 query_stat_gen1.sel_format <- function(group_by) {
   ### Sélection du format du médicament dans le code SQL.
 
@@ -143,14 +237,12 @@ query_stat_gen1.sel_format <- function(group_by) {
   }
 
 }
-
 query_stat_gen1.where_dates <- function(debut, fin) {
   ### Filtre les dates de services.
 
   return(paste0("where SMED_DAT_SERV between '",debut,"' and '",fin,"'\n"))
 
 }
-
 query_stat_gen1.where_codes <- function(type_Rx, codes) {
   ### Sélection du format du médicament dans le code SQL.
 
@@ -163,7 +255,6 @@ query_stat_gen1.where_codes <- function(type_Rx, codes) {
   }
 
 }
-
 query_stat_gen1.where_code_serv <- function(code_serv, code_serv_filtre) {
   ### Sélection des codes de service (SMED_COD_SERV_1).
 
@@ -178,7 +269,6 @@ query_stat_gen1.where_code_serv <- function(code_serv, code_serv_filtre) {
   }
 
 }
-
 query_stat_gen1.where_code_list <- function(code_list, code_list_filtre) {
   ### Sélection des codes de catégorie de liste de médicaments (SMED_COD_CATG_LISTE_MED).
 
@@ -193,7 +283,6 @@ query_stat_gen1.where_code_list <- function(code_list, code_list_filtre) {
   }
 
 }
-
 query_stat_gen1.group_order_by <- function(type_Rx, group_by) {
   ### Grouper les résultats par...
 
