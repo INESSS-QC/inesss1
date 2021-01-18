@@ -13,6 +13,30 @@ file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
 file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))
 
 
+# Build Vignettes ---------------------------------------------------------
+devtools::build_vignettes()
+
+
+# Vignettes ---------------------------------------------------------------
+for (file in list.files("vignettes")) {
+  render(
+    input = paste0("vignettes/",file),
+    output_dir = "Documentation/Vignettes"
+  )
+}
+
+
+# Formulaire --------------------------------------------------------------
+render(
+  input = "Documentation/source/formulaire.Rmd",
+  output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
+  output_dir = "Documentation",
+  params = list(conn = conn),
+  envir = new.env()
+)
+if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
+  unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
+}
 
 
 # README ------------------------------------------------------------------
@@ -29,6 +53,7 @@ render(  # pdf_document
   envir = new.env()
 )
 
+
 # R-Rtools-installation ---------------------------------------------------
 render(
   input = "Documentation/source/R-Rtools-installation.Rmd",
@@ -36,6 +61,7 @@ render(
   output_dir = "Documentation",
   envir = new.env()
 )
+
 
 # Registre Versions -------------------------------------------------------
 render(
@@ -52,17 +78,5 @@ render(  # pdf_document
   output_dir = "Documentation",
   envir = new.env()
 )
-
-# Formulaire --------------------------------------------------------------
-render(
-  input = "Documentation/source/formulaire.Rmd",
-  output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
-  output_dir = "Documentation",
-  params = list(conn = conn),
-  envir = new.env()
-)
-if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
-  unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
-}
 
 # ----------------------------------------------------------------------- #
