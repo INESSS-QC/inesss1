@@ -8,7 +8,6 @@
 #' @encoding UTF-8
 #' @return "from `bd`.`vue`"
 #' @keywords internal
-#' @export
 from_bd.vue <- function(bd = "PROD", vue) {
   ### Provenance des données
   return(paste0("from ",bd,".",vue))
@@ -24,7 +23,6 @@ from_bd.vue <- function(bd = "PROD", vue) {
 #' @encoding UTF-8
 #' @return Quatre (4) espaces répétés `niv` fois.
 #' @keywords internal
-#' @export
 indent <- function(niv = 1) {
   if (niv == "select") {
     return("       ")
@@ -42,7 +40,6 @@ indent <- function(niv = 1) {
 #' @keywords internal
 #' @encoding UTF-8
 #' @return c("x", "y") -> "'x','y'"
-#' @export
 qu <- function(x) {
   return(paste(paste0("'",x,"'"), collapse = ", "))
 }
