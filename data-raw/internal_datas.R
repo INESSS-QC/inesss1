@@ -1,6 +1,7 @@
 library(usethis)
 fct_values <- list(
 
+  ### STAT_GEN1
   query_stat_gen1 = list(
     type_Rx = c("DENOM", "DIN"),
     group_by = c("Codes", "Teneur", "Format"),
