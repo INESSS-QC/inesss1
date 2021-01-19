@@ -92,8 +92,9 @@ query_stat_gen1 <- function(
                                code_list, code_list_filtre)
   }
 
-  ### Arranger les codes
-  codes <- sunique(codes)  # tri croissant + valeurs uniques
+  ### Arranger les arguments
+  # codes
+  codes <- (sunique(codes))  # tri croissant + valeurs uniques
   if (type_Rx == "DENOM") {
     # Code Denom doit être une chaine de caractères de longueur 5
     codes <- stringr::str_pad(codes, width = 5, side = "left", pad = "0")
@@ -169,6 +170,16 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
     addError("type_Rx doit être de longueur 1.", check)
   }
 
+  # codes
+  if (anyNA(codes)) {
+    addError("codes ne peut contenir de NA.", check)
+  } else {
+    codes <- suppressWarnings({codes <- as.numeric(codes)})
+    if (anyNA(codes)) {
+      addError("codes doit contenir des valeurs numériques.", check)
+    }
+  }
+
   # group_by
   if (!is.null(group_by) && !all(group_by %in% vals$group_by)) {
     if (length(group_by) == 1) {
@@ -178,13 +189,20 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
     }
   }
 
+  # code_serv & code_list
+  for (val in c("code_serv", "code_list")) {
+    if (anyNA(get(val))) {
+      addError(paste(val, "ne peut contenir de NA."), check)
+    }
+  }
+
   # code_serv_filtre & code_list_filtre
   for (val in c("code_serv_filtre", "code_list_filtre")) {
     if (length(get(val)) != 1) {
       addError(paste(val, "doit être de longueur 1."), check)
     }
     if (!get(val) %in% vals[[val]]) {
-      addError(paste(val, "n'est pas une valeur permise."), check)
+      addError(paste(val, "ne contient pas une valeur permise."), check)
     }
   }
 
