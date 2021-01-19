@@ -9,13 +9,38 @@ SQL_stat_gen1 <- function(
 ) {
 
   ### Vérification des arguments
+  ### Seulement conn & uid - les autres sont vérifiés dans la fonction query_stat_gen1()
   dot_args <- list(...)
   if (!"verif" %in% names(dot_args)) {
     dot_args$verif <- TRUE  # vérification par défaut
   }
   if (dot_args$verif) {
-
+    SQL_stat_gen1.verif_args(conn, uid, pwd)
   }
+
+  ### Demander le mot de passe si pas inscrit
+  if (is.null(conn) && is.null(pwd)) {
+    pwd <- askpass::askpass("Quel est votre mot de passe")
+  }
+
+  ### Arranger les arguments
+  # codes
+  if (type_Rx == "DENOM") {
+    # DENOM est une chaîne de caractères de longueur 5
+    stringr::str_pad(codes, width = 5, side = "left", pad = "0")
+  }
+  # code_list
+  if (!is.null(code_list)) {
+    # code_list est une chaîne de caractères de longueur 2
+  stringr::str_pad(code_list, width = 2, side = "left", pad = "0")
+  }
+
+  ### Effectuer la connexion si nécessaire
+  if (is.null(conn)) {
+    conn <- SQL_connexion(uid, pwd)
+  }
+
+  ### Effectuer la requête à partir des arguments
 
 }
 
