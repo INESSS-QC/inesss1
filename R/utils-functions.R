@@ -157,7 +157,6 @@ nl <- function(x = 1) {
 #' @return `"DENOM"` : `"NOM_DENOM"`.\cr
 #' `"DIN"` = `"NOM_MARQ_COMRC`.
 nom_type_rx <- function(type_rx) {
-  ###
 
   if (type_rx == "DENOM") {
     return("NOM_DENOM")
