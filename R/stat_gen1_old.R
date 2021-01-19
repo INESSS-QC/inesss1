@@ -124,7 +124,6 @@ SQL_stat_gen1_old <- function(
       # Supprimer virgule si c'est le dernier select avant le from
       if (str_detect(query, ",\nfrom")) {
         stringr::str_sub(query, str_locate(query, ",\nfrom")[1,][[1]], str_locate(query, ",\nfrom")[1,][[1]]) <- ""
-        str_locate(query, ",\nfrom")[1,][[1]]
       }
     }
     return(query)
