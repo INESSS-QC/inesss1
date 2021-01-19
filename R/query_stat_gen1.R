@@ -77,7 +77,7 @@ query_stat_gen1 <- function(
   type_Rx = "DENOM", codes,
   group_by = "Codes",
   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-  code_list = NULL, code_list_filtre = "Inclusions",
+  code_list = NULL, code_list_filtre = "Inclusion",
   ...
 ) {
 
