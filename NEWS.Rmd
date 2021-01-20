@@ -23,8 +23,6 @@ knitr::opts_chunk$set(
 #### v0.4.0
 * `query_stat_gen1()` remplace `stat_gen1_query()`.
 * `SQL_stat_gen1()` utilise l'argument *group_by* au lieu de *result_by*. `group_by='Codes'` au lieu de `'Périodes'`.
-* Fichier *inesss_0.4.0.pdf*.
-* Fichier *AIDE-FORMULAIRE_2021-01-20.pdf*.
 * Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
 * Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
 * Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.

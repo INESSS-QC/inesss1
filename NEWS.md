@@ -6,8 +6,6 @@ Librairie [`inesss` v.0.4.0](https://github.com/INESSS-QC/inesss1)
 -   `query_stat_gen1()` remplace `stat_gen1_query()`.
 -   `SQL_stat_gen1()` utilise l’argument *group\_by* au lieu de
     *result\_by*. `group_by='Codes'` au lieu de `'Périodes'`.
--   Fichier *inesss\_0.4.0.pdf*.
--   Fichier *AIDE-FORMULAIRE\_2021-01-20.pdf*.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
 -   Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.
