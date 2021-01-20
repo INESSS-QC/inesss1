@@ -24,7 +24,7 @@ formulaire <- function() {
     ### Colonnes nécessaires pour chaque méthode
 
     return(list(
-      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "RESULTATS_PAR",
+      sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
     ))
   }
@@ -34,7 +34,7 @@ formulaire <- function() {
     return(list(
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
-        RESULTATS_PAR = c("Périodes", "Teneur", "Format"),
+        GROUPER_PAR = c("Codes", "Teneur", "Format"),
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
@@ -113,23 +113,27 @@ formulaire <- function() {
     dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))
     dt <- setkey(dt, code)
     return(dt)
+
   }
   format_xl_err_nl <- function(l = 60) {
     ### Répétition de '=' collé 'l' fois. Souvent utilisé pour une nouvelle
     ### section
 
     return(paste0("\n", paste(rep("=", l), collapse = ""), "\n\n"))
+
   }
   format_xl_err_sh <- function(name) {
     ### Indiquer le nom de l'onglet dans les messages d'erreur = 'sh : '
 
     return(paste0(name," :\n"))
+
   }
   format_price <- function(x) {
     ### Converti un nombre en chaîne de caractères avec deux décimales, même si
     ### c'est zéro (0)
 
     return(sapply(x, formatC, digits = 2, format = "f", big.mark = " ", decimal.mark = ","))
+
   }
   msg_error_from_xlfile <- function(file) {
     ### À partir d'un fichier Excel, vérifie chaque onglet et renvoie les
@@ -207,6 +211,7 @@ formulaire <- function() {
     ### Enregistrer au format Excel
 
     write_xlsx(dt, save_path$datapath)
+
   }
   save_xl_file_queries_method <- function(conn, filepath, savepath) {
     ### Effectuer la requête de chaque onglet du fichier Excel contenant les
@@ -245,20 +250,25 @@ formulaire <- function() {
     dates_fin <- as_date_excel_chr(str_remove_all(rmNA(dt$DATE_FIN), " "))
     type_rx <- str_remove_all(rmNA(dt$TYPE_RX), " ")
     code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-    resultby <- str_remove_all(rmNA(dt$RESULTATS_PAR), " ")
-    if (!length(resultby)) resultby <- NULL
+    grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+    if (!length(grpby)) {
+      grpby <- NULL
+    }
     code_serv_filtre <- str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
     code_serv <- sort(adapt_code_serv(str_remove_all(rmNA(dt$CODE_SERV), " ")))
-    if (!length(code_serv)) code_serv <- NULL
+    if (!length(code_serv)) {
+      code_serv <- NULL
+    }
     code_list_filtre <- str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
     code_list <- sort(str_remove_all(rmNA(dt$CODE_LIST), " "))
-    if (!length(code_list)) code_list <- NULL
+    if (!length(code_list)) {
+      code_list <- NULL
+    }
 
     # Tableau des résultats
     DT <- SQL_stat_gen1(
-      conn = conn,
-      debut = dates_debut, fin = dates_fin,
-      type_Rx = type_rx, codes = code_rx, result_by = resultby,
+      conn = conn, debut = dates_debut, fin = dates_fin,
+      type_Rx = type_rx, codes = code_rx, group_by = grpby,
       code_serv = code_serv, code_serv_filtre = code_serv_filtre,
       code_list = code_list, code_list_filtre = code_list_filtre
     )
@@ -271,14 +281,13 @@ formulaire <- function() {
       dt = DT,  # tableau des résultats
       args_list = list(  # liste des arguments
         METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-        TYPE_RX = type_rx, CODE_RX = code_rx,
-        RESULTATS_PAR = resultby,
+        TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
         CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
         CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
       ),
-      query = stat_gen1_query(  # code SQL de la 1ere période d'étude
-        debut = dates_debut[1], fin = dates_fin[1], type_Rx = type_rx, codes = code_rx,
-        result_by = resultby,
+      query = query_stat_gen1(  # code SQL de la 1ere période d'étude
+        debut = dates_debut[1], fin = dates_fin[1],
+        type_Rx = type_rx, codes = code_rx, group_by = grpby,
         code_serv = code_serv, code_serv_filtre = code_serv_filtre,
         code_list = code_list, code_list_filtre = code_list_filtre
       )
@@ -325,6 +334,7 @@ formulaire <- function() {
       }
       return(vec)
     }
+
   }
   sg1_code_list_choices <- function(dt_code_list) {
     ### Valeurs utilisées pour le choix des codes de liste de médicaments
@@ -332,6 +342,7 @@ formulaire <- function() {
     dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
     dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
   }
   sg1_code_serv_choices <- function(dt_code_serv) {
     ### Valeurs utilisées pour le choix des codes de service
@@ -339,6 +350,7 @@ formulaire <- function() {
     dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
     dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
     return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
   }
   sg1_dbGetQuery <- function(input, conn) {
     ### Effectue la ou les requêtes de statistiques générales selon les arguments
@@ -349,7 +361,7 @@ formulaire <- function() {
     DT <- SQL_stat_gen1(
       conn = conn,
       debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
-      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), result_by = input$sg1_group_by,
+      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
       code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
       code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
     )
@@ -376,9 +388,11 @@ formulaire <- function() {
       ]
       return(dt)
     }
+
   }
   shinyFiles_directories <- function(input_name, method) {
     ### Créer le répertoire à partir d'un shinyFileButton
+
     if (is.integer(input_name)) {
       return(NULL)
     } else if (method == "save") {
@@ -388,6 +402,7 @@ formulaire <- function() {
     } else {
       stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
+
   }
   verif_sg1 <- function(dt, sh, msg_error) {
     ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
@@ -493,17 +508,17 @@ formulaire <- function() {
       }
     }
 
-    # RESULTATS_PAR
-    if ("RESULTATS_PAR" %in% names(dt)) {
-      resultby <- str_remove_all(rmNA(dt$RESULTATS_PAR), " ")
-      if (length(resultby)) {
-        if (!all(resultby %in% vals$RESULTATS_PAR)) {
+    # GROUPER_PAR
+    if ("GROUPER_PAR" %in% names(dt)) {
+      grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+      if (length(grpby)) {
+        if (!all(grpby %in% vals$GROUPER_PAR)) {
           if (new_error) {
             msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
             new_error <- FALSE
           }
           msg_error <- paste0(msg_error,
-            " -  RESULTATS_PAR ne contient pas une valeur permise.\n"
+            " -  GROUPER_PAR ne contient pas une valeur permise.\n"
           )
         }
       }
@@ -542,6 +557,7 @@ formulaire <- function() {
     ### Détermine la fonction vérification à utiliser selon la méthode
 
     return(list(stat_gen1 = verif_sg1))
+
   }
   Volumes_path <- function() {
     ### Répertoires disponible sur l'ordinateur où l'on peut sélectionner ou
@@ -553,6 +569,7 @@ formulaire <- function() {
       R = R.home(),
       getVolumes()()
     ))
+
   }
 
 # Datas -------------------------------------------------------------------
@@ -641,11 +658,6 @@ formulaire <- function() {
             style = "color: #ffffff; background-color: #0086b3;"
           ),
           div(style = "margin-top:10px"),
-          # Afficher sur la première ligne
-          #   - Nombre de périodes d'analyse
-          #   - Nombre de codes Rx à analyser
-          #   - Les variables 'Grouper Par', 'Exclusion Code Services',
-          #     'Selection Categorie Liste', ...
           fluidRow(
             column(  # Périodes d'analyse
               width = 3,
@@ -667,8 +679,9 @@ formulaire <- function() {
               width = 2,
               # Grouper par
               checkboxGroupInput(
-                "sg1_group_by", "Résultats par",
-                choices = c("Périodes", "Teneur", "Format")
+                "sg1_group_by", "Grouper par",
+                choices = c("Codes", "Teneur", "Format"),
+                selected = "Codes"
               )
             ),
             column(
@@ -789,10 +802,12 @@ formulaire <- function() {
 
     # Déconnexion à Teradata
     observeEvent(input$sql_deconn, {
+      # Supprimer les informations
       conn_values$conn <- NULL  # aucune connexion
       conn_values$msg <- NULL
       conn_values$uid <- NULL
       conn_values$pwd <- NULL
+      # Effacer les informations inscrites dans les textInput
       updateTextInput(session, "sql_user", value = "")
       updateTextInput(session, "sql_pwd", value = "")
     })
@@ -983,7 +998,6 @@ formulaire <- function() {
       } else {
         return(NULL)
       }
-
       },
       options = list(scrollX = TRUE)  # scrolling si le tableau est plus large que la fenêtre
     )
@@ -1025,8 +1039,7 @@ formulaire <- function() {
             ),
             query = stat_gen1_query(
               debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-              type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input),
-              result_by = input$sg1_group_by,
+              type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
               code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
             )
@@ -1056,10 +1069,9 @@ formulaire <- function() {
     # Code SQL en lien avec les résultats
     sg1_code_SQL <- eventReactive(input$sg1_go_extract, {
       # Code SQL associé à la requête demandée
-      stat_gen1_query(
+      query_stat_gen1(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-        type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)),
-        result_by = input$sg1_group_by,
+        type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)), group_by = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
       )
@@ -1088,7 +1100,7 @@ formulaire <- function() {
 
       # Mettre à jour les checkboxGroup
       updateCheckboxGroupInput(session, inputId = "sg1_group_by",
-                               selected = character(0))
+                               selected = "Codes")
       updateSelectInput(session, inputId = "sg1_code_serv_filter",
                         selected = "Exclusion")
       updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
