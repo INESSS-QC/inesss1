@@ -99,6 +99,7 @@ formulaire <- function() {
       .(code = CODE, desc = CODE_DESC)  # colonnes code + description
     ]
     return(dt)
+
   }
   create_dt_code_serv <- function() {
     ### Data contenant la liste des codes de services et leur description
