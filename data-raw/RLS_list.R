@@ -17,12 +17,10 @@ RLS_list <- as.integer(c(
   1511, 1512, 1513, 1514, 1515, 1516, 1517,
   1611, 1612, 1621, 1622, 1623, 1631, 1632, 1633, 1634,
   # FAUX RLS
-  1001,
-  1701,
-  1801
+  1001, 1701, 1801
 ))
 
 sort(RLS_list)
-attr(RLS_list, "Create") <- Sys.Date()
+attr(RLS_list, "Create") <- Sys.Date()  # date dr création
 
 use_data(RLS_list, overwrite = TRUE)

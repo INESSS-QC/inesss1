@@ -3,27 +3,34 @@ library(odbc)
 library(data.table)
 library(askpass)
 library(inesss)
-# conn <- sql_connexion(askpass("User"))
+library(lubridate)
+# conn <- SQL_connexion(askpass("User"))
 
 fct <- function(need_conn = FALSE) {
 
+  rmNA <- inesss:::rmNA
+
+  ### Effectuer la connexion à Teradata
   if (need_conn) {
     conn <- sql_connexion(askpass("User"))
   }
 
+  ### Extraction SQL
   query <-
     "select distinct NMED_COD_DENOM_COMNE as DENOM,
 				NMED_COD_DIN as DIN,
 				NMED_NOM_MARQ_COMRC as NOM_MARQ_COMRC,
 				NMED_DD_PRODU_MED as DATE_DEBUT,
 				NMED_DF_PRODU_MED as DATE_FIN
-    from PROD.V_PRODU_MED
-    order by NMED_COD_DENOM_COMNE, NMED_COD_DIN, NMED_DD_PRODU_MED;"
-
+    from PROD.V_PRODU_MED;"
   DT <- as.data.table(dbGetQuery(conn, query))
   setkey(DT, DENOM, DIN, DATE_DEBUT)
 
-  # Regrouper les périodes qui se chevauche
+  ### Arranger les données
+  DT[, `:=` (DATE_DEBUT = as_date(DATE_DEBUT),  # s'assurer que c'est une Date
+             DATE_FIN = as_date(DATE_FIN))]
+
+  ### Regrouper les périodes qui se chevauchent
   DT[
     rmNA(DT[, .I[.N > 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1),
     diff := as.integer(DATE_DEBUT - shift(DATE_FIN)),
@@ -37,11 +44,11 @@ fct <- function(need_conn = FALSE) {
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
 
-  attr(DT, "Date") <- Sys.Date()
+  attr(DT, "Date") <- Sys.Date()  # date de création
   return(DT)
 
 }
 
 
-V_PRODU_MED.NOM_MARQ_COMRC <- fct()
-use_data(V_PRODU_MED.NOM_MARQ_COMRC, overwrite = TRUE)
+V_PRODU_MED.NMED_NOM_MARQ_COMRC <- fct()
+use_data(V_PRODU_MED.NMED_NOM_MARQ_COMRC, overwrite = TRUE)

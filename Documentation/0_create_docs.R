@@ -5,7 +5,6 @@ conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 
 
 # Build Manual ------------------------------------------------------------
-# ATTENTION : INSTALLER LE PACKAGE AVANT DE FAIRE CE CODE
 devtools::build_manual(path = "Documentation")
 
 
@@ -28,7 +27,7 @@ render(
   output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
   output_dir = "Documentation",
   params = list(conn = conn),
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
   unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
@@ -39,14 +38,14 @@ if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/
 render(  # github_document
   input = "README.Rmd",
   output_file = "README.md",
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 render(  # pdf_document
   input = "README.Rmd",
   output_format = "pdf_document",
   output_file = paste0("LISEZ-MOI_",Sys.Date(),".pdf"),
   output_dir = "Documentation",
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 
 
@@ -55,7 +54,7 @@ render(
   input = "Documentation/source/R-Rtools-installation.Rmd",
   output_file = paste0("R_RTOOLS_INSTALLATION_",Sys.Date(),".pdf"),
   output_dir = "Documentation",
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 
 
@@ -65,14 +64,14 @@ render(
   output_format = "md_document",
   output_file = "NEWS.md",
   output_dir = getwd(),
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 render(  # pdf_document
   input = "NEWS.Rmd",
   output_format = "pdf_document",
   output_file = "inesss-REGISTRE-VERSION.pdf",
   output_dir = "Documentation",
-  envir = new.env()
+  envir = new.env(), encoding = "UTF-8"
 )
 
 # ----------------------------------------------------------------------- #

@@ -1037,7 +1037,7 @@ formulaire <- function() {
               CODE_LIST_FILTRE = input$sg1_code_list_filter,
               CODE_LIST = input$sg1_code_list
             ),
-            query = stat_gen1_query(
+            query = query_stat_gen1(
               debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
               type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,

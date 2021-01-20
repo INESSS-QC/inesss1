@@ -7,7 +7,7 @@
 \title{Correspondance RLS Loi 10}
 \format{
 Tableau de 2 variables et 84 observations :
-\describe {
+\describe{
 \item{RLS14}{Code de RLS \strong{avant} l'adoption de la loi 10.}
 \item{RLS15}{Code de RLS \strong{après} l'adoption de la loi 10.}
 }
