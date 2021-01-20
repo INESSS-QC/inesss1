@@ -2,7 +2,7 @@
 #'
 #' Connexion entre R et SQL Teradata.
 #'
-#' Voir \code{\link[odbc]{dbConnect}}.
+#' Voir `?odbc::dbConnect`.
 #'
 #' @param uid Identifiant.
 #' @param pwd Mot de passe. Si `NULL`, le mot de passe est demandé lors de l'exécution.

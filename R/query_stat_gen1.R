@@ -8,20 +8,20 @@
 #' **`code_serv_filtre`, `code_list_filtre` :**\cr
 #' `"Exclusion"` : Inclus les `NULL`, `"Inclusion"` exclus les `NULL`.
 #'
-#' @param debut Date de début de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
-#' @param fin Date de fin de la période d'étude au format `"AAAA-MM-JJ"` (une seule valeur).
+#' @param debut Date de début de la période d'étude au format `'AAAA-MM-JJ'` (une seule valeur).
+#' @param fin Date de fin de la période d'étude au format `'AAAA-MM-JJ'` (une seule valeur).
 #' @param type_Rx Indique le type de code analysé :
-#' * `"DENOM"` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
-#' * `"DIN"` : Code d'identification du médicament (`SMED_COD_DIN`).
+#' * `'DENOM'` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
+#' * `'DIN'` : Code d'identification du médicament (`SMED_COD_DIN`).
 #' @param codes Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.
 #' @param group_by Regrouper (aggréger) les résultats par :
-#' * `"Codes"` : Résultats par code analysé.
-#' * `"Teneur"` : Résultats par teneur de médicament (`SMED_COD_TENR_MED`) incluant les valeurs absentes.
-#' * `"Format"` : Résultats par format d'acquisition du médicament (`SMED_COD_FORMA_ACQ_MED`) inclouant les valeurs absentes.
+#' * `'Codes'` : Résultats par code analysé.
+#' * `'Teneur'` : Résultats par teneur de médicament (`SMED_COD_TENR_MED`) incluant les valeurs absentes.
+#' * `'Format'` : Résultats par format d'acquisition du médicament (`SMED_COD_FORMA_ACQ_MED`) inclouant les valeurs absentes.
 #' @param code_serv Vecteur de type `character` comprenant le ou les codes de service (`SMED_COD_SERV_1`) à exclure ou à inclure, sinon inscrire `NULL`.
-#' @param code_serv_filtre `"Inclusion"` ou `"Exclusion"` des codes de service `code_serv`. Inscrire `code_serv = NULL` s'il n'y a pas de filtre à appliquer.
+#' @param code_serv_filtre `'Inclusion'` ou `'Exclusion'` des codes de service `code_serv`. Inscrire `code_serv = NULL` s'il n'y a pas de filtre à appliquer.
 #' @param code_list Vecteur de type `character` comprenant le ou les codes de catégories de liste de médicaments (`SMED_COD_CATG_LISTE_MED`) à exclure ou à inclure, sinon inscrire `NULL`.
-#' @param code_list_filtre `"Inclusion"` ou `"Exclusion"` des codes de catégories de liste de médicaments `code_list`. Inscrire `code_list = NULL` s'il n'y a pas de filtre à appliquer.
+#' @param code_list_filtre `'Inclusion'` ou `'Exclusion'` des codes de catégories de liste de médicaments `code_list`. Inscrire `code_list = NULL` s'il n'y a pas de filtre à appliquer.
 #'
 #' @return Chaîne de caractères à utiliser dans une requête SQL.
 #' @encoding UTF-8

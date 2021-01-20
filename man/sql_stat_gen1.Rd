@@ -28,32 +28,32 @@ SQL_stat_gen1(
 
 \item{pwd}{Mot de passe associé à l'identifiant. Si \code{NULL}, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.}
 
-\item{debut}{Date de début de la période d'étude au format \code{"AAAA-MM-JJ"} (une seule valeur).}
+\item{debut}{Date de début de la période d'étude au format \code{'AAAA-MM-JJ'} (une seule valeur).}
 
-\item{fin}{Date de fin de la période d'étude au format \code{"AAAA-MM-JJ"} (une seule valeur).}
+\item{fin}{Date de fin de la période d'étude au format \code{'AAAA-MM-JJ'} (une seule valeur).}
 
 \item{type_Rx}{Indique le type de code analysé :
 \itemize{
-\item \code{"DENOM"} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
-\item \code{"DIN"} : Code d'identification du médicament (\code{SMED_COD_DIN}).
+\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
+\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
 \item{codes}{Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
 
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
-\item \code{"Codes"} : Résultats par code analysé.
-\item \code{"Teneur"} : Résultats par teneur de médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
-\item \code{"Format"} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) inclouant les valeurs absentes.
+\item \code{'Codes'} : Résultats par code analysé.
+\item \code{'Teneur'} : Résultats par teneur de médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
+\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) inclouant les valeurs absentes.
 }}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
-\item{code_serv_filtre}{\code{"Inclusion"} ou \code{"Exclusion"} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
+\item{code_serv_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
 
 \item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
-\item{code_list_filtre}{\code{"Inclusion"} ou \code{"Exclusion"} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
+\item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 }
 \description{
 Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.

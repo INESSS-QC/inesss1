@@ -7,10 +7,6 @@ conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 # Build Manual ------------------------------------------------------------
 # ATTENTION : INSTALLER LE PACKAGE AVANT DE FAIRE CE CODE
 devtools::build_manual(path = "Documentation")
-file.copy(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"),
-          paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
-          overwrite = TRUE)
-file.remove(paste0("../inesss_",as.character(packageVersion("inesss")),".pdf"))
 
 
 # Build Vignettes ---------------------------------------------------------
