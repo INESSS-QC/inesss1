@@ -1,5 +1,18 @@
-Librairie [`inesss` v.0.3.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.4.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+#### v0.4.0
+
+-   `query_stat_gen1()` remplace `stat_gen1_query()`.
+-   `SQL_stat_gen1()` utilise l’argument *group\_by* au lieu de
+    *result\_by*. `group_by='Codes'` au lieu de `'Périodes'`.
+-   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
+-   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
+-   Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.
+-   Data `V_DEM_PAIMT_MED_CM.SMED_COD_SERV`.
+-   Data `V_DENOM_COMNE_MED`.
+-   Data `V_DES_COD`.
+-   Data `V_PRODU_MED.NOM_MARQ_COMRC`.
 
 ### [v0.3.0](https://github.com/INESSS-QC/inesss1/pull/6/files)
 

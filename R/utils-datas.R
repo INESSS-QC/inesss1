@@ -1,3 +1,6 @@
+
+# Pop_QC ------------------------------------------------------------------
+
 #' Estimations et projections de population comparables (1996-2041)
 #'
 #' Tableau de la population québécoise par niveau géographique.\cr\cr
@@ -23,13 +26,13 @@
 #' }
 #'
 #' @usage data("Pop_QC") / MaVariable <- Pop_QC.
-#'
 #' @encoding UTF-8
-#'
 #' @source \href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/EstimationProjectionComparable_1996_2041_20200424.xlsx}{Fichier Excel utilisé}.
 "Pop_QC"
 
+
+# RLS_convert -------------------------------------------------------------
 
 #' Correspondance RLS Loi 10
 #'
@@ -40,27 +43,119 @@
 #' `attr(RLS_convert, "RLS_exclus_value")` renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.
 #'
 #' @format Tableau de 2 variables et 84 observations :
-#' \describe {
+#' \describe{
 #'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10.}
 #'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10.}
 #' }
-#'
 #' @usage data("RLS_convert") / MaVariable <- RLS_convert.
-#'
 #' @encoding UTF-8
-#'
 #' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
 "RLS_convert"
 
+
+# RLS_list ----------------------------------------------------------------
 
 #' Liste des RLS
 #'
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 #'
 #' @format Vecteur `integer` de 96 nombres.
-#'
 #' @encoding UTF-8
-#'
 #' @usage data("RLS_list") / MaVariable <- RLS_list.
 "RLS_list"
+
+
+# V_DEM_PAIMT_MED_CM.SMED_COD_DIN -----------------------------------------
+
+#' Data - COD_DIN
+#'
+#' Codes d'identification des médicaments (`SMED_COD_DIN`) qui sont présents dans la vue `V_DEM_PAIMT_MED_CM`.
+#'
+#' @format Tableau de 3 variables :
+#' \describe{
+#'   \item{DIN}{Code d'identification du médicament (`SMED_COD_DIN`). `integer`.}
+#'   \item{DEBUT}{Première année où le code a été inscrit. `integer`.}
+#'   \item{FIN}{Dernière année où le code a été inscrit. `integer`.}
+#' }
+#' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.
+"V_DEM_PAIMT_MED_CM.SMED_COD_DIN"
+
+
+# V_DEM_PAIMT_MED_CM.SMED_COD_SERV ----------------------------------------
+
+#' Data - COD_SERV
+#'
+#' Codes de services (`SMED_COD_SERV_X`) qui sont présent dans la vue `V_DEM_PAIMT_MED_CM`.
+#'
+#' @format Tableau de 5 variables :
+#' \describe{
+#'   \item{COD_SERV}{Codes de services pouvant être isncrit dans les colonnes `SMED_COD_SERV_1`, `SMED_COD_SERV_2` et `SMED_COD_SERV3`. `character`.}
+#'   \item{SERV_1}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_1`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
+#'   \item{SERV_2}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_2`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
+#'   \item{SERV_3}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_3`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
+#'   \item{COD_SERV_DESC}{Description du code de service tirée de la variable `COD_SERV_DESC` de la vue `V_PARAM_SERV_MED`. `character`.}
+#' }
+#' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.
+"V_DEM_PAIMT_MED_CM.SMED_COD_SERV"
+
+
+# V_DENOM_COMNE_MED -------------------------------------------------------
+
+#' Data
+#'
+#' Description des codes de dénomination commune.
+#'
+#' @format Tableau de 7 variables :
+#' \describe{
+#'   \item{DENOM}{Code de dénomination commune (`NMED_COD_DENOM_COMNE`). `character`.}
+#'   \item{DATE_DEBUT}{Date à laquelle cette dénomination commune est apparue pour la première fois (`NMED_DD_DENOM_COMNE`). `Date`.}
+#'   \item{DATE_FIN}{Date à laquelle la dénomination commune a cessé d'être utilisée (`NMED_DF_DENOM_COMNE`). `Date`.}
+#'   \item{NOM_DENOM}{Nom de la dénomination commune du médicament (`NMED_NOM_DENOM_COMNE`). `character`.}
+#'   \item{NOM_DENOM_SYNON}{Synonyme du nom de la dénomination commune du médicament\cr(`NMED_NOM_DENOM_COMNE_SYNON`). `character`.}
+#'   \item{NOM_DENOM_ANGLAIS}{Nom anglais de la dénomination commune du médicament\cr(`NMED_NOM_ANGL_DENOM_COMNE`). `character`.}
+#'   \item{NOM_DENOM_SYNON_ANGLAIS}{Synonyme du nom anglais de la dénomination commune du médicament (`NMED_NOM_ANGL_DENOM_SYNON`). `character`.}
+#' }
+#' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1082&NomVue=V%5FDENOM%5FCOMNE%5FMED+%28D%E9nomination+commune+m%E9dicament%29}{V_DENOM_COMNE_MED}.
+"V_DENOM_COMNE_MED"
+
+
+# V_DES_COD ---------------------------------------------------------------
+
+#' Data
+#'
+#' Domaine de valeurs pour les différents codes de l'environnement informationnel.
+#'
+#' @format Tableau de 5 variables :
+#' \describe{
+#'   \item{CODE}{Valeurs codifiées que peut prendre un élément (`CODE_VAL_COD`). `character`.}
+#'   \item{TYPE_CODE}{Nom identifiant un élément de données (`CODE_NOM_COD`). `character`.}
+#'   \item{CODE_DESC}{Description du code (`CODE_DES`). `character`.}
+#'   \item{DATE_DEBUT}{Date de début de la période d'application (`CODE_DD_DES_COD`). `Date`.}
+#'   \item{DATE_FIN}{Date de fin de la période d'application (`CODE_DF_DES_COD`). `Date`.}
+#' }
+#' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=111&NomVue=V%5FDES%5FCOD+%28DESCRIPTIONS+DES+CODES%29}{V_DES_COD}.
+"V_DES_COD"
+
+
+# V_PRODU_MED.NMED_NOM_MARQ_COMRC -----------------------------------------
+
+#' Data - NOM_MARQ_COMRC
+#'
+#' Nom sous lequel est commercialisé un produit pharmaceutique.
+#'
+#' @format Tableau de 5 variables :
+#' \describe{
+#'   \item{DENOM}{Code de dénomination commune (`NMED_COD_DENOM_COMNE`). `character`.}
+#'   \item{DIN}{Code d'identification du médicament (`NMED_COD_DIN`). `integer`.}
+#'   \item{NOM_MARQ_COMRC}{Nom sous lequel est commercialisé un produit pharmaceutique\cr(`NMED_NOM_MARQ_COMRC`). `character`.}
+#'   \item{DATE_DEBUT}{Date de début d'une occurence de cette table (`NMED_DD_PRODU_MED`). `Date`.}
+#'   \item{DATE_FIN}{Date de fin d'une occurence de cette table (`NMED_DF_PRODU_MED`). `Date`.}
+#' }
+#' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1555&NomVue=V%5FPRODU%5FMED+%28Produit+m%E9dicament%29}{V_PRODU_MED}.
+"V_PRODU_MED.NMED_NOM_MARQ_COMRC"

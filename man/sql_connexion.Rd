@@ -23,12 +23,11 @@ Connexion Teradata, sinon \code{NULL}.
 Connexion entre R et SQL Teradata.
 }
 \details{
-Voir \code{\link[odbc]{dbConnect}}.
+Voir \code{?odbc::dbConnect}.
 }
 \examples{
 \dontrun{
-conn <- sql_connexion("abc007")
-conn <- sql_connexion(uid = "abc007", pwd = "MonMotDePasse",
-                      dsn = "PEI_PRD", encoding = "latin1")
+conn <- SQL_connexion("abc007")
+conn <- SQL_connexion(uid = "abc007", pwd = "MonMotDePasse", dsn = "PEI_PRD")
 }
 }

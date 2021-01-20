@@ -20,6 +20,17 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
+#### v0.4.0
+* `query_stat_gen1()` remplace `stat_gen1_query()`.
+* `SQL_stat_gen1()` utilise l'argument *group_by* au lieu de *result_by*. `group_by='Codes'` au lieu de `'Périodes'`.
+* Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
+* Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
+* Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.
+* Data `V_DEM_PAIMT_MED_CM.SMED_COD_SERV`.
+* Data `V_DENOM_COMNE_MED`.
+* Data `V_DES_COD`.
+* Data `V_PRODU_MED.NOM_MARQ_COMRC`.
+
 ### [v0.3.0](https://github.com/INESSS-QC/inesss1/pull/6/files)
 * Le formulaire, section *Requêtes via Excel*, indique le répertoire du fichier sélectionné.
 * Statistiques générales (`stat_gen1`) permet d'afficher les résultats par `Teneur` et `Format`.

@@ -38,7 +38,8 @@ La documentation de la librairie est disponible [ici](https://github.com/INESSS-
 Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
 ```{r, eval=FALSE, echo=TRUE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-remotes::install_github("INESSS-QC/inesss")
+remotes::install_github("INESSS-QC/inesss", upgrade = "never",
+                        build_manual = T, build_vignettes = T)
 ```
 
 # Démarrer le formulaire
