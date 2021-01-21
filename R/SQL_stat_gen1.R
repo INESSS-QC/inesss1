@@ -219,9 +219,9 @@ SQL_stat_gen1.nom_med <- function(dt, deb, fin, type_Rx, group_by) {
 
     # Base de données avec les nom à inscrire
     if (type_Rx == "DENOM") {
-      dt_noms <- inesss::V_DENOM_COMNE_MED.NMED_COD_DENOM_COMNE[get(type_Rx) %in% dt[[type_Rx]]]
+      dt_noms <- inesss::V_DENOM_COMNE_MED[get(type_Rx) %in% dt[[type_Rx]]]
     } else if (type_Rx == "DIN") {
-      dt_noms <- inesss::V_PRODU_MED.NOM_MARQ_COMRC[get(type_Rx) %in% dt[[type_Rx]]]
+      dt_noms <- inesss::V_PRODU_MED.NMED_NOM_MARQ_COMRC[get(type_Rx) %in% dt[[type_Rx]]]
     }
 
     # Modifier les dates pour être certain d'avoir un nom aux périodes demandées
@@ -234,7 +234,7 @@ SQL_stat_gen1.nom_med <- function(dt, deb, fin, type_Rx, group_by) {
       dt_noms[idx, DATE_FIN := lubridate::as_date(paste0(year(DATE_FIN),"-12-31"))]
     }
 
-    # Conserver la ligne selon les dates de périodes
+    # Conserver la ligne selon les dates de périodes et les colonnes Code+Nom
     dt_noms <- dt_noms[
       DATE_DEBUT <= deb & deb <= DATE_FIN,  # le bon nom selon la période d'étude
       c(type_Rx, nom_type_rx(type_Rx)), with = FALSE  # sélection des colonnes
