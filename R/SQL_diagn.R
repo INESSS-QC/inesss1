@@ -1,0 +1,290 @@
+#' Diagnostiques
+#'
+#' Extraction SQL des diagnostiques.
+#'
+#' Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.
+#'
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
+#' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
+#' @param pwd Mot de passe associé à l'identifiant. Si `NULL`, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.
+#' @param cohort Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.
+#' @param debut Date de début de la période d'étude au format `'AAAA-MM-JJ'`.
+#' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
+#' @param diagn_codes `list` contenant les codes *regex SQL* des codes de diagnostiques. Voir *Details*.
+#' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
+#' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
+#'
+#' @return `data.table` de 4 variables :
+#' * **`ID`** : Numéro d'identification de l'usager.
+#' * **`DATE_DX`** : Date de diagnostique.
+#' * **`DIAGN`** : Code descriptif des diagnostiques provenant de `diagn_codes`.
+#' * **`SOURCE`** : Indique d'où provient l'information. Une valeur parmi `dt_source`.
+#' @encoding UTF-8
+#' @export
+SQL_diagn <- function(
+  conn, uid, pwd,
+  cohort, debut, fin,
+  diagn_codes = Comorbidity_SQL_regex,
+  dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM",
+                "V_EPISO_SOIN_DURG_CM", "I_SMOD_SERV_MD_CM"),
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
+                 V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD")
+) {
+
+  ### Arranger les arguments
+  # Arguments possiblement manquants
+  if (missing(conn)) {
+    conn <- NULL
+  }
+  if (missing(uid)) {
+    uid <- NULL
+  }
+  if (missing(pwd)) {
+    pwd <- NULL
+  }
+
+  ### Connexion Teradata
+  if (is.null(conn)) {  # doit se connecter avec uid+pwd
+    if (is.null(pwd)) {  # demande le mot de passe s'il n'a pas été inscrit
+      pwd <- askpass::askpass("Quel est votre mot de passe?")
+    }
+    conn <- SQL_connexion(uid, pwd)  # connexion à Teradata
+  }
+
+  ### Extraction des diagn
+  if (is.null(conn)) {  # si encore NULL = Erreur
+    stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
+  } else {
+    DT <- vector("list", length(dt_source) * length(diagn_codes))  # contiendra toutes les requêtes
+    i <- 1L
+    for (sour in dt_source) {
+      print(sour)
+      fct <- get(paste0("SQL_diagn.",sour))  # fonction d'extraction selon la source
+      for (dia in names(diagn_codes)) {
+        print(paste0(" - ",dia))
+        DT[[i]] <- fct(  # tableau provenant de la requête
+          conn = conn, ids = cohort, diagn = diagn_codes[[dia]],
+          debut = debut, fin = fin,
+          diag_desc = dia, sourc_desc = dt_desc[[sour]]
+        )
+        i <- i + 1L
+      }
+    }
+    DT <- data.table::rbindlist(DT)  # regrouper tous les tableaux en un seul
+    setkey(DT)  # tri
+    return(DT)
+  }
+
+}
+
+SQL_diagn.verif_args <- function(conn, uid, pwd, cohort, debut, fin, diagn_codes,
+                                 dt_source, dt_desc) {
+  ### Vérification des arguments initiaux
+
+}
+#' @keywords internal
+#' @import data.table
+SQL_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+  ### Requête SQL pour extraire les diagnostiques de la vue V_DIAGN_SEJ_HOSP_CM
+  ### @conn = Connexion teradata.
+  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
+  ### @diagn = Codes SQL regex à chercher dans la base de données.
+  ### @debut,@fin = Date de début et de période où chercher les informations.
+
+  yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
+  yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
+  DT <- vector("list", yr_fin - yr_deb + 1L)  # contiendra toutes les années
+  i <- 1L
+  for (yr in yr_deb:yr_fin) {
+    # Ajuster les dates
+    if (yr == yr_deb) {
+      deb <- debut
+    } else {
+      deb <- paste0(yr,"-01-01")
+    }
+    if (yr == yr_fin) {
+      fi <- fin
+    } else {
+      fi <- paste0(yr,"-12-31")
+    }
+    # Extraction des diagn selon l'année
+    DT[[i]] <- as.data.table(odbc::dbGetQuery(
+      conn = conn, statement = paste0(
+        "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
+        "       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX\n",
+        "from RES_SSS.V_DIAGN_SEJ_HOSP_CM\n",
+        "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
+        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"'\n",
+        "    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');"
+      )
+    ))
+    if (!is.null(ids)) {
+      DT[[i]] <- DT[[i]][ID %in% ids]  # filtrer les IDs demandés
+    }
+    i <- i + 1L
+  }
+  DT <- rbindlist(DT)  # regrouper les tableaux
+
+  ### Ajouter les descriptions et forcer les classes
+  DT[, `:=` (ID = as.integer(ID),
+             DATE_DX = lubridate::as_date(DATE_DX),
+             DIAGN = diag_desc,
+             SOURCE = sourc_desc)]
+
+  return(DT)
+
+}
+#' @keywords internal
+#' @import data.table
+SQL_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+  ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
+  ### @conn = Connexion teradata.
+  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
+  ### @diagn = Codes SQL regex à chercher dans la base de données.
+  ### @debut,@fin = Date de début et de période où chercher les informations.
+
+  yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
+  yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
+  DT <- vector("list", yr_fin - yr_deb + 1L)  # contiendra toutes les années
+  i <- 1L
+  for (yr in yr_deb:yr_fin) {
+    # Ajuster les dates
+    if (yr == yr_deb) {
+      deb <- debut
+    } else {
+      deb <- paste0(yr,"-01-01")
+    }
+    if (yr == yr_fin) {
+      fi <- fin
+    } else {
+      fi <- paste0(yr,"-12-31")
+    }
+    # Extraction des diagn selon l'année
+    DT[[i]] <- as.data.table(odbc::dbGetQuery(
+      conn = conn, statement = paste0(
+        "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
+        "       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX\n",
+        "from RES_SSS.V_SEJ_SERV_HOSP_CM\n",
+        "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
+        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"';"
+      )
+    ))
+    if (!is.null(ids)) {
+      DT[[i]] <- DT[[i]][ID %in% ids]  # filtrer les IDs demandés
+    }
+    i <- i + 1L
+  }
+  DT <- rbindlist(DT)  # regrouper les tableaux
+
+  ### Ajouter les descriptions et forcer les classes
+  DT[, `:=` (ID = as.integer(ID),
+             DATE_DX = lubridate::as_date(DATE_DX),
+             DIAGN = diag_desc,
+             SOURCE = sourc_desc)]
+
+  return(DT)
+
+}
+#' @keywords internal
+#' @import data.table
+SQL_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+  ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
+  ### @conn = Connexion teradata.
+  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
+  ### @diagn = Codes SQL regex à chercher dans la base de données.
+  ### @debut,@fin = Date de début et de période où chercher les informations.
+
+  yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
+  yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
+  DT <- vector("list", yr_fin - yr_deb + 1L)  # contiendra toutes les années
+  i <- 1L
+  for (yr in yr_deb:yr_fin) {
+    # Ajuster les dates
+    if (yr == yr_deb) {
+      deb <- debut
+    } else {
+      deb <- paste0(yr,"-01-01")
+    }
+    if (yr == yr_fin) {
+      fi <- fin
+    } else {
+      fi <- paste0(yr,"-12-31")
+    }
+    # Extraction des diagn selon l'année
+    DT[[i]] <- as.data.table(odbc::dbGetQuery(
+      conn = conn, statement = paste0(
+        "select SMOD_NO_INDIV_BEN_BANLS as ID,\n",
+        "       SMOD_DAT_SERV as DATE_DX\n",
+        "from PROD.I_SMOD_SERV_MD_CM\n",
+        "where SMOD_COD_DIAGN_PRIMR like any (",qu(diagn),")\n",
+        "    and SMOD_COD_STA_DECIS = 'PAY'\n",
+        "    and SMOD_DAT_SERV between '",deb,"' and '",fi,"';"
+      )
+    ))
+    if (!is.null(ids)) {
+      DT[[i]] <- DT[[i]][ID %in% ids]  # filtrer les IDs demandés
+    }
+    i <- i + 1L
+  }
+  DT <- rbindlist(DT)  # regrouper les tableaux
+
+  ### Ajouter les descriptions et forcer les classes
+  DT[, `:=` (ID = as.integer(ID),
+             DATE_DX = lubridate::as_date(DATE_DX),
+             DIAGN = diag_desc,
+             SOURCE = sourc_desc)]
+
+  return(DT)
+
+}
+#' @keywords internal
+#' @import data.table
+SQL_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+  ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
+  ### @conn = Connexion teradata.
+  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
+  ### @diagn = Codes SQL regex à chercher dans la base de données.
+  ### @debut,@fin = Date de début et de période où chercher les informations.
+
+  yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
+  yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
+  DT <- vector("list", yr_fin - yr_deb + 1L)  # contiendra toutes les années
+  i <- 1L
+  for (yr in yr_deb:yr_fin) {
+    # Ajuster les dates
+    if (yr == yr_deb) {
+      deb <- debut
+    } else {
+      deb <- paste0(yr,"-01-01")
+    }
+    if (yr == yr_fin) {
+      fi <- fin
+    } else {
+      fi <- paste0(yr,"-12-31")
+    }
+    # Extraction des diagn selon l'année
+    DT[[i]] <- as.data.table(odbc::dbGetQuery(
+      conn = conn, statement = paste0(
+        "select SURG_NO_INDIV_BEN_BANLS as ID,\n",
+        "       SURG_DH_DEPAR_USAG_DURG as DATE_DX\n",
+        "from RES_SSS.V_EPISO_SOIN_DURG_CM\n",
+        "where SURG_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
+        "    and SURG_DH_DEPAR_USAG_DURG between To_Date('",deb,"') and To_Date('",fi,"');"
+      )
+    ))
+    if (!is.null(ids)) {
+      DT[[i]] <- DT[[i]][ID %in% ids]  # filtrer les IDs demandés
+    }
+    i <- i + 1L
+  }
+  DT <- rbindlist(DT)  # regrouper les tableaux
+
+  ### Ajouter les descriptions et forcer les classes
+  DT[, `:=` (ID = as.integer(ID),
+             DATE_DX = lubridate::as_date(DATE_DX),
+             DIAGN = diag_desc,
+             SOURCE = sourc_desc)]
+
+  return(DT)
+
+}
