@@ -6,9 +6,9 @@
 \title{Statistiques générales}
 \usage{
 SQL_stat_gen1(
-  conn = NULL,
-  uid = NULL,
-  pwd = NULL,
+  conn,
+  uid,
+  pwd,
   debut,
   fin,
   type_Rx = "DENOM",
@@ -22,7 +22,7 @@ SQL_stat_gen1(
 )
 }
 \arguments{
-\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
+\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments \code{uid} et \code{pwd}.}
 
 \item{uid}{Nom de l'identifiant pour la connexion SQL Teradata.}
 
@@ -57,6 +57,9 @@ SQL_stat_gen1(
 }
 \description{
 Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.
+}
+\details{
+Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.
 }
 \examples{
 \dontrun{

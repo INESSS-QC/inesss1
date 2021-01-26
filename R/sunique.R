@@ -8,6 +8,7 @@
 #'
 #' @keywords internal
 #' @encoding UTF-8
+#' @export
 sunique <- function(x, decreasing = FALSE, na.last = FALSE) {
 
   return(sort(unique(x), decreasing = decreasing, na.last = na.last))

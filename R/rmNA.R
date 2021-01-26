@@ -6,6 +6,7 @@
 #'
 #' @keywords internal
 #' @encoding UTF-8
+#' @export
 rmNA <- function(x) {
 
   if (anyNA(x)) {
