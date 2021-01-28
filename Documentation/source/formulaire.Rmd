@@ -457,6 +457,64 @@ order by TENEUR;
 
 \pagebreak
 
+#### Trimestres
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = paste0(2018, c("-01-01", "-04-01", "-07-01", "-10-01")),
+  DATE_FIN = paste0(2018, c("-03-31", "-06-30", "-09-30", "-12-31")),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 48222), GROUPER_PAR = "Codes",
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+                         code_serv = ll$CODE_SERV)
+sg1_format_table(tab_res)
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_stat_gen1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select '2018-01-01' as DATE_DEBUT,
+       '2018-03-31' as DATE_FIN,
+       SMED_COD_DENOM_COMNE as DENOM,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-03-31'
+    and SMED_COD_DENOM_COMNE in ('47092', '48222')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+group by DENOM
+order by DENOM;
+```
+
+\pagebreak
+
 #### Exclusion codes de services et Inclusion codes listes.
 \nl
 
