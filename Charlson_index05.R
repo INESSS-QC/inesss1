@@ -32,7 +32,7 @@ Condition1<-paste0(Condition1,var_names1)
 ###################### Cardiac_arrhythmias #######################
 
 Dx2<-c('4260%', '42610%','42612%', '42613%','4267%', '4269%', '4270%','4271%','4272%','4273%','4274%','4276%',
-       '4277%','4278%','4279%','7850%', '99601%', '99604%','V450%', 'V533%', 
+       '4277%','4278%','4279%','7850%', '99601%', '99604%','V450%', 'V533%',
        'I441%','I442%','I443%', 'I456%','I459%', 'I47%','I48%','I49%','R000%', 'R001%','R008%', 'T821%','Z450%', 'Z950%')
 DX2<- as.character()
 for(i in 1:length(Dx2)){
@@ -109,7 +109,7 @@ Condition5<-paste0(Condition5,var_names5)
 ###################### Renal_disease #######################
 
 Dx6<-c('40301%','40311%','40391%','40402%','40403%','40412%','40413%','40492%',
-       '40493%','585%','585%','586%','5880%','V420%','V451%','V56%', 
+       '40493%','585%','585%','586%','5880%','V420%','V451%','V56%',
        'N18%','N19%', 'N250%', 'Z49%','Z940%', 'Z992%')
 DX6<- as.character()
 for(i in 1:length(Dx6)){
@@ -268,7 +268,7 @@ Condition15<-paste0(Condition15,var_names15)
 
 ###################### Depression #######################
 
-Dx16<-c('2961%', '2963%', '3004%', '309%', '311%', 
+Dx16<-c('2961%', '2963%', '3004%', '309%', '311%',
         'F204%', 'F313%', 'F314%','F315%','F32%', 'F33%', 'F341%','F412%', 'F432%')
 DX16<- as.character()
 for(i in 1:length(Dx16)){
@@ -301,7 +301,7 @@ Condition17<-paste0(Condition17,var_names17)
 
 ###################### Alcohol_abuse #######################
 
-Dx18<-c('2652%', '2911%','2912%','2913%','2915%','2916%','2917%','2918%','2919%','303%','3050%','3575%', '4255%','5353%', '5710%','5713%','980%', 
+Dx18<-c('2652%', '2911%','2912%','2913%','2915%','2916%','2917%','2918%','2919%','303%','3050%','3575%', '4255%','5353%', '5710%','5713%','980%',
         'F10%', 'E52%', 'G621%','I426%', 'K292%', 'K700%','K703%', 'K709%', 'T51%','Z502%', 'Z714%', 'Z721%')
 DX18<- as.character()
 for(i in 1:length(Dx18)){
@@ -318,7 +318,7 @@ Condition18<-paste0(Condition18,var_names18)
 
 ###################### Liver_disease #######################
 
-Dx19<-c('0702%','0703%','0704%','0705%','571%','5733%','5734%','5739%','V427%','4560%','4561%','4562%','5723%','5728%',  
+Dx19<-c('0702%','0703%','0704%','0705%','571%','5733%','5734%','5739%','V427%','4560%','4561%','4562%','5723%','5728%',
         'B18%','K700%','K701%','K702%','K703%','K709%','K713%','K714%','K715%','K716%','K717%',
         'K73%','K74%','K754%','K760%','K761%','K762%','K763%','K764%','K768%','K769%','Z944%',
         'I85%','I864%','I982%','K711%','K721%','K729%','K765%','K766%','K767%')
@@ -369,9 +369,9 @@ Condition21<-paste0(Condition21,var_names21)
 ###################### Rheumatoid_arthcollagen_vascularD #######################
 
 Dx22<-c('1361%','446%','7010%','7100%','7101%','7102%','7103%','7104%','7105%','7108%',
-        '7109%','7112%','714%','7193%','720%','725%','7285%','4465%', 
+        '7109%','7112%','714%','7193%','720%','725%','7285%','4465%',
         'L900%', 'L940%', 'L941%','L943%', 'M05%', 'M06%','M08%', 'M120%', 'M123%',
-        'M30%', 'M31%','M32%','M33%','M34%', 'M35%', 'M45%','M460%', 
+        'M30%', 'M31%','M32%','M33%','M34%', 'M35%', 'M45%','M460%',
         'M05%','M06%','M315%','M32%','M33%','M34%','M350%','M351%','M353%')
 DX22<- as.character()
 for(i in 1:length(Dx22)){
@@ -403,7 +403,7 @@ Condition23<-paste0(Condition23,var_names23)
 
 ###################### Weight_loss #######################
 
-Dx24<-c('260%','261%','263%','7832%','7994%', 
+Dx24<-c('260%','261%','263%','7832%','7994%',
         'E40%','E41%','E42%','E43%','E44%','E45%','E46%','R634%','R64%')
 DX24<- as.character()
 for(i in 1:length(Dx24)){
@@ -466,7 +466,7 @@ Condition27<-paste0(Condition27,var_names27)
 
 ###################### Ulcer_disease #######################
 
-Dx28<-c('531%','532%','533%','534%', 
+Dx28<-c('531%','532%','533%','534%',
         'K25%','K26%','K27%','K28%')
 DX28<- as.character()
 for(i in 1:length(Dx28)){
@@ -531,7 +531,7 @@ Condition31<-paste0(Condition31,var_names31)
 
 ###################### Diabetes_complicated #######################
 
-Dx32<-c('25030%','2504%','2505%','2506%','2507%','2508%','2509%', 
+Dx32<-c('25030%','2504%','2505%','2506%','2507%','2508%','2509%',
         'E102%','E103%','E104%','E105%','E106%','E107%','E108%','E112%','E113%','E114%','E115%','E116%','E117%','E118%',
         'E132%','E133%','E134%','E135%','E136%','E137%','E138%','E142%','E143%','E144%','E145%','E146%','E147%','E148%')
 DX32<- as.character()
@@ -548,7 +548,7 @@ Condition32<-paste0(Condition32,var_names32)
 
 rm(Dx1,Dx2,Dx3,Dx4,Dx5,Dx6,Dx7,Dx8,Dx9,Dx10,Dx11,Dx12,Dx13,Dx14,Dx15,Dx16,Dx17,Dx18,Dx19,Dx20,Dx21,Dx22,Dx23,Dx24,Dx25,Dx26,Dx27,Dx28,Dx29,Dx30,Dx31,Dx32)
 
-######################  ######################  ######################  ######################  ######################  ###################### 
+######################  ######################  ######################  ######################  ######################  ######################
 ###################### Evenement Obstétrique #######################
 Dx_obst<-c('641%','642%','643%','644%','645%','646%','647%','648%','649%','650%','651%','652%','653%','654%','655%','656%','657%','658%','659%',
            '660%','661%','662%','663%','664%','665%','666%','667%','668%','669%','670%','671%','672%','673%','674%','675%','676%','V27%','O1%',
@@ -576,15 +576,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM DONNE_INESSS.",nom_BD," AS B
                              LEFT JOIN (
                              SELECT DISTINCT
-                             A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                             A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                              A.SMOD_DAT_SERV AS DateDx,
                              'SMOD' AS Source_DIAG
                              FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                              WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG,"))
-                             AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                             AND A.SMOD_COD_STA_DECIS IN ('PAY')
                              UNION ALL
                              SELECT DISTINCT ID, DateDx, Source_DIAG
-                             from ( 
+                             from (
                              SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
@@ -592,15 +592,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                             UNION ALL 
-                             SELECT DISTINCT	
+                             UNION ALL
+                             SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
                              'MED' AS Source_DIAG
                              FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              ) k
-                             UNION ALL 
+                             UNION ALL
                              SELECT DISTINCT
                              A.SURG_NO_INDIV_BEN_BANLS AS ID,
                              (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDx,
@@ -622,15 +622,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM DONNE_INESSS.",nom_BD," AS B
                              LEFT JOIN (
                              SELECT DISTINCT
-                             A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                             A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                              A.SMOD_DAT_SERV AS DateDx,
                              'SMOD' AS Source_DIAG
                              FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                              WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG,"))
-                             AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                             AND A.SMOD_COD_STA_DECIS IN ('PAY')
                              UNION ALL
                              SELECT DISTINCT ID, DateDx, Source_DIAG
-                             from ( 
+                             from (
                              SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
@@ -638,15 +638,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                             UNION ALL 
-                             SELECT DISTINCT	
+                             UNION ALL
+                             SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
                              'MED' AS Source_DIAG
                              FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              ) k
-                             UNION ALL 
+                             UNION ALL
                              SELECT DISTINCT
                              A.SURG_NO_INDIV_BEN_BANLS AS ID,
                              (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDx,
@@ -659,9 +659,9 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              ORDER BY b.ID, DateDx
                              "))
     DT<-as.data.table(DT)
-    
-  } 
-  
+
+  }
+
   else{
     DT<-dbGetQuery(con, paste0("
                              SELECT b.*,
@@ -670,15 +670,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM DONNE_INESSS.",nom_BD," AS B
                              LEFT JOIN (
                              SELECT DISTINCT
-                             A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                             A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                              A.SMOD_DAT_SERV AS DateDx,
                              'SMOD' AS Source_DIAG
                              FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                              WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG,"))
-                             AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                             AND A.SMOD_COD_STA_DECIS IN ('PAY')
                              UNION ALL
                              SELECT DISTINCT ID, DateDx, Source_DIAG
-                             from ( 
+                             from (
                              SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
@@ -686,15 +686,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                             UNION ALL 
-                             SELECT DISTINCT	
+                             UNION ALL
+                             SELECT DISTINCT
                              A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                              A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDx,
                              'MED' AS Source_DIAG
                              FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                              WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG,")
                              ) k
-                             UNION ALL 
+                             UNION ALL
                              SELECT DISTINCT
                              A.SURG_NO_INDIV_BEN_BANLS AS ID,
                              (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDx,
@@ -708,7 +708,7 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                              "))
     DT<-as.data.table(DT)
   }
-  
+
   if (lookback==2){
     DT_obst<-dbGetQuery(con, paste0("
                                   SELECT b.*,
@@ -717,15 +717,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM DONNE_INESSS.",nom_BD," AS B
                                   LEFT JOIN (
                                   SELECT DISTINCT
-                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                                   A.SMOD_DAT_SERV AS DateDxObs,
                                   'SMOD' AS Source_DIAG_Obs
                                   FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                                   WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG_obst,"))
-                                  AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                                  AND A.SMOD_COD_STA_DECIS IN ('PAY')
                                   UNION ALL
                                   SELECT DISTINCT ID, DateDxObs, Source_DIAG_Obs
-                                  from ( 
+                                  from (
                                   SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
@@ -733,15 +733,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                                  UNION ALL 
-                                  SELECT DISTINCT	
+                                  UNION ALL
+                                  SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
                                   'MED' AS Source_DIAG_Obs
                                   FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   ) k
-                                  UNION ALL 
+                                  UNION ALL
                                   SELECT DISTINCT
                                   A.SURG_NO_INDIV_BEN_BANLS AS ID,
                                   (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDxObs,
@@ -753,7 +753,7 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   WHERE (c.DateDxObs BETWEEN DAT_lookback AND b.DAT_Index)
                                   ORDER BY b.ID, DateDxObs
                                   "))
-    DT_obst<-as.data.table(DT_obst)   
+    DT_obst<-as.data.table(DT_obst)
   }
   else if (lookback==3){
     DT_obst<-dbGetQuery(con, paste0("
@@ -763,15 +763,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM DONNE_INESSS.",nom_BD," AS B
                                   LEFT JOIN (
                                   SELECT DISTINCT
-                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                                   A.SMOD_DAT_SERV AS DateDxObs,
                                   'SMOD' AS Source_DIAG_Obs
                                   FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                                   WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG_obst,"))
-                                  AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                                  AND A.SMOD_COD_STA_DECIS IN ('PAY')
                                   UNION ALL
                                   SELECT DISTINCT ID, DateDxObs, Source_DIAG_Obs
-                                  from ( 
+                                  from (
                                   SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
@@ -779,15 +779,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                                  UNION ALL 
-                                  SELECT DISTINCT	
+                                  UNION ALL
+                                  SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
                                   'MED' AS Source_DIAG_Obs
                                   FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   ) k
-                                  UNION ALL 
+                                  UNION ALL
                                   SELECT DISTINCT
                                   A.SURG_NO_INDIV_BEN_BANLS AS ID,
                                   (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDxObs,
@@ -799,9 +799,9 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   WHERE (c.DateDxObs BETWEEN DAT_lookback AND b.DAT_Index)
                                   ORDER BY b.ID, DateDxObs
                                   "))
-    DT_obst<-as.data.table(DT_obst)  
-  } 
-  
+    DT_obst<-as.data.table(DT_obst)
+  }
+
   else{
     DT_obst<-dbGetQuery(con, paste0("
                                   SELECT b.*,
@@ -810,15 +810,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM DONNE_INESSS.",nom_BD," AS B
                                   LEFT JOIN (
                                   SELECT DISTINCT
-                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID, 
+                                  A.SMOD_NO_INDIV_BEN_BANLS AS ID,
                                   A.SMOD_DAT_SERV AS DateDxObs,
                                   'SMOD' AS Source_DIAG_Obs
                                   FROM Prod.I_SMOD_SERV_MD_CM  AS  A
                                   WHERE (A.SMOD_COD_DIAGN_PRIMR like any (",DIAG_obst,"))
-                                  AND A.SMOD_COD_STA_DECIS IN ('PAY') 
+                                  AND A.SMOD_COD_STA_DECIS IN ('PAY')
                                   UNION ALL
                                   SELECT DISTINCT ID, DateDxObs, Source_DIAG_Obs
-                                  from ( 
+                                  from (
                                   SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
@@ -826,15 +826,15 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   FROM RES_SSS.V_DIAGN_SEJ_HOSP_CM AS A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   AND A.SHOP_TYP_DIAGN_SEJ_HOSP IN ('A','P','S')
-                                  UNION ALL 
-                                  SELECT DISTINCT	
+                                  UNION ALL
+                                  SELECT DISTINCT
                                   A.SHOP_NO_INDIV_BEN_BANLS AS ID,
                                   A.SHOP_DAT_DEPAR_SEJ_HOSP AS DateDxObs,
                                   'MED' AS Source_DIAG_Obs
                                   FROM RES_SSS.V_SEJ_SERV_HOSP_CM  AS  A
                                   WHERE A.SHOP_COD_DIAGN_MDCAL_CLINQ like any (",DIAG_obst,")
                                   ) k
-                                  UNION ALL 
+                                  UNION ALL
                                   SELECT DISTINCT
                                   A.SURG_NO_INDIV_BEN_BANLS AS ID,
                                   (Cast(A.SURG_DH_DEPAR_USAG_DURG AS DATE FORMAT 'yyyy-mm-dd')) AS DateDxObs,
@@ -846,20 +846,20 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
                                   WHERE (c.DateDxObs BETWEEN DAT_lookback AND b.DAT_Index)
                                   ORDER BY b.ID, DateDxObs
                                   "))
-    DT_obst<-as.data.table(DT_obst)      
+    DT_obst<-as.data.table(DT_obst)
   }
   Dx_All<-setDT(merge(DT,DT_obst,by="ID",all.x = T, allow.cartesian=TRUE))
   setorder(Dx_All,ID,DateDx)
-  idx<-Dx_All[,.I[!is.na(DateDxObs) & (DateDxObs-DateDx<=180)& (DateDxObs-DateDx>=-120)]] 
+  idx<-Dx_All[,.I[!is.na(DateDxObs) & (DateDxObs-DateDx<=180)& (DateDxObs-DateDx>=-120)]]
   Dx_All<-unique(Dx_All[!idx,.(ID,DateDx,Source_DIAG)])
   setorder(Dx_All,ID,DateDx)
   Dx_All<-as.data.table(Dx_All)
-  
+
   dt <- as.data.table(Dx_All)
   if (!is.Date(dt$DateDx))
     dt[, DateDX := as_date(DateDx)]
   setkey(dt, ID, DateDx)
-  
+
   dt[
     dt[, .I[.N > 1], .(ID)]$V1,
     diff := as.integer(DateDx - shift(DateDx)),
@@ -872,7 +872,7 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
     }, x = diff, accumulate = TRUE),
     .(ID)
     ]
-  
+
   dt[, `:=` (diff_conf = FALSE,
              cum_diff_conf = FALSE)]
   dt[
@@ -889,13 +889,13 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
   dt <- dt[diff_conf == TRUE | cum_diff_conf == TRUE]
   if (nrow(dt)) {
     dt <- dt[dt[, .I[1], .(ID)]$V1]
-    
+
     dt[
       diff_conf == TRUE, conf_njours := diff
       ][
         cum_diff_conf == TRUE, conf_njours := cum_diff
         ]
-    
+
     idx <- dt[, .I[
       diff_conf == TRUE & cum_diff_conf == TRUE
       & diff_conf != cum_diff_conf
@@ -904,7 +904,7 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
       dt[diff_conf < cum_diff_conf, conf_njours := cum_diff]
       dt[diff_conf > cum_diff_conf, conf_njours := diff]
     }
-    
+
     dt[, DAT_Rep := DateDx - conf_njours]
     dt <- dt[
       , .(DAT_Rep,
@@ -913,23 +913,23 @@ GetFinalData<-function(nom_BD,DIAG,DIAG_obst,lookback=c(2,3,5),Vars_name){
       ]
     dt[, YEAR_DAT_Rep := year(DAT_Rep)]
   }
-  
+
   dt<-as.data.table(dt)
-  DT<-DT %>% 
+  DT<-DT %>%
     rename(DAT_Conf=DateDx)
-  dt<-left_join(dt,DT,by=c("ID","DAT_Conf")) %>% 
+  dt<-left_join(dt,DT,by=c("ID","DAT_Conf")) %>%
     mutate(Maladie=1)
-  
+
   colnames(dt)<-Vars_name
-  
+
   return(dt<-as.data.table(dt))
-  
+
 }
 
 
 
 Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
-  if (lookbacks==2){  
+  if (lookbacks==2){
   Data1<-GetFinalData(nom_BD,DX1,DX_obst,2,var_names1)
   Data2<-GetFinalData(nom_BD,DX2,DX_obst,2,var_names2)
   Data3<-GetFinalData(nom_BD,DX3,DX_obst,2,var_names3)
@@ -962,15 +962,15 @@ Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
   Data30<-GetFinalData(nom_BD,DX30,DX_obst,2,var_names30)
   Data31<-GetFinalData(nom_BD,DX31,DX_obst,2,var_names31)
   Data32<-GetFinalData(nom_BD,DX32,DX_obst,2,var_names32)
-  
-  DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE), 
+
+  DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE),
               list(Data1, Data2, Data3,Data4,Data5,Data6,Data7,Data8,Data9,Data10,
                    Data11,Data12,Data13,Data14,Data15,Data16,Data17,Data18,Data19,Data20,
                    Data21,Data22,Data23,Data24,Data25,Data26,Data27,Data28,Data29,Data30,Data31,Data32))
   DT<-setkey(DT,ID)
-  
+
   }
-  else if(lookbacks==3){  
+  else if(lookbacks==3){
     Data1<-GetFinalData(nom_BD,DX1,DX_obst,3,var_names1)
     Data2<-GetFinalData(nom_BD,DX2,DX_obst,3,var_names2)
     Data3<-GetFinalData(nom_BD,DX3,DX_obst,3,var_names3)
@@ -1003,8 +1003,8 @@ Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
     Data30<-GetFinalData(nom_BD,DX30,DX_obst,3,var_names30)
     Data31<-GetFinalData(nom_BD,DX31,DX_obst,3,var_names31)
     Data32<-GetFinalData(nom_BD,DX32,DX_obst,3,var_names32)
-    
-    DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE), 
+
+    DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE),
                 list(Data1, Data2, Data3,Data4,Data5,Data6,Data7,Data8,Data9,Data10,
                      Data11,Data12,Data13,Data14,Data15,Data16,Data17,Data18,Data19,Data20,
                      Data21,Data22,Data23,Data24,Data25,Data26,Data27,Data28,Data29,Data30,Data31,Data32))
@@ -1043,15 +1043,15 @@ Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
     Data30<-GetFinalData(nom_BD,DX30,DX_obst,5,var_names30)
     Data31<-GetFinalData(nom_BD,DX31,DX_obst,5,var_names31)
     Data32<-GetFinalData(nom_BD,DX32,DX_obst,5,var_names32)
-    
-    DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE), 
+
+    DT<- Reduce(function(x, y) merge(x, y, by = c("ID","DAT_Rep","DAT_Conf","YEAR_DAT_Rep","DAT_Index","DAT_lookback","Source_DIAG"),all=TRUE),
                 list(Data1, Data2, Data3,Data4,Data5,Data6,Data7,Data8,Data9,Data10,
                      Data11,Data12,Data13,Data14,Data15,Data16,Data17,Data18,Data19,Data20,
                      Data21,Data22,Data23,Data24,Data25,Data26,Data27,Data28,Data29,Data30,Data31,Data32))
     DT<-setkey(DT,ID)
   }
-  
-  DT<-DT %>% 
+
+  DT<-DT %>%
     mutate(Chronic_pulmonary_disease1=1*Chronic_pulmonary_disease,
            Diabetes_uncomplicated1=0*Diabetes_uncomplicated,
            Any_tumor_without_metastasis1=2*Any_tumor_without_metastasis,
@@ -1068,9 +1068,24 @@ Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
            Paralysis1=1*Paralysis,
            Ulcer_disease1=0*Ulcer_disease,
            AIDS_HIV1=6*AIDS_HIV) %>%
-    mutate(Charlson_index=rowSums(.[,c("Chronic_pulmonary_disease1","Diabetes_uncomplicated1","Any_tumor_without_metastasis1","Renal_disease1","Myocardial_infarction1",
-                                       "Congestive_heart_failure1","Valvular_disease1","Metastatic_cancer1","Dementia1","Cerebrovascular_disease1","Liver_disease1","Diabetes_complicated1",
-                                       "Rheumatoid_arthcollagen_vascularD1","Paralysis1","Ulcer_disease1","AIDS_HIV1")], na.rm=TRUE)) %>% 
+    mutate(Charlson_index=rowSums(.[,c(
+      "Chronic_pulmonary_disease1",
+      "Diabetes_uncomplicated1",
+      "Any_tumor_without_metastasis1",
+      "Renal_disease1",
+      "Myocardial_infarction1",
+      "Congestive_heart_failure1",
+      "Valvular_disease1",
+      "Metastatic_cancer1",
+      "Dementia1",
+      "Cerebrovascular_disease1",
+      "Liver_disease1",
+      "Diabetes_complicated1",
+      "Rheumatoid_arthcollagen_vascularD1",
+      "Paralysis1",
+      "Ulcer_disease1",
+      "AIDS_HIV1"
+    )], na.rm=TRUE)) %>%
     mutate(Hypertension1=0*Hypertension,
            Cardiac_arrhythmias1=0*Cardiac_arrhythmias,
            Deficiency_anemia1=0*Deficiency_anemia,
@@ -1086,20 +1101,20 @@ Comorbidities_Index_DATIndex<-function(nom_BD,lookbacks=c(2,3,5)){
            Coagulopathy1=2*Coagulopathy,
            Weight_loss1=2*Weight_loss,
            Drug_abuse1=0*Drug_abuse,
-           Blood_loss_anemia1=0*Blood_loss_anemia) %>% 
+           Blood_loss_anemia1=0*Blood_loss_anemia) %>%
     mutate(Elixhauser_index=rowSums(.[,c("Hypertension1","Chronic_pulmonary_disease1","Cardiac_arrhythmias1","Diabetes_uncomplicated1","Deficiency_anemia1","Any_tumor_without_metastasis1","Hypothyroidism1",
                                          "Renal_disease1","Fluid_Electrolyte_disorders1","Peripheral_vascular_disorders1","Congestive_heart_failure1","Obesity1","Valvular_disease1","Metastatic_cancer1",
-                                         "Depression1","Neurological_disorders1","Alcohol_abuse1","Liver_disease1","Psychoses1","Pulmonary_circulation_disorders1","Rheumatoid_arthcollagen_vascularD1", "Coagulopathy1",                     
-                                         "Weight_loss1","Drug_abuse1","Paralysis1","Blood_loss_anemia1","Ulcer_disease1","AIDS_HIV1","Hypertension1","Diabetes_complicated1")], na.rm=TRUE)) %>% 
-    mutate(Combined_index=rowSums(.[,c("Chronic_pulmonary_disease1","Cardiac_arrhythmias1","Deficiency_anemia1","Any_tumor_without_metastasis1","Hypothyroidism1","Renal_disease1","Fluid_Electrolyte_disorders1",      
-                                       "Peripheral_vascular_disorders1","Myocardial_infarction1","Congestive_heart_failure1","Obesity1","Valvular_disease1","Metastatic_cancer1","Dementia1","Cerebrovascular_disease1",          
-                                       "Depression1","Neurological_disorders1","Alcohol_abuse1","Liver_disease1","Psychoses1","Pulmonary_circulation_disorders1","Rheumatoid_arthcollagen_vascularD1", "Coagulopathy1",                     
-                                       "Weight_loss1","Drug_abuse1","Paralysis1","Blood_loss_anemia1","Ulcer_disease1","AIDS_HIV1","Hypertension1","Diabetes_uncomplicated1","Diabetes_complicated1")], na.rm=TRUE)) %>% 
-    select(-c(Chronic_pulmonary_disease1,Cardiac_arrhythmias1,Deficiency_anemia1,Any_tumor_without_metastasis1,Hypothyroidism1,Renal_disease1,Fluid_Electrolyte_disorders1,      
-              Peripheral_vascular_disorders1,Myocardial_infarction1,Congestive_heart_failure1,Obesity1,Valvular_disease1,Metastatic_cancer1,Dementia1,Cerebrovascular_disease1,          
-              Depression1,Neurological_disorders1,Alcohol_abuse1,Liver_disease1,Psychoses1,Pulmonary_circulation_disorders1,Rheumatoid_arthcollagen_vascularD1, Coagulopathy1,                     
+                                         "Depression1","Neurological_disorders1","Alcohol_abuse1","Liver_disease1","Psychoses1","Pulmonary_circulation_disorders1","Rheumatoid_arthcollagen_vascularD1", "Coagulopathy1",
+                                         "Weight_loss1","Drug_abuse1","Paralysis1","Blood_loss_anemia1","Ulcer_disease1","AIDS_HIV1","Hypertension1","Diabetes_complicated1")], na.rm=TRUE)) %>%
+    mutate(Combined_index=rowSums(.[,c("Chronic_pulmonary_disease1","Cardiac_arrhythmias1","Deficiency_anemia1","Any_tumor_without_metastasis1","Hypothyroidism1","Renal_disease1","Fluid_Electrolyte_disorders1",
+                                       "Peripheral_vascular_disorders1","Myocardial_infarction1","Congestive_heart_failure1","Obesity1","Valvular_disease1","Metastatic_cancer1","Dementia1","Cerebrovascular_disease1",
+                                       "Depression1","Neurological_disorders1","Alcohol_abuse1","Liver_disease1","Psychoses1","Pulmonary_circulation_disorders1","Rheumatoid_arthcollagen_vascularD1", "Coagulopathy1",
+                                       "Weight_loss1","Drug_abuse1","Paralysis1","Blood_loss_anemia1","Ulcer_disease1","AIDS_HIV1","Hypertension1","Diabetes_uncomplicated1","Diabetes_complicated1")], na.rm=TRUE)) %>%
+    select(-c(Chronic_pulmonary_disease1,Cardiac_arrhythmias1,Deficiency_anemia1,Any_tumor_without_metastasis1,Hypothyroidism1,Renal_disease1,Fluid_Electrolyte_disorders1,
+              Peripheral_vascular_disorders1,Myocardial_infarction1,Congestive_heart_failure1,Obesity1,Valvular_disease1,Metastatic_cancer1,Dementia1,Cerebrovascular_disease1,
+              Depression1,Neurological_disorders1,Alcohol_abuse1,Liver_disease1,Psychoses1,Pulmonary_circulation_disorders1,Rheumatoid_arthcollagen_vascularD1, Coagulopathy1,
               Weight_loss1,Drug_abuse1,Paralysis1,Blood_loss_anemia1,Ulcer_disease1,AIDS_HIV1,Hypertension1,Diabetes_uncomplicated1,Diabetes_complicated1))
-  
+
   return(DT<-as.data.table(DT))
 }
 
