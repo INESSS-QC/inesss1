@@ -279,11 +279,11 @@ SQL_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_de
   }
   DT <- rbindlist(DT)  # regrouper les tableaux
 
-  ### Ajouter les descriptions et forcer les classes
-  DT[, `:=` (ID = as.integer(ID),
-             DATE_DX = lubridate::as_date(DATE_DX),
-             DIAGN = diag_desc,
-             SOURCE = sourc_desc)]
+  # ### Ajouter les descriptions et forcer les classes
+  # DT[, `:=` (ID = as.integer(ID),
+  #            DATE_DX = lubridate::as_date(DATE_DX),
+  #            DIAGN = diag_desc,
+  #            SOURCE = sourc_desc)]
 
   return(DT)
 

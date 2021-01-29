@@ -1,18 +1,12 @@
 library(data.table)
-conn <- SQL_connexion("ms045")
+DT <- readRDS("C:/Users/ms045/Desktop/Github/INESSS-QC_inesss1/data-fake/diagnostiques.rds")
 
-Cohort <- readRDS("V:/_MedPersAg/Charlson_test.rds")
-setDT(Cohort)
-Cohort <- unique(Cohort, by = "ID")
-setkey(Cohort)
-
-DT <- SQL_diagn(
-  conn = conn,
-  cohort = sunique(Cohort$ID),
-  debut = as.character(min(Cohort$DAT_Index)-730),
-  fin = as.character(max(Cohort$DAT_Index)),
-  diagn_codes = Comorbidity_SQL_regex[1:5]
-)
-
-dt <- Cohort[ID %in% DT$ID, .(ID, DATE_INDEX = DAT_Index)]  # cohorte présente dans DT
-dt <- DT[dt, on = .(ID)]  # ajouter les dates des ID
+dt = copy(DT)
+ID = "ID"
+DIAGN = "DIAGN"
+DATE_DX = "DATE_DX"
+SOURCE = "SOURCE"
+indic = c("charlson", "elixhauser")
+n1 = 30
+n2 = 730
+confirm_sourc = list("MED-ECHO" = 1, "BDCU" = 2, "SMOD" = 2)

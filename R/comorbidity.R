@@ -21,7 +21,7 @@ comorbidity <- function(
   dt[, DATE_DX := as.integer(DATE_DX)]  # convertir en integer -> memory efficient
 
   ### Confirmation des codes de diagnostiques
-  dt <- confirm_diagn(dt, n1, n2, confirm_sources)
+  dt <- comorbidity.confirm_diagn(dt, n1, n2, confirm_sources)
 
   ### Mettre une colonne par diagn
   dt <- dcast(dt[, .(ID, DIAGN, val = 1L)], ID ~ DIAGN, value.var = "val")
