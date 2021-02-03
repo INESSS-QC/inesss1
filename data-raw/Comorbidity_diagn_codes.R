@@ -1,5 +1,9 @@
 library(usethis)
 library(stringr)
+library(rlist)
+
+
+# Comorbidity_diagn_codes -------------------------------------------------
 
 ### Codes de diagnostiques CIM9 et CIM10.
 ### Charlson et Elixhauser confondus.
@@ -78,6 +82,12 @@ Comorbidity_diagn_codes <- list(
     CIM9 = c(490:505, 5064, 5081),
     CIM10 = c(paste0("I", c(278, 279)),
               paste0("J", c(40:47, 60:67, 684, 701, 703)))
+  ),
+
+  # Deficiency Anemia
+  dane = list(
+    CIM9 = c(28091:28099, 281, 2859),
+    CIM10 = c(paste0("D", c(501, 508, 509, 51:53, 63, 649)))
   ),
 
   # Dementia
@@ -245,3 +255,134 @@ Comorbidity_diagn_codes <- list(
   )
 
 )
+
+
+# Charlson_diagn_codes ----------------------------------------------------
+
+Charlson_diagn_codes <- list(
+  # AIDS/HIV
+  aids = Comorbidity_diagn_codes$aids,
+  # Cancer (without metastasis)
+  canc = Comorbidity_diagn_codes$canc,
+  # Cerebrovascular disease
+  cevd = Comorbidity_diagn_codes$cevd,
+  # Congestive heart failure
+  chf = Comorbidity_diagn_codes$chf,
+  # Chronic pulmonary disease
+  copd = Comorbidity_diagn_codes$copd,
+  # Dementia
+  dementia = Comorbidity_diagn_codes$dementia,
+  # Diabetes without complications
+  diab = Comorbidity_diagn_codes$diab,
+  # Diabetes with complications
+  diabwc = Comorbidity_diagn_codes$diabwc,
+  # Liver disease
+  ld = Comorbidity_diagn_codes$ld,
+  # Metastatic cancer
+  metacanc = Comorbidity_diagn_codes$metacanc,
+  # Myocardial Infarction
+  mi = Comorbidity_diagn_codes$mi,
+  # Paralysis
+  para = Comorbidity_diagn_codes$para,
+  # Renal disease
+  rend = Comorbidity_diagn_codes$rend,
+  # Rheumatoid arthritis/collaged vascular disease
+  rheumd = list(
+    CIM9 = c(4465, 7100:7104, 7140:7142, 7148, 725),
+    CIM10 = c("M05", "M06", paste0("M", c(315, 32:34, 350:351, 353)))
+  ),
+  # Ulcer disease
+  ud = Comorbidity_diagn_codes$ud,
+  # Valvular disease
+  valv = Comorbidity_diagn_codes$valv
+)
+
+
+
+# Elixhauser_diagn_codes --------------------------------------------------
+
+Elixhauser_diagn_codes <- list(
+  # AIDS/HIV
+  aids = Comorbidity_diagn_codes$aids,
+  # Alcohol abuse
+  alcool = Comorbidity_diagn_codes$alcool,
+  # Blood loss anemina
+  blane = Comorbidity_diagn_codes$blane,
+  # Cancer (without metastasis)
+  canc = Comorbidity_diagn_codes$canc,
+  # Cardiac arrhythmias
+  carit = Comorbidity_diagn_codes$carit,
+  # Congestive heart failure
+  chf = Comorbidity_diagn_codes$chf,
+  # Coagulopathy
+  coag = Comorbidity_diagn_codes$coag,
+  # Chronic pulmonary disease
+  copd = Comorbidity_diagn_codes$copd,
+  # Deficiency Anemia
+  dane = Comorbidity_diagn_codes$dane,
+  # Depression
+  depre = Comorbidity_diagn_codes$depre,
+  # Diabetes without complications
+  diab = Comorbidity_diagn_codes$diab,
+  # Diabetes with complications
+  diabwc = Comorbidity_diagn_codes$diabwc,
+  # Drug abuse
+  drug = Comorbidity_diagn_codes$drug,
+  # Fluid and electrolyte disorders
+  fed = Comorbidity_diagn_codes$fed,
+  # Hypertension
+  hyp = Comorbidity_diagn_codes$hyp,
+  # Hypothyroidism
+  hypothy = Comorbidity_diagn_codes$hypothy,
+  # Liver disease
+  ld = Comorbidity_diagn_codes$ld,
+  # Metastatic cancer
+  metacanc = Comorbidity_diagn_codes$metacanc,
+  # Neurological disorders
+  nd = Comorbidity_diagn_codes$nd,
+  # Obesity
+  obes = Comorbidity_diagn_codes$obes,
+  # Paralysis
+  para = Comorbidity_diagn_codes$para,
+  # Pulmonary circulation disorders
+  pcd = Comorbidity_diagn_codes$pcd,
+  # Psychose
+  psycho = Comorbidity_diagn_codes$psycho,
+  # Peripheral vascular disease
+  pvd = Comorbidity_diagn_codes$pvd,
+  # Renal disease
+  rend = Comorbidity_diagn_codes$rend,
+  # Rheumatoid arthritis/collaged vascular disease
+  rheumd = Comorbidity_diagn_codes$rheumd,
+  # Ulcer disease
+  ud = list(
+    CIM9 = c(5317, 5319, 5327, 5329, 5337, 5339, 5347, 5349),
+    CIM10 = c(paste0("K", c(257, 259, 267, 269, 277, 279, 287, 289)))
+  ),
+  # Valvular disease
+  valv = Comorbidity_diagn_codes$valv,
+  # Weight loss
+  wloss = Comorbidity_diagn_codes$wloss
+)
+
+
+# SQL regex ---------------------------------------------------------------
+
+### Ajouter un '%' après chaque code pour pouvoir les utiliser dans du SQL regex
+for (k in c("Comorbidity_diagn_codes", "Charlson_diagn_codes", "Elixhauser_diagn_codes")) {
+  dt <- get(k)
+  for (i in 1:length(dt)) {
+    for (j in c("CIM9", "CIM10")) {
+      dt[[i]][[j]] <- paste0(dt[[i]][[j]], "%")
+    }
+  }
+  assign(k, dt)
+}
+
+
+# Save datas --------------------------------------------------------------
+
+use_data(Comorbidity_diagn_codes,
+         Charlson_diagn_codes,
+         Elixhauser_diagn_codes,
+         overwrite = TRUE)

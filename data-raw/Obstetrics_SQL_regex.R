@@ -1,7 +1,7 @@
 library(usethis)
 library(inesss)
 
-Obstetrics_SQL_regex <- list(
+Obstetrics_diagn_codes <- list(
   # Obstetrics
   obstetric = c(
     paste0(641:676,"%"),
@@ -10,4 +10,4 @@ Obstetrics_SQL_regex <- list(
   )
 )
 
-use_data(Obstetrics_SQL_regex, overwrite = TRUE)
+use_data(Obstetrics_diagn_codes, overwrite = TRUE)
