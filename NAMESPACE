@@ -2,8 +2,8 @@
 
 export(.SQL_adr_internal)
 export(SQL_adr)
+export(SQL_comorbidity_diagn)
 export(SQL_connexion)
-export(SQL_diagn)
 export(SQL_stat_gen1)
 export(addError)
 export(addMessage)
