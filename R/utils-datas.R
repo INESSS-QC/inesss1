@@ -1,7 +1,30 @@
 
+# Comorbidity_diagn_codes -------------------------------------------------
+
+#' Codes diagnostiques
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostiques pour l'étude de la comorbisité.
+#'
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+#' @name Comorbidity_diagn_codes
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 32 diagnostics.
+"Comorbidity_diagn_codes"
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 16 diagnostics.
+"Charlson_diagn_codes"
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 29 diagnostics.
+"Elixhauser_diagn_codes"
+
+
 # Pop_QC ------------------------------------------------------------------
 
-#' Estimations et projections de population comparables (1996-2041)
+#' Data - Estimations et projections de population comparables (1996-2041)
 #'
 #' Tableau de la population québécoise par niveau géographique.\cr\cr
 #' Ce fichier présente une série continue de données populationnelles comparables composée de la série des estimations (1996-2019) et de la série des projections (2020-2041) de population. Ces données tiennent compte de l'évolution de la population selon les plus récentes données observées de naissances, décès et mouvements migratoires.\cr\cr
@@ -34,7 +57,7 @@
 
 # RLS_convert -------------------------------------------------------------
 
-#' Correspondance RLS Loi 10
+#' Data - Correspondance RLS Loi 10
 #'
 #' Établir la correspondance des RLS avant et après l'adoption de la loi 10.
 #'
@@ -56,7 +79,7 @@
 
 # RLS_list ----------------------------------------------------------------
 
-#' Liste des RLS
+#' Data - Liste des RLS
 #'
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 #'

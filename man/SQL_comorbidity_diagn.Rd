@@ -14,7 +14,6 @@ SQL_comorbidity_diagn(
   fin,
   method = c("Charlson", "Elixhauser"),
   CIM = c("CIM9", "CIM10"),
-  CIM_score = "CIM10",
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM", "V_EPISO_SOIN_DURG_CM",
     "I_SMOD_SERV_MD_CM"),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
@@ -35,9 +34,15 @@ SQL_comorbidity_diagn(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
+\item{method}{Extraire les diagnostiques associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
+
+\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostiques selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
+
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
+
+\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \value{
 \code{data.table} de 4 variables :
@@ -52,8 +57,8 @@ SQL_comorbidity_diagn(
 Extraction SQL des diagnostiques pour l'étude de la comorbidité.
 }
 \details{
-**\code{conn}, \code{uid}, \code{pwd} : ** Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr
-**\code{dt_source} : **
+\strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr
+\strong{\code{dt_source} :}
 \itemize{
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V\%5FDIAGN\%5FSEJ\%5FHOSP\%5FCM+\%28Diagnostic+s\%E9jour+hospitalier\%29}{\code{V_DIAGN_SEJ_HOSP_CM}} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V\%5FSEJ\%5FSERV\%5FHOSP\%5FCM+\%28S\%E9jour+service+hospitalier\%29}{\code{V_SEJ_SERV_HOSP_CM}} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
@@ -61,5 +66,5 @@ Extraction SQL des diagnostiques pour l'étude de la comorbidité.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 }
 
-Salut
+\strong{\code{method} :} Voir les listes \code{LINK} pour connaître les codes de diagnostiques extraits.
 }

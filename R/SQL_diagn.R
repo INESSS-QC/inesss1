@@ -2,14 +2,14 @@
 #'
 #' Extraction SQL des diagnostiques pour l'étude de la comorbidité.
 #'
-#' **`conn`, `uid`, `pwd` : ** Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
-#' **`dt_source` : **
+#' \strong{`conn`, `uid`, `pwd` :} Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
+#' \strong{`dt_source` :}
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V%5FDIAGN%5FSEJ%5FHOSP%5FCM+%28Diagnostic+s%E9jour+hospitalier%29}{`V_DIAGN_SEJ_HOSP_CM`} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I%5FSMOD%5FSERV%5FMD%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 #'
-#' Salut
+#' \strong{`method` :} Voir les listes `LINK` pour connaître les codes de diagnostiques extraits.
 #'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
 #' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
@@ -17,9 +17,11 @@
 #' @param cohort Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.
 #' @param debut Date de début de la période d'étude au format `'AAAA-MM-JJ'`.
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
-#'
+#' @param method Extraire les diagnostiques associés aux méthodes de calcul *Charlson*, *Elixhauser* ou les deux.
+#' @param CIM `'CIM9'`, `'CIM10'` ou les deux. Permet de filtrer les codes de diagnostiques selon le numéro de révision de la *Classification statistique internationale des maladies et des problèmes de santé connexes* (CIM).
 #' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
 #' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
+#' @param verbose `TRUE` ou `FALSE`. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (`dt_source`). Utile pour suivre le déroulement de l'extraction.
 #'
 #' @return `data.table` de 4 variables :
 #' * **`ID`** : Numéro d'identification de l'usager.
@@ -32,7 +34,7 @@ SQL_comorbidity_diagn <- function(
   conn, uid, pwd,
   cohort, debut, fin,
   method = c("Charlson", "Elixhauser"),
-  CIM = c("CIM9", "CIM10"), CIM_score = "CIM10",
+  CIM = c("CIM9", "CIM10"),
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM",
                 "V_EPISO_SOIN_DURG_CM", "I_SMOD_SERV_MD_CM"),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
@@ -92,16 +94,27 @@ SQL_comorbidity_diagn <- function(
     DT <- vector("list", length(dt_source) * length(diagn_codes))  # contiendra toutes les requêtes
     i <- 1L
     for (sour in dt_source) {
-      print(sour)
-      fct <- get(paste0("SQL_diagn.",sour))  # fonction d'extraction selon la source
+      if (verbose) {
+        cat(sour)
+      }
+      fct <- get(paste0("SQL_comorbidity_diagn.",sour))  # fonction d'extraction selon la source
       for (dia in names(diagn_codes)) {
-        print(paste0(" - ",dia))
+        t1 <- Sys.time()
         DT[[i]] <- fct(  # tableau provenant de la requête
           conn = conn, ids = cohort, diagn = diagn_codes[[dia]],
           debut = debut, fin = fin,
           diag_desc = dia, sourc_desc = dt_desc[[sour]]
         )
+        t2 <- Sys.time()
         i <- i + 1L
+        # Afficher le temps d'exécution
+        if (verbose) {
+          cat(" - ",dia,
+              " (",round(as.numeric(difftime(t2, t1)), 2),
+              " ",attr(difftime(t2, t1), "units"), ")",
+              sep = "")
+
+        }
       }
     }
     DT <- data.table::rbindlist(DT)  # regrouper tous les tableaux en un seul
@@ -111,14 +124,14 @@ SQL_comorbidity_diagn <- function(
 
 }
 
-SQL_diagn.verif_args <- function(conn, uid, pwd, cohort, debut, fin, diagn_codes,
+SQL_comorbidity_diagn.verif_args <- function(conn, uid, pwd, cohort, debut, fin, diagn_codes,
                                  dt_source, dt_desc) {
   ### Vérification des arguments initiaux
 
 }
 #' @keywords internal
 #' @import data.table
-SQL_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
   ### Requête SQL pour extraire les diagnostiques de la vue V_DIAGN_SEJ_HOSP_CM
   ### @conn = Connexion teradata.
   ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
@@ -174,7 +187,7 @@ SQL_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_des
 }
 #' @keywords internal
 #' @import data.table
-SQL_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
   ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
   ### @conn = Connexion teradata.
   ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
@@ -229,7 +242,7 @@ SQL_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc
 }
 #' @keywords internal
 #' @import data.table
-SQL_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
   ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
   ### @conn = Connexion teradata.
   ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
@@ -285,7 +298,7 @@ SQL_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc,
 }
 #' @keywords internal
 #' @import data.table
-SQL_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
+SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
   ### Requête SQL pour extraire les diagnostiques de la vue V_SEJ_SERV_HOSP_CM
   ### @conn = Connexion teradata.
   ### @ids = Vecteur contenant les numéros des identifiants (cohorte).

@@ -26,3 +26,4 @@ Utiliser l'argument \code{n_chunks} ou \code{n_vals}, pas les deux.
 chunk_vec(x = 1:10, n_chunks = 3)
 chunk_vec(x = 1:10, n_vals = 3)
 }
+\keyword{internal}

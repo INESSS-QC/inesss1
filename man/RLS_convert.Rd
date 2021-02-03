@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{RLS_convert}
 \alias{RLS_convert}
-\title{Correspondance RLS Loi 10}
+\title{Data - Correspondance RLS Loi 10}
 \format{
 Tableau de 2 variables et 84 observations :
 \describe{
