@@ -19,7 +19,8 @@ params:
 \fancyhead[RE,RO]{\leftmark}
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, results = "asis")
+knitr::opts_chunk$set(echo = FALSE, results = "asis",
+                      warning = FALSE, message = FALSE)
 library(inesss)
 library(data.table)
 library(kableExtra)
