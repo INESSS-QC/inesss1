@@ -39,7 +39,8 @@ Librairies
 ----------
 
 `askpass` v.1.1<br> `data.table` v.1.13.4<br> `DBI` v.1.1.0<br> `fs`
-v.1.5.0<br> `lubridate` v.1.7.9.2<br> `miniUI` v.0.1.1.1<br> `odbc`
-v.1.3.0<br> `readxl` v.1.3.1<br> `rstudioapi` v.0.13<br> `shiny`
-v.1.5.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
-`stringr` v.1.4.0<br> `testthat` v.3.0.1<br> `writexl` v.1.3.1
+v.1.5.0<br> `knitr` v.1.30<br> `lubridate` v.1.7.9.2<br> `miniUI`
+v.0.1.1.1<br> `odbc` v.1.3.0<br> `readxl` v.1.3.1<br> `rmarkdown`
+v.2.6<br> `rstudioapi` v.0.13<br> `shiny` v.1.5.0<br> `shinydashboard`
+v.0.7.1<br> `shinyFiles` v.0.9.0<br> `stringr` v.1.4.0<br> `testthat`
+v.3.0.1<br> `writexl` v.1.3.1
