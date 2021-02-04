@@ -17,7 +17,7 @@ Comorbidity_diagn_codes <- list(
   ),
 
   # Alcohol abuse
-  alcool = list(
+  alcohol = list(
     CIM9 = c(2652, 2911:2913, 2915:2919, 303, 3050, 3575, 4255,
              5353, 5710:5713, 980),
     CIM10 = c("F10", "E52", "G621", "I426",
@@ -305,7 +305,7 @@ Elixhauser_diagn_codes <- list(
   # AIDS/HIV
   aids = Comorbidity_diagn_codes$aids,
   # Alcohol abuse
-  alcool = Comorbidity_diagn_codes$alcool,
+  alcohol = Comorbidity_diagn_codes$alcohol,
   # Blood loss anemina
   blane = Comorbidity_diagn_codes$blane,
   # Cancer (without metastasis)

@@ -5,7 +5,7 @@
 \alias{comorbidity.confirm_diagn}
 \title{Comorbidity}
 \usage{
-comorbidity.confirm_diagn(dt, n1, n2, confirm_sources)
+comorbidity.confirm_diagn(dt, n1, n2, confirm_sourc)
 }
 \value{
 \code{data.table} de 6 colonnes :

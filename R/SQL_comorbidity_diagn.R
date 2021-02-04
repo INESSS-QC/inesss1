@@ -95,7 +95,7 @@ SQL_comorbidity_diagn <- function(
     i <- 1L
     for (sour in dt_source) {
       if (verbose) {
-        cat(sour)
+        cat(sour, "\n")
       }
       fct <- get(paste0("SQL_comorbidity_diagn.",sour))  # fonction d'extraction selon la source
       for (dia in names(diagn_codes)) {
@@ -111,15 +111,19 @@ SQL_comorbidity_diagn <- function(
         if (verbose) {
           cat(" - ",dia,
               " (",round(as.numeric(difftime(t2, t1)), 2),
-              " ",attr(difftime(t2, t1), "units"), ")",
+              " ",attr(difftime(t2, t1), "units"), ")\n",
               sep = "")
 
         }
       }
     }
     DT <- data.table::rbindlist(DT)  # regrouper tous les tableaux en un seul
-    setkey(DT)  # tri
+
+    if (nrow(DT)) {
+      setkey(DT)  # tri
+    }
     return(DT)
+
   }
 
 }

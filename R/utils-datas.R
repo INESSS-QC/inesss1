@@ -22,6 +22,23 @@
 "Elixhauser_diagn_codes"
 
 
+# Comorbidity_weights -----------------------------------------------------
+
+#' Poids des codes de diagnostiques
+#'
+#' @format Tableau de 4 variables et 32 observations.
+#' \describe{
+#'   \item{DIAGN}{Identification du diagnostique (`chr`).}
+#'   \item{DIAGN_CODE}{Code de diagnostique utilisé utilisé dans la programmation (`chr`).}
+#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM (`int`).}
+#'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM (`int`).}
+#' }
+#' @usage data("Comorbidity_weights") / MaVariable <- Comorbidity_weights
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+"Comorbidity_weights"
+
+
 # Pop_QC ------------------------------------------------------------------
 
 #' Data - Estimations et projections de population comparables (1996-2041)
