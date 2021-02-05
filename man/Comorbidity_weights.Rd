@@ -4,12 +4,12 @@
 \encoding{UTF-8}
 \name{Comorbidity_weights}
 \alias{Comorbidity_weights}
-\title{Data - Poids des codes de diagnostiques}
+\title{Data - Poids des codes de diagnostics}
 \format{
 Tableau de 4 variables et 32 observations.
 \describe{
-\item{DIAGN}{Identification du diagnostique (\code{chr}).}
-\item{DIAGN_CODE}{Code de diagnostique utilisé utilisé dans la programmation (\code{chr}).}
+\item{DIAGN}{Identification du diagnostic (\code{chr}).}
+\item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation (\code{chr}).}
 \item{CIM9}{Poids utilisé pour la \emph{9e} révision du CIM (\code{int}).}
 \item{CIM10}{Poids utilisé pour la \emph{10e} révision du CIM (\code{int}).}
 }
@@ -18,9 +18,12 @@ Tableau de 4 variables et 32 observations.
 \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
 }
 \usage{
-data("Comorbidity_weights") / MaVariable <- Comorbidity_weights
+data('Comorbidity_weights') / MaVariable <- Comorbidity_weights
 }
 \description{
-Data - Poids des codes de diagnostiques
+Data - Poids des codes de diagnostics
+}
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
 }
 \keyword{datasets}

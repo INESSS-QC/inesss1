@@ -28,9 +28,9 @@ SQL_stat_gen1(
 
 \item{pwd}{Mot de passe associé à l'identifiant. Si \code{NULL}, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.}
 
-\item{debut}{Date de début de la période d'étude au format \code{'AAAA-MM-JJ'} (une seule valeur).}
+\item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{fin}{Date de fin de la période d'étude au format \code{'AAAA-MM-JJ'} (une seule valeur).}
+\item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
 \item{type_Rx}{Indique le type de code analysé :
 \itemize{
@@ -67,41 +67,41 @@ Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid}
 # Aucun group by
 dt1 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"), fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = NULL
+  debut = c('2017-01-01', '2018-01-01'), fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = NULL
 )
 # Codes - DENOM
 dt2 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes"
+  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes'
 )
 # Codes - DIN
 dt3 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DIN", codes = c(30848, 585092), group_by = "Codes"
+  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'Codes'
 )
 # Codes et Format
 dt4 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = c("Codes", "Format")
+  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = c('Codes', 'Format')
 )
 # Teneur
 dt5 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Teneur"
+  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Teneur'
 )
 
 ### Exclusion & Inclusion
 dt6 <- SQL_stat_gen1(
   conn = conn,
-  debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-  type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes",
-  code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-  code_list = c("03", "40", "41"), code_list_filtre = "Inclusion"
+  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = c('03', '40', '41'), code_list_filtre = 'Inclusion'
 )
 }
 }

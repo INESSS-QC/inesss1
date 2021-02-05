@@ -21,6 +21,6 @@ RLS_list <- as.integer(c(
 ))
 
 sort(RLS_list)
-attr(RLS_list, "Create") <- Sys.Date()  # date dr création
+attr(RLS_list, "MaJ") <- Sys.Date()  # date dr création
 
 use_data(RLS_list, overwrite = TRUE)

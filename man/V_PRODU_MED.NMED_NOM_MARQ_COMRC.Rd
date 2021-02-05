@@ -24,4 +24,7 @@ V_PRODU_MED.NMED_NOM_MARQ_COMRC
 \description{
 Nom sous lequel est commercialisé un produit pharmaceutique.
 }
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+}
 \keyword{datasets}

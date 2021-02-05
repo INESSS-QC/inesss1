@@ -40,9 +40,9 @@ SQL_comorbidity(
 
 \item{DATE_INDEX}{Nom de la colonne contenant la date index de chaque usager.}
 
-\item{method}{Extraire les diagnostiques associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
+\item{method}{Extraire les diagnostics associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
 
-\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostiques selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
+\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
 \item{scores}{\code{'CIM9'} ou \code{'CIM10'}. Nom de la colonne du dataset \code{Comorbidity_weights} à utiliser pour le calcul des indicateurs.}
 
@@ -56,11 +56,11 @@ SQL_comorbidity(
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
 
-\item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmé par un autre code dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
+\item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
 
 \item{obstetric_exclu}{\code{TRUE} ou \code{FALSE}. Si l'on doit exclure (\code{TRUE}) les diabètes et les hypertensions de type gestationnel. Voir Détails.}
 
-\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
+\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \value{
 \code{data.table} :
@@ -69,11 +69,11 @@ SQL_comorbidity(
 \item \code{Charlson} : Indicateur, seulement si \code{method} contient \code{'Charlson'}.
 \item \code{Elixhauser} : Indicateur, seulement si \code{method} contient \code{'Elixhauser'}.
 \item \code{Combined} : Indicateur, seulement si \code{method} contient \code{'Charlson'} et \code{'Elixhauser'}.
-\item Tous les diagnostiques ainsi que leur poids (score).
+\item Tous les diagnostics ainsi que leur poids (score).
 }
 }
 \description{
-Extraction des codes de diagnostiques CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
+Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 }
 \details{
 \strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr

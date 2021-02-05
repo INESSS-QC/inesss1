@@ -1,10 +1,10 @@
 #' Comorbidity
 #'
-#' Extraction des codes de diagnostiques CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
+#' Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 #'
-#' \strong{`conn`, `uid`, `pwd` :} Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
-#' \strong{`dt` :} Si un `ID` a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
-#' \strong{`obstetric_exclu` :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.
+#' \strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
+#' \strong{\code{dt} :} Si un `ID` a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
+#' \strong{\code{obstetric_exclu} :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.
 #'
 #' @inheritParams SQL_comorbidity_diagn
 #' @inheritParams comorbidity
@@ -19,20 +19,20 @@
 #' * `Charlson` : Indicateur, seulement si `method` contient `'Charlson'`.
 #' * `Elixhauser` : Indicateur, seulement si `method` contient `'Elixhauser'`.
 #' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.
-#' * Tous les diagnostiques ainsi que leur poids (score).
+#' * Tous les diagnostics ainsi que leur poids (score).
 #' @import data.table
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
   conn, uid, pwd,
   dt, ID, DATE_INDEX,
-  method = c("Charlson", "Elixhauser"), CIM = c("CIM9", "CIM10"), scores = "CIM10",
+  method = c('Charlson', 'Elixhauser'), CIM = c('CIM9', 'CIM10'), scores = 'CIM10',
   lookup = 2, n1 = 30, n2 = 730,
-  dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM",
-                "V_EPISO_SOIN_DURG_CM", "I_SMOD_SERV_MD_CM"),
-  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
-                 V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
-  confirm_sourc = list("MED-ECHO" = 1, "BDCU" = 2, "SMOD" = 2),
+  dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
+                'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MED-ECHO', V_SEJ_SERV_HOSP_CM = 'MED-ECHO',
+                 V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
+  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
   obstetric_exclu = TRUE,
   verbose = TRUE
 ) {
@@ -77,7 +77,7 @@ SQL_comorbidity <- function(
       dt <- dt[dt[, .I[1], .(ID)]$V1]
     }
 
-    ### Extraction des diagnostiques dans les années désirées
+    ### Extraction des diagnostics dans les années désirées
     DIAGN <- SQL_comorbidity_diagn(
       conn, uid = NULL, pwd = NULL,
       cohort = sunique(dt$ID),
@@ -89,7 +89,7 @@ SQL_comorbidity <- function(
     )
 
     ### Filtrer dt pour en faire l'analyse
-    # Supprimer les diagnostiques qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
+    # Supprimer les diagnostics qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
     dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
     dt <- dt[DATE_INDEX - lubridate::years(lookup) - n1 <= DATE_DX & DATE_DX <= DATE_INDEX]
     # Supprimer les dates < (DATE_INDEX - lookup) dont la source a une confirmation = 1
@@ -126,8 +126,8 @@ SQL_comorbidity <- function(
 #' @import data.table
 #' @encoding UTF-8
 SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, verbose) {
-  ### Supprimer les cas de diabètes de grosses. Un diagnostique de diabète sera
-  ### supprimé s'il se trouve 120 jours avant le diagnostique et 180 jours après.
+  ### Supprimer les cas de diabètes de grosses. Un diagnostic de diabète sera
+  ### supprimé s'il se trouve 120 jours avant le diagnostic et 180 jours après.
 
   ### Cas de diabète & hypertension
   dt_diab_hyp <- unique(dt[  # un seul cas par ID + DIAGN + DATE

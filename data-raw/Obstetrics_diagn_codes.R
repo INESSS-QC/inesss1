@@ -16,4 +16,5 @@ for (i in 1:length(Obstetrics_diagn_codes)) {
   }
 }
 
+attr(Obstetrics_diagn_codes, "MaJ") <- Sys.Date()
 use_data(Obstetrics_diagn_codes, overwrite = TRUE)

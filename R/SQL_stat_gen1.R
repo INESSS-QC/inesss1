@@ -18,50 +18,50 @@
 #' # Aucun group by
 #' dt1 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"), fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = NULL
+#'   debut = c('2017-01-01', '2018-01-01'), fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = NULL
 #' )
 #' # Codes - DENOM
 #' dt2 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes'
 #' )
 #' # Codes - DIN
 #' dt3 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DIN", codes = c(30848, 585092), group_by = "Codes"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'Codes'
 #' )
 #' # Codes et Format
 #' dt4 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = c("Codes", "Format")
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = c('Codes', 'Format')
 #' )
 #' # Teneur
 #' dt5 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Teneur"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Teneur'
 #' )
 #'
 #' ### Exclusion & Inclusion
 #' dt6 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes",
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-#'   code_list = c("03", "40", "41"), code_list_filtre = "Inclusion"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+#'   code_list = c('03', '40', '41'), code_list_filtre = 'Inclusion'
 #' )
 #' }
 SQL_stat_gen1 <- function(
   conn, uid, pwd,
   debut, fin,
-  type_Rx = "DENOM", codes,
-  group_by = "Codes",
-  code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-  code_list = NULL, code_list_filtre = "Inclusion",
+  type_Rx = 'DENOM', codes,
+  group_by = 'Codes',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = NULL, code_list_filtre = 'Inclusion',
   ...
 ) {
 

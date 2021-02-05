@@ -23,7 +23,7 @@ comorbidity(
 
 \item{ID}{Nom de la colonne indiquant le numéro de l'usager, de l'individu.}
 
-\item{DIAGN}{Nom de la colonne indiquant le code d'un diagnostic. Voir \code{names(inesss::Comorbidity_diagn_codes)}.}
+\item{DIAGN}{Nom de la colonne indiquant le code d'un diagnostic.\cr Voir \code{names(inesss::Comorbidity_diagn_codes)}.}
 
 \item{DATE_DX}{Nom de la colonne indiquant la date du diagnostic.}
 
@@ -35,10 +35,10 @@ comorbidity(
 
 \item{scores}{\code{'CIM9'} ou \code{'CIM10'}. Nom de la colonne du dataset \code{Comorbidity_weights} à utiliser pour le calcul des indicateurs.}
 
-\item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmé par un autre code dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
+\item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
 }
 \value{
-\code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnostiques indiquant leur poids.
+\code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnosti indiquant leur poids.
 }
 \description{
 Calcul des indicateurs de \emph{Charlson}, \emph{Elixhauser} et la combinaison des deux.

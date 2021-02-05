@@ -9,4 +9,5 @@ Comorbidity_weights[, `:=` (CIM9 = as.integer(CIM9),
                             CIM10 = as.integer(CIM10))]
 setkey(Comorbidity_weights, DIAGN_CODE)
 
+attr(Comorbidity_weights, "MaJ") <- Sys.Date()
 use_data(Comorbidity_weights, overwrite = TRUE)

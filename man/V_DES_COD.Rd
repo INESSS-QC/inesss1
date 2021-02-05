@@ -24,4 +24,7 @@ V_DES_COD
 \description{
 Domaine de valeurs pour les différents codes de l'environnement informationnel.
 }
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+}
 \keyword{datasets}

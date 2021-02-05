@@ -2,14 +2,14 @@
 #'
 #' Générateur de code SQL pour la méthode `stat_gen1`.
 #'
-#' **Méthode `stat_gen1` :**\cr
+#' \strong{Méthode `stat_gen1` :}\cr
 #' Statistiques descriptives tirées de la vue `V_DEM_PAIMT_MED_CM`.\cr\cr
-#' **`group_by` :** Revient à utiliser la commande `group by` dans le code SQL.\cr\cr
-#' **`code_serv_filtre`, `code_list_filtre` :**\cr
-#' `"Exclusion"` : Inclus les `NULL`, `"Inclusion"` exclus les `NULL`.
+#' \strong{`group_by` :} Revient à utiliser la commande `group by` dans le code SQL.\cr\cr
+#' \strong{`code_serv_filtre`, `code_list_filtre` :}\cr
+#' `"Exclusion"` : Inclus les `NULL`, `'Inclusion'` exclus les `NULL`.
 #'
-#' @param debut Date de début de la période d'étude au format `'AAAA-MM-JJ'` (une seule valeur).
-#' @param fin Date de fin de la période d'étude au format `'AAAA-MM-JJ'` (une seule valeur).
+#' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
+#' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
 #' @param type_Rx Indique le type de code analysé :
 #' * `'DENOM'` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
 #' * `'DIN'` : Code d'identification du médicament (`SMED_COD_DIN`).
@@ -30,54 +30,54 @@
 #' ### Avantages d'utiliser cat() si c'est pour afficher du code dans la console.
 #' # Avec cat()
 #' cat(query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222), group_by = "Codes",
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222), group_by = 'Codes',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
 #' ))
 #' # Sans cat()
 #' query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222), group_by = "Codes",
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222), group_by = 'Codes',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
 #' )
 #'
 #' ### GROUP_BY
 #' # group_by = NULL : resultats par periode d'etude.
 #' cat(query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
 #'   group_by = NULL,
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
 #' ))
-#' # group_by = "Codes" : resultats par code d'analyse.
+#' # group_by = 'Codes' : resultats par code d'analyse.
 #' cat(query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
-#'   group_by = "Codes",
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
+#'   group_by = 'Codes',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
 #' ))
-#' # group_by = c("Teneur", "Format") : resultats par teneur et format.
+#' # group_by = c('Teneur', 'Format') : resultats par teneur et format.
 #' cat(query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
-#'   group_by = c("Teneur", "Format"),
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion"
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
+#'   group_by = c('Teneur', 'Format'),
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
 #' ))
 #'
 #' ### Exclusion VS Inclusion
 #' cat(query_stat_gen1(
-#'   debut = "2020-01-01", fin = "2020-12-31",
-#'   type_Rx = "DENOM", codes = c(47092, 47135, 48222),
+#'   debut = '2020-01-01', fin = '2020-12-31',
+#'   type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
 #'   group_by = NULL,
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-#'   code_list = c("40", "41"), code_list_filtre = "Inclusion"
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+#'   code_list = c('40', '41'), code_list_filtre = 'Inclusion'
 #' ))
 query_stat_gen1 <- function(
   debut, fin,
-  type_Rx = "DENOM", codes,
-  group_by = "Codes",
-  code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-  code_list = NULL, code_list_filtre = "Inclusion",
+  type_Rx = 'DENOM', codes,
+  group_by = 'Codes',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = NULL, code_list_filtre = 'Inclusion',
   ...
 ) {
 

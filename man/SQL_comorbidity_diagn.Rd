@@ -30,31 +30,31 @@ SQL_comorbidity_diagn(
 
 \item{cohort}{Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.}
 
-\item{debut}{Date de début de la période d'étude au format \code{'AAAA-MM-JJ'}.}
+\item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ}.}
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{method}{Extraire les diagnostiques associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
+\item{method}{Extraire les diagnostics associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
 
-\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostiques selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
+\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
 
-\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
+\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \value{
 \code{data.table} de 4 variables :
 \itemize{
 \item \strong{\code{ID}} : Numéro d'identification de l'usager.
-\item \strong{\code{DATE_DX}} : Date de diagnostique.
-\item \strong{\code{DIAGN}} : Code descriptif des diagnostiques provenant de \code{diagn_codes}.
+\item \strong{\code{DATE_DX}} : Date de diagnostic.
+\item \strong{\code{DIAGN}} : Code descriptif des diagnostics provenant de \code{diagn_codes}.
 \item \strong{\code{SOURCE}} : Indique d'où provient l'information. Une valeur parmi \code{dt_source}.
 }
 }
 \description{
-Extraction SQL des diagnostiques pour l'étude de la comorbidité.
+Extraction SQL des diagnostics pour l'étude de la comorbidité.
 }
 \details{
 \strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr
@@ -66,5 +66,5 @@ Extraction SQL des diagnostiques pour l'étude de la comorbidité.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 }
 
-\strong{\code{method} :} Voir les listes \code{LINK} pour connaître les codes de diagnostiques extraits.
+\strong{\code{method} :} Voir les listes \link{Comorbidity_diagn_codes} pour connaître les codes de diagnostics extraits.
 }

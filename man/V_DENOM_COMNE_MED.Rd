@@ -26,4 +26,7 @@ V_DENOM_COMNE_MED
 \description{
 Description des codes de dénomination commune.
 }
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+}
 \keyword{datasets}

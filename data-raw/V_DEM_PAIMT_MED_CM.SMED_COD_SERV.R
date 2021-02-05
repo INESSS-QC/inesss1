@@ -64,7 +64,7 @@ fct <- function(need_conn = FALSE) {
   ### Arrangements finaux
   setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
   DT[, COD_SERV := str_remove_all(COD_SERV, " ")]  # supprimer espaces
-  attr(DT, "Date") <- Sys.Date()  # date de création
+  attr(DT, "MaJ") <- Sys.Date()  # date de création
 
   return(DT)
 

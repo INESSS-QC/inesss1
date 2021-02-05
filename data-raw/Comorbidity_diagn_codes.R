@@ -382,6 +382,10 @@ for (k in c("Comorbidity_diagn_codes", "Charlson_diagn_codes", "Elixhauser_diagn
 
 # Save datas --------------------------------------------------------------
 
+attr(Comorbidity_diagn_codes, "MaJ") <- Sys.Date()
+attr(Charlson_diagn_codes, "MaJ") <- Sys.Date()
+attr(Elixhauser_diagn_codes, "MaJ") <- Sys.Date()
+
 use_data(Comorbidity_diagn_codes,
          Charlson_diagn_codes,
          Elixhauser_diagn_codes,

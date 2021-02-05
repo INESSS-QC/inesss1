@@ -28,17 +28,17 @@ SQL_obstetric(
 
 \item{cohort}{Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.}
 
-\item{debut}{Date de début de la période d'étude au format \code{'AAAA-MM-JJ'}.}
+\item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ}.}
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostiques selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
+\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
 
-\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
+\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \description{
 Extraction des événements obstétriques.

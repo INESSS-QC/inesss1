@@ -12,9 +12,9 @@ SQL_connexion(uid, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1")
 
 \item{pwd}{Mot de passe. Si \code{NULL}, le mot de passe est demandé lors de l'exécution.}
 
-\item{dsn}{\strong{D}ata \strong{S}ource \strong{N}ame. Par défaut \code{"PEI_PRD"}.}
+\item{dsn}{\strong{D}ata \strong{S}ource \strong{N}ame. Par défaut \code{'PEI_PRD'}.}
 
-\item{encoding}{\code{"latin1"} ou \code{"UTF-8"}. Encodage de la base de données. Par défaut \code{"latin1"}.}
+\item{encoding}{\code{'latin1'} ou \code{'UTF-8'}. Encodage de la base de données. Par défaut \code{'latin1'}.}
 }
 \value{
 Connexion Teradata, sinon \code{NULL}.
@@ -27,7 +27,7 @@ Voir \code{?odbc::dbConnect}.
 }
 \examples{
 \dontrun{
-conn <- SQL_connexion("abc007")
-conn <- SQL_connexion(uid = "abc007", pwd = "MonMotDePasse", dsn = "PEI_PRD")
+conn <- SQL_connexion('abc007')
+conn <- SQL_connexion(uid = 'abc007', pwd = 'MonMotDePasse', dsn = 'PEI_PRD')
 }
 }

@@ -44,7 +44,7 @@ fct <- function(need_conn = FALSE) {
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
 
-  attr(DT, "Date") <- Sys.Date()  # date de création
+  attr(DT, "MaJ") <- Sys.Date()  # date de création
   return(DT)
 
 }

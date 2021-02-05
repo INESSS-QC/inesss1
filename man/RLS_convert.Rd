@@ -17,14 +17,15 @@ Tableau de 2 variables et 84 observations :
 \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
 }
 \usage{
-data("RLS_convert") / MaVariable <- RLS_convert.
+data('RLS_convert') / MaVariable <- RLS_convert.
 }
 \description{
 Établir la correspondance des RLS avant et après l'adoption de la loi 10.
 }
 \details{
-Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr\cr
-\code{attr(RLS_convert, "RLS_exclus")} indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr\cr
-\code{attr(RLS_convert, "RLS_exclus_value")} renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.
+Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr
+\code{attr(RLS_convert, "RLS_exclus")} indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr
+\code{attr(RLS_convert, "RLS_exclus_value")} renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.\cr\cr
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
 }
 \keyword{datasets}
