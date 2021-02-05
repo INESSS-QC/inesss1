@@ -2,7 +2,9 @@
 #'
 #' Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.
 #'
-#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
+#' Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.
+#'
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
 #' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
 #' @param pwd Mot de passe associé à l'identifiant. Si `NULL`, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.
 #' @inheritParams query_stat_gen1
@@ -54,7 +56,7 @@
 #' )
 #' }
 SQL_stat_gen1 <- function(
-  conn = NULL, uid = NULL, pwd = NULL,
+  conn, uid, pwd,
   debut, fin,
   type_Rx = "DENOM", codes,
   group_by = "Codes",
@@ -62,6 +64,16 @@ SQL_stat_gen1 <- function(
   code_list = NULL, code_list_filtre = "Inclusion",
   ...
 ) {
+
+  if (missing(conn)) {
+    conn <- NULL
+  }
+  if (missing(uid)) {
+    uid <- NULL
+  }
+  if (missing(pwd)) {
+    pwd <- NULL
+  }
 
   ### Vérification des arguments
   ### Seulement conn & uid - les autres sont vérifiés dans la fonction query_stat_gen1()
@@ -75,7 +87,7 @@ SQL_stat_gen1 <- function(
 
   ### Demander le mot de passe si pas inscrit
   if (is.null(conn) && is.null(pwd)) {
-    pwd <- askpass::askpass("Quel est votre mot de passe")
+    pwd <- askpass::askpass("Quel est votre mot de passe?")
   }
 
   ### Arranger les arguments

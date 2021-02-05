@@ -1,4 +1,9 @@
 library(usethis)
+
+
+# fct_values --------------------------------------------------------------
+### Valeurs possible des arguments des fonctions
+
 fct_values <- list(
 
   ### STAT_GEN1
