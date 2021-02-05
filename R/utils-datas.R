@@ -8,7 +8,7 @@
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @encoding UTF-8
-#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
 #' @name Comorbidity_diagn_codes
 
 #' @rdname Comorbidity_diagn_codes
@@ -39,7 +39,7 @@
 #' }
 #' @usage data('Comorbidity_weights') / MaVariable <- Comorbidity_weights
 #' @encoding UTF-8
-#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
 "Comorbidity_weights"
 
 

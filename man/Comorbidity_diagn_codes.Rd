@@ -15,7 +15,7 @@
 \code{list(nom_diagn = list(CIM9, CIM10))}. 29 diagnostics.
 }
 \source{
-\href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+\href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
 }
 \usage{
 Comorbidity_diagn_codes

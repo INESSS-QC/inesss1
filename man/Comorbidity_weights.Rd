@@ -15,7 +15,7 @@ Tableau de 4 variables et 32 observations.
 }
 }
 \source{
-\href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+\href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
 }
 \usage{
 data('Comorbidity_weights') / MaVariable <- Comorbidity_weights
