@@ -1,7 +1,7 @@
 Librairie [`inesss` v.0.5.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.5.0
+### [v0.5.0](https://github.com/INESSS-QC/inesss1/pull/10)
 
 -   Fonction `SQL_comorbidity`.
 -   Fonction `SQL_comorbidity_diagn`.
