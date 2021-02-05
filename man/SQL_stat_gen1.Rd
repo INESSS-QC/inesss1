@@ -22,7 +22,6 @@ SQL_stat_gen1(
 )
 }
 \arguments{
-  
 \item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments \code{uid} et \code{pwd}.}
 
 \item{uid}{Nom de l'identifiant pour la connexion SQL Teradata.}
