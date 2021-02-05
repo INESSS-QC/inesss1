@@ -2,7 +2,7 @@
 % Please edit documentation in R/SQL_obstetric.R
 \name{SQL_obstetric}
 \alias{SQL_obstetric}
-\title{Diagn Obstetric}
+\title{Extraction - Codes diagn obstetriques}
 \usage{
 SQL_obstetric(
   conn,
@@ -14,6 +14,8 @@ SQL_obstetric(
   CIM = c("CIM9", "CIM10"),
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM", "V_EPISO_SOIN_DURG_CM",
     "I_SMOD_SERV_MD_CM"),
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
+    V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   verbose = TRUE
 )
 }
@@ -34,11 +36,10 @@ SQL_obstetric(
 
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 
+\item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
+
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostiques d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
-\value{
-
-}
 \description{
-Extraction des événements obstétriques
+Extraction des événements obstétriques.
 }

@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_comorbidity_diagn}
 \alias{SQL_comorbidity_diagn}
-\title{Comorbidity -- Diagn}
+\title{Extraction - Codes diagn comorbidity}
 \usage{
 SQL_comorbidity_diagn(
   conn,

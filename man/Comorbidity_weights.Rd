@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Comorbidity_weights}
 \alias{Comorbidity_weights}
-\title{Poids des codes de diagnostiques}
+\title{Data - Poids des codes de diagnostiques}
 \format{
 Tableau de 4 variables et 32 observations.
 \describe{
@@ -21,6 +21,6 @@ Tableau de 4 variables et 32 observations.
 data("Comorbidity_weights") / MaVariable <- Comorbidity_weights
 }
 \description{
-Poids des codes de diagnostiques
+Data - Poids des codes de diagnostiques
 }
 \keyword{datasets}

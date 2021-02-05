@@ -1,4 +1,4 @@
-#' Comorbidity -- Diagn
+#' Extraction - Codes diagn comorbidity
 #'
 #' Extraction SQL des diagnostiques pour l'étude de la comorbidité.
 #'

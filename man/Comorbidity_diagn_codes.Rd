@@ -6,7 +6,7 @@
 \alias{Comorbidity_diagn_codes}
 \alias{Charlson_diagn_codes}
 \alias{Elixhauser_diagn_codes}
-\title{Codes diagnostiques}
+\title{Data - Codes diagnostiques}
 \format{
 \code{list(nom_diagn = list(CIM9, CIM10))}. 32 diagnostics.
 
@@ -25,6 +25,6 @@ Charlson_diagn_codes
 Elixhauser_diagn_codes
 }
 \description{
-Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostiques pour l'étude de la comorbisité.
+Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostiques pour l'étude de la comorbidité.
 }
 \keyword{datasets}

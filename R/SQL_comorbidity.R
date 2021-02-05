@@ -1,6 +1,27 @@
 #' Comorbidity
 #'
+#' Extraction des codes de diagnostiques CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
+#'
+#' \strong{`conn`, `uid`, `pwd` :} Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
+#' \strong{`dt` :} Si un `ID` a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
+#' \strong{`obstetric_exclu` :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.
+#'
+#' @inheritParams SQL_comorbidity_diagn
+#' @inheritParams comorbidity
+#' @param dt Tableau ayant au moins deux colonnes : `ID` et `DATE_INDEX`.
+#' @param ID Nom de la colonne contenant l’identifiant unique de l’usager.
+#' @param DATE_INDEX Nom de la colonne contenant la date index de chaque usager.
+#' @param lookup Nombre entier. Années à analyser avant la date index de chaque individu.
+#' @param obstetric_exclu `TRUE` ou `FALSE`. Si l'on doit exclure (`TRUE`) les diabètes et les hypertensions de type gestationnel. Voir Détails.
+#'
+#' @return `data.table` :
+#' * `ID` : Colonne contenant l’identifiant unique de l’usager.
+#' * `Charlson` : Indicateur, seulement si `method` contient `'Charlson'`.
+#' * `Elixhauser` : Indicateur, seulement si `method` contient `'Elixhauser'`.
+#' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.
+#' * Tous les diagnostiques ainsi que leur poids (score).
 #' @import data.table
+#' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
   conn, uid, pwd,
@@ -46,8 +67,14 @@ SQL_comorbidity <- function(
     }
     dt <- dt[, c(ID, DATE_INDEX), with = FALSE]  # sélection des colonnes
     setnames(dt, names(dt), c("ID", "DATE_INDEX"))  # renommer les colonnes
+    setkey(dt)
     if (!lubridate::is.Date(dt$DATE_INDEX)) {
       dt[, DATE_INDEX := lubridate::as_date(DATE_INDEX)]  # convertir au format date
+    }
+    # Conserver la première date index de chaque ID s'ils ne sont pas unique
+    idx <- rmNA(dt[, .I[.N > 1], .(ID)]$V1)
+    if (length(idx)) {
+      dt <- dt[dt[, .I[1], .(ID)]$V1]
     }
 
     ### Extraction des diagnostiques dans les années désirées
@@ -63,9 +90,7 @@ SQL_comorbidity <- function(
 
     ### Filtrer dt pour en faire l'analyse
     # Supprimer les diagnostiques qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
-    dt <- DIAGN[dt, on = .(ID)]  # ajouter les diagn aux dates index
-    dt <- dt[!is.na(DATE_DX)]  # supprimer les ID qui n'ont pas de de cas
-    setkey(dt, ID, DATE_DX, DATE_INDEX)
+    dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
     dt <- dt[DATE_INDEX - lubridate::years(lookup) - n1 <= DATE_DX & DATE_DX <= DATE_INDEX]
     # Supprimer les dates < (DATE_INDEX - lookup) dont la source a une confirmation = 1
     sourc <- comorbidity.confirm_sourc_names(confirm_sourc, 1)
@@ -79,49 +104,55 @@ SQL_comorbidity <- function(
       }
     }
     # Exclusion des cas gestationnelles
-
+    if (obstetric_exclu) {
+      dt <- SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
+    }
 
     ### Calcul des scores
-    dt1 <- comorbidity(
+    dt <- comorbidity(
       dt, "ID", "DIAGN", "DATE_DX", "SOURCE", n1, n2,
       method, scores, confirm_sourc
     )
+
+    return(dt)
 
   }
 
 }
 
-SQL_comorbidity.exclu_diab_gross <- function(conn, dt, ids, debut, fin, CIM, dt_source, verbose) {
+#' @title SQL_comorbidity
+#' @description Exclusion des cas de diabète et d'hypertension gestationnel.
+#' @keywords internal
+#' @import data.table
+#' @encoding UTF-8
+SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, verbose) {
   ### Supprimer les cas de diabètes de grosses. Un diagnostique de diabète sera
   ### supprimé s'il se trouve 120 jours avant le diagnostique et 180 jours après.
 
-  dt_diab_hyp <- unique(dt[DIAGN %in% c("diab", "diabwc", "hyp"), .(ID, DATE_DX, DIAGN)])
+  ### Cas de diabète & hypertension
+  dt_diab_hyp <- unique(dt[  # un seul cas par ID + DIAGN + DATE
+    DIAGN %in% c("diab", "diabwc", "hyp"),  # cas de diabète ou d'hypertension
+    .(ID, DATE_DX, DIAGN)  # colonnes
+  ])
+
+  ### Extraction des cas de grossesses
   dt_gross <- SQL_obstetric(
     conn, uid = NULL, pwd = NULL,
-    cohort = dt$ID,
-    debut = min(dt_diab_hyp$DATE_DX - 180), fin = max(dt_diab_hyp$DATE_DX) + 120,
-    CIM, dt_source, verbose
+    cohort = sunique(dt_diab_hyp$ID),
+    debut = min(dt_diab_hyp$DATE_DX) - 180, fin = max(dt_diab_hyp$DATE_DX) + 120,
+    CIM, dt_source, dt_desc, verbose
   )
-  dt_gross <- unique(dt_gross[, .(ID, DATE_OBSTE = DATE_DX)])
-  dt_diab_hyp <- dt_gross[dt_diab_hyp, on = .(ID), allow.cartesian = TRUE]
-  dt_diab_hyp <- dt_diab_hyp[
-    !is.na(DATE_OBSTE) &
-      DATE_OBSTE + 180 >= DATE_DX & DATE_DX >= DATE_OBSTE - 120
+
+  ### Arranger le data pour exclusion des diabètes et hypertension de grossesses
+  dt_gross <- unique(dt_gross[, .(ID, DATE_OBSTE = DATE_DX)])  # un seul cas par ID + DATE
+  dt_diab_hyp <- dt_gross[dt_diab_hyp, on = .(ID), nomatch = 0]  # combinaison {diab, hyp} + {obstetric}
+  dt_diab_hyp <- dt_diab_hyp[  # supprimer les diagn qui ont au moins un cas de grossesse [-120; 180] jours.
+    !is.na(DATE_OBSTE) &  # n'a pas de cas de grosseses
+      DATE_OBSTE + 180 >= DATE_DX & DATE_DX >= DATE_OBSTE - 120  # cas où l'obstetric annule le diab ou l'hyp
   ]
-  dt_diab_hyp <- unique(dt_diab_hyp[, .(ID, DATE_DX, DIAGN)])
-  dt <- dt[!dt_diab_hyp, on = .(ID, DATE_DX, DIAGN)]
+  dt_diab_hyp <- unique(dt_diab_hyp[, .(ID, DATE_DX, DIAGN)])  # un seul cas par date et diagn
+  dt <- dt[!dt_diab_hyp, on = .(ID, DATE_DX, DIAGN)]  # exclure de dt les observations qui sont présentes dans dt_diab_hyp
 
   return(dt)
 
 }
-
-dt <- readRDS("C:/Users/ms045/Desktop/Github/INESSS-QC_inesss1/data-fake/diagnostiques.rds")
-setkey(dt, ID, DIAGN, DATE_DX)
-dt <- dt[dt[, .I[1], .(ID, DATE_DX, DIAGN)]$V1]
-dt_gross <- readRDS("C:/Users/ms045/Desktop/Github/INESSS-QC_inesss1/data-fake/diagnostiques_obstetric.rds")
-
-
-
-
-
-

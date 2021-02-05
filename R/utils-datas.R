@@ -1,9 +1,9 @@
 
 # Comorbidity_diagn_codes -------------------------------------------------
 
-#' Codes diagnostiques
+#' Data - Codes diagnostiques
 #'
-#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostiques pour l'étude de la comorbisité.
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostiques pour l'étude de la comorbidité.
 #'
 #' @encoding UTF-8
 #' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
@@ -24,7 +24,7 @@
 
 # Comorbidity_weights -----------------------------------------------------
 
-#' Poids des codes de diagnostiques
+#' Data - Poids des codes de diagnostiques
 #'
 #' @format Tableau de 4 variables et 32 observations.
 #' \describe{
