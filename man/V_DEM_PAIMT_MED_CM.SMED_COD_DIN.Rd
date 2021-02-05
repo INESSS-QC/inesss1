@@ -22,4 +22,7 @@ V_DEM_PAIMT_MED_CM.SMED_COD_DIN
 \description{
 Codes d'identification des médicaments (\code{SMED_COD_DIN}) qui sont présents dans la vue \code{V_DEM_PAIMT_MED_CM}.
 }
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+}
 \keyword{datasets}

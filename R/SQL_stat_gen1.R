@@ -2,7 +2,9 @@
 #'
 #' Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.
 #'
-#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
+#' Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.
+#'
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
 #' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
 #' @param pwd Mot de passe associé à l'identifiant. Si `NULL`, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.
 #' @inheritParams query_stat_gen1
@@ -16,52 +18,62 @@
 #' # Aucun group by
 #' dt1 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"), fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = NULL
+#'   debut = c('2017-01-01', '2018-01-01'), fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = NULL
 #' )
 #' # Codes - DENOM
 #' dt2 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes'
 #' )
 #' # Codes - DIN
 #' dt3 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DIN", codes = c(30848, 585092), group_by = "Codes"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'Codes'
 #' )
 #' # Codes et Format
 #' dt4 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = c("Codes", "Format")
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = c('Codes', 'Format')
 #' )
 #' # Teneur
 #' dt5 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Teneur"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Teneur'
 #' )
 #'
 #' ### Exclusion & Inclusion
 #' dt6 <- SQL_stat_gen1(
 #'   conn = conn,
-#'   debut = c("2017-01-01", "2018-01-01"),fin = c("2017-12-31", "2018-12-31"),
-#'   type_Rx = "DENOM", codes = c(39, 47092, 48222), group_by = "Codes",
-#'   code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-#'   code_list = c("03", "40", "41"), code_list_filtre = "Inclusion"
+#'   debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+#'   code_list = c('03', '40', '41'), code_list_filtre = 'Inclusion'
 #' )
 #' }
 SQL_stat_gen1 <- function(
-  conn = NULL, uid = NULL, pwd = NULL,
+  conn, uid, pwd,
   debut, fin,
-  type_Rx = "DENOM", codes,
-  group_by = "Codes",
-  code_serv = c("1", "AD"), code_serv_filtre = "Exclusion",
-  code_list = NULL, code_list_filtre = "Inclusion",
+  type_Rx = 'DENOM', codes,
+  group_by = 'Codes',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = NULL, code_list_filtre = 'Inclusion',
   ...
 ) {
+
+  if (missing(conn)) {
+    conn <- NULL
+  }
+  if (missing(uid)) {
+    uid <- NULL
+  }
+  if (missing(pwd)) {
+    pwd <- NULL
+  }
 
   ### Vérification des arguments
   ### Seulement conn & uid - les autres sont vérifiés dans la fonction query_stat_gen1()
@@ -75,7 +87,7 @@ SQL_stat_gen1 <- function(
 
   ### Demander le mot de passe si pas inscrit
   if (is.null(conn) && is.null(pwd)) {
-    pwd <- askpass::askpass("Quel est votre mot de passe")
+    pwd <- askpass::askpass("Quel est votre mot de passe?")
   }
 
   ### Arranger les arguments

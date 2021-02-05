@@ -1,10 +1,23 @@
-## Librairie [`inesss` v.0.4.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.5.0](https://github.com/INESSS-QC/inesss1)
+------------------------------------------------------------------
+
+### v0.5.0
+
+-   Fonction `SQL_comorbidity`.
+-   Fonction `SQL_comorbidity_diagn`.
+-   Fonction `SQL_obstetric`.
+-   Fonction `comorbidity`.
+-   Data `Comorbidity_diagn_codes`.
+-   Data `Charlson_diagn_codes`.
+-   Data `Elixhauser_diagn_codes`.
+-   Data `Comorbidity_weights`.
+-   Data `Obstetrics_diagn_codes`.
 
 #### [v0.4.0](https://github.com/INESSS-QC/inesss1/pull/7)
 
 -   `query_stat_gen1()` remplace `stat_gen1_query()`.
--   `SQL_stat_gen1()` utilise l’argument *group_by* au lieu de
-    *result_by*. `group_by='Codes'` au lieu de `'Périodes'`.
+-   `SQL_stat_gen1()` utilise l’argument *group\_by* au lieu de
+    *result\_by*. `group_by='Codes'` au lieu de `'Périodes'`.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
 -   Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.
@@ -33,9 +46,9 @@
 -   Fonction `formulaire()`.
 -   Fonction `sql_connexion()`.
 -   Fonction `sql_stat_gen1()`.
--   Création du fichier *AIDE-FORMULAIRE_2021-01-06.pdf*.
--   Création du fichier *LISEZ-MOI_2021-01-06.pdf*.
--   Création du fichier *R_RTOOLS_INSTALLATION_2021-01-06.pdf*.
+-   Création du fichier *AIDE-FORMULAIRE\_2021-01-06.pdf*.
+-   Création du fichier *LISEZ-MOI\_2021-01-06.pdf*.
+-   Création du fichier *R\_RTOOLS\_INSTALLATION\_2021-01-06.pdf*.
 -   Exemples au format Excel. Voir fichiers
     *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx* et
     *AIDE-FORMULAIRES-EXEMPLES-RÉSULTATS.xlsx*.
@@ -43,4 +56,4 @@
 
 ### v0.1.1.9000
 
--   Documentation des datas *Pop_QC*, *RLS_convert* et *RLS_list*.
+-   Documentation des datas *Pop\_QC*, *RLS\_convert* et *RLS\_list*.

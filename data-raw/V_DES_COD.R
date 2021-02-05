@@ -28,7 +28,7 @@ fct <- function(need_conn = FALSE) {
              DATE_FIN = as_date(DATE_FIN))]
   setkey(DT, TYPE_CODE, CODE, DATE_DEBUT)  # tri
 
-  attr(DT, "Date") <- Sys.Date()  # date de création
+  attr(DT, "MaJ") <- Sys.Date()  # date de création
   return(DT)
 
 }

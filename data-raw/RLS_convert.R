@@ -19,6 +19,6 @@ setkey(DT, RLS15)  # tri
 RLS_convert <- copy(DT)
 attr(RLS_convert, "RLS_exclus") <- RLS_exclus
 attr(RLS_convert, "RLS_exclus_value") <- RLS_double
-attr(RLS_convert, "Create") <- Sys.Date()
+attr(RLS_convert, "MaJ") <- Sys.Date()
 
 use_data(RLS_convert, overwrite = TRUE)

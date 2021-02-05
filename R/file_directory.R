@@ -8,6 +8,7 @@
 #'
 #' @keywords internal
 #' @encoding UTF-8
+#' @export
 file_directory <- function(){
 
   path <- dirname(rstudioapi::getActiveDocumentContext()$path)

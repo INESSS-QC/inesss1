@@ -1,7 +1,51 @@
 
+# Comorbidity_diagn_codes -------------------------------------------------
+
+#' Data - Codes diagnostics
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+#' @name Comorbidity_diagn_codes
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 32 diagnostics.
+"Comorbidity_diagn_codes"
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 16 diagnostics.
+"Charlson_diagn_codes"
+
+#' @rdname Comorbidity_diagn_codes
+#' @format `list(nom_diagn = list(CIM9, CIM10))`. 29 diagnostics.
+"Elixhauser_diagn_codes"
+
+
+# Comorbidity_weights -----------------------------------------------------
+
+#' Data - Poids des codes de diagnostics
+#'
+#' @details L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
+#' @format Tableau de 4 variables et 32 observations.
+#' \describe{
+#'   \item{DIAGN}{Identification du diagnostic (`chr`).}
+#'   \item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation (`chr`).}
+#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM (`int`).}
+#'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM (`int`).}
+#' }
+#' @usage data('Comorbidity_weights') / MaVariable <- Comorbidity_weights
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{Ajouter lien}{Voir PDF.}
+"Comorbidity_weights"
+
+
 # Pop_QC ------------------------------------------------------------------
 
-#' Estimations et projections de population comparables (1996-2041)
+#' Data - Estimations et projections de population comparables (1996-2041)
 #'
 #' Tableau de la population québécoise par niveau géographique.\cr\cr
 #' Ce fichier présente une série continue de données populationnelles comparables composée de la série des estimations (1996-2019) et de la série des projections (2020-2041) de population. Ces données tiennent compte de l'évolution de la population selon les plus récentes données observées de naissances, décès et mouvements migratoires.\cr\cr
@@ -11,7 +55,8 @@
 #' **Mise en ligne** : 25 février 2016.\cr
 #' **Dernière modification** : 24 avril 2020.\cr
 #' **Publication no** : EstimProjComp-ISQ.\cr\cr
-#' La fiche d'information et technique de cette base de données est disponible avec le fichier Excel (voir *Source*).
+#' La fiche d'information et technique de cette base de données est disponible avec le fichier Excel (voir *Source*).\cr\cr
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 8 variables et 2 595 320 observations :
 #' \describe{
@@ -25,7 +70,7 @@
 #'   \item{POP}{Population}
 #' }
 #'
-#' @usage data("Pop_QC") / MaVariable <- Pop_QC.
+#' @usage data('Pop_QC') / MaVariable <- Pop_QC.
 #' @encoding UTF-8
 #' @source \href{https://www.msss.gouv.qc.ca/professionnels/informations-geographiques-et-de-population/donnees-populationnelles/}{MSSS Données de population}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/EstimationProjectionComparable_1996_2041_20200424.xlsx}{Fichier Excel utilisé}.
@@ -34,20 +79,21 @@
 
 # RLS_convert -------------------------------------------------------------
 
-#' Correspondance RLS Loi 10
+#' Data - Correspondance RLS Loi 10
 #'
 #' Établir la correspondance des RLS avant et après l'adoption de la loi 10.
 #'
-#' Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr\cr
-#' `attr(RLS_convert, "RLS_exclus")` indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr\cr
-#' `attr(RLS_convert, "RLS_exclus_value")` renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.
+#' Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr
+#' `attr(RLS_convert, "RLS_exclus")` indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr
+#' `attr(RLS_convert, "RLS_exclus_value")` renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.\cr\cr
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 2 variables et 84 observations :
 #' \describe{
 #'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10.}
 #'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10.}
 #' }
-#' @usage data("RLS_convert") / MaVariable <- RLS_convert.
+#' @usage data('RLS_convert') / MaVariable <- RLS_convert.
 #' @encoding UTF-8
 #' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10}.\cr
 #' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
@@ -56,13 +102,15 @@
 
 # RLS_list ----------------------------------------------------------------
 
-#' Liste des RLS
+#' Data - Liste des RLS
 #'
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 #'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
 #' @format Vecteur `integer` de 96 nombres.
 #' @encoding UTF-8
-#' @usage data("RLS_list") / MaVariable <- RLS_list.
+#' @usage data('RLS_list') / MaVariable <- RLS_list.
 "RLS_list"
 
 
@@ -71,6 +119,8 @@
 #' Data - COD_DIN
 #'
 #' Codes d'identification des médicaments (`SMED_COD_DIN`) qui sont présents dans la vue `V_DEM_PAIMT_MED_CM`.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 3 variables :
 #' \describe{
@@ -88,6 +138,8 @@
 #' Data - COD_SERV
 #'
 #' Codes de services (`SMED_COD_SERV_X`) qui sont présent dans la vue `V_DEM_PAIMT_MED_CM`.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 5 variables :
 #' \describe{
@@ -107,6 +159,8 @@
 #' Data
 #'
 #' Description des codes de dénomination commune.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 7 variables :
 #' \describe{
@@ -129,6 +183,8 @@
 #'
 #' Domaine de valeurs pour les différents codes de l'environnement informationnel.
 #'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
 #' @format Tableau de 5 variables :
 #' \describe{
 #'   \item{CODE}{Valeurs codifiées que peut prendre un élément (`CODE_VAL_COD`). `character`.}
@@ -147,6 +203,8 @@
 #' Data - NOM_MARQ_COMRC
 #'
 #' Nom sous lequel est commercialisé un produit pharmaceutique.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 5 variables :
 #' \describe{

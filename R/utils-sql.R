@@ -40,6 +40,7 @@ indent <- function(niv = 1) {
 #' @keywords internal
 #' @encoding UTF-8
 #' @return c("x", "y") -> "'x','y'"
+#' @export
 qu <- function(x) {
   return(paste(paste0("'",x,"'"), collapse = ", "))
 }

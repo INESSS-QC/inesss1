@@ -15,6 +15,8 @@ replace_NA_in_dt <- function(dt, by) {
 
   if (is.character(by)) {
     to_char <- TRUE
+  } else {
+    to_char <- FALSE
   }
 
   for (j in 1:ncol(dt)) {

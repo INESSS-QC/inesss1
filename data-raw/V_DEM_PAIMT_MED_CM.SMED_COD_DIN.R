@@ -53,7 +53,7 @@ fct <- function(need_con = FALSE) {
     .(DIN)
   ]
 
-  attr(DT, "Date") <- Sys.Date()  # date de création
+  attr(DT, "MaJ") <- Sys.Date()  # date de création
   return(DT)
 
 }

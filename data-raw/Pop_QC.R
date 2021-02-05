@@ -47,5 +47,5 @@ dt[, `:=` (CODE = as.integer(CODE),
 setkey(dt, GEO, CODE, AN, SEXE, AGE)
 
 Pop_QC <- copy(dt)
-attr(Pop_QC, "Create") <- Sys.Date()
+attr(Pop_QC, "MaJ") <- Sys.Date()
 use_data(Pop_QC, overwrite = TRUE)

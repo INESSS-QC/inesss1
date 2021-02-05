@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Pop_QC}
 \alias{Pop_QC}
-\title{Estimations et projections de population comparables (1996-2041)}
+\title{Data - Estimations et projections de population comparables (1996-2041)}
 \format{
 Tableau de 8 variables et 2 595 320 observations :
 \describe{
@@ -23,7 +23,7 @@ Tableau de 8 variables et 2 595 320 observations :
 \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/EstimationProjectionComparable_1996_2041_20200424.xlsx}{Fichier Excel utilisé}.
 }
 \usage{
-data("Pop_QC") / MaVariable <- Pop_QC.
+data('Pop_QC') / MaVariable <- Pop_QC.
 }
 \description{
 Tableau de la population québécoise par niveau géographique.\cr\cr
@@ -35,6 +35,7 @@ La classe des colonnes est \code{character} lorsque c'est du texte ou \code{inte
 \strong{Mise en ligne} : 25 février 2016.\cr
 \strong{Dernière modification} : 24 avril 2020.\cr
 \strong{Publication no} : EstimProjComp-ISQ.\cr\cr
-La fiche d'information et technique de cette base de données est disponible avec le fichier Excel (voir \emph{Source}).
+La fiche d'information et technique de cette base de données est disponible avec le fichier Excel (voir \emph{Source}).\cr\cr
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
 }
 \keyword{datasets}

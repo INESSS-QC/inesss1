@@ -4,14 +4,17 @@
 \encoding{UTF-8}
 \name{RLS_list}
 \alias{RLS_list}
-\title{Liste des RLS}
+\title{Data - Liste des RLS}
 \format{
 Vecteur \code{integer} de 96 nombres.
 }
 \usage{
-data("RLS_list") / MaVariable <- RLS_list.
+data('RLS_list') / MaVariable <- RLS_list.
 }
 \description{
 Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
+}
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
 }
 \keyword{datasets}

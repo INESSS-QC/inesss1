@@ -24,4 +24,7 @@ V_DEM_PAIMT_MED_CM.SMED_COD_SERV
 \description{
 Codes de services (\code{SMED_COD_SERV_X}) qui sont présent dans la vue \code{V_DEM_PAIMT_MED_CM}.
 }
+\details{
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+}
 \keyword{datasets}
