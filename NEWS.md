@@ -1,5 +1,10 @@
-Librairie [`inesss` v.0.5.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.5.1](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### [v0.5.1](https://github.com/INESSS-QC/inesss1/commit/7a4055b3937c17c67af24723f8aae2938dfed8a1)
+
+-   Data `I_APME_DEM_AUTOR_CRITR_ETEN_CM`.
+-   Documentation : Corrections mineures.
 
 ### [v0.5.0](https://github.com/INESSS-QC/inesss1/pull/10)
 
