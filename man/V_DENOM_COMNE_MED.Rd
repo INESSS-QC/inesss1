@@ -21,7 +21,7 @@ Tableau de 7 variables :
 \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1082&NomVue=V\%5FDENOM\%5FCOMNE\%5FMED+\%28D\%E9nomination+commune+m\%E9dicament\%29}{V_DENOM_COMNE_MED}.
 }
 \usage{
-V_DENOM_COMNE_MED
+data('V_DENOM_COMNE_MED')
 }
 \description{
 Description des codes de dénomination commune.

@@ -17,7 +17,7 @@ Tableau de 2 variables et 84 observations :
 \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
 }
 \usage{
-data('RLS_convert') / MaVariable <- RLS_convert.
+data('RLS_convert')
 }
 \description{
 Établir la correspondance des RLS avant et après l'adoption de la loi 10.

@@ -19,7 +19,7 @@ Tableau de 5 variables :
 \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1555&NomVue=V\%5FPRODU\%5FMED+\%28Produit+m\%E9dicament\%29}{V_PRODU_MED}.
 }
 \usage{
-V_PRODU_MED.NMED_NOM_MARQ_COMRC
+data('V_PRODU_MED.NMED_NOM_MARQ_COMRC')
 }
 \description{
 Nom sous lequel est commercialisé un produit pharmaceutique.

@@ -19,7 +19,7 @@ Tableau de 5 variables :
 \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}.
 }
 \usage{
-V_DEM_PAIMT_MED_CM.SMED_COD_SERV
+data('V_DEM_PAIMT_MED_CM.SMED_COD_SERV')
 }
 \description{
 Codes de services (\code{SMED_COD_SERV_X}) qui sont présent dans la vue \code{V_DEM_PAIMT_MED_CM}.

@@ -6,6 +6,7 @@ conn <- SQL_connexion(askpass("User"))  # connexion teradata
 files <- c(
   "Comorbidity_diagn_codes.R",
   "Comorbidity_weights.R",
+  "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
   # "internal_datas.R",
   "Obstetrics_diagn_codes.R",
   # "Pop_QC.R",
