@@ -32,13 +32,13 @@ no_seq_indcn_recnu <- function(conn) {
 
   ### Afficher la valeur min et la valeur max des dates pour chaque code
   DT <- DT[
-    , .(DD_TRAIT_DEM = paste0(min(DD_TRAIT_DEM),"-",max(DD_TRAIT_DEM)),
-        DF_TRAIT_DEM = paste0(min(DF_TRAIT_DEM),"-",max(DF_TRAIT_DEM)),
-        DD_AUTOR = paste0(min(DD_AUTOR),"-",max(DD_AUTOR)),
-        DF_AUTOR = paste0(min(DF_AUTOR),"-",max(DF_AUTOR)),
-        DD_APLIC_AUTOR = paste0(min(DD_APLIC_AUTOR),"-",max(DD_APLIC_AUTOR)),
-        DF_APLIC_AUTOR = paste0(min(DF_APLIC_AUTOR),"-",max(DF_APLIC_AUTOR)),
-        DAT_STA_DEM = paste0(min(DAT_STA_DEM),"-",max(DAT_STA_DEM))),
+    , .(DD_TRAIT_DEM = paste0(min(DD_TRAIT_DEM, na.rm = TRUE),"-",max(DD_TRAIT_DEM, na.rm = TRUE)),
+        DF_TRAIT_DEM = paste0(min(DF_TRAIT_DEM, na.rm = TRUE),"-",max(DF_TRAIT_DEM, na.rm = TRUE)),
+        DD_AUTOR = paste0(min(DD_AUTOR, na.rm = TRUE),"-",max(DD_AUTOR, na.rm = TRUE)),
+        DF_AUTOR = paste0(min(DF_AUTOR, na.rm = TRUE),"-",max(DF_AUTOR, na.rm = TRUE)),
+        DD_APLIC_AUTOR = paste0(min(DD_APLIC_AUTOR, na.rm = TRUE),"-",max(DD_APLIC_AUTOR, na.rm = TRUE)),
+        DF_APLIC_AUTOR = paste0(min(DF_APLIC_AUTOR, na.rm = TRUE),"-",max(DF_APLIC_AUTOR, na.rm = TRUE)),
+        DAT_STA_DEM = paste0(min(DAT_STA_DEM, na.rm = TRUE),"-",max(DAT_STA_DEM, na.rm = TRUE))),
     .(NO_SEQ_INDCN_RECNU)
   ]
 
