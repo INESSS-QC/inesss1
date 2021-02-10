@@ -1,7 +1,7 @@
 Librairie [`inesss` v.0.5.2](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.5.2
+### [v0.5.2](https://github.com/INESSS-QC/inesss1/commit/198d47ddaf7ff50fb956704e857923e3b6c7caf7)
 
 -   Documentation `Comorbidity_diagn_codes` : Description des codes de
     diagnostiques.
