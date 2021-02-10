@@ -21,6 +21,7 @@
 #' @param CIM `'CIM9'`, `'CIM10'` ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la *Classification statistique internationale des maladies et des problèmes de santé connexes* (CIM).
 #' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
 #' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
+#' @param exclu_diagn Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir \code{names(inesss::Comorbidity_diagn_codes)} pour connaître les codes de diagnostics pouvant être exclus.
 #' @param verbose `TRUE` ou `FALSE`. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (`dt_source`). Utile pour suivre le déroulement de l'extraction.
 #'
 #' @return `data.table` de 4 variables :
@@ -39,7 +40,7 @@ SQL_comorbidity_diagn <- function(
                 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MED-ECHO', V_SEJ_SERV_HOSP_CM = 'MED-ECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
-  verbose = TRUE
+  exclu_diagn = NULL, verbose = TRUE
 ) {
 
   ### Arranger les arguments
@@ -77,6 +78,10 @@ SQL_comorbidity_diagn <- function(
       diagn_codes <- inesss::Elixhauser_diagn_codes
     } else {
       stop("SQL_diagn(): method ne contient pas une combinaison possible.")
+    }
+    # Exclusion des diagnostiques
+    if (!is.null(exclu_diagn)) {
+      diagn_codes <- diagn_codes[!names(diagn_codes) %in% exclu_diagn]
     }
     # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
     # de classification de code.
@@ -128,11 +133,7 @@ SQL_comorbidity_diagn <- function(
 
 }
 
-SQL_comorbidity_diagn.verif_args <- function(conn, uid, pwd, cohort, debut, fin, diagn_codes,
-                                 dt_source, dt_desc) {
-  ### Vérification des arguments initiaux
 
-}
 #' @keywords internal
 #' @import data.table
 SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {

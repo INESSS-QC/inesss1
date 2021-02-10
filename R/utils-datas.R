@@ -5,7 +5,39 @@
 #'
 #' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
-#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
+#' `aids` : AIDS/HIV\cr
+#' `alcohol` : Alcohol abuse\cr
+#' `canc` : Any tumor without metastasis\cr
+#' `blane` : Blood loss anemia\cr
+#' `carit` : Cardiac arrhythmias\cr
+#' `cevd` : Cerebrovascular disease\cr
+#' `copd` : Chronic pulmonary disease\cr
+#' `coag` : Coagulopathy\cr
+#' `chf` : Congestive heart failure\cr
+#' `dane` : Deficiency anemia\cr
+#' `dementia` : Dementia\cr
+#' `depre` : Depression\cr
+#' `diab` : Diabetes, complicated\cr
+#' `diabwc` : Diabetes, uncomplicated\cr
+#' `drug` : Drug abuse\cr
+#' `fed` : Fluid and electrolyte disorders\cr
+#' `hyp` : Hypertension\cr
+#' `hypothy` : Hypothyroidism\cr
+#' `ld` : Liver disease\cr
+#' `metacanc` : Metastatic cancer\cr
+#' `mi` : Myocardial infarction\cr
+#' `nd` : Neurological disorders\cr
+#' `obes` : Obesity\cr
+#' `para` : Paralysis\cr
+#' `pvd` : Peripheral vascular disorders\cr
+#' `psycho` : Psychoses\cr
+#' `pcd` : Pulmonary circulation disorders\cr
+#' `rend` : Renal disease\cr
+#' `rheumd` : Rheumatoid arth./collagen vascular disease\cr
+#' `ud` : Ulcer disease\cr
+#' `valv` : Valvular disease\cr
+#' `wloss` : Weight loss
 #'
 #' @encoding UTF-8
 #' @usage data('Comorbidity_diagn_codes')

@@ -28,6 +28,38 @@ Elixhauser_diagn_codes
 Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 }
 \details{
-L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
+L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.\cr\cr
+\code{aids} : AIDS/HIV\cr
+\code{alcohol} : Alcohol abuse\cr
+\code{canc} : Any tumor without metastasis\cr
+\code{blane} : Blood loss anemia\cr
+\code{carit} : Cardiac arrhythmias\cr
+\code{cevd} : Cerebrovascular disease\cr
+\code{copd} : Chronic pulmonary disease\cr
+\code{coag} : Coagulopathy\cr
+\code{chf} : Congestive heart failure\cr
+\code{dane} : Deficiency anemia\cr
+\code{dementia} : Dementia\cr
+\code{depre} : Depression\cr
+\code{diab} : Diabetes, complicated\cr
+\code{diabwc} : Diabetes, uncomplicated\cr
+\code{drug} : Drug abuse\cr
+\code{fed} : Fluid and electrolyte disorders\cr
+\code{hyp} : Hypertension\cr
+\code{hypothy} : Hypothyroidism\cr
+\code{ld} : Liver disease\cr
+\code{metacanc} : Metastatic cancer\cr
+\code{mi} : Myocardial infarction\cr
+\code{nd} : Neurological disorders\cr
+\code{obes} : Obesity\cr
+\code{para} : Paralysis\cr
+\code{pvd} : Peripheral vascular disorders\cr
+\code{psycho} : Psychoses\cr
+\code{pcd} : Pulmonary circulation disorders\cr
+\code{rend} : Renal disease\cr
+\code{rheumd} : Rheumatoid arth./collagen vascular disease\cr
+\code{ud} : Ulcer disease\cr
+\code{valv} : Valvular disease\cr
+\code{wloss} : Weight loss
 }
 \keyword{datasets}

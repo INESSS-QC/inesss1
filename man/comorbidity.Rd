@@ -15,7 +15,8 @@ comorbidity(
   n2 = 730,
   method = c("Charlson", "Elixhauser"),
   scores = "CIM10",
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2)
+  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  keep_confirm_data = FALSE
 )
 }
 \arguments{
@@ -36,6 +37,8 @@ comorbidity(
 \item{scores}{\code{'CIM9'} ou \code{'CIM10'}. Nom de la colonne du dataset \code{Comorbidity_weights} à utiliser pour le calcul des indicateurs.}
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
+
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnosti indiquant leur poids.

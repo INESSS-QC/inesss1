@@ -24,7 +24,9 @@ SQL_comorbidity(
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
   obstetric_exclu = TRUE,
-  verbose = TRUE
+  exclu_diagn = NULL,
+  verbose = TRUE,
+  keep_confirm_data = FALSE
 )
 }
 \arguments{
@@ -60,7 +62,11 @@ SQL_comorbidity(
 
 \item{obstetric_exclu}{\code{TRUE} ou \code{FALSE}. Si l'on doit exclure (\code{TRUE}) les diabètes et les hypertensions de type gestationnel. Voir Détails.}
 
+\item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir \code{names(inesss::Comorbidity_diagn_codes)} pour connaître les codes de diagnostics pouvant être exclus.}
+
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
+
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table} :

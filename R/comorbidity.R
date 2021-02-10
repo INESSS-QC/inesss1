@@ -13,6 +13,7 @@
 #' @param method Méthode de calcul des indicateurs. `'Charlson'` ou `'Elixhauser'`. Inscrire les deux crée la colonne `Combined`.
 #' @param scores `'CIM9'` ou `'CIM10'`. Nom de la colonne du dataset `Comorbidity_weights` à utiliser pour le calcul des indicateurs.
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
+#' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'
 #' @return `data.table` avec les colonnes `ID`, `Charlson` (selon `method`), `Elixhauser` (selon `method`), `Combined` (selon `method`), et tous les codes de diagnosti indiquant leur poids.
 #' @import data.table
@@ -22,7 +23,8 @@ comorbidity <- function(
   dt, ID, DIAGN, DATE_DX, SOURCE,
   n1 = 30, n2 = 730,
   method = c('Charlson', 'Elixhauser'), scores = 'CIM10',
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2)
+  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  keep_confirm_data = FALSE
 ) {
 
   ### Arranger dataset à analyser
@@ -42,6 +44,9 @@ comorbidity <- function(
 
   ### Confirmation des codes de diagnostiques
   dt <- comorbidity.confirm_diagn(dt, n1, n2, confirm_sourc)
+  if (keep_confirm_data) {  # conserver ce data à mettre en attribut
+    confirm_data <- copy(dt)
+  }
 
   ### Ajouter le score aux diagn
   dt <- inesss::Comorbidity_weights[, .(DIAGN = DIAGN_CODE, val = get(scores))][dt, on = .(DIAGN)]
@@ -63,12 +68,15 @@ comorbidity <- function(
 
   ### Information dans les attributs
   attr(dt, "infos") <- list(
-    CreateDate = Sys.Date(),
-    Method = method,
-    Scores = scores,
-    ConfirmSources = confirm_sourc,
-    nJours = sort(c(n1, n2))
+    CreateDate = Sys.Date(),  # date de création
+    Method = method,  # méthode utilisée
+    Scores = scores,  # score utilisé
+    ConfirmSources = confirm_sourc,  # confiance des sources
+    nJours = sort(c(n1, n2))  # jours utilisés pour l'intervalle de confirmation
   )
+  if (keep_confirm_data) {  # ajouter le data des confirmations de diagn en attribut
+    attr(dt, "infos") <- c(attr(dt, "infos"), list(confirm_data = confirm_data))
+  }
 
   return(dt)
 

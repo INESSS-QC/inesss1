@@ -38,8 +38,8 @@ SQL_comorbidity <- function(
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MED-ECHO', V_SEJ_SERV_HOSP_CM = 'MED-ECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
   confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
-  obstetric_exclu = TRUE,
-  verbose = TRUE
+  obstetric_exclu = TRUE, exclu_diagn = NULL,
+  verbose = TRUE, keep_confirm_data = FALSE
 ) {
 
   ### Arranger les arguments
@@ -90,7 +90,7 @@ SQL_comorbidity <- function(
       fin = max(dt$DATE_INDEX),
       method = method, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
-      verbose = verbose
+      exclu_diagn = exclu_diagn, verbose = verbose
     )
 
     ### Filtrer dt pour en faire l'analyse
@@ -116,7 +116,8 @@ SQL_comorbidity <- function(
     ### Calcul des scores
     dt <- comorbidity(
       dt, "ID", "DIAGN", "DATE_DX", "SOURCE", n1, n2,
-      method, scores, confirm_sourc
+      method, scores, confirm_sourc,
+      keep_confirm_data
     )
 
     return(dt)

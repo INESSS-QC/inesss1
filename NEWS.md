@@ -1,5 +1,18 @@
-Librairie [`inesss` v.0.5.1](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.5.2](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.5.2
+
+-   Documentation `Comorbidity_diagn_codes` : Description des codes de
+    diagnostiques.
+-   Argument `keep_confirm_data` de la fonction `comorbidity` permet de
+    mettre en attribut le data indiquant la date de repérage du
+    diagnostic ainsi que sa date de confirmation.
+-   Argument `exclu_diagn` de la fonction `SQL_comorbidity_diagn` permet
+    d’exclure un code de diganostic de l’analyse.
+-   Arguments `keep_confirm_data` et `exclu_diagn` ajouté à la fonction
+    `SQL_comorbidity`, car utilise les fonctions `comorbidity` et
+    `SQL_comorbidity_diagn`.
 
 ### [v0.5.1](https://github.com/INESSS-QC/inesss1/commit/7a4055b3937c17c67af24723f8aae2938dfed8a1)
 
