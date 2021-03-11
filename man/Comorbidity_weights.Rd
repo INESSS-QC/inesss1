@@ -8,10 +8,10 @@
 \format{
 Tableau de 4 variables et 32 observations.
 \describe{
-\item{DIAGN}{Identification du diagnostic (\code{chr}).}
-\item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation (\code{chr}).}
-\item{CIM9}{Poids utilisé pour la \emph{9e} révision du CIM (\code{int}).}
-\item{CIM10}{Poids utilisé pour la \emph{10e} révision du CIM (\code{int}).}
+\item{DIAGN}{Identification du diagnostic. \code{character}.}
+\item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation. \code{character}.}
+\item{CIM9}{Poids utilisé pour la \emph{9e} révision du CIM. \code{integer}}
+\item{CIM10}{Poids utilisé pour la \emph{10e} révision du CIM. \code{integer}.}
 }
 }
 \source{

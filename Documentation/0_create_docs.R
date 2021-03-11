@@ -49,15 +49,6 @@ render(  # pdf_document
 )
 
 
-# R-Rtools-installation ---------------------------------------------------
-render(
-  input = "Documentation/source/R-Rtools-installation.Rmd",
-  output_file = paste0("R_RTOOLS_INSTALLATION_",Sys.Date(),".pdf"),
-  output_dir = "Documentation",
-  envir = new.env(), encoding = "UTF-8"
-)
-
-
 # Registre Versions -------------------------------------------------------
 render(
   input = "NEWS.Rmd",

@@ -24,6 +24,11 @@ formulaire <- function() {
     ### Colonnes nécessaires pour chaque méthode
 
     return(list(
+      # Naifs/Switch
+      ns1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
+              "RX_RETROSPECT_A_EXCLURE", "NJOURS_SANS_CONSO",
+              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST"),
+      # Statistiques générales
       sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
     ))
@@ -32,6 +37,16 @@ formulaire <- function() {
     ### Valeurs permises dans les colonnes de cols_Excel_file()
 
     return(list(
+      # Naifs/Switch
+      ns1 = list(
+        TYPE_RX = c("DENOM", "DIN"),
+        GROUPER_PAR = c("Codes"),
+        CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
+        CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
+        CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
+        CODE_LIST = c("3", "03", "40", "41")
+      ),
+      # Statistiques générales
       sg1 = list(
         TYPE_RX = c("DENOM", "DIN"),
         GROUPER_PAR = c("Codes", "Teneur", "Format"),
@@ -46,6 +61,7 @@ formulaire <- function() {
     ### Liste des méthodes existantes
 
     return(c(
+      "naif_switch1",
       "stat_gen1"
     ))
   }
@@ -83,7 +99,9 @@ formulaire <- function() {
     ### Possible de le faire rapidement grâce à cols_Excel_file()
 
     # Colonnes à sélectionner
-    if (method == "stat_gen1") {  # méthode statistiques générales 1
+    if (method == "naif_switch1") {
+      cols <- names(dt)[names(dt) %in% c("METHODE", cols_Excel_file()$ns1)]
+    } else if (method == "stat_gen1") {  # méthode statistiques générales 1
       cols <- names(dt)[names(dt) %in% c("METHODE", cols_Excel_file()$sg1)]
     }
 
@@ -104,7 +122,7 @@ formulaire <- function() {
   create_dt_code_serv <- function() {
     ### Data contenant la liste des codes de services et leur description
 
-    dt <- inesss::V_DEM_PAIMT_MED_CM.SMED_COD_SERV[
+    dt <- inesss::V_DEM_PAIMT_MED_CM$COD_SERV[
       , .(code = COD_SERV, desc = COD_SERV_DESC)  # colonnes code + description
     ]
 
@@ -156,7 +174,7 @@ formulaire <- function() {
           if (method %in% methods_Excel_file()) {
             dt <- cols_select_from_method(dt, method)  # sélection des colonnes en lien avec la méthode
             if (is.null(rmNA(dt$DATE_DEBUT)) && is.null(rmNA(dt$DATE_FIN))) {
-              next
+              next  # si pas de valeurs, implique que l'onglet ne doit pas être considéré, donc on passe au prochain
             }
             msg_error <- verif_method()[[method]](dt, sh, msg_error)  # vérifications selon méthode
             if (!at_least_1) {
@@ -230,7 +248,9 @@ formulaire <- function() {
       if (is.null(rmNA(dt$DATE_DEBUT)) && is.null(rmNA(dt$DATE_FIN))) {
         next
       } else {
-        if (method == "stat_gen1") {
+        if (method == "naif_switch1") {
+          excel_requetes[[i]] <- save_xl_file_queries_ns1(dt, conn)
+        } else if (method == "stat_gen1") {
           excel_requetes[[i]] <- save_xl_file_queries_sg1(dt, conn)
         }
         names(excel_requetes)[i] <- sheets[sh]  # conserver le nom initial des onglets
@@ -240,6 +260,80 @@ formulaire <- function() {
     }
 
     write_xlsx(excel_requetes, savepath)  # sauvegarder les tableaux en Excel sur le poste
+
+  }
+  save_xl_file_queries_ns1 <- function(dt, conn) {
+    ### Référence à save_xl_file_queries_method() lorsque la méthode est "naif_switch1"
+
+    ### Arguments selon les valeurs du tableau dt
+    dates_debut <- as_date_excel_chr(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " "))
+    dates_fin <- as_date_excel_chr(stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))
+    type_rx <- stringr::str_remove_all(rmNA(dt$TYPE_RX), " ")
+    code_rx <- as.numeric(stringr::str_remove_all(rmNA(dt$CODE_RX), " "))
+    grpby <- stringr::str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+    if (!length(grpby)) grpby <- NULL
+    rx_retro <- as.numeric(stringr::str_remove_all(rmNA(dt$RX_RETROSPECT_A_EXCLURE), " "))
+    if (!length(rx_retro)) rx_retro <- code_rx
+    njours_sans_conso <- as.numeric(stringr::str_remove_all(rmNA(dt$NJOURS_SANS_CONSO), " "))
+    code_serv_filtre <- stringr::str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
+    code_serv <- sort(adapt_code_serv(stringr::str_remove_all(rmNA(dt$CODE_SERV), " ")))
+    if (!length(code_serv)) code_serv <- NULL
+    code_list_filtre <- stringr::str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
+    code_list <- sort(stringr::str_remove_all(rmNA(dt$CODE_LIST), " "))
+    if (!length(code_list)) code_list <- NULL
+
+    ### Tableau des résultats
+    DT <- SQL_naif_switch1(
+      conn, debut = dates_debut, fin = dates_fin,
+      type_rx = type_rx, codes = code_rx, grouper_par = grpby,
+      rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
+      code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+      code_list = code_list, code_list_filtre = code_list_filtre
+    )
+
+    ### Résultats sur une page
+    if (is.null(grpby)) {
+      # Pas de regroupement
+      result_page <- create_dt_data_args_query(
+        dt = DT,
+        args_list = list(
+          METHODE = "naif_switch1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+          TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
+          RX_RETROSPECT_A_EXCLURE = rx_retro, NJOURS_SANS_CONSO = njours_sans_conso,
+          CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
+          CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+        ),
+        query = query_naif_switch1(
+          debut = dates_debut[1], fin = dates_fin[1],
+          type_rx = type_rx, codes = code_rx,
+          rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
+          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+          code_list = code_list, code_list_filtre = code_list_filtre
+        )
+      )
+    } else {
+      result_page <- create_dt_data_args_query(
+        # Résultats par code
+        dt = DT,
+        args_list = list(
+          METHODE = "naif_switch1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+          TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
+          RX_RETROSPECT_A_EXCLURE = rx_retro, NJOURS_SANS_CONSO = njours_sans_conso,
+          CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
+          CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+        ),
+        query = query_naif_switch1(
+          # Implique qu'on affiche un exemple de code SQL pour le 1er code seulement
+          debut = dates_debut[1], fin = dates_fin[1],
+          type_rx = type_rx, codes = code_rx[1],
+          rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
+          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+          code_list = code_list, code_list_filtre = code_list_filtre
+        )
+      )
+    }
+
+    return(result_page)
 
   }
   save_xl_file_queries_sg1 <- function(dt, conn) {
@@ -404,6 +498,212 @@ formulaire <- function() {
     }
 
   }
+  verif_ns1 <- function(dt, sh, msg_error) {
+    ### Vérification de chaque colonne pour la méthode ns1/naif_switch1
+    ### lorsque les arguments sont inscrit dans un fichier Excel
+
+    cols <- cols_Excel_file()$ns1  # colonnes nécessaires
+    vals <- values_Excel_file()$ns1  # valeurs possible des colonnes
+    new_error <- TRUE  # nouvelle erreur -> indiquer nom onglet
+    init_msg_error <- msg_error  # comparer a la fin pour déterminer s'il y a une erreur
+
+    # Vérifier la présence de chaque colonne
+    for (col in cols) {
+      if (!col %in% names(dt)) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error," -  La colonne ",col," est absente.\n")
+      }
+    }
+
+    # Vérifier la valeur dans chaque colonne (celles nécessaires)
+    # DATE_DEBUT & DATE_FIN
+    for (col in c("DATE_DEBUT", "DATE_FIN")) {
+      if (col %in% names(dt)) {  # si la colonne existe - erreur gérée plus haut
+        col_date <- str_remove_all(rmNA(dt[[col]]), " ")  # vecteur contenant les valeurs
+        if (length(col_date)) {  # s'il y a des valeurs
+          col_date <- as_date_excel_chr(col_date)  # convertir au format date
+          if (anyNA(col_date)) {  # NA après conversion -> erreur
+            if (new_error) {
+              msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+              new_error <- FALSE
+            }
+            msg_error <- paste0(msg_error,
+                                " -  ",col," a au moins une valeur qui n'est pas au format 'AAAA-MM-JJ'.\n"
+            )
+          }
+        } else {
+          # La colonne ne contient pas de valeurs
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  ",col," ne contient pas de valeurs.\n"
+          )
+        }
+      }
+    }
+
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
+      lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
+      lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
+      if (lng_deb != lng_fin) {  # si le nbre de valeurs est différent
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
+        )
+      }
+    }
+
+    # TYPE_RX, CODE_SERV_FILTRE, CODE_LIST_FILTRE
+    for (col in c("TYPE_RX", "CODE_SERV_FILTRE", "CODE_LIST_FILTRE")) {
+      if (col %in% names(dt)) {
+        vec <- str_remove_all(rmNA(dt[[col]]), " ")  # extraire la valeur du tableau
+        if (length(vec) == 1) {
+          if (!all(vec %in% vals[[col]])) {
+            if (new_error) {
+              msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+              new_error <- FALSE
+            }
+            msg_error <- paste0(msg_error,
+                                " -  ",col," ne contient pas une valeur permise.\n"
+            )
+          }
+        } else {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  ",col," doit contenir une valeur.\n"
+          )
+        }
+      }
+    }
+
+    # CODE_RX
+    if ("CODE_RX" %in% names(dt)) {
+      code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+      if (length(code_rx)) {
+        nbr_NAs <- sum(is.na(code_rx))
+        code_rx <- as.numeric(code_rx)
+        if (sum(is.na(code_rx)) != nbr_NAs) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  CODE_RX doit contenir des valeurs numériques.\n"
+          )
+        }
+      } else {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  CODE_RX doit contenir au moins une valeur.\n"
+        )
+      }
+    }
+
+    # GROUPER_PAR
+    if ("GROUPER_PAR" %in% names(dt)) {
+      grpby <- str_remove_all(rmNA(dt$GROUPER_PAR), " ")
+      if (length(grpby)) {
+        if (!all(grpby %in% vals$GROUPER_PAR)) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  GROUPER_PAR ne contient pas une valeur permise.\n"
+          )
+        }
+      }
+    }
+
+    # RX_RETROSPECT_A_EXCLURE
+    if ("RX_RETROSPECT_A_EXCLURE" %in% names(dt)) {
+      rx_retro <- stringr::str_remove_all(rmNA(dt$RX_RETROSPECT_A_EXCLURE), " ")
+      if (length(rx_retro)) {
+        nbr_NAs <- sum(is.na(rx_retro))
+        rx_retro <- as.numeric(rx_retro)
+        if (sum(is.na(rx_retro)) != nbr_NAs) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  RX_RETROSPECT_A_EXCLURE doit contenir une(des) valeur(s) numérique(s).\n"
+          )
+        }
+      }
+    }
+
+    # NJOURS_SANS_CONSO
+    if ("NJOURS_SANS_CONSO" %in% names(dt)) {
+      no_conso <- stringr::str_remove_all(rmNA(dt$NJOURS_SANS_CONSO), " ")
+      if (length(no_conso) > 1) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  NJOURS_SANS_CONSO doit contenir une seule valeur.\n"
+        )
+      }
+      if (length(no_conso)) {
+        nbr_NAs <- sum(is.na(no_conso))
+        no_conso <- as.numeric(no_conso)
+        if (sum(is.na(no_conso)) != nbr_NAs) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  NJOURS_SANS_CONSO doit contenir une valeur numérique.\n"
+          )
+        }
+      }
+    }
+
+    # CODE_SERV, CODE_LIST
+    for (col in c("CODE_SERV", "CODE_LIST")) {
+      if (col %in% names(dt)) {
+        vec <- str_remove_all(rmNA(dt[[col]]), " ")
+        if (length(vec)) {
+          if (col == "CODE_SERV") {
+            vec <- adapt_code_serv(vec)
+          }
+          if (!all(vec %in% vals[[col]])) {
+            if (new_error) {
+              msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+              new_error <- FALSE
+            }
+            msg_error <- paste0(msg_error,
+                                " -  ",col," ne contient pas une valeur permise.\n"
+            )
+          }
+        }
+      }
+    }
+
+    # Vérifier s'il y a eu une erreur et ajouter une séparation au texte s'il y a lieu
+    if (init_msg_error != msg_error) {
+      msg_error <- paste0(msg_error, format_xl_err_nl())
+    }
+
+    return(msg_error)
+
+  }
   verif_sg1 <- function(dt, sh, msg_error) {
     ### Vérification de chaque colonne pour la méthode sg1/stat_gen1/Statistiques générales
     ### lorsque les arguments sont inscrit dans un fichier Excel
@@ -497,13 +797,25 @@ formulaire <- function() {
     # CODE_RX
     if ("CODE_RX" %in% names(dt)) {
       code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-      if (!length(code_rx)) {
+      if (length(code_rx)) {
+        nbr_NAs <- sum(is.na(code_rx))
+        code_rx <- as.numeric(code_rx)
+        if (sum(is.na(code_rx)) != nbr_NAs) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  CODE_RX doit contenir des valeurs numériques.\n"
+          )
+        }
+      } else {
         if (new_error) {
           msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
           new_error <- FALSE
         }
         msg_error <- paste0(msg_error,
-          " -  CODE_RX doit contenir au moins une valeur.\n"
+                            " -  CODE_RX doit contenir au moins une valeur.\n"
         )
       }
     }
@@ -556,7 +868,10 @@ formulaire <- function() {
   verif_method <- function() {
     ### Détermine la fonction vérification à utiliser selon la méthode
 
-    return(list(stat_gen1 = verif_sg1))
+    return(list(
+      naif_switch1 = verif_ns1,
+      stat_gen1 = verif_sg1
+    ))
 
   }
   Volumes_path <- function() {
@@ -622,6 +937,8 @@ formulaire <- function() {
           h5(strong("État de la connexion :")),
           verbatimTextOutput("sql_is_conn", placeholder = TRUE)
         ),
+
+
 
 
         ### Requêtes via Excel - tabExcel
@@ -848,7 +1165,7 @@ formulaire <- function() {
 
     # Bouton pour enregistrer les requêtes via fichier Excel
     output$save_xl_file <- renderUI({
-      if (xl_errors_msg() == "Aucune erreur, exécution possible.") {
+      if (!is.null(attr(conn_values$conn, "info")) && xl_errors_msg() == "Aucune erreur, exécution possible.") {
         return(shinySaveButton(
           "save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
           filetype = list(`Classeur Excel` = "xlsx"),
@@ -865,7 +1182,11 @@ formulaire <- function() {
     save_xl_file <- reactive({ shinyFiles_directories(input$save_xl_file, "save")})
     # Enregistrer les requêtes dans un fichier Excel
     observeEvent(save_xl_file(), {
-      if (xl_errors_msg() == "Aucune erreur, exécution possible." && !is.null(conn_values$conn)) {
+      if (is.null(conn_values$conn)) {
+        showNotification("Exécution impossible. Vérifier la connexion ou corriger les erreurs.")
+      } else if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
+        showNotification("Exécution impossible. Vérifier la connexion ou corriger les erreurs.")
+      } else {
         showNotification("Exécution en cours...", id = "save_xl_file", type = "message", duration = NULL)
         save_xl_file_queries_method(  # effectuer les requêtes pour chaque onglet du fichier
           conn = conn_values$conn,
@@ -873,10 +1194,8 @@ formulaire <- function() {
           savepath = save_xl_file()$datapath
         )
         removeNotification("save_xl_file")
-      } else {
-        showNotification("Exécution impossible. Vérifier la connexion ou corriger les erreurs.")
       }
-    })
+    }, ignoreInit = TRUE)
 
 
 

@@ -57,7 +57,8 @@ Générateur de code SQL pour la méthode \code{stat_gen1}.
 Statistiques descriptives tirées de la vue \code{V_DEM_PAIMT_MED_CM}.\cr\cr
 \strong{\code{group_by} :} Revient à utiliser la commande \verb{group by} dans le code SQL.\cr\cr
 \strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
-\code{"Exclusion"} : Inclus les \code{NULL}, \code{'Inclusion'} exclus les \code{NULL}.
+\code{'Exclusion'} inclus les \code{NULL}\cr
+\code{'Inclusion'} exclus les \code{NULL}.
 }
 \examples{
 ### Avantages d'utiliser cat() si c'est pour afficher du code dans la console.
