@@ -31,6 +31,7 @@ Ce fichier présente une série continue de données populationnelles comparable
 Il est à noter que ces données de population sont présentées sur la base du découpage territorial du réseau de la santé et des services sociaux, soit pour les territoires suivants : le Québec, les réseaux universitaires intégrés de santé et de services sociaux (RUISSS), les régions sociosanitaires (RSS), les réseaux territoriaux de services (RTS), les réseaux locaux de services (RLS) et les centres locaux de services communautaires (CLSC).
 }
 \details{
+\strong{Attention} \code{AGE = 90} équivaut à \emph{90 ans et plus}.\cr\cr
 La classe des colonnes est \code{character} lorsque c'est du texte ou \code{integer} lorsque c'est un nombre.\cr\cr
 \strong{Mise en ligne} : 25 février 2016.\cr
 \strong{Dernière modification} : 24 avril 2020.\cr

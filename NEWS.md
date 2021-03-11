@@ -1,5 +1,13 @@
-Librairie [`inesss` v.0.5.2](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.6.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.6.0
+
+-   Fonction `date_ymd`.
+-   Fonctions `query_naif_switch1` et `SQL_naif_switch1`
+-   Méthode `naif_switch1` dans le formulaire (via EXCEL seulement).
+-   Nouvelle structure des `datas` décrivant les bases de données de la
+    RAMQ. `list` décrivant un ou plusieurs éléments.
 
 ### [v0.5.2](https://github.com/INESSS-QC/inesss1/commit/198d47ddaf7ff50fb956704e857923e3b6c7caf7)
 

@@ -20,6 +20,12 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
+### v0.6.0
+* Fonction `date_ymd`.
+* Fonctions `query_naif_switch1` et `SQL_naif_switch1`
+* Méthode `naif_switch1` dans le formulaire (via EXCEL seulement).
+* Nouvelle structure des `datas` décrivant les bases de données de la RAMQ. `list` décrivant un ou plusieurs éléments.
+
 ### [v0.5.2](https://github.com/INESSS-QC/inesss1/commit/198d47ddaf7ff50fb956704e857923e3b6c7caf7)
 * Documentation `Comorbidity_diagn_codes` : Description des codes de diagnostiques.
 * Argument `keep_confirm_data` de la fonction `comorbidity` permet de mettre en attribut le data indiquant la date de repérage du diagnostic ainsi que sa date de confirmation.

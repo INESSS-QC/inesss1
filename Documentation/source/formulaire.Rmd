@@ -124,8 +124,414 @@ Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel.
 
 \pagebreak
 
+## Naïf / Switch
+Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.  
+Un individu est considéré naïf lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements de la même famille.  
+Un individu est considéré switch lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant à la même famille.  
+Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+
+### Arguments {#ns1_arguments}
+* **`METHODE` :** Indique la méthode à utiliser, ici `naif_switch1`.
+* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
+* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
+* **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
+* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
+* **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
+    + `Codes` : Résultats pour chaque `CODE_RX`.
+* **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la période rétrospective. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*. La période rétrospective est construite à partir des dates de références (index) et de l'argument `NJOURS_SANS_CONSO` : [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
+* **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence (index) où un individu ne doit pas avoir consommé `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective (voir `RX_RETROSPECT_A_EXCLURE`).
+* **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
+* **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).  
+Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+* **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
+* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).  
+Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+
+### Résultats
+Un onglet résultat contient trois (3) éléments :
+
+#### Tableau des résultats
+* **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
+* **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
+* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+* **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+* **`COHORTE` :** Nombre d'individus unique. [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+* **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
+* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
+* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
+* **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude.
+* **`RX_RETROSPECT_A_EXCLURE` :** Code(s) de médicament(s) qui n'ont *jamais* été consommé(s) durant la période rétrospective.
+* **`NJOURS_SANS_CONSO` :** Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré comme *naïf* ou *switch*.
+
+#### Tableau des arguments
+* Table rappelant les arguments fournis par l'utilisateur à la section [Arguments](#ns1_arguments)
+
+#### Code SQL
+* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
+
+\pagebreak
+
+### Exemples {#ns1_exemples}
+
+#### DENOM --- GROUPER_PAR *Codes*
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47873, 47958, 48213), GROUPER_PAR = "Codes",
+  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- SQL_naif_switch1(
+  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
+)
+sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seulement le code SQL de la première période et du premier code d'analyse est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX[1],
+  rx_retrospect_a_exclure = ll$CODE_RX,
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select SMED_NO_INDIV_BEN_BANLS as ID,
+           min(SMED_DAT_SERV) as DATE_INDEX
+    from PROD.V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('47873')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct(A.ID)
+    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+        and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
+        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
+    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
+where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and V.SMED_COD_DENOM_COMNE in ('47873')
+    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+```
+
+\pagebreak
+
+#### GROUPER_PAR *NULL* --- Plusieurs codes pour un même type de traitement.
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47873, 47958, 48213), GROUPER_PAR = NA,
+  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- SQL_naif_switch1(
+  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
+)
+sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select SMED_NO_INDIV_BEN_BANLS as ID,
+           min(SMED_DAT_SERV) as DATE_INDEX
+    from PROD.V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct(A.ID)
+    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+        and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
+        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
+    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
+where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
+    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+```
+
+\pagebreak
+
+#### DIN
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = 2241927, GROUPER_PAR = NA,
+  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- SQL_naif_switch1(
+  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
+)
+sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select SMED_NO_INDIV_BEN_BANLS as ID,
+           min(SMED_DAT_SERV) as DATE_INDEX
+    from PROD.V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('2241927')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct(A.ID)
+    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+        and V.SMED_COD_DENOM_COMNE in ('2241927')
+        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
+    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
+where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and V.SMED_COD_DENOM_COMNE in ('2241927')
+    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+```
+
+\pagebreak
+
+#### RX_RETROSPECT_A_EXCLURE conteant plus de valeurs que CODES (avec ou sans les memes valeurs)
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = c(2257238, 2272903), GROUPER_PAR = NA,
+  RX_RETROSPECT_A_EXCLURE = c(2042479, 2042487, 2257238, 2272903, 2317192, 2317206),
+  NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+)
+stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(stat_gen1_args)
+```
+
+**Tableau des résultats :**
+```{r}
+tab_res <- SQL_naif_switch1(
+  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
+  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
+)
+sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
+kable_tab(tab_res)
+```
+
+**Code SQL :**
+Seule la première période est affichée.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select SMED_NO_INDIV_BEN_BANLS as ID,
+           min(SMED_DAT_SERV) as DATE_INDEX
+    from PROD.V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('2257238', '2272903')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct(A.ID)
+    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+        and V.SMED_COD_DENOM_COMNE in ('2042479', '2042487', '2257238', '2272903', '2317192', '2317206')
+        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select '2018-01-01' as DATE_DEBUT,
+       '2018-12-31' as DATE_FIN,
+       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+       count(*) as NBRE_RX,
+       sum(SMED_QTE_MED) as QTE_MED,
+       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
+    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
+where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and V.SMED_COD_DENOM_COMNE in ('2257238', '2272903')
+    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+```
+
+
+\pagebreak
+
+
 ## Statistiques générales
-Statistiques descriptives tirées de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.  
+Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#sg1_arguments}
 * **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.

@@ -7,8 +7,6 @@
 \usage{
 SQL_stat_gen1(
   conn,
-  uid,
-  pwd,
   debut,
   fin,
   type_Rx = "DENOM",
@@ -17,16 +15,11 @@ SQL_stat_gen1(
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
-  code_list_filtre = "Inclusion",
-  ...
+  code_list_filtre = "Inclusion"
 )
 }
 \arguments{
-\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments \code{uid} et \code{pwd}.}
-
-\item{uid}{Nom de l'identifiant pour la connexion SQL Teradata.}
-
-\item{pwd}{Mot de passe associé à l'identifiant. Si \code{NULL}, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.}
+\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
 
 \item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
@@ -55,11 +48,32 @@ SQL_stat_gen1(
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 }
+\value{
+\code{data.table} contenant certaines de ces colonnes selon les cas :
+\itemize{
+\item \code{DATE_DEBUT} : Date(s) de début de la période d'étude.
+\item \code{DATE_FIN} : Date(s) de fin de la période d'étude.
+\item \code{DENOM} ou \code{DIN} : Code(s) analysé(s) à l’intérieur de la période d’étude.
+\item \code{NOM_DENOM} ou \code{NOM_MARQ_COMRC} : Nom de la dénomination commune ou le nom de la marque de commerce.
+\item \code{TENEUR} : Teneur du médicament.
+\item \code{FORMAT_ACQ} : Format d'acquisition du médicament.
+\item \code{MNT_MED} : Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s’il y a lieu) et la part du manufacturier.
+\item \code{MNT_SERV} : Montant de frais de service autorisé par la RAMQ à la date du service.
+\item \code{MNT_TOT} : Somme des variables \code{MNT_MED} et \code{MNT_SERV}.
+\item \code{COHORTE} : Nombre d'individus unique.
+\item \code{NBRE_RX} : Nombre de prescriptions/paiements.
+\item \code{QTE_MED} : Quantité totale des médicaments ou des fournitures dispensés.
+\item \code{DUREE_TX} : Durée de traitement totale des prescriptions en jours.
+}
+}
 \description{
-Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.
+Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
+Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
 \details{
-Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.
+\strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
+\code{'Exclusion'} inclus les \code{NULL}\cr
+\code{'Inclusion'} exclus les \code{NULL}.
 }
 \examples{
 \dontrun{

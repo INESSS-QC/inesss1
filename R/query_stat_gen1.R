@@ -6,7 +6,8 @@
 #' Statistiques descriptives tirées de la vue `V_DEM_PAIMT_MED_CM`.\cr\cr
 #' \strong{`group_by` :} Revient à utiliser la commande `group by` dans le code SQL.\cr\cr
 #' \strong{`code_serv_filtre`, `code_list_filtre` :}\cr
-#' `"Exclusion"` : Inclus les `NULL`, `'Inclusion'` exclus les `NULL`.
+#' `'Exclusion'` inclus les `NULL`\cr
+#' `'Inclusion'` exclus les `NULL`.
 #'
 #' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
@@ -149,7 +150,6 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
 
   check <- newArgCheck()
   vals <- inesss:::fct_values$query_stat_gen1  # Possible values
-  vals <- fct_values$query_stat_gen1  # Possible values
 
   # debut & fin
   for (val in c("debut", "fin")) {
@@ -174,7 +174,7 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
   if (anyNA(codes)) {
     addError("codes ne peut contenir de NA.", check)
   } else {
-    codes <- suppressWarnings({codes <- as.numeric(codes)})
+    suppressWarnings({codes <- as.numeric(codes)})
     if (anyNA(codes)) {
       addError("codes doit contenir des valeurs numériques.", check)
     }
@@ -283,7 +283,7 @@ query_stat_gen1.where_code_serv <- function(code_serv, code_serv_filtre) {
   } else if (code_serv_filtre == "Inclusion") {
     return(paste0(indent(),"and SMED_COD_SERV_1 in (",qu(code_serv),")\n"))
   } else {
-    stop("query_stat_gen1.where_code_serv(): erreur valeur code_serv_filtre")
+    stop("query_stat_gen1.where_code_serv(): erreur valeur code_serv_filtre.")
   }
 
 }
@@ -297,7 +297,7 @@ query_stat_gen1.where_code_list <- function(code_list, code_list_filtre) {
   } else if (code_list_filtre == "Inclusion") {
     return(paste0(indent(),"and SMED_COD_CATG_LISTE_MED in (",qu(code_list),")\n"))
   } else {
-    stop("stat_gen1_txt_query_1period.where_code_list() code_list_filtre valeur non permise")
+    stop("stat_gen1_txt_query_1period.where_code_list() code_list_filtre valeur non permise.")
   }
 
 }

@@ -1,14 +1,29 @@
 #' Statistiques générales
 #'
-#' Tableau indiquant les statistiques générales d'un ou de plusieurs codes de médicaments selon certains critères.
+#' Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
+#' Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}}.
 #'
-#' Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.
+#' \strong{`code_serv_filtre`, `code_list_filtre` :}\cr
+#' `'Exclusion'` inclus les `NULL`\cr
+#' `'Inclusion'` exclus les `NULL`.
 #'
-#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
-#' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
-#' @param pwd Mot de passe associé à l'identifiant. Si `NULL`, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
 #' @inheritParams query_stat_gen1
 #'
+#' @return `data.table` contenant certaines de ces colonnes selon les cas :
+#' * `DATE_DEBUT` : Date(s) de début de la période d'étude.
+#' * `DATE_FIN` : Date(s) de fin de la période d'étude.
+#' * `DENOM` ou `DIN` : Code(s) analysé(s) à l’intérieur de la période d’étude.
+#' * `NOM_DENOM` ou `NOM_MARQ_COMRC` : Nom de la dénomination commune ou le nom de la marque de commerce.
+#' * `TENEUR` : Teneur du médicament.
+#' * `FORMAT_ACQ` : Format d'acquisition du médicament.
+#' * `MNT_MED` : Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s’il y a lieu) et la part du manufacturier.
+#' * `MNT_SERV` : Montant de frais de service autorisé par la RAMQ à la date du service.
+#' * `MNT_TOT` : Somme des variables `MNT_MED` et `MNT_SERV`.
+#' * `COHORTE` : Nombre d'individus unique.
+#' * `NBRE_RX` : Nombre de prescriptions/paiements.
+#' * `QTE_MED` : Quantité totale des médicaments ou des fournitures dispensés.
+#' * `DUREE_TX` : Durée de traitement totale des prescriptions en jours.
 #' @encoding UTF-8
 #' @import data.table
 #' @export
@@ -56,39 +71,12 @@
 #' )
 #' }
 SQL_stat_gen1 <- function(
-  conn, uid, pwd,
-  debut, fin,
+  conn, debut, fin,
   type_Rx = 'DENOM', codes,
   group_by = 'Codes',
   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion',
-  ...
+  code_list = NULL, code_list_filtre = 'Inclusion'
 ) {
-
-  if (missing(conn)) {
-    conn <- NULL
-  }
-  if (missing(uid)) {
-    uid <- NULL
-  }
-  if (missing(pwd)) {
-    pwd <- NULL
-  }
-
-  ### Vérification des arguments
-  ### Seulement conn & uid - les autres sont vérifiés dans la fonction query_stat_gen1()
-  dot_args <- list(...)
-  if (!"verif" %in% names(dot_args)) {
-    dot_args$verif <- TRUE  # vérification par défaut
-  }
-  if (dot_args$verif) {
-    SQL_stat_gen1.verif_args(conn, uid, pwd)
-  }
-
-  ### Demander le mot de passe si pas inscrit
-  if (is.null(conn) && is.null(pwd)) {
-    pwd <- askpass::askpass("Quel est votre mot de passe?")
-  }
 
   ### Arranger les arguments
   # codes
@@ -102,13 +90,8 @@ SQL_stat_gen1 <- function(
     code_list <- stringr::str_pad(code_list, width = 2, side = "left", pad = "0")
   }
 
-  ### Effectuer la connexion si nécessaire
-  if (is.null(conn)) {
-    conn <- SQL_connexion(uid, pwd)
-  }
-
   ### Effectuer la requête à partir des arguments
-  if (is.null(conn)) {
+  if (is.null(attr(conn, "info")) || is.null(conn)) {
     stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
   } else {
     DT <- vector("list", length(debut))  # contiendra les tableaux résultats
@@ -150,21 +133,6 @@ SQL_stat_gen1 <- function(
 
 }
 
-SQL_stat_gen1.verif_args <- function(conn, uid, pwd) {
-  ### Vérification des arguments
-  # Seulement les arguments conn, uid et pwd. Les autres sont vérifiés lors de
-  # la fonction query_stat_gen1()
-
-  check <- newArgCheck()
-
-  # conn & uid & pwd
-  if ((is.null(conn) & is.null(uid)) || (!is.null(conn) & !is.null(uid))) {
-    addError("Utiliser la variable conn OU la combinaison uid et pwd.", check)
-  }
-
-  finishArgCheck(check)
-
-}
 SQL_stat_gen1.infos_query <- function(conn, dt, deb, fin, type_Rx, codes, group_by) {
   ### Statement de la requêtes à exécuter pour la colonne qui indique quels sont
   ### les codes analysés pour chaque ligne de 'group_by'.
@@ -233,7 +201,7 @@ SQL_stat_gen1.nom_med <- function(dt, deb, fin, type_Rx, group_by) {
     if (type_Rx == "DENOM") {
       dt_noms <- inesss::V_DENOM_COMNE_MED[get(type_Rx) %in% dt[[type_Rx]]]
     } else if (type_Rx == "DIN") {
-      dt_noms <- inesss::V_PRODU_MED.NMED_NOM_MARQ_COMRC[get(type_Rx) %in% dt[[type_Rx]]]
+      dt_noms <- inesss::V_PRODU_MED$NOM_MARQ_COMRC[get(type_Rx) %in% dt[[type_Rx]]]
     }
 
     # Modifier les dates pour être certain d'avoir un nom aux périodes demandées

@@ -6,7 +6,13 @@ library(usethis)
 
 fct_values <- list(
 
-  ### STAT_GEN1
+  query_naif_switch1 = list(
+    type_rx = c("DENOM", "DIN"),
+    grouper_par = c("Codes"),
+    code_serv_filtre = c("Exclusion", "Inclusion"),
+    code_list_filtre = c("Exclusion", "Inclusion")
+  ),
+
   query_stat_gen1 = list(
     type_Rx = c("DENOM", "DIN"),
     group_by = c("Codes", "Teneur", "Format"),

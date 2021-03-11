@@ -16,7 +16,7 @@ Tableau de 5 variables :
 }
 }
 \source{
-\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=111&NomVue=V\%5FDES\%5FCOD+\%28DESCRIPTIONS+DES+CODES\%29}{V_DES_COD}.
+\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=111&NomVue=V\%5FDES\%5FCOD+\%28DESCRIPTIONS+DES+CODES\%29}{Dictionnaire EI}.
 }
 \usage{
 data('V_DES_COD')

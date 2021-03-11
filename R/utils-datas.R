@@ -65,10 +65,10 @@
 #'
 #' @format Tableau de 4 variables et 32 observations.
 #' \describe{
-#'   \item{DIAGN}{Identification du diagnostic (`chr`).}
-#'   \item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation (`chr`).}
-#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM (`int`).}
-#'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM (`int`).}
+#'   \item{DIAGN}{Identification du diagnostic. `character`.}
+#'   \item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation. `character`.}
+#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM. `integer`}
+#'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM. `integer`.}
 #' }
 #'
 #' @usage data('Comorbidity_weights')
@@ -82,13 +82,16 @@
 
 #' Data - Demandes d'autorisation de Patient-Médicament d'exceptions.
 #'
-#' @format `list` décrivant certaines variables
+#' @details Certaines dates de fin sont plus grande que la date du jour (souvent 2078-12-31). Si c'est le cas, ces dates sont modifiées par la date du jour.
+#'
+#' @format `list`
 #' \describe{
-#'   \item{NPME_NO_SEQ_INDCN_RECNU_PME}{Indique la première et la dernière année d'utilisation des codes \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{\code{NO_SEQ_INDCN_RECNU}} pour les variables :\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37534&TypOrigElmVue=T&NoSeqElmOrig=9381}{\code{DD_TRAIT_DEM}} : Date de début de traitement demandée.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37537&TypOrigElmVue=T&NoSeqElmOrig=9382}{\code{DF_TRAIT_DEM}} : Date de fin de traitement demandée.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37944&TypOrigElmVue=T&NoSeqElmOrig=9367}{\code{DD_AUTOR}} : Date de début de l'autorisation PME.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37946&TypOrigElmVue=T&NoSeqElmOrig=9368}{\code{DF_AUTOR}} : Date de fin de l'autorisation PME.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37943&TypOrigElmVue=T&NoSeqElmOrig=9363}{\code{DD_APLIC_AUTOR}} : Date de début de l'applicabilité de l'autorisation de PME.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37945&TypOrigElmVue=T&NoSeqElmOrig=9364}{\code{DF_APLIC_AUTOR}} : Date de fin de l'applicabilité de l'autorisation de PME.\cr \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{DAT_STA_DEM}} : Date de création ou de mise à jour du statut d'une demande d'autorisation correspondant à l'attribution du dernier statut de la demande.}
+#'   \item{NO_SEQ_INDCN_RECNU_PME}{Indique la première et la dernière année d'utilisation.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{\code{NO_SEQ_INDCN_RECNU}} : Numéro de séquence d'indication reconnue - PME. `integer`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37534&TypOrigElmVue=T&NoSeqElmOrig=9381}{\code{DD_TRAIT_DEM}} : Date de début de traitement demandée.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37537&TypOrigElmVue=T&NoSeqElmOrig=9382}{\code{DF_TRAIT_DEM}} : Date de fin de traitement demandée.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37944&TypOrigElmVue=T&NoSeqElmOrig=9367}{\code{DD_AUTOR}} : Date de début de l'autorisation PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37946&TypOrigElmVue=T&NoSeqElmOrig=9368}{\code{DF_AUTOR}} : Date de fin de l'autorisation PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37943&TypOrigElmVue=T&NoSeqElmOrig=9363}{\code{DD_APLIC_AUTOR}} : Date de début de l'applicabilité de l'autorisation de PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37945&TypOrigElmVue=T&NoSeqElmOrig=9364}{\code{DF_APLIC_AUTOR}} : Date de fin de l'applicabilité de l'autorisation de PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{DAT_STA_DEM}} : Date de création ou de mise à jour du statut d'une demande d'autorisation correspondant à l'attribution du dernier statut de la demande.}
 #' }
 #'
 #' @usage data('I_APME_DEM_AUTOR_CRITR_ETEN_CM')
 #' @encoding UTF-8
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=2325&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM}{Dictionnaire EI}
 "I_APME_DEM_AUTOR_CRITR_ETEN_CM"
 
 
@@ -101,6 +104,7 @@
 #' Ce fichier présente une série continue de données populationnelles comparables composée de la série des estimations (1996-2019) et de la série des projections (2020-2041) de population. Ces données tiennent compte de l'évolution de la population selon les plus récentes données observées de naissances, décès et mouvements migratoires.\cr\cr
 #' Il est à noter que ces données de population sont présentées sur la base du découpage territorial du réseau de la santé et des services sociaux, soit pour les territoires suivants : le Québec, les réseaux universitaires intégrés de santé et de services sociaux (RUISSS), les régions sociosanitaires (RSS), les réseaux territoriaux de services (RTS), les réseaux locaux de services (RLS) et les centres locaux de services communautaires (CLSC).
 #'
+#' **Attention** `AGE = 90` équivaut à *90 ans et plus*.\cr\cr
 #' La classe des colonnes est `character` lorsque c'est du texte ou `integer` lorsque c'est un nombre.\cr\cr
 #' **Mise en ligne** : 25 février 2016.\cr
 #' **Dernière modification** : 24 avril 2020.\cr
@@ -165,48 +169,28 @@
 "RLS_list"
 
 
-# V_DEM_PAIMT_MED_CM.SMED_COD_DIN -----------------------------------------
 
-#' Data - COD_DIN
+# V_DEM_PAIMT_MED_CM ------------------------------------------------------
+
+#' Data
 #'
-#' Codes d'identification des médicaments (`SMED_COD_DIN`) qui sont présents dans la vue `V_DEM_PAIMT_MED_CM`.
+#' Base de données sur les demandes de paiement de médicaments.
 #'
-#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création
 #'
-#' @format Tableau de 3 variables :
+#' @format `list` de trois (3) éléments :
 #' \describe{
-#'   \item{DIN}{Code d'identification du médicament (`SMED_COD_DIN`). `integer`.}
-#'   \item{DEBUT}{Première année où le code a été inscrit. `integer`.}
-#'   \item{FIN}{Dernière année où le code a été inscrit. `integer`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265}{\code{COD_DIN}}}{Description des codes d'identification du médicament :\cr - \code{DIN} : Code d'identification du médicament. `integer`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
+#'   \item{COD_SERV}{Description et années d'utilisation des codes de service. `NA` indique que le code n'a pas été utilisé.\cr - \code{COD_SERV} : Code de service. `character`.\cr - \code{SERV_1} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295}{SMED_COD_SERV_1}. `character`.\cr - \code{SERV_2} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30955&TypOrigElmVue=T&NoSeqElmOrig=6397}{SMED_COD_SERV_2}. `character`.\cr - \code{SERV_3} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30956&TypOrigElmVue=T&NoSeqElmOrig=6398}{SMED_COD_SERV_3}. `character`.\cr - \code{COD_SERV_DESC} : Description du code de service. `character`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30958&TypOrigElmVue=T&NoSeqElmOrig=6162}{COD_STA_DECIS}}{Codes de statut de décision qui existent dans la base de données \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.\cr - \code{COD_STA_DECIS}: Code de statut de décision. `character`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233}{COD_DENOM_COMNE}}{Codes de dénominations communes qui existent dans la base de données \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.\cr - \code{DENOM} : Code de dénomination commune. `character`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
 #' }
 #'
 #' @encoding UTF-8
-#' @usage data('V_DEM_PAIMT_MED_CM.SMED_COD_DIN')
-#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.
-"V_DEM_PAIMT_MED_CM.SMED_COD_DIN"
+#' @usage data('V_DEM_PAIMT_MED_CM')
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{Dictionnaire EI}
+"V_DEM_PAIMT_MED_CM"
 
-
-# V_DEM_PAIMT_MED_CM.SMED_COD_SERV ----------------------------------------
-
-#' Data - COD_SERV
-#'
-#' Codes de services (`SMED_COD_SERV_X`) qui sont présent dans la vue `V_DEM_PAIMT_MED_CM`.
-#'
-#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
-#'
-#' @format Tableau de 5 variables :
-#' \describe{
-#'   \item{COD_SERV}{Codes de services pouvant être isncrit dans les colonnes `SMED_COD_SERV_1`, `SMED_COD_SERV_2` et `SMED_COD_SERV3`. `character`.}
-#'   \item{SERV_1}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_1`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
-#'   \item{SERV_2}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_2`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
-#'   \item{SERV_3}{Première et dernière année que le code de service a été inscrit dans la colonne `SMED_COD_SERV_3`. Si `NA`, le code n'a jamais été inscrit dans cette colonne. `character`.}
-#'   \item{COD_SERV_DESC}{Description du code de service tirée de la variable `COD_SERV_DESC` de la vue `V_PARAM_SERV_MED`. `character`.}
-#' }
-#'
-#' @encoding UTF-8
-#' @usage data('V_DEM_PAIMT_MED_CM.SMED_COD_SERV')
-#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.
-"V_DEM_PAIMT_MED_CM.SMED_COD_SERV"
 
 
 # V_DENOM_COMNE_MED -------------------------------------------------------
@@ -230,7 +214,7 @@
 #'
 #' @encoding UTF-8
 #' @usage data('V_DENOM_COMNE_MED')
-#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1082&NomVue=V%5FDENOM%5FCOMNE%5FMED+%28D%E9nomination+commune+m%E9dicament%29}{V_DENOM_COMNE_MED}.
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1082&NomVue=V%5FDENOM%5FCOMNE%5FMED+%28D%E9nomination+commune+m%E9dicament%29}{Dictionnaire EI}.
 "V_DENOM_COMNE_MED"
 
 
@@ -253,28 +237,25 @@
 #'
 #' @encoding UTF-8
 #' @usage data('V_DES_COD')
-#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=111&NomVue=V%5FDES%5FCOD+%28DESCRIPTIONS+DES+CODES%29}{V_DES_COD}.
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=111&NomVue=V%5FDES%5FCOD+%28DESCRIPTIONS+DES+CODES%29}{Dictionnaire EI}.
 "V_DES_COD"
 
 
-# V_PRODU_MED.NMED_NOM_MARQ_COMRC -----------------------------------------
 
-#' Data - NOM_MARQ_COMRC
+# V_PRODU_MED -------------------------------------------------------------
+
+#' Data
 #'
-#' Nom sous lequel est commercialisé un produit pharmaceutique.
+#' Produit qui peut faire l'objet d'une facturation. Règle générale, c'est un médicament conçu par un fabricant.
 #'
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
 #' @format Tableau de 5 variables :
 #' \describe{
-#'   \item{DENOM}{Code de dénomination commune (`NMED_COD_DENOM_COMNE`). `character`.}
-#'   \item{DIN}{Code d'identification du médicament (`NMED_COD_DIN`). `integer`.}
-#'   \item{NOM_MARQ_COMRC}{Nom sous lequel est commercialisé un produit pharmaceutique\cr(`NMED_NOM_MARQ_COMRC`). `character`.}
-#'   \item{DATE_DEBUT}{Date de début d'une occurence de cette table (`NMED_DD_PRODU_MED`). `Date`.}
-#'   \item{DATE_FIN}{Date de fin d'une occurence de cette table (`NMED_DF_PRODU_MED`). `Date`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FPRODU%5FMED+%28Produit+m%E9dicament%29&NoSeqElmVue=27099&TypOrigElmVue=T&NoSeqElmOrig=5283}{NOM_MARQ_COMRC}}{Nom sous lequel est commercialisé un produit pharmaceutique.\cr - \code{DENOM} : Code de dénomination commune (`NMED_COD_DENOM_COMNE`). `character`.\cr - \code{DIN} : Code d'identification du médicament (`NMED_COD_DIN`). `integer`.\cr - \code{NOM_MARQ_COMRC} : Nom sous lequel est commercialisé un produit pharmaceutique\cr(`NMED_NOM_MARQ_COMRC`). `character`.\cr - \code{DATE_DEBUT} : Date d'entrée en vigueur de la mise à jour à laquelle est relié l'ajout ou la modification de cette occurrence (`NMED_DD_PRODU_MED`). `Date`.\cr - \code{DATE_FIN} : Date d'entrée en vigueur de la mise à jour **moins un jour** de l'occurrence suivante (`NMED_DF_PRODU_MED`). `Date`.}
 #' }
 #'
 #' @encoding UTF-8
-#' @usage data('V_PRODU_MED.NMED_NOM_MARQ_COMRC')
-#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1555&NomVue=V%5FPRODU%5FMED+%28Produit+m%E9dicament%29}{V_PRODU_MED}.
-"V_PRODU_MED.NMED_NOM_MARQ_COMRC"
+#' @usage data('V_PRODU_MED')
+#' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1555&NomVue=V%5FPRODU%5FMED+%28Produit+m%E9dicament%29}{Dictionnaire EI}.
+"V_PRODU_MED"

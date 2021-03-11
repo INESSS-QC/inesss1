@@ -45,7 +45,8 @@ no_seq_indcn_recnu <- function(conn) {
 }
 
 I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
-  NPME_NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu(conn)  # no séquence indication reconnue - PME
+  NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu(conn)  # no séquence indication reconnue - PME
 )
+attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
 use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)

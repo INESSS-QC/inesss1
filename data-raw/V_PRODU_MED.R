@@ -6,14 +6,7 @@ library(inesss)
 library(lubridate)
 # conn <- SQL_connexion(askpass("User"))
 
-fct <- function(need_conn = FALSE) {
-
-  rmNA <- inesss:::rmNA
-
-  ### Effectuer la connexion à Teradata
-  if (need_conn) {
-    conn <- sql_connexion(askpass("User"))
-  }
+nom_marq_comrc <- function() {
 
   ### Extraction SQL
   query <-
@@ -44,11 +37,14 @@ fct <- function(need_conn = FALSE) {
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
 
-  attr(DT, "MaJ") <- Sys.Date()  # date de création
   return(DT)
 
 }
 
 
-V_PRODU_MED.NMED_NOM_MARQ_COMRC <- fct()
-use_data(V_PRODU_MED.NMED_NOM_MARQ_COMRC, overwrite = TRUE)
+V_PRODU_MED <- list(
+  NOM_MARQ_COMRC = nom_marq_comrc()
+)
+attr(V_PRODU_MED, "MaJ") <- Sys.Date()
+
+use_data(V_PRODU_MED, overwrite = TRUE)
