@@ -1,4 +1,4 @@
-**inesss v.0.6.0**
+**inesss v.0.6.1**
 
 Support
 =======
@@ -53,6 +53,15 @@ v.1.5.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
 
 Autres installations/désinstallations
 =====================================
+
+Macros VBA EXCEL
+----------------
+
+Après avoir installé la librairie *inesss*, exécuter le code suivant :
+
+``` r
+inesss::inesss_excel_macros()
+```
 
 Installation de R
 -----------------

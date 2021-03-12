@@ -106,6 +106,13 @@ newpage()
 
 # Autres installations/désinstallations
 
+## Macros VBA EXCEL
+Après avoir installé la librairie *inesss*, exécuter le code suivant :
+```{r, eval=FALSE, echo=TRUE}
+inesss::inesss_excel_macros()
+```
+
+
 ## Installation de R {#inst}
 
 * Télécharger la version R 4.0.3 en cliquant [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.3/R-4.0.3-win.exe).

@@ -1,5 +1,9 @@
-Librairie [`inesss` v.0.6.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.6.1](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.6.1
+
+-   Fonction `inesss_excel_macros`.
 
 ### v0.6.0
 
