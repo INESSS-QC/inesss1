@@ -108,7 +108,7 @@ newpage()
 
 ## Macros VBA EXCEL
 Après avoir installé la librairie *inesss*, exécuter le code suivant :
-```{r, eval=FALSE}
+```{r, eval=FALSE, echo=TRUE}
 inesss::inesss_excel_macros()
 ```
 

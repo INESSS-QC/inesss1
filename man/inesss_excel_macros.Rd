@@ -12,7 +12,7 @@ inesss_excel_macros(filename = "PERSONAL.XLSB")
 }
 \description{
 Télécharge le fichier Excel contenant les macros VBA et l'enregistre au répertoire suivant :\cr
-\verb{C:\\\\Users\\\\NomUtilisateur\\\\AppData\\\\Roaming\\\\Microsoft\\\\Excel\\\\XLSTART}.\cr
+\code{C:\\Users\\NomUtilisateur\\AppData\\Roaming\\Microsoft\\Excel\\XLSTART}.\cr
 L'enregistrer à cet endroit permet de rendre disponible les macros VBA à partir de n'importe quelle classeur Excel.
 }
 \examples{

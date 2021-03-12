@@ -1,7 +1,7 @@
 #' Macros VBA
 #'
 #' Télécharge le fichier Excel contenant les macros VBA et l'enregistre au répertoire suivant :\cr
-#' `C:\\Users\\NomUtilisateur\\AppData\\Roaming\\Microsoft\\Excel\\XLSTART`.\cr
+#' \code{C:\\Users\\NomUtilisateur\\AppData\\Roaming\\Microsoft\\Excel\\XLSTART}.\cr
 #' L'enregistrer à cet endroit permet de rendre disponible les macros VBA à partir de n'importe quelle classeur Excel.
 #'
 #' @param filename Nom du fichier contenant les macros VBA. Si le fichier existe déjà, on demande si on veut le remplacer. Par défaut `'PERSONAL.XLSB'`.
@@ -39,8 +39,7 @@ inesss_excel_macros <- function(filename = 'PERSONAL.XLSB') {
   if (answ) {
     download.file(
       url = "https://github.com/INESSS-QC/inesss1/raw/devel/Documentation/Gabarits%20et%20Outils%20EXCEL/PERSONAL.XLSB",
-      destfile = paste0(dir,"/",filename),
-      mode = "wb"
+      destfile = paste0(dir,"/",filename), mode = "wb"
     )
   }
 
