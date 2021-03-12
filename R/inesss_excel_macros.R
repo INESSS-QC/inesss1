@@ -38,7 +38,7 @@ inesss_excel_macros <- function(filename = 'PERSONAL.XLSB') {
   }
   if (answ) {
     download.file(
-      url = "https://github.com/INESSS-QC/inesss1/raw/devel/Documentation/Gabarits%20et%20Outils%20EXCEL/PERSONAL.XLSB",
+      url = "https://github.com/INESSS-QC/inesss1/blob/master/Documentation/Gabarits%20et%20Outils%20EXCEL/PERSONAL.XLSB?raw=true",
       destfile = paste0(dir,"/",filename), mode = "wb"
     )
   }
