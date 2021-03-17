@@ -1,5 +1,5 @@
 ---
-title: "Calcul de l'âge en divisant par 365"
+title: "Calcul de l'âge"
 author: "Guillaume Boucher"
 output: rmarkdown::html_vignette
 vignette: >
