@@ -20,13 +20,13 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
-### v0.6.2
+### [v0.6.2](https://github.com/INESSS-QC/inesss1/commit/d223ab8038d16db8b7c7949f7289f71b2fa30fb0)
 * Data `I_APME_DEM_AUTOR_CRITR_ETEN_CM` section `DES_COURT_INDCN_RECNU`.
 
-### v0.6.1
+### [v0.6.1](https://github.com/INESSS-QC/inesss1/pull/12)
 * Fonction `inesss_excel_macros`.
 
-### v0.6.0
+### [v0.6.0](https://github.com/INESSS-QC/inesss1/pull/11)
 * Fonction `date_ymd`.
 * Fonctions `query_naif_switch1` et `SQL_naif_switch1`
 * Méthode `naif_switch1` dans le formulaire (via EXCEL seulement).
