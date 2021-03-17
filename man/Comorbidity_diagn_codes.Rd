@@ -8,11 +8,11 @@
 \alias{Elixhauser_diagn_codes}
 \title{Data - Codes diagnostics}
 \format{
-\code{list(nom_diagn = list(CIM9, CIM10))}. 32 diagnostics.
+\code{list}
 
-\code{list(nom_diagn = list(CIM9, CIM10))}. 16 diagnostics.
+An object of class \code{list} of length 16.
 
-\code{list(nom_diagn = list(CIM9, CIM10))}. 29 diagnostics.
+An object of class \code{list} of length 29.
 }
 \source{
 \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
@@ -20,9 +20,9 @@
 \usage{
 data('Comorbidity_diagn_codes')
 
-Charlson_diagn_codes
+data('Charlson_diagn_codes')
 
-Elixhauser_diagn_codes
+data('Elixhauser_diagn_codes')
 }
 \description{
 Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.

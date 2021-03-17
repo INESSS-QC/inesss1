@@ -5,7 +5,28 @@ library(askpass)
 library(inesss)
 # conn <- SQL_connexion(askpass("User"))
 
-no_seq_indcn_recnu <- function(conn) {
+des_court_indcn_recnu <- function() {
+
+  years <- 1996:year(Sys.Date())
+  DT <- vector("list", length(years))
+  i <- 1L
+  for (yr in years) {
+    DT[[i]] <- dbGetQuery(conn, statement = paste0(
+      "select distinct(NPME_DES_COURT_INDCN_RECNU) as DES_COURT_INDCN_RECNU\n",
+      "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+      "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, 1, 1),"' and '",date_ymd(yr, 12, 31),"';"
+    ))
+    i <- i + 1L
+  }
+  DT <- rbindlist(DT)
+  DT <- unique(DT)
+  DT <- DT[complete.cases(DT)]
+  setorder(DT, DES_COURT_INDCN_RECNU)
+
+  return(DT)
+
+}
+no_seq_indcn_recnu <- function() {
 
   ### Extraction data
   DT <- dbGetQuery(
@@ -42,10 +63,13 @@ no_seq_indcn_recnu <- function(conn) {
     .(NO_SEQ_INDCN_RECNU)
   ]
 
+  return(DT)
+
 }
 
 I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
-  NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu(conn)  # no séquence indication reconnue - PME
+  DES_COURT_INDCN_RECNU = des_court_indcn_recnu(),
+  NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu()
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 

@@ -1,4 +1,4 @@
-**inesss v.0.6.1**
+**inesss v.0.6.2**
 
 Support
 =======
@@ -18,8 +18,7 @@ la librairie *inesss*.
 
 ``` r
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-remotes::install_github("INESSS-QC/inesss", upgrade = "never",
-                        build_manual = T, build_vignettes = T)
+remotes::install_github("INESSS-QC/inesss", upgrade = "never", build_vignettes = T)
 ```
 
 Démarrer le formulaire

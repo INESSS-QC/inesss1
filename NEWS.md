@@ -1,5 +1,10 @@
-Librairie [`inesss` v.0.6.1](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.6.2](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.6.2
+
+-   Data `I_APME_DEM_AUTOR_CRITR_ETEN_CM` section
+    `DES_COURT_INDCN_RECNU`.
 
 ### v0.6.1
 

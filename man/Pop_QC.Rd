@@ -8,14 +8,14 @@
 \format{
 Tableau de 8 variables et 2 595 320 observations :
 \describe{
-\item{GEO}{Niveau géographique : Québec, RUISSS, RSS, RTS, RLS, CLSC.}
-\item{CODE}{Code du territoire.}
-\item{AN}{Année.}
-\item{TYPE}{Type de données : Estimations ou Projections.}
-\item{STATUT}{Donnée révisée ou provisoire. \code{NA} indique que la donnée n'a pas été changée depuis la dernière publication.}
-\item{SEXE}{}
-\item{AGE}{}
-\item{POP}{Population}
+\item{GEO}{Niveau géographique : Québec, RUISSS, RSS, RTS, RLS, CLSC. \code{character}.}
+\item{CODE}{Code du territoire. \code{integer}.}
+\item{AN}{Année. \code{integer}.}
+\item{TYPE}{Type de données : Estimations ou Projections. \code{character}.}
+\item{STATUT}{Donnée révisée ou provisoire. \code{NA} indique que la donnée n'a pas été changée depuis la dernière publication. \code{character}.}
+\item{SEXE}{\code{character}.}
+\item{AGE}{\code{integer}.}
+\item{POP}{Population. \code{integer}.}
 }
 }
 \source{

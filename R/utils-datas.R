@@ -39,21 +39,21 @@
 #' `valv` : Valvular disease\cr
 #' `wloss` : Weight loss
 #'
+#' @format `list`
 #' @encoding UTF-8
-#' @usage data('Comorbidity_diagn_codes')
 #' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
 #' @name Comorbidity_diagn_codes
 
 #' @rdname Comorbidity_diagn_codes
-#' @format `list(nom_diagn = list(CIM9, CIM10))`. 32 diagnostics.
+#' @usage data('Comorbidity_diagn_codes')
 "Comorbidity_diagn_codes"
 
 #' @rdname Comorbidity_diagn_codes
-#' @format `list(nom_diagn = list(CIM9, CIM10))`. 16 diagnostics.
+#' @usage data('Charlson_diagn_codes')
 "Charlson_diagn_codes"
 
 #' @rdname Comorbidity_diagn_codes
-#' @format `list(nom_diagn = list(CIM9, CIM10))`. 29 diagnostics.
+#' @usage data('Elixhauser_diagn_codes')
 "Elixhauser_diagn_codes"
 
 
@@ -67,7 +67,7 @@
 #' \describe{
 #'   \item{DIAGN}{Identification du diagnostic. `character`.}
 #'   \item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation. `character`.}
-#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM. `integer`}
+#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM. `integer`.}
 #'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM. `integer`.}
 #' }
 #'
@@ -86,7 +86,8 @@
 #'
 #' @format `list`
 #' \describe{
-#'   \item{NO_SEQ_INDCN_RECNU_PME}{Indique la première et la dernière année d'utilisation.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{\code{NO_SEQ_INDCN_RECNU}} : Numéro de séquence d'indication reconnue - PME. `integer`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37534&TypOrigElmVue=T&NoSeqElmOrig=9381}{\code{DD_TRAIT_DEM}} : Date de début de traitement demandée.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37537&TypOrigElmVue=T&NoSeqElmOrig=9382}{\code{DF_TRAIT_DEM}} : Date de fin de traitement demandée.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37944&TypOrigElmVue=T&NoSeqElmOrig=9367}{\code{DD_AUTOR}} : Date de début de l'autorisation PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37946&TypOrigElmVue=T&NoSeqElmOrig=9368}{\code{DF_AUTOR}} : Date de fin de l'autorisation PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37943&TypOrigElmVue=T&NoSeqElmOrig=9363}{\code{DD_APLIC_AUTOR}} : Date de début de l'applicabilité de l'autorisation de PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37945&TypOrigElmVue=T&NoSeqElmOrig=9364}{\code{DF_APLIC_AUTOR}} : Date de fin de l'applicabilité de l'autorisation de PME.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{DAT_STA_DEM}} : Date de création ou de mise à jour du statut d'une demande d'autorisation correspondant à l'attribution du dernier statut de la demande.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37934&TypOrigElmVue=D&NoSeqElmOrig=37196}{DES_COURT_INDCN_RECNU}}{Valeurs uniques de la description courte complète de l'indication reconnue de PME.\cr - \code{DES_COURT_INDCN_RECNU} : `character`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{NO_SEQ_INDCN_RECNU_PME}}{Indique la première et la dernière année d'utilisation.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{\code{NO_SEQ_INDCN_RECNU}} : Numéro de séquence d'indication reconnue - PME. `integer`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37534&TypOrigElmVue=T&NoSeqElmOrig=9381}{\code{DD_TRAIT_DEM}} : Date de début de traitement demandée. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37537&TypOrigElmVue=T&NoSeqElmOrig=9382}{\code{DF_TRAIT_DEM}} : Date de fin de traitement demandée. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37944&TypOrigElmVue=T&NoSeqElmOrig=9367}{\code{DD_AUTOR}} : Date de début de l'autorisation PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37946&TypOrigElmVue=T&NoSeqElmOrig=9368}{\code{DF_AUTOR}} : Date de fin de l'autorisation PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37943&TypOrigElmVue=T&NoSeqElmOrig=9363}{\code{DD_APLIC_AUTOR}} : Date de début de l'applicabilité de l'autorisation de PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37945&TypOrigElmVue=T&NoSeqElmOrig=9364}{\code{DF_APLIC_AUTOR}} : Date de fin de l'applicabilité de l'autorisation de PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{DAT_STA_DEM}} : Date de création ou de mise à jour du statut d'une demande d'autorisation correspondant à l'attribution du dernier statut de la demande. `character`.}
 #' }
 #'
 #' @usage data('I_APME_DEM_AUTOR_CRITR_ETEN_CM')
@@ -114,14 +115,14 @@
 #'
 #' @format Tableau de 8 variables et 2 595 320 observations :
 #' \describe{
-#'   \item{GEO}{Niveau géographique : Québec, RUISSS, RSS, RTS, RLS, CLSC.}
-#'   \item{CODE}{Code du territoire.}
-#'   \item{AN}{Année.}
-#'   \item{TYPE}{Type de données : Estimations ou Projections.}
-#'   \item{STATUT}{Donnée révisée ou provisoire. `NA` indique que la donnée n'a pas été changée depuis la dernière publication.}
-#'   \item{SEXE}{}
-#'   \item{AGE}{}
-#'   \item{POP}{Population}
+#'   \item{GEO}{Niveau géographique : Québec, RUISSS, RSS, RTS, RLS, CLSC. `character`.}
+#'   \item{CODE}{Code du territoire. `integer`.}
+#'   \item{AN}{Année. `integer`.}
+#'   \item{TYPE}{Type de données : Estimations ou Projections. `character`.}
+#'   \item{STATUT}{Donnée révisée ou provisoire. `NA` indique que la donnée n'a pas été changée depuis la dernière publication. `character`.}
+#'   \item{SEXE}{`character`.}
+#'   \item{AGE}{`integer`.}
+#'   \item{POP}{Population. `integer`.}
 #' }
 #'
 #' @usage data('Pop_QC')
@@ -144,8 +145,8 @@
 #'
 #' @format Tableau de 2 variables et 84 observations :
 #' \describe{
-#'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10.}
-#'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10.}
+#'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10. `integer`.}
+#'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10. `integer`.}
 #' }
 #'
 #' @usage data('RLS_convert')
