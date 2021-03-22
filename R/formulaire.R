@@ -130,6 +130,7 @@ formulaire <- function() {
     dt <- dt[!code %in% c("L", "M", "M1", "M2", "M3")]
     dt <- rbind(dt, data.table(code = "L, M, M1 à M3", desc = "PREPARATION MAGISTRALE"))
     dt <- setkey(dt, code)
+    dt <- dt[dt[, .I[.N], .(code)]$V1]  # description la plus récente des codes de service
     return(dt)
 
   }
@@ -1250,7 +1251,7 @@ formulaire <- function() {
         updateNumericInput(session, "sg1_nb_codes", value = 1)
       }
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-        # dans le textInput sans qu'il y ait de réactivité
+                # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
         # Créer des textInput. Possible de conserver les valeurs précédentes
         # si input$sg1_nb_codes diminue
