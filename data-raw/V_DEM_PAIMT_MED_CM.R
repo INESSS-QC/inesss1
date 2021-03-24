@@ -64,6 +64,8 @@ cod_serv <- function() {
     , .(DEBUT = min(DEBUT), FIN = max(FIN)),
     .(COD_SERV, COD_SERV_DESC, per)
   ][, per := NULL]
+  # Modifier les valeurs pour avoir des descriptions avant 2003
+  DT_desc[DT_desc[, .I[1], .(COD_SERV)]$V1, DEBUT := 1996L]
 
   ### Liste des codes de service dans chaque colonne (1 à 3) de SMED_COD_SERV_
   to_year <- 1996:year(Sys.Date())  # années à analyser
