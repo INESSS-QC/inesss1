@@ -104,7 +104,7 @@ newpage()
 
 ## Installation de R {#inst}
 
-* Télécharger la version R 4.0.3 en cliquant [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.3/R-4.0.3-win.exe).
+* Télécharger la version R 4.0.3 en cliquant [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.3/R-4.0.3-win.exe) (ou la dernière version [ici](https://cloud.r-project.org/bin/windows/base/).
 * Ouvrir le fichier téléchargé.
 * Choisir la langue utilisée par l'assistant d'installation, puis cliquer sur *OK*.
 * **Information** : Une note apparaît indiquant que vous devez avoir les privilèges d'administrateurs. Ignorer cet avertissement et cliquer sur *Suivant*.
