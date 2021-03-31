@@ -82,8 +82,6 @@
 
 #' Data - Demandes d'autorisation de Patient-Médicament d'exceptions.
 #'
-#' @details Certaines dates de fin sont plus grande que la date du jour (souvent 2078-12-31). Si c'est le cas, ces dates sont modifiées par la date du jour.
-#'
 #' @format `list`
 #' \describe{
 #'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37934&TypOrigElmVue=D&NoSeqElmOrig=37196}{DES_COURT_INDCN_RECNU}}{Valeurs uniques de la description courte complète de l'indication reconnue de PME.\cr - \code{DES_COURT_INDCN_RECNU} : `character`.}

@@ -112,7 +112,7 @@ NULL_if_NA <- function(x) {
 Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser [les gabarits disponibles](https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits).
 
 1. Cliquer sur le bouton *Sélectionner fichier Excel* pour sélectionner le fichier Excel contenant la ou les requêtes à exécuter.
-2. Le répertoire du fichier sélectionné apparaît sous le bouton pour valider si c'est le bon fichier à utiliser.
+2. Le répertoire du fichier sélectionné apparaît sous le bouton pour vérifier si c'est le bon fichier à utiliser.
 3. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
 4. Si la structure est acceptée, le message «`Aucune erreur, exécution possible.`» s'affiche. Sinon, le message indique, pour chaque onglet, les erreurs à corriger.
 5. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la ou les requêtes associées aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
@@ -126,8 +126,8 @@ Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel.
 
 ## Naïf / Switch
 Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.  
-Un individu est considéré naïf lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements de la même famille.  
-Un individu est considéré switch lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant à la même famille.  
+Un individu est considéré comme étant *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements de la même famille.  
+Un individu est considéré comme étant *switch* lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant à la même famille.  
 Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#ns1_arguments}
@@ -558,7 +558,7 @@ Un onglet résultat contient trois (3) éléments :
 * **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
 * **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude. Si on ne demande pas les résultats par `Codes`, cette colonne se situera à la fin du tableau et tous les codes seront indiqués dans une même cellule.
 * **`NOM_DENOM / NOM_MARQ_COMRC` :** Indique le nom de la dénomination commune si c'est un `DENOM` ou le nom de la marque de commerce si c'est un `DIN`. Conditionnel : demander les résultats par `Codes`.
-* **`TENEUR` :** Teneur du médicament. Conditionnel : demander les résultats par `Teneur`. Voir
+* **`TENEUR` :** Teneur du médicament. Conditionnel : demander les résultats par `Teneur`.
 * **`FORMAT_ACQ` :** Format d'acquisition du médicament. Conditionnel : demander les résultats par `Format`.
 * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
 * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].

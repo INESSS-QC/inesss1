@@ -9,13 +9,13 @@
 #' @param DIAGN Nom de la colonne indiquant le code d'un diagnostic.\cr Voir `names(inesss::Comorbidity_diagn_codes)`.
 #' @param DATE_DX Nom de la colonne indiquant la date du diagnostic.
 #' @param SOURCE Nom de la colonne indiquant la provenance du diagnostic.
-#' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostique soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
+#' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
 #' @param method Méthode de calcul des indicateurs. `'Charlson'` ou `'Elixhauser'`. Inscrire les deux crée la colonne `Combined`.
 #' @param scores `'CIM9'` ou `'CIM10'`. Nom de la colonne du dataset `Comorbidity_weights` à utiliser pour le calcul des indicateurs.
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
 #' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'
-#' @return `data.table` avec les colonnes `ID`, `Charlson` (selon `method`), `Elixhauser` (selon `method`), `Combined` (selon `method`), et tous les codes de diagnosti indiquant leur poids.
+#' @return `data.table` avec les colonnes `ID`, `Charlson` (selon `method`), `Elixhauser` (selon `method`), `Combined` (selon `method`), et tous les codes de diagnostic indiquant leur poids.
 #' @import data.table
 #' @encoding UTF-8
 #' @export
