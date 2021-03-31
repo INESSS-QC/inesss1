@@ -6,7 +6,7 @@
 #' @import shiny
 #' @import shinydashboard
 #' @export
-data_explore <- function() {
+datas_inesss <- function() {
 
   ui <- dashboardPage(
 
@@ -32,7 +32,7 @@ data_explore <- function() {
           tabName = "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
           selectInput(inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                       label = "Élément",
-                      choices = names(I_APME_DEM_AUTOR_CRITR_ETEN_CM)),
+                      choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)),
           uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
           dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt")
         ),
@@ -41,7 +41,7 @@ data_explore <- function() {
           tabName = "V_DEM_PAIMT_MED_CM",
           selectInput(inputId = "V_DEM_PAIMT_MED_CM__data",
                       label = "Élément",
-                      choices = names(V_DEM_PAIMT_MED_CM)),
+                      choices = names(inesss::V_DEM_PAIMT_MED_CM)),
           uiOutput("V_DEM_PAIMT_MED_CM__params"),
           dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
         )
@@ -99,7 +99,7 @@ data_explore <- function() {
     # Tableau
     I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- reactive({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        DT <- copy(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
+        DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
         search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
                                                   "\\+"))
         if (length(search_words) == 1 && search_words == "") {
@@ -113,7 +113,7 @@ data_explore <- function() {
         }
         return(DT)
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
-        DT <- copy(I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
+        DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
         for (col in names(DT)) {
           search_words <- unlist(stringr::str_split(
             input[[paste0("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__",col)]], "\\+"
@@ -165,9 +165,10 @@ data_explore <- function() {
               width = 4,
               textInput("V_DEM_PAIMT_MED_CM__COD_DIN__DIN", "DIN"),
               sliderInput("V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN", "DEBUT - FIN",
-                          min = min(V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT),
-                          max = max(V_DEM_PAIMT_MED_CM$COD_DIN$FIN),
-                          value = c(min(V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT), max(V_DEM_PAIMT_MED_CM$COD_DIN$FIN)),
+                          min = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT),
+                          max = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN),
+                          value = c(min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT),
+                                    max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN)),
                           sep = "", step = 1),
               actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser")
             )
@@ -198,6 +199,37 @@ data_explore <- function() {
           ),
           div(style = "margin-top:20px")
         ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__COD_STA_DECIS", "COD_STA_DECIS"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DENOM", "DENOM")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__NOM_DENOM", "NOM_DENOM"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
       } else {
         return(NULL)
       }
@@ -206,7 +238,7 @@ data_explore <- function() {
     # Tableau
     V_DEM_PAIMT_MED_CM__dt <- reactive({
       if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
-        DT <- copy(V_DEM_PAIMT_MED_CM$COD_DIN)
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_DIN)
         if (length(input$V_DEM_PAIMT_MED_CM__COD_DIN__DIN) && input$V_DEM_PAIMT_MED_CM__COD_DIN__DIN != "") {
           search_words <- unlist(stringr::str_split(input$"V_DEM_PAIMT_MED_CM__COD_DIN__DIN", "\\+"))
           for (i in 1:length(search_words)) {
@@ -215,10 +247,13 @@ data_explore <- function() {
             DT[, paste(i) := NULL]
           }
         }
-        DT <- DT[input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[1]] <= DEBUT & FIN <= input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[2]]]
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[2]]
+        ]
         return(DT)
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
-        DT <- copy(V_DEM_PAIMT_MED_CM$COD_SERV)
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_SERV)
         for (col in c("COD_SERV", "COD_SERV_DESC")) {
           search_words <- unlist(stringr::str_split(
             input[[paste0("V_DEM_PAIMT_MED_CM__COD_SERV__",col)]], "\\+"
@@ -245,6 +280,48 @@ data_explore <- function() {
           }
         }
         return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_STA_DECIS)
+        for (col in c("COD_STA_DECIS")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE)
+        for (col in c("DENOM", "NOM_DENOM")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN[[2]]
+        ]
+        return(DT)
       } else {
         return(NULL)
       }
@@ -259,7 +336,8 @@ data_explore <- function() {
     observeEvent(input$V_DEM_PAIMT_MED_CM__COD_DIN__reset, {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DIN", value = "")
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN",
-                        value = c(min(V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT), max(V_DEM_PAIMT_MED_CM$COD_DIN$FIN)))
+                        value = c(min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT),
+                                  max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN)))
     })
     observeEvent(input$V_DEM_PAIMT_MED_CM__COD_SERV__reset, {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV", value = "")
@@ -268,6 +346,15 @@ data_explore <- function() {
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_2", value = c(1996, year(Sys.Date())))
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_3", value = c(1996, year(Sys.Date())))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_FILTER", selected = character(0))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_STA_DECIS__COD_STA_DECIS", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__NOM_DENOM", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN", value = c(1996, year(Sys.Date())))
     })
 
   }

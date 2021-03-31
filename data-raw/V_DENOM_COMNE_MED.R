@@ -6,12 +6,7 @@ library(inesss)
 library(lubridate)
 # conn <- SQL_connexion(askpass("User"))
 
-fct <- function(need_conn = FALSE) {
-
-  ### Effectuer la connexion à Teradata
-  if (need_conn) {
-    conn <- sql_connexion(askpass("User"))
-  }
+fct <- function() {
 
   ### Tableau des codes DENOM
   query <-

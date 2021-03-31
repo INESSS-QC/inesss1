@@ -145,6 +145,24 @@ cod_sta_decis <- function() {
 }
 cod_denom <- function() {
 
+  ### Descriptions des Denom à ajouter
+  query <-
+    "select NMED_COD_DENOM_COMNE as DENOM,
+  	  NMED_DD_DENOM_COMNE as DATE_DEBUT,
+  	  NMED_DF_DENOM_COMNE as DATE_FIN,
+  	  NMED_NOM_DENOM_COMNE as NOM_DENOM
+    from PROD.V_DENOM_COMNE_MED
+    order by DENOM, DATE_DEBUT;"
+  DT_desc <- as.data.table(dbGetQuery(conn, query))
+  DT_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
+  # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
+  # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
+  # en utilisant la seule description possible
+  idx <- DT_desc[, .I[.N == 1], .(DENOM)]$V1
+  if (length(idx)) {
+    DT_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
+  }
+
   to_year <- 1996:year(Sys.Date())
   DT <- vector("list", length(to_year) * 12)
   i <- 1L
@@ -155,6 +173,7 @@ cod_denom <- function() {
         "from V_DEM_PAIMT_MED_CM\n",
         "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
+      dt <- DT_desc[DATE_DEBUT <= yr & yr <= DATE_FIN, .(DENOM, NOM_DENOM)][dt, on = .(DENOM)]
       dt[, ANNEE := yr]
       DT[[i]] <- dt
       i <- i + 1L
@@ -165,7 +184,7 @@ cod_denom <- function() {
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM)
+    .(DENOM, NOM_DENOM)
   ]
   return(DT)
 

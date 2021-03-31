@@ -3,6 +3,7 @@ library(odbc)
 library(data.table)
 library(askpass)
 library(inesss)
+library(stringr)
 # conn <- SQL_connexion(askpass("User"))
 
 des_court_indcn_recnu <- function() {
@@ -44,12 +45,13 @@ no_seq_indcn_recnu <- function() {
   )
   setDT(DT)
   setkey(DT, NO_SEQ_INDCN_RECNU, DD_TRAIT_DEM, DD_AUTOR, DD_APLIC_AUTOR, DAT_STA_DEM)
-
-  ### Arranger les dates
-  for (col in names(DT)[names(DT) != "NO_SEQ_INDCN_RECNU"]) {
-    DT[get(col) > Sys.Date(), (col) := Sys.Date()]
-    DT[, (col) := year(get(col))]
-  }
+  DT[, `:=` (DD_TRAIT_DEM = year(DD_TRAIT_DEM),
+             DF_TRAIT_DEM = year(DF_TRAIT_DEM),
+             DD_AUTOR = year(DD_AUTOR),
+             DF_AUTOR = year(DF_AUTOR),
+             DD_APLIC_AUTOR = year(DD_APLIC_AUTOR),
+             DF_APLIC_AUTOR = year(DF_APLIC_AUTOR),
+             DAT_STA_DEM = year(DAT_STA_DEM))]
 
   ### Afficher la valeur min et la valeur max des dates pour chaque code
   DT <- DT[

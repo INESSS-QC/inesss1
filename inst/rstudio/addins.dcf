@@ -1,3 +1,9 @@
+Name: Datas INESSS
+Description: Exploration des datasets du package inesss
+Binding: datas_inesss_addin
+Interactive: true
+
+
 Name: Formulaire
 Description: Démarrage du formulaire avec Shiny.
 Binding: formulaire_addin
