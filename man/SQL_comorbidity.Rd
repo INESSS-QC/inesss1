@@ -7,8 +7,6 @@
 \usage{
 SQL_comorbidity(
   conn,
-  uid,
-  pwd,
   dt,
   ID,
   DATE_INDEX,
@@ -30,11 +28,7 @@ SQL_comorbidity(
 )
 }
 \arguments{
-\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments \code{uid} et \code{pwd}.}
-
-\item{uid}{Nom de l'identifiant pour la connexion SQL Teradata.}
-
-\item{pwd}{Mot de passe associé à l'identifiant. Si \code{NULL}, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.}
+\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
 
 \item{dt}{Tableau ayant au moins deux colonnes : \code{ID} et \code{DATE_INDEX}.}
 
@@ -82,7 +76,6 @@ SQL_comorbidity(
 Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 }
 \details{
-\strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr
 \strong{\code{dt} :} Si un \code{ID} a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
 \strong{\code{obstetric_exclu} :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.\cr\cr
 \strong{\code{dt_source} :}

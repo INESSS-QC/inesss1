@@ -1,5 +1,12 @@
-Librairie [`inesss` v.0.6.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.6.3](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.6.3
+
+-   Addins `Datas INESSS` qui permet d’explorer les datasets de la
+    librairie.
+-   MaJ fonction `SQL_comorbidity` qui avait un message d’erreur lors du
+    tri des évènements obstétriques.
 
 ### [v0.6.2](https://github.com/INESSS-QC/inesss1/commit/d223ab8038d16db8b7c7949f7289f71b2fa30fb0)
 

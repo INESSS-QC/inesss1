@@ -66,17 +66,3 @@ render(  # pdf_document
   envir = new.env(), encoding = "UTF-8"
 )
 
-
-# BD_descriptif -----------------------------------------------------------
-
-files <- c(
-  "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
-  "V_DEM_PAIMT_MED_CM",
-  "V_DENOM_COMNE_MED",
-  "V_DES_COD",
-  "V_PRODU_MED"
-)
-for (f in files) {
-  write_xlsx(get(f), paste0("Documentation/BD_descriptif/",f,".xlsx"))
-}
-

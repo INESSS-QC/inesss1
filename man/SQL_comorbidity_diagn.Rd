@@ -7,8 +7,6 @@
 \usage{
 SQL_comorbidity_diagn(
   conn,
-  uid,
-  pwd,
   cohort,
   debut,
   fin,
@@ -23,11 +21,7 @@ SQL_comorbidity_diagn(
 )
 }
 \arguments{
-\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments \code{uid} et \code{pwd}.}
-
-\item{uid}{Nom de l'identifiant pour la connexion SQL Teradata.}
-
-\item{pwd}{Mot de passe associé à l'identifiant. Si \code{NULL}, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.}
+\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
 
 \item{cohort}{Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.}
 
@@ -60,7 +54,6 @@ SQL_comorbidity_diagn(
 Extraction SQL des diagnostics pour l'étude de la comorbidité.
 }
 \details{
-\strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser \code{conn} ou la combinaison \code{uid} et \code{pwd}.\cr\cr
 \strong{\code{dt_source} :}
 \itemize{
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V\%5FDIAGN\%5FSEJ\%5FHOSP\%5FCM+\%28Diagnostic+s\%E9jour+hospitalier\%29}{\code{V_DIAGN_SEJ_HOSP_CM}} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.

@@ -6,8 +6,6 @@
 \usage{
 SQL_obstetric(
   conn,
-  uid,
-  pwd,
   cohort,
   debut,
   fin,
