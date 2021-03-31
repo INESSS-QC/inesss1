@@ -2,7 +2,6 @@
 #'
 #' Extraction SQL des diagnostics pour l'étude de la comorbidité.
 #'
-#' \strong{\code{conn}, \code{uid}, \code{pwd} :} Pour se connecter à Teradata, utiliser `conn` ou la combinaison `uid` et `pwd`.\cr\cr
 #' \strong{\code{dt_source} :}
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V%5FDIAGN%5FSEJ%5FHOSP%5FCM+%28Diagnostic+s%E9jour+hospitalier%29}{`V_DIAGN_SEJ_HOSP_CM`} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
@@ -11,9 +10,7 @@
 #'
 #' \strong{`method` :} Voir les listes \link{Comorbidity_diagn_codes} pour connaître les codes de diagnostics extraits.
 #'
-#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}. Évite d'utiliser les arguments `uid` et `pwd`.
-#' @param uid Nom de l'identifiant pour la connexion SQL Teradata.
-#' @param pwd Mot de passe associé à l'identifiant. Si `NULL`, le programme demande le mot passe. Cela permet de ne pas afficher le mot de passe dans un script.
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
 #' @param cohort Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.
 #' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ`.
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
@@ -32,8 +29,7 @@
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity_diagn <- function(
-  conn, uid, pwd,
-  cohort, debut, fin,
+  conn, cohort, debut, fin,
   method = c('Charlson', 'Elixhauser'),
   CIM = c('CIM9', 'CIM10'),
   dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
@@ -48,23 +44,9 @@ SQL_comorbidity_diagn <- function(
   if (missing(conn)) {
     conn <- NULL
   }
-  if (missing(uid)) {
-    uid <- NULL
-  }
-  if (missing(pwd)) {
-    pwd <- NULL
-  }
-
-  ### Connexion Teradata
-  if (is.null(conn)) {  # doit se connecter avec uid+pwd
-    if (is.null(pwd)) {  # demande le mot de passe s'il n'a pas été inscrit
-      pwd <- askpass::askpass("Quel est votre mot de passe?")
-    }
-    conn <- SQL_connexion(uid, pwd)  # connexion à Teradata
-  }
 
   ### Extraction des diagn
-  if (is.null(conn)) {  # si encore NULL = Erreur
+  if (!"info" %in% names(attributes(conn))) {  # si encore NULL = Erreur
     stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
   } else {
 

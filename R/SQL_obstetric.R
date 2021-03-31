@@ -10,7 +10,7 @@
 #'
 #' @export
 SQL_obstetric <- function(
-  conn, uid, pwd,
+  conn,
   cohort, debut, fin,
   CIM = c('CIM9', 'CIM10'),
   dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
@@ -25,23 +25,9 @@ SQL_obstetric <- function(
   if (missing(conn)) {
     conn <- NULL
   }
-  if (missing(uid)) {
-    uid <- NULL
-  }
-  if (missing(pwd)) {
-    pwd <- NULL
-  }
-
-  ### Connexion Teradata
-  if (is.null(conn)) {  # doit se connecter avec uid+pwd
-    if (is.null(pwd)) {  # demande le mot de passe s'il n'a pas été inscrit
-      pwd <- askpass::askpass("Quel est votre mot de passe?")
-    }
-    conn <- SQL_connexion(uid, pwd)  # connexion à Teradata
-  }
 
   ### Extraction des diagn
-  if (is.null(conn)) {  # si encore NULL = Erreur
+  if (!"info" %in% names(attributes(conn))) {  # si encore NULL = Erreur
     stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
   } else {
 

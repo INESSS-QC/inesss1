@@ -45,6 +45,28 @@ cod_din <- function() {
 }
 cod_serv <- function() {
 
+  ### Description des codes de service
+  DT_desc <- as.data.table(dbGetQuery(
+    conn, statement = paste0(
+      "select	NMED_COD_SERV_MED as COD_SERV,
+		          NMED_DES_SERV_MED as COD_SERV_DESC,
+		          NMED_DD_PARAM_SERV_MED as DEBUT,
+		          NMED_DF_PARAM_SERV_MED as FIN
+      from PROD.V_PARAM_SERV_MED;"
+    )
+  ))
+  DT_desc[, `:=` (DEBUT = year(DEBUT), FIN = year(FIN))]
+  setkey(DT_desc, COD_SERV, DEBUT, FIN)
+  # Joindre les cod+cod_desc qui se chevauchent dans le temps
+  DT_desc[, diff := DEBUT - shift(FIN), .(COD_SERV, COD_SERV_DESC)][is.na(diff), diff := 0L]
+  DT_desc[, per := 0L][diff > 1, per := 1L][, per := cumsum(per) + 1L]
+  DT_desc <- DT_desc[
+    , .(DEBUT = min(DEBUT), FIN = max(FIN)),
+    .(COD_SERV, COD_SERV_DESC, per)
+  ][, per := NULL]
+  # Modifier les valeurs pour avoir des descriptions avant 2003
+  DT_desc[DT_desc[, .I[1], .(COD_SERV)]$V1, DEBUT := 1996L]
+
   ### Liste des codes de service dans chaque colonne (1 à 3) de SMED_COD_SERV_
   to_year <- 1996:year(Sys.Date())  # années à analyser
   DT <- vector("list", length(to_year) * 3)  # contiendra les tableaux des requêtes
@@ -58,8 +80,8 @@ cod_serv <- function() {
           "where SMED_DAT_SERV between '",paste0(yr,"-01-01"),"' and '",paste0(yr,"-12-31"),"';"
         )
       ))
-      dt <- dt[!is.na(COD_SERV)]
       if (nrow(dt)) {
+        dt <- DT_desc[DEBUT <= yr & yr <= FIN, .(COD_SERV, COD_SERV_DESC)][dt, on = .(COD_SERV)]
         dt[, `:=` (SERV = c_serv, ANNEE = yr)]  # indiquer numéro de service et année
         DT[[i]] <- dt
       } else {
@@ -74,24 +96,14 @@ cod_serv <- function() {
   ### Indiquer la période que le code a été utilisé : min(ANNEE)-max(ANNEE)
   DT <- DT[
     , .(PERIODE = paste0(min(ANNEE),"-",max(ANNEE))),
-    by = .(COD_SERV, SERV)
+    by = .(COD_SERV, COD_SERV_DESC, SERV)
   ]
-  DT <- dcast(DT, COD_SERV ~ SERV, value.var = "PERIODE")  # lignes en colonnes
+  DT <- dcast(DT, COD_SERV + COD_SERV_DESC ~ SERV, value.var = "PERIODE")  # lignes en colonnes
   for (col in 2:3) {  # Créer la colonne du code de service si absente
     if (!paste(col) %in% names(DT)) {
       DT[, paste(col) := NA]
     }
   }
-
-  ### Dataset avec la description de chaque Code de service et ajouter à DT
-  COD_SERV_DESC <- as.data.table(dbGetQuery(
-    conn,
-    "select distinct NMED_COD_SERV_MED as COD_SERV, NMED_DES_SERV_MED as COD_SERV_DESC
-   from PROD.V_PARAM_SERV_MED;"
-  ))
-  setkey(COD_SERV_DESC, COD_SERV)
-  DT <- merge(DT, COD_SERV_DESC,  # ajouter les descriptif
-              by = "COD_SERV", all = TRUE)
 
   ### Arrangements finaux
   setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
@@ -133,6 +145,24 @@ cod_sta_decis <- function() {
 }
 cod_denom <- function() {
 
+  ### Descriptions des Denom à ajouter
+  query <-
+    "select NMED_COD_DENOM_COMNE as DENOM,
+  	  NMED_DD_DENOM_COMNE as DATE_DEBUT,
+  	  NMED_DF_DENOM_COMNE as DATE_FIN,
+  	  NMED_NOM_DENOM_COMNE as NOM_DENOM
+    from PROD.V_DENOM_COMNE_MED
+    order by DENOM, DATE_DEBUT;"
+  DT_desc <- as.data.table(dbGetQuery(conn, query))
+  DT_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
+  # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
+  # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
+  # en utilisant la seule description possible
+  idx <- DT_desc[, .I[.N == 1], .(DENOM)]$V1
+  if (length(idx)) {
+    DT_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
+  }
+
   to_year <- 1996:year(Sys.Date())
   DT <- vector("list", length(to_year) * 12)
   i <- 1L
@@ -143,6 +173,7 @@ cod_denom <- function() {
         "from V_DEM_PAIMT_MED_CM\n",
         "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
+      dt <- DT_desc[DATE_DEBUT <= yr & yr <= DATE_FIN, .(DENOM, NOM_DENOM)][dt, on = .(DENOM)]
       dt[, ANNEE := yr]
       DT[[i]] <- dt
       i <- i + 1L
@@ -153,7 +184,7 @@ cod_denom <- function() {
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM)
+    .(DENOM, NOM_DENOM)
   ]
   return(DT)
 
