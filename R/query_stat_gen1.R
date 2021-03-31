@@ -129,7 +129,7 @@ query_stat_gen1 <- function(
     query_stat_gen1.where_codes(type_Rx, codes),  # filtre les codes à analyser
     query_stat_gen1.where_code_serv(code_serv, code_serv_filtre),  # filtre les codes de service
     query_stat_gen1.where_code_list(code_list, code_list_filtre),  # filtre les codes de catégorie de liste de médicament
-    indent(),"and SMED_NBR_JR_DUREE_TRAIT > 0",
+    indent(),"and SMED_NBR_JR_DUREE_TRAIT > 0\n",
     query_stat_gen1.group_order_by(type_Rx, group_by),  # grouper et trier les résultats
     ";"
   )
