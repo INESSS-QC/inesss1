@@ -36,8 +36,8 @@ SQL_stat_gen1(
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
 \item \code{'Codes'} : Résultats par code analysé.
-\item \code{'Teneur'} : Résultats par teneur de médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
-\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) inclouant les valeurs absentes.
+\item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
+\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
 }}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}

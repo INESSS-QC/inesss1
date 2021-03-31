@@ -21,7 +21,4 @@ data('I_APME_DEM_AUTOR_CRITR_ETEN_CM')
 \description{
 Data - Demandes d'autorisation de Patient-Médicament d'exceptions.
 }
-\details{
-Certaines dates de fin sont plus grande que la date du jour (souvent 2078-12-31). Si c'est le cas, ces dates sont modifiées par la date du jour.
-}
 \keyword{datasets}

@@ -104,12 +104,12 @@ newpage()
 
 ## Installation de R {#inst}
 
-* Télécharger la version R 4.0.3 en cliquant [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.3/R-4.0.3-win.exe) (ou la dernière version [ici](https://cloud.r-project.org/bin/windows/base/)).
+* Télécharger la version R 4.0.5 en cliquant [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe) (ou la dernière version [ici](https://cloud.r-project.org/bin/windows/base/)).
 * Ouvrir le fichier téléchargé.
 * Choisir la langue utilisée par l'assistant d'installation, puis cliquer sur *OK*.
 * **Information** : Une note apparaît indiquant que vous devez avoir les privilèges d'administrateurs. Ignorer cet avertissement et cliquer sur *Suivant*.
 * **Information** : Une note sur la licence et les droits d'utilisation de R apparaît. Cliquer sur *Suivant*.
-* **Dossier de destination** : Choisir un répertoire où vous avez les droits d'écriture. Le répertoire par défaut `C:\Users\msXXX\Documents\R\R-4.0.3` est un bon choix. Cliquer sur *Suivant*.
+* **Dossier de destination** : Choisir un répertoire où vous avez les droits d'écriture. Le répertoire par défaut `C:\Users\msXXX\Documents\R\R-4.0.5` est un bon choix. Cliquer sur *Suivant*.
 * **Composants à installer** : Installer tous les composants. Cliquer sur *Suivant*.
 * **Options de démarrage** : Choisir *Non (accepter les valeurs par défaut)*.
 * **Sélection du dossier du menu Démarrer**  Cliquer sur *Suivant*.
@@ -118,7 +118,7 @@ newpage()
 * Ouvrir RStudio (disponible sur les postes de la RAMQ).
 * Cliquer sur *Tools*, puis sur *Global Options...*.  
 ![](Documentation/source/images/inst-R-options.png){ width=50% }
-* À la section *R version:*, cliquer sur *Change...*, *Choose a specific version of R:*, puis sélectionner la version *[64-bit] R-4.0.3*. Cliquer sur *OK*.  
+* À la section *R version:*, cliquer sur *Change...*, *Choose a specific version of R:*, puis sélectionner la version *[64-bit] R-4.0.5*. Cliquer sur *OK*.  
 ![](Documentation/source/images/inst-R-version.png){ width=37% }
 * Toujours dans les options *General* :  
 ![](Documentation/source/images/inst-R-global-options.PNG){ width=40% }
@@ -134,11 +134,11 @@ newpage()
 Suivre les étapes suivantes pour supprimer une ancienne version de R installée à partir de la [section 1 *Installation de R*](#inst).
 
 * Ouvrir le dossier contenant la version de R.  
-Généralement situé au répertoire `C:\Users\msXXX\Documents\R\R-4.0.3` où *msXXX* est le numéro d'identifiant et *R-4.0.3* doit être remplacé par le numéro de version à désinstaller.
+Généralement situé au répertoire `C:\Users\msXXX\Documents\R\R-4.0.5` où *msXXX* est le numéro d'identifiant et *R-4.0.5* doit être remplacé par le numéro de version à désinstaller.
 * Cliquer sur le fichier *unins000.exe*.
 * Cliquer sur *Oui* pour désinstaller complètement R ainsi que tous ses composants.
 * La désinstallation s'effectue, puis cliquer sur *OK* pour faire disparaître le message indiquant que R a été correctement désinstallé.
-* *Facultatif* : Le dossier *R-4.0.3*, ou autre numéro de version, est toujours existant et contient toutes les librairies qui avaient été installées. Pour sauver de l'espace disque, il est conseillé de supprimer ce dossier (clic droit de la souris, puis supprimer).
+* *Facultatif* : Le dossier *R-4.0.5*, ou autre numéro de version, est toujours existant et contient toutes les librairies qui avaient été installées. Pour sauver de l'espace disque, il est conseillé de supprimer ce dossier (clic droit de la souris, puis supprimer).
 
 
 ## Rtools40

@@ -44,9 +44,9 @@ SQL_comorbidity(
 
 \item{lookup}{Nombre entier. Années à analyser avant la date index de chaque individu.}
 
-\item{n1}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostique soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
+\item{n1}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
-\item{n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostique soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
+\item{n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 

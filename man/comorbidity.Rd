@@ -30,7 +30,7 @@ comorbidity(
 
 \item{SOURCE}{Nom de la colonne indiquant la provenance du diagnostic.}
 
-\item{n1, n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostique soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
+\item{n1, n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
 \item{method}{Méthode de calcul des indicateurs. \code{'Charlson'} ou \code{'Elixhauser'}. Inscrire les deux crée la colonne \code{Combined}.}
 
@@ -41,7 +41,7 @@ comorbidity(
 \item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
-\code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnosti indiquant leur poids.
+\code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnostic indiquant leur poids.
 }
 \description{
 Calcul des indicateurs de \emph{Charlson}, \emph{Elixhauser} et la combinaison des deux.

@@ -35,17 +35,17 @@ Notes de création
 R
 -
 
-R version 4.0.3 (2020-10-10)
+R version 4.0.5 (2021-03-31)
 
 Librairies
 ----------
 
-`askpass` v.1.1<br> `data.table` v.1.13.6<br> `DBI` v.1.1.0<br> `fs`
-v.1.5.0<br> `knitr` v.1.31<br> `lubridate` v.1.7.9.2<br> `miniUI`
-v.0.1.1.1<br> `parallel` v.4.0.3<br> `odbc` v.1.3.0<br> `readxl`
-v.1.3.1<br> `rmarkdown` v.2.6<br> `rstudioapi` v.0.13<br> `shiny`
-v.1.5.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
-`stringr` v.1.4.0<br> `testthat` v.3.0.1<br> `writexl` v.1.3.1
+`askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
+v.1.5.0<br> `knitr` v.1.31<br> `lubridate` v.1.7.10<br> `miniUI`
+v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc` v.1.3.1<br> `readxl`
+v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi` v.0.13<br> `shiny`
+v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
+`stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl` v.1.3.1
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
@@ -56,8 +56,8 @@ Autres installations/désinstallations
 Installation de R
 -----------------
 
--   Télécharger la version R 4.0.3 en cliquant
-    [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.3/R-4.0.3-win.exe)
+-   Télécharger la version R 4.0.5 en cliquant
+    [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe)
     (ou la dernière version
     [ici](https://cloud.r-project.org/bin/windows/base/)).
 -   Ouvrir le fichier téléchargé.
@@ -70,7 +70,7 @@ Installation de R
     d’utilisation de R apparaît. Cliquer sur *Suivant*.
 -   **Dossier de destination** : Choisir un répertoire où vous avez les
     droits d’écriture. Le répertoire par défaut
-    `C:\Users\msXXX\Documents\R\R-4.0.3` est un bon choix. Cliquer sur
+    `C:\Users\msXXX\Documents\R\R-4.0.5` est un bon choix. Cliquer sur
     *Suivant*.
 -   **Composants à installer** : Installer tous les composants. Cliquer
     sur *Suivant*.
@@ -83,7 +83,7 @@ Installation de R
 -   Cliquer sur *Tools*, puis sur *Global Options…*.  
     <img src="Documentation/source/images/inst-R-options.png" style="width:50.0%" />
 -   À la section *R version:*, cliquer sur *Change…*, *Choose a specific
-    version of R:*, puis sélectionner la version *\[64-bit\] R-4.0.3*.
+    version of R:*, puis sélectionner la version *\[64-bit\] R-4.0.5*.
     Cliquer sur *OK*.  
     <img src="Documentation/source/images/inst-R-version.png" style="width:37.0%" />
 -   Toujours dans les options *General* :  
@@ -107,8 +107,8 @@ installée à partir de la [section 1 *Installation de R*](#inst).
 
 -   Ouvrir le dossier contenant la version de R.  
     Généralement situé au répertoire
-    `C:\Users\msXXX\Documents\R\R-4.0.3` où *msXXX* est le numéro
-    d’identifiant et *R-4.0.3* doit être remplacé par le numéro de
+    `C:\Users\msXXX\Documents\R\R-4.0.5` où *msXXX* est le numéro
+    d’identifiant et *R-4.0.5* doit être remplacé par le numéro de
     version à désinstaller.
 -   Cliquer sur le fichier *unins000.exe*.
 -   Cliquer sur *Oui* pour désinstaller complètement R ainsi que tous
@@ -116,7 +116,7 @@ installée à partir de la [section 1 *Installation de R*](#inst).
 -   La désinstallation s’effectue, puis cliquer sur *OK* pour faire
     disparaître le message indiquant que R a été correctement
     désinstallé.
--   *Facultatif* : Le dossier *R-4.0.3*, ou autre numéro de version, est
+-   *Facultatif* : Le dossier *R-4.0.5*, ou autre numéro de version, est
     toujours existant et contient toutes les librairies qui avaient été
     installées. Pour sauver de l’espace disque, il est conseillé de
     supprimer ce dossier (clic droit de la souris, puis supprimer).
