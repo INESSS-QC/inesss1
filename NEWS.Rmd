@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1)
 
-### v0.6.3
+### [v0.6.3](https://github.com/INESSS-QC/inesss1/pull/13)
 * Addins `Datas INESSS` qui permet d'explorer les datasets de la librairie.
 * MaJ méthode *stat_gen1* : filtre par défaut `where SMED_NBR_JR_DUREE_TRAIT > 0`.
 * MaJ fonction `SQL_comorbidity` qui avait un message d'erreur lors du tri des évènements obstétriques.

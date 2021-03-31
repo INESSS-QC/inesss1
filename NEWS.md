@@ -1,7 +1,7 @@
 Librairie [`inesss` v.0.6.3](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.6.3
+### [v0.6.3](https://github.com/INESSS-QC/inesss1/pull/13)
 
 -   Addins `Datas INESSS` qui permet d’explorer les datasets de la
     librairie.
