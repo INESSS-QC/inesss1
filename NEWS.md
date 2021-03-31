@@ -5,6 +5,8 @@ Librairie [`inesss` v.0.6.3](https://github.com/INESSS-QC/inesss1)
 
 -   Addins `Datas INESSS` qui permet d’explorer les datasets de la
     librairie.
+-   MaJ méthode *stat\_gen1* : filtre par défaut
+    `where SMED_NBR_JR_DUREE_TRAIT > 0`.
 -   MaJ fonction `SQL_comorbidity` qui avait un message d’erreur lors du
     tri des évènements obstétriques.
 
