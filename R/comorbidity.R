@@ -11,14 +11,14 @@
 #' @param SOURCE Nom de la colonne indiquant la provenance du diagnostic.
 #' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
 #' @param Dx_table Nom du dataset contenant la liste des codes de diagnostics à l'étude.
-#' * `Combine_Dx_CCI_INSPQ18`
-#' * `Charlson_Dx_CCI_INSPQ18`
-#' * `Elixhauser_Dx_CCI_INSPQ18`
-#' * `Charlson_Dx_UManitoba16`
+#' * `'Combine_Dx_CCI_INSPQ18'`
+#' * `'Charlson_Dx_CCI_INSPQ18'`
+#' * `'Elixhauser_Dx_CCI_INSPQ18'`
+#' * `'Charlson_Dx_UManitoba16'`
 #' @param scores Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste `ComorbidityWeights`.
-#' * `CCI_INSPQ_2018_CIM9`
-#' * `CCI_INSPQ_2018_CIM10`
-#' * `UManitoba_2016`
+#' * `'CCI_INSPQ_2018_CIM9'`
+#' * `'CCI_INSPQ_2018_CIM10'`
+#' * `'UManitoba_2016'`
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
 #' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'

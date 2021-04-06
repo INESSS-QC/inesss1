@@ -59,6 +59,4 @@ Extraction SQL des diagnostics pour l'étude de la comorbidité.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V\%5FEPISO\%5FSOIN\%5FDURG\%5FCM+\%28\%C9pisodes+de+soins+en+D\%E9partement+d\%27urgence\%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 }
-
-\strong{\code{method} :} Voir les listes \link{Comorbidity_diagn_codes} pour connaître les codes de diagnostics extraits.
 }

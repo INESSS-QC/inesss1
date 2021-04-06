@@ -34,17 +34,17 @@ comorbidity(
 
 \item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
 \itemize{
-\item \code{Combine_Dx_CCI_INSPQ18}
-\item \code{Charlson_Dx_CCI_INSPQ18}
-\item \code{Elixhauser_Dx_CCI_INSPQ18}
-\item \code{Charlson_Dx_UManitoba16}
+\item \code{'Combine_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_CCI_INSPQ18'}
+\item \code{'Elixhauser_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_UManitoba16'}
 }}
 
 \item{scores}{Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste \code{ComorbidityWeights}.
 \itemize{
-\item \code{CCI_INSPQ_2018_CIM9}
-\item \code{CCI_INSPQ_2018_CIM10}
-\item \code{UManitoba_2016}
+\item \code{'CCI_INSPQ_2018_CIM9'}
+\item \code{'CCI_INSPQ_2018_CIM10'}
+\item \code{'UManitoba_2016'}
 }}
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}

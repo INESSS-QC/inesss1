@@ -8,8 +8,6 @@
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I%5FSMOD%5FSERV%5FMD%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 #'
-#' \strong{`method` :} Voir les listes \link{Comorbidity_diagn_codes} pour connaître les codes de diagnostics extraits.
-#'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
 #' @param cohort Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.
 #' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ`.

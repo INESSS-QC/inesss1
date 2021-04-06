@@ -38,19 +38,19 @@ SQL_comorbidity(
 
 \item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
 \itemize{
-\item \code{Combine_Dx_CCI_INSPQ18}
-\item \code{Charlson_Dx_CCI_INSPQ18}
-\item \code{Elixhauser_Dx_CCI_INSPQ18}
-\item \code{Charlson_Dx_UManitoba16}
+\item \code{'Combine_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_CCI_INSPQ18'}
+\item \code{'Elixhauser_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_UManitoba16'}
 }}
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
 \item{scores}{Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste \code{ComorbidityWeights}.
 \itemize{
-\item \code{CCI_INSPQ_2018_CIM9}
-\item \code{CCI_INSPQ_2018_CIM10}
-\item \code{UManitoba_2016}
+\item \code{'CCI_INSPQ_2018_CIM9'}
+\item \code{'CCI_INSPQ_2018_CIM10'}
+\item \code{'UManitoba_2016'}
 }}
 
 \item{lookup}{Nombre entier. Années à analyser avant la date indexe de chaque individu.}
