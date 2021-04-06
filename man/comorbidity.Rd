@@ -13,9 +13,9 @@ comorbidity(
   SOURCE,
   n1 = 30,
   n2 = 730,
-  method = c("Charlson", "Elixhauser"),
-  scores = "CIM10",
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  Dx_table = "Comorbidity_Dx_CCI_INSPQ18",
+  scores = "CCI_INSPQ_2018_CIM10",
+  confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
   keep_confirm_data = FALSE
 )
 }
@@ -32,16 +32,27 @@ comorbidity(
 
 \item{n1, n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
-\item{method}{Méthode de calcul des indicateurs. \code{'Charlson'} ou \code{'Elixhauser'}. Inscrire les deux crée la colonne \code{Combined}.}
+\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\itemize{
+\item \code{Combine_Dx_CCI_INSPQ18}
+\item \code{Charlson_Dx_CCI_INSPQ18}
+\item \code{Elixhauser_Dx_CCI_INSPQ18}
+\item \code{Charlson_Dx_UManitoba16}
+}}
 
-\item{scores}{\code{'CIM9'} ou \code{'CIM10'}. Nom de la colonne du dataset \code{Comorbidity_weights} à utiliser pour le calcul des indicateurs.}
+\item{scores}{Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste \code{ComorbidityWeights}.
+\itemize{
+\item \code{CCI_INSPQ_2018_CIM9}
+\item \code{CCI_INSPQ_2018_CIM10}
+\item \code{UManitoba_2016}
+}}
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
 
 \item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
-\code{data.table} avec les colonnes \code{ID}, \code{Charlson} (selon \code{method}), \code{Elixhauser} (selon \code{method}), \code{Combined} (selon \code{method}), et tous les codes de diagnostic indiquant leur poids.
+\code{data.table}
 }
 \description{
 Calcul des indicateurs de \emph{Charlson}, \emph{Elixhauser} et la combinaison des deux.

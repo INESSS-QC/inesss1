@@ -7,7 +7,7 @@
 #' \strong{\code{dt_source} :}
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V%5FDIAGN%5FSEJ%5FHOSP%5FCM+%28Diagnostic+s%E9jour+hospitalier%29}{`V_DIAGN_SEJ_HOSP_CM`} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
-#' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
+#' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{`V_EPISO_SOIN_DURG_CM`} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I%5FSMOD%5FSERV%5FMD%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 #'
 #' @inheritParams SQL_comorbidity_diagn
@@ -15,7 +15,7 @@
 #' @param dt Tableau ayant au moins deux colonnes : `ID` et `DATE_INDEX`.
 #' @param ID Nom de la colonne contenant l’identifiant unique de l’usager.
 #' @param DATE_INDEX Nom de la colonne contenant la date index de chaque usager.
-#' @param lookup Nombre entier. Années à analyser avant la date index de chaque individu.
+#' @param lookup Nombre entier. Années à analyser avant la date indexe de chaque individu.
 #' @param obstetric_exclu `TRUE` ou `FALSE`. Si l'on doit exclure (`TRUE`) les diabètes et les hypertensions de type gestationnel. Voir Détails.
 #'
 #' @return `data.table` :
@@ -30,25 +30,17 @@
 SQL_comorbidity <- function(
   conn,
   dt, ID, DATE_INDEX,
-  method = c('Charlson', 'Elixhauser'), CIM = c('CIM9', 'CIM10'), scores = 'CIM10',
+  Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'), scores = 'CCI_INSPQ_2018_CIM10',
   lookup = 2, n1 = 30, n2 = 730,
-  dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
-                'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
-  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MED-ECHO', V_SEJ_SERV_HOSP_CM = 'MED-ECHO',
-                 V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM', 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO', V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
+  confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
   obstetric_exclu = TRUE, exclu_diagn = NULL,
   verbose = TRUE, keep_confirm_data = FALSE
 ) {
 
-  ### Arranger les arguments
-  # Arguments possiblement manquants
-  if (missing(conn)) {
-    conn <- NULL
-  }
-
   if (!"info" %in% names(attributes(conn))) {
-    stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
+    stop("Erreur de connexion.")
   } else {
 
     ### Arranger dataset
@@ -69,13 +61,16 @@ SQL_comorbidity <- function(
       dt <- dt[dt[, .I[1], .(ID)]$V1]
     }
 
+    ### Cohorte d'étude
+    cohort <- sunique(dt$ID)
+
     ### Extraction des diagnostics dans les années désirées
     DIAGN <- SQL_comorbidity_diagn(
       conn,
-      cohort = sunique(dt$ID),
+      cohort = cohort,
       debut = min(dt$DATE_INDEX) - lubridate::years(lookup) - n1,
       fin = max(dt$DATE_INDEX),
-      method = method, CIM = CIM,
+      Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
       exclu_diagn = exclu_diagn, verbose = verbose
     )
@@ -103,9 +98,20 @@ SQL_comorbidity <- function(
     ### Calcul des scores
     dt <- comorbidity(
       dt, "ID", "DIAGN", "DATE_DX", "SOURCE", n1, n2,
-      method, scores, confirm_sourc,
+      Dx_table, scores, confirm_sourc,
       keep_confirm_data
     )
+
+    ### Ajouter les ID manquants
+    ids_2_add <- cohort[!cohort %in% dt$ID]
+    if (length(ids_2_add)) {
+      dt <- rbind(dt, data.table(ID = ids_2_add), fill = TRUE)
+      # Remplacer les NA par 0
+      for (col in names(dt)[names(dt) != "ID"]) {
+        set(dt, which(is.na(dt[[col]])), col, 0L)
+      }
+    }
+    setkey(dt, ID)
 
     return(dt)
 

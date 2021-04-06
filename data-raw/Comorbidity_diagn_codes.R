@@ -1,12 +1,12 @@
 library(usethis)
 library(stringr)
 
-# Comorbidity_Dx_CCI_INSPQ18 -------------------------------------------------
+# Combine_Dx_CCI_INSPQ18 -------------------------------------------------
 
 ### Codes de diagnostics CIM9 et CIM10.
 ### Charlson et Elixhauser confondus.
 ### Ces codes sont à utiliser dans le REGEX de SQL.
-Comorbidity_Dx_CCI_INSPQ18 <- list(
+Combine_Dx_CCI_INSPQ18 <- list(
 
   # AIDS/HIV
   aids = list(
@@ -259,40 +259,40 @@ Comorbidity_Dx_CCI_INSPQ18 <- list(
 
 Charlson_Dx_CCI_INSPQ18 <- list(
   # AIDS/HIV
-  aids = Comorbidity_Dx_CCI_INSPQ18$aids,
+  aids = Combine_Dx_CCI_INSPQ18$aids,
   # Cancer (without metastasis)
-  canc = Comorbidity_Dx_CCI_INSPQ18$canc,
+  canc = Combine_Dx_CCI_INSPQ18$canc,
   # Cerebrovascular disease
-  cevd = Comorbidity_Dx_CCI_INSPQ18$cevd,
+  cevd = Combine_Dx_CCI_INSPQ18$cevd,
   # Congestive heart failure
-  chf = Comorbidity_Dx_CCI_INSPQ18$chf,
+  chf = Combine_Dx_CCI_INSPQ18$chf,
   # Chronic pulmonary disease
-  copd = Comorbidity_Dx_CCI_INSPQ18$copd,
+  copd = Combine_Dx_CCI_INSPQ18$copd,
   # Dementia
-  dementia = Comorbidity_Dx_CCI_INSPQ18$dementia,
+  dementia = Combine_Dx_CCI_INSPQ18$dementia,
   # Diabetes without complications
-  diab = Comorbidity_Dx_CCI_INSPQ18$diab,
+  diab = Combine_Dx_CCI_INSPQ18$diab,
   # Diabetes with complications
-  diabwc = Comorbidity_Dx_CCI_INSPQ18$diabwc,
+  diabwc = Combine_Dx_CCI_INSPQ18$diabwc,
   # Liver disease
-  ld = Comorbidity_Dx_CCI_INSPQ18$ld,
+  ld = Combine_Dx_CCI_INSPQ18$ld,
   # Metastatic cancer
-  metacanc = Comorbidity_Dx_CCI_INSPQ18$metacanc,
+  metacanc = Combine_Dx_CCI_INSPQ18$metacanc,
   # Myocardial Infarction
-  mi = Comorbidity_Dx_CCI_INSPQ18$mi,
+  mi = Combine_Dx_CCI_INSPQ18$mi,
   # Paralysis
-  para = Comorbidity_Dx_CCI_INSPQ18$para,
+  para = Combine_Dx_CCI_INSPQ18$para,
   # Renal disease
-  rend = Comorbidity_Dx_CCI_INSPQ18$rend,
+  rend = Combine_Dx_CCI_INSPQ18$rend,
   # Rheumatoid arthritis/collaged vascular disease
   rheumd = list(
     CIM9 = c(4465, 7100:7104, 7140:7142, 7148, 725),
     CIM10 = c("M05", "M06", paste0("M", c(315, 32:34, 350:351, 353)))
   ),
   # Ulcer disease
-  ud = Comorbidity_Dx_CCI_INSPQ18$ud,
+  ud = Combine_Dx_CCI_INSPQ18$ud,
   # Valvular disease
-  valv = Comorbidity_Dx_CCI_INSPQ18$valv
+  valv = Combine_Dx_CCI_INSPQ18$valv
 )
 
 
@@ -301,66 +301,66 @@ Charlson_Dx_CCI_INSPQ18 <- list(
 
 Elixhauser_Dx_CCI_INSPQ18 <- list(
   # AIDS/HIV
-  aids = Comorbidity_Dx_CCI_INSPQ18$aids,
+  aids = Combine_Dx_CCI_INSPQ18$aids,
   # Alcohol abuse
-  alcohol = Comorbidity_Dx_CCI_INSPQ18$alcohol,
+  alcohol = Combine_Dx_CCI_INSPQ18$alcohol,
   # Blood loss anemina
-  blane = Comorbidity_Dx_CCI_INSPQ18$blane,
+  blane = Combine_Dx_CCI_INSPQ18$blane,
   # Cancer (without metastasis)
-  canc = Comorbidity_Dx_CCI_INSPQ18$canc,
+  canc = Combine_Dx_CCI_INSPQ18$canc,
   # Cardiac arrhythmias
-  carit = Comorbidity_Dx_CCI_INSPQ18$carit,
+  carit = Combine_Dx_CCI_INSPQ18$carit,
   # Congestive heart failure
-  chf = Comorbidity_Dx_CCI_INSPQ18$chf,
+  chf = Combine_Dx_CCI_INSPQ18$chf,
   # Coagulopathy
-  coag = Comorbidity_Dx_CCI_INSPQ18$coag,
+  coag = Combine_Dx_CCI_INSPQ18$coag,
   # Chronic pulmonary disease
-  copd = Comorbidity_Dx_CCI_INSPQ18$copd,
+  copd = Combine_Dx_CCI_INSPQ18$copd,
   # Deficiency Anemia
-  dane = Comorbidity_Dx_CCI_INSPQ18$dane,
+  dane = Combine_Dx_CCI_INSPQ18$dane,
   # Depression
-  depre = Comorbidity_Dx_CCI_INSPQ18$depre,
+  depre = Combine_Dx_CCI_INSPQ18$depre,
   # Diabetes without complications
-  diab = Comorbidity_Dx_CCI_INSPQ18$diab,
+  diab = Combine_Dx_CCI_INSPQ18$diab,
   # Diabetes with complications
-  diabwc = Comorbidity_Dx_CCI_INSPQ18$diabwc,
+  diabwc = Combine_Dx_CCI_INSPQ18$diabwc,
   # Drug abuse
-  drug = Comorbidity_Dx_CCI_INSPQ18$drug,
+  drug = Combine_Dx_CCI_INSPQ18$drug,
   # Fluid and electrolyte disorders
-  fed = Comorbidity_Dx_CCI_INSPQ18$fed,
+  fed = Combine_Dx_CCI_INSPQ18$fed,
   # Hypertension
-  hyp = Comorbidity_Dx_CCI_INSPQ18$hyp,
+  hyp = Combine_Dx_CCI_INSPQ18$hyp,
   # Hypothyroidism
-  hypothy = Comorbidity_Dx_CCI_INSPQ18$hypothy,
+  hypothy = Combine_Dx_CCI_INSPQ18$hypothy,
   # Liver disease
-  ld = Comorbidity_Dx_CCI_INSPQ18$ld,
+  ld = Combine_Dx_CCI_INSPQ18$ld,
   # Metastatic cancer
-  metacanc = Comorbidity_Dx_CCI_INSPQ18$metacanc,
+  metacanc = Combine_Dx_CCI_INSPQ18$metacanc,
   # Neurological disorders
-  nd = Comorbidity_Dx_CCI_INSPQ18$nd,
+  nd = Combine_Dx_CCI_INSPQ18$nd,
   # Obesity
-  obes = Comorbidity_Dx_CCI_INSPQ18$obes,
+  obes = Combine_Dx_CCI_INSPQ18$obes,
   # Paralysis
-  para = Comorbidity_Dx_CCI_INSPQ18$para,
+  para = Combine_Dx_CCI_INSPQ18$para,
   # Pulmonary circulation disorders
-  pcd = Comorbidity_Dx_CCI_INSPQ18$pcd,
+  pcd = Combine_Dx_CCI_INSPQ18$pcd,
   # Psychose
-  psycho = Comorbidity_Dx_CCI_INSPQ18$psycho,
+  psycho = Combine_Dx_CCI_INSPQ18$psycho,
   # Peripheral vascular disease
-  pvd = Comorbidity_Dx_CCI_INSPQ18$pvd,
+  pvd = Combine_Dx_CCI_INSPQ18$pvd,
   # Renal disease
-  rend = Comorbidity_Dx_CCI_INSPQ18$rend,
+  rend = Combine_Dx_CCI_INSPQ18$rend,
   # Rheumatoid arthritis/collaged vascular disease
-  rheumd = Comorbidity_Dx_CCI_INSPQ18$rheumd,
+  rheumd = Combine_Dx_CCI_INSPQ18$rheumd,
   # Ulcer disease
   ud = list(
     CIM9 = c(5317, 5319, 5327, 5329, 5337, 5339, 5347, 5349),
     CIM10 = c(paste0("K", c(257, 259, 267, 269, 277, 279, 287, 289)))
   ),
   # Valvular disease
-  valv = Comorbidity_Dx_CCI_INSPQ18$valv,
+  valv = Combine_Dx_CCI_INSPQ18$valv,
   # Weight loss
-  wloss = Comorbidity_Dx_CCI_INSPQ18$wloss
+  wloss = Combine_Dx_CCI_INSPQ18$wloss
 )
 
 
@@ -511,7 +511,7 @@ Charlson_Dx_UManitoba16 <- list(
 # SQL regex ---------------------------------------------------------------
 
 ### Ajouter un '%' après chaque code pour pouvoir les utiliser dans du SQL regex
-for (k in c("Comorbidity_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18")) {
+for (k in c("Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18")) {
   dt <- get(k)
   for (i in 1:length(dt)) {
     for (j in c("CIM9", "CIM10")) {
@@ -524,12 +524,12 @@ for (k in c("Comorbidity_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser
 
 # Save datas --------------------------------------------------------------
 
-attr(Comorbidity_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
+attr(Combine_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Charlson_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Elixhauser_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Charlson_Dx_UManitoba16, "MaJ") <- Sys.Date()
 
-use_data(Comorbidity_Dx_CCI_INSPQ18,
+use_data(Combine_Dx_CCI_INSPQ18,
          Charlson_Dx_CCI_INSPQ18,
          Elixhauser_Dx_CCI_INSPQ18,
          Charlson_Dx_UManitoba16,

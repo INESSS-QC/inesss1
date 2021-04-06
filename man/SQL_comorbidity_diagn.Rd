@@ -10,11 +10,11 @@ SQL_comorbidity_diagn(
   cohort,
   debut,
   fin,
-  method = c("Charlson", "Elixhauser"),
+  Dx_table = "Combine_Dx_CCI_INSPQ18",
   CIM = c("CIM9", "CIM10"),
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM", "V_EPISO_SOIN_DURG_CM",
     "I_SMOD_SERV_MD_CM"),
-  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MEDECHO", V_SEJ_SERV_HOSP_CM = "MEDECHO",
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   exclu_diagn = NULL,
   verbose = TRUE
@@ -28,8 +28,6 @@ SQL_comorbidity_diagn(
 \item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ}.}
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
-
-\item{method}{Extraire les diagnostics associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 

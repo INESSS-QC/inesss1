@@ -1,20 +1,21 @@
 
-# Comorbidity_diagn_codes -------------------------------------------------
+# Combine_Dx_CCI_INSPQ18 --------------------------------------------------
 
 #' Data - Codes diagnostics
 #'
 #' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
+#' Contient les codes des datas `Charlson_Dx_CCI_INSPQ18` et `Elixhauser_Dx_CCI_INSPQ18`.\cr\cr
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
 #' `aids` : AIDS/HIV\cr
 #' `alcohol` : Alcohol abuse\cr
-#' `canc` : Any tumor without metastasis\cr
 #' `blane` : Blood loss anemia\cr
+#' `canc` : Any tumor without metastasis\cr
 #' `carit` : Cardiac arrhythmias\cr
 #' `cevd` : Cerebrovascular disease\cr
-#' `copd` : Chronic pulmonary disease\cr
-#' `coag` : Coagulopathy\cr
 #' `chf` : Congestive heart failure\cr
+#' `coag` : Coagulopathy\cr
+#' `copd` : Chronic pulmonary disease\cr
 #' `dane` : Deficiency anemia\cr
 #' `dementia` : Dementia\cr
 #' `depre` : Depression\cr
@@ -39,42 +40,141 @@
 #' `valv` : Valvular disease\cr
 #' `wloss` : Weight loss
 #'
-#' @format `list`
+#' @format `list(Dx = list(CIM9, CIM10))`
 #' @encoding UTF-8
 #' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
-#' @name Comorbidity_diagn_codes
-
-#' @rdname Comorbidity_diagn_codes
-#' @usage data('Comorbidity_diagn_codes')
-"Comorbidity_diagn_codes"
-
-#' @rdname Comorbidity_diagn_codes
-#' @usage data('Charlson_diagn_codes')
-"Charlson_diagn_codes"
-
-#' @rdname Comorbidity_diagn_codes
-#' @usage data('Elixhauser_diagn_codes')
-"Elixhauser_diagn_codes"
+#' @usage data('Combine_Dx_CCI_INSPQ18')
+#' @encoding UTF-8
+"Combine_Dx_CCI_INSPQ18"
 
 
-# Comorbidity_weights -----------------------------------------------------
+# Charlson_Dx_CCI_INSPQ18 -------------------------------------------------
+
+#' Data - Codes diagnostics
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
+#' `aids` : AIDS/HIV\cr
+#' `canc` : Any tumor without metastasis\cr
+#' `cevd` : Cerebrovascular disease\cr
+#' `chf` : Congestive heart failure\cr
+#' `copd` : Chronic pulmonary disease\cr
+#' `dementia` : Dementia\cr
+#' `diab` : Diabetes, complicated\cr
+#' `diabwc` : Diabetes, uncomplicated\cr
+#' `ld` : Liver disease\cr
+#' `metacanc` : Metastatic cancer\cr
+#' `mi` : Myocardial infarction\cr
+#' `para` : Paralysis\cr
+#' `rend` : Renal disease\cr
+#' `rheumd` : Rheumatoid arth./collagen vascular disease\cr
+#' `ud` : Ulcer disease\cr
+#' `valv` : Valvular disease
+#'
+#' @format `list(Dx = list(CIM9, CIM10))`
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
+#' @usage data('Charlson_Dx_CCI_INSPQ18')
+#' @encoding UTF-8
+"Charlson_Dx_CCI_INSPQ18"
+
+
+# Elixhauser_Dx_CCI_INSPQ18 --------------------------------------------------
+
+#' Data - Codes diagnostics
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
+#' `aids` : AIDS/HIV\cr
+#' `alcohol` : Alcohol abuse\cr
+#' `blane` : Blood loss anemia\cr
+#' `canc` : Any tumor without metastasis\cr
+#' `carit` : Cardiac arrhythmias\cr
+#' `chf` : Congestive heart failure\cr
+#' `coag` : Coagulopathy\cr
+#' `copd` : Chronic pulmonary disease\cr
+#' `dane` : Deficiency anemia\cr
+#' `depre` : Depression\cr
+#' `diab` : Diabetes, complicated\cr
+#' `diabwc` : Diabetes, uncomplicated\cr
+#' `drug` : Drug abuse\cr
+#' `fed` : Fluid and electrolyte disorders\cr
+#' `hyp` : Hypertension\cr
+#' `hypothy` : Hypothyroidism\cr
+#' `ld` : Liver disease\cr
+#' `metacanc` : Metastatic cancer\cr
+#' `nd` : Neurological disorders\cr
+#' `obes` : Obesity\cr
+#' `para` : Paralysis\cr
+#' `pcd` : Pulmonary circulation disorders\cr
+#' `psycho` : Psychoses\cr
+#' `pvd` : Peripheral vascular disorders\cr
+#' `rend` : Renal disease\cr
+#' `rheumd` : Rheumatoid arth./collagen vascular disease\cr
+#' `ud` : Ulcer disease\cr
+#' `valv` : Valvular disease\cr
+#' `wloss` : Weight loss
+#'
+#' @format `list(Dx = list(CIM9, CIM10))`
+#' @encoding UTF-8
+#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
+#' @usage data('Elixhauser_Dx_CCI_INSPQ18')
+#' @encoding UTF-8
+"Elixhauser_Dx_CCI_INSPQ18"
+
+
+# Charlson_Dx_UManitoba16 -------------------------------------------------
+
+#' Data - Codes diagnostics
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
+#' `aids` : HIV/AIDS\cr
+#' `canc` : Cancer\cr
+#' `chf` : Congestive Heart Failure\cr
+#' `cpd` : Chronic Pulmonary Disease\cr
+#' `ctdrd` : Connective Tissue Disease - Rheumatic Disease\cr
+#' `cvd` : Cerebrovascular Disease\cr
+#' `dementia` : Dementia\cr
+#' `diab` : Diabetes with Chronic Complications\cr
+#' `diabwc` : Diabetes without Chronic Complications\cr
+#' `ld1` : Mild Liver Disease\cr
+#' `ld2` : Moderate or Severe Liver Disease\cr
+#' `mc` : Metastatic Carcinoma\cr
+#' `mi` : Myocardial Infarction\cr
+#' `ph` : Paraplegia and Hemiplegia\cr
+#' `pud` : Peptic Ulcer Disease\cr
+#' `pvd` : Peripheral Vascular Disease\cr
+#' `rd` : Renal Disease
+#'
+#' @format `list(Dx = list(CIM9, CIM10))`
+#' @encoding UTF-8
+#' @source \href{http://mchp-appserv.cpe.umanitoba.ca/reference/Candata_web_final.pdf#Page=92}{CANCER DATA LINKAGE IN MANITOBA: EXPANDING THE INFRASTRUCTURE FOR RESEARCH} page 72 du document.
+#' @usage data('Charlson_Dx_UManitoba16')
+#' @encoding UTF-8
+"Charlson_Dx_UManitoba16"
+
+
+# ComorbidityWeights ------------------------------------------------------
 
 #' Data - Poids des codes de diagnostics
 #'
 #' @details L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
-#' @format Tableau de 4 variables et 32 observations.
+#' @format `list` contenant trois (3) tables indiquant la description, le code et le poids :
 #' \describe{
-#'   \item{DIAGN}{Identification du diagnostic. `character`.}
-#'   \item{DIAGN_CODE}{Code de diagnostic utilisé utilisé dans la programmation. `character`.}
-#'   \item{CIM9}{Poids utilisé pour la *9e* révision du CIM. `integer`.}
-#'   \item{CIM10}{Poids utilisé pour la *10e* révision du CIM. `integer`.}
+#'   \item{CCI_INSPQ_2018_CIM9}{}
+#'   \item{CCI_INSPQ_2018_CIM10}{}
+#'   \item{UManitoba_2016}{}
 #' }
 #'
-#' @usage data('Comorbidity_weights')
+#' @usage data('ComorbidityWeights')
 #' @encoding UTF-8
-#' @source \href{https://pubmed.ncbi.nlm.nih.gov/29578951/}{Validation of the Combined Comorbidity Index of Charlson and Elixhauser to Predict 30-Day Mortality Across ICD-9 and ICD-10}. \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/articles/CCI_INSPQ.pdf}{Voir PDF.}
-"Comorbidity_weights"
+#' @source Voir la source des datas \code{\link{Combine_Dx_CCI_INSPQ18}}, \code{\link{Charlson_Dx_CCI_INSPQ18}}, \code{\link{Elixhauser_Dx_CCI_INSPQ18}} et \code{\link{Charlson_Dx_UManitoba16}}
+"ComorbidityWeights"
 
 
 
@@ -177,12 +277,12 @@
 #'
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création
 #'
-#' @format `list` de trois (3) éléments :
+#' @format `list` :
 #' \describe{
 #'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265}{\code{COD_DIN}}}{Description des codes d'identification du médicament :\cr - \code{DIN} : Code d'identification du médicament. `integer`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
 #'   \item{COD_SERV}{Description et années d'utilisation des codes de service. `NA` indique que le code n'a pas été utilisé.\cr - \code{COD_SERV} : Code de service. `character`.\cr - \code{SERV_1} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295}{SMED_COD_SERV_1}. `character`.\cr - \code{SERV_2} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30955&TypOrigElmVue=T&NoSeqElmOrig=6397}{SMED_COD_SERV_2}. `character`.\cr - \code{SERV_3} : Première et dernière année que le code de service a été inscrit dans la colonne \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30956&TypOrigElmVue=T&NoSeqElmOrig=6398}{SMED_COD_SERV_3}. `character`.\cr - \code{COD_SERV_DESC} : Description du code de service. `character`.}
 #'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30958&TypOrigElmVue=T&NoSeqElmOrig=6162}{COD_STA_DECIS}}{Codes de statut de décision qui existent dans la base de données \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.\cr - \code{COD_STA_DECIS}: Code de statut de décision. `character`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
-#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233}{COD_DENOM_COMNE}}{Codes de dénominations communes qui existent dans la base de données \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.\cr - \code{DENOM} : Code de dénomination commune. `character`.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233}{COD_DENOM_COMNE}}{Codes de dénominations communes qui existent dans la base de données \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}.\cr - \code{DENOM} : Code de dénomination commune. `character`.\cr - \code{NOM_DENOM} : Description du code \code{DENOM}.\cr - \code{DEBUT} : Première année où le code a été inscrit dans la base de données. `integer`.\cr - \code{FIN} : Dernière année où le code a été inscrit dans la base de données. `integer`.}
 #' }
 #'
 #' @encoding UTF-8
