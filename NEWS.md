@@ -1,5 +1,17 @@
-Librairie [`inesss` v.0.6.3](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.7.0](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### [v0.7.0](https://github.com/INESSS-QC/inesss1/pull/14)
+
+-   Nouveaux datas pour l’étude de la comorbidité :
+    `Combine_Dx_CCI_INSPQ18`, `Charlson_Dx_CCI_INSPQ18`,
+    `Elixhauser_Dx_CCI_INSPQ18`, `Charlson_Dx_UManitoba16` et
+    `ComorbidityWeights`.
+-   Ajustements des arguments des fonctions en lien avec l’étude de la
+    comorbidité : `comorbidity`, `SQL_comorbidity_diagn` et
+    `SQL_comorbidity`.
+-   Lors du calcul des *scores* de comorbidité, tous les individus de la
+    cohorte sont présents.
 
 ### [v0.6.3](https://github.com/INESSS-QC/inesss1/pull/13)
 
