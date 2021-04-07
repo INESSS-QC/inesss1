@@ -20,6 +20,7 @@
 #' * `'CCI_INSPQ_2018_CIM10'`
 #' * `'UManitoba_2016'`
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
+#' @param exclu_diagn Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de `Dx_table` pour connaître les valeurs permises.
 #' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'
 #' @return `data.table`
@@ -31,6 +32,7 @@ comorbidity <- function(
   n1 = 30, n2 = 730,
   Dx_table = 'Comorbidity_Dx_CCI_INSPQ18', scores = 'CCI_INSPQ_2018_CIM10',
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
+  exclu_diagn = NULL,
   keep_confirm_data = FALSE
 ) {
 
@@ -63,7 +65,7 @@ comorbidity <- function(
   dt <- replace_NA_in_dt(dt, 0L)
 
   ### Calculer les scores
-  dt <- comorbidity.scores(dt, Dx_table)
+  dt <- comorbidity.scores(dt, Dx_table, exclu_diagn)
 
   ### Information dans les attributs
   attr(dt, "infos") <- list(
@@ -198,7 +200,7 @@ comorbidity.confirm_sourc_names <- function(confirm_sourc, val) {
 #' @import data.table
 #' @encoding UTF-8
 #' @keywords internal
-comorbidity.scores <- function(dt, Dx_table) {
+comorbidity.scores <- function(dt, Dx_table, exclu_diagn) {
   Dx_table_name <- Dx_table
   Dx_table <- SQL_comorbidity_diagn.select_Dx_table(Dx_table)
 

@@ -10,8 +10,8 @@
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{`V_EPISO_SOIN_DURG_CM`} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I%5FSMOD%5FSERV%5FMD%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 #'
-#' @inheritParams SQL_comorbidity_diagn
 #' @inheritParams comorbidity
+#' @inheritParams SQL_comorbidity_diagn
 #' @param dt Tableau ayant au moins deux colonnes : `ID` et `DATE_INDEX`.
 #' @param ID Nom de la colonne contenant l’identifiant unique de l’usager.
 #' @param DATE_INDEX Nom de la colonne contenant la date index de chaque usager.
@@ -33,7 +33,8 @@ SQL_comorbidity <- function(
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'), scores = 'CCI_INSPQ_2018_CIM10',
   lookup = 2, n1 = 30, n2 = 730,
   dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM', 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
-  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO', V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO',
+                 V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
   obstetric_exclu = TRUE, exclu_diagn = NULL,
   verbose = TRUE, keep_confirm_data = FALSE
@@ -99,7 +100,7 @@ SQL_comorbidity <- function(
     dt <- comorbidity(
       dt, "ID", "DIAGN", "DATE_DX", "SOURCE", n1, n2,
       Dx_table, scores, confirm_sourc,
-      keep_confirm_data
+      exclu_diagn, keep_confirm_data
     )
 
     ### Ajouter les ID manquants

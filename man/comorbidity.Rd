@@ -16,6 +16,7 @@ comorbidity(
   Dx_table = "Comorbidity_Dx_CCI_INSPQ18",
   scores = "CCI_INSPQ_2018_CIM10",
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
+  exclu_diagn = NULL,
   keep_confirm_data = FALSE
 )
 }
@@ -48,6 +49,8 @@ comorbidity(
 }}
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
+
+\item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
 
 \item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
