@@ -10,17 +10,17 @@ SQL_comorbidity(
   dt,
   ID,
   DATE_INDEX,
-  method = c("Charlson", "Elixhauser"),
+  Dx_table = "Combine_Dx_CCI_INSPQ18",
   CIM = c("CIM9", "CIM10"),
-  scores = "CIM10",
+  scores = "CCI_INSPQ_2018_CIM10",
   lookup = 2,
   n1 = 30,
   n2 = 730,
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM", "V_EPISO_SOIN_DURG_CM",
     "I_SMOD_SERV_MD_CM"),
-  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
+  dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MEDECHO", V_SEJ_SERV_HOSP_CM = "MEDECHO",
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
   obstetric_exclu = TRUE,
   exclu_diagn = NULL,
   verbose = TRUE,
@@ -36,13 +36,24 @@ SQL_comorbidity(
 
 \item{DATE_INDEX}{Nom de la colonne contenant la date index de chaque usager.}
 
-\item{method}{Extraire les diagnostics associés aux méthodes de calcul \emph{Charlson}, \emph{Elixhauser} ou les deux.}
+\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\itemize{
+\item \code{'Combine_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_CCI_INSPQ18'}
+\item \code{'Elixhauser_Dx_CCI_INSPQ18'}
+\item \code{'Charlson_Dx_UManitoba16'}
+}}
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
-\item{scores}{\code{'CIM9'} ou \code{'CIM10'}. Nom de la colonne du dataset \code{Comorbidity_weights} à utiliser pour le calcul des indicateurs.}
+\item{scores}{Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste \code{ComorbidityWeights}.
+\itemize{
+\item \code{'CCI_INSPQ_2018_CIM9'}
+\item \code{'CCI_INSPQ_2018_CIM10'}
+\item \code{'UManitoba_2016'}
+}}
 
-\item{lookup}{Nombre entier. Années à analyser avant la date index de chaque individu.}
+\item{lookup}{Nombre entier. Années à analyser avant la date indexe de chaque individu.}
 
 \item{n1}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
@@ -56,7 +67,7 @@ SQL_comorbidity(
 
 \item{obstetric_exclu}{\code{TRUE} ou \code{FALSE}. Si l'on doit exclure (\code{TRUE}) les diabètes et les hypertensions de type gestationnel. Voir Détails.}
 
-\item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir \code{names(inesss::Comorbidity_diagn_codes)} pour connaître les codes de diagnostics pouvant être exclus.}
+\item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
 
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 
@@ -82,7 +93,7 @@ Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de
 \itemize{
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V\%5FDIAGN\%5FSEJ\%5FHOSP\%5FCM+\%28Diagnostic+s\%E9jour+hospitalier\%29}{\code{V_DIAGN_SEJ_HOSP_CM}} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V\%5FSEJ\%5FSERV\%5FHOSP\%5FCM+\%28S\%E9jour+service+hospitalier\%29}{\code{V_SEJ_SERV_HOSP_CM}} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
-\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V\%5FEPISO\%5FSOIN\%5FDURG\%5FCM+\%28\%C9pisodes+de+soins+en+D\%E9partement+d\%27urgence\%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
+\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V\%5FEPISO\%5FSOIN\%5FDURG\%5FCM+\%28\%C9pisodes+de+soins+en+D\%E9partement+d\%27urgence\%29}{\code{V_EPISO_SOIN_DURG_CM}} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 }
 }

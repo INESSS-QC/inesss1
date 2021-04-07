@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{comorbidity.confirm_diagn}
 \alias{comorbidity.confirm_diagn}
-\title{Comorbidity}
+\title{comorbidity}
 \usage{
 comorbidity.confirm_diagn(dt, n1, n2, confirm_sourc)
 }
@@ -19,6 +19,6 @@ comorbidity.confirm_diagn(dt, n1, n2, confirm_sourc)
 }
 }
 \description{
-Comorbidity
+comorbidity
 }
 \keyword{internal}

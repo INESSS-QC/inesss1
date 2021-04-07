@@ -17,6 +17,23 @@ SQL_obstetric(
   verbose = TRUE
 )
 }
+\arguments{
+\item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
+
+\item{cohort}{Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.}
+
+\item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ}.}
+
+\item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
+
+\item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
+
+\item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
+
+\item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
+
+\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
+}
 \description{
 Extraction des événements obstétriques.
 }
@@ -25,7 +42,7 @@ Extraction des événements obstétriques.
 \itemize{
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V\%5FDIAGN\%5FSEJ\%5FHOSP\%5FCM+\%28Diagnostic+s\%E9jour+hospitalier\%29}{\code{V_DIAGN_SEJ_HOSP_CM}} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V\%5FSEJ\%5FSERV\%5FHOSP\%5FCM+\%28S\%E9jour+service+hospitalier\%29}{\code{V_SEJ_SERV_HOSP_CM}} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
-\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V\%5FEPISO\%5FSOIN\%5FDURG\%5FCM+\%28\%C9pisodes+de+soins+en+D\%E9partement+d\%27urgence\%29}{V_EPISO_SOIN_DURG_CM} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
-\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{I_SMOD_SERV_MD_CM} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
+\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V\%5FEPISO\%5FSOIN\%5FDURG\%5FCM+\%28\%C9pisodes+de+soins+en+D\%E9partement+d\%27urgence\%29}{\code{V_EPISO_SOIN_DURG_CM}} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
+\item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I\%5FSMOD\%5FSERV\%5FMD\%5FCM}{\code{I_SMOD_SERV_MD_CM}} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
 }
 }

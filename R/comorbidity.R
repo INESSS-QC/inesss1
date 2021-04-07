@@ -10,20 +10,29 @@
 #' @param DATE_DX Nom de la colonne indiquant la date du diagnostic.
 #' @param SOURCE Nom de la colonne indiquant la provenance du diagnostic.
 #' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
-#' @param method Méthode de calcul des indicateurs. `'Charlson'` ou `'Elixhauser'`. Inscrire les deux crée la colonne `Combined`.
-#' @param scores `'CIM9'` ou `'CIM10'`. Nom de la colonne du dataset `Comorbidity_weights` à utiliser pour le calcul des indicateurs.
+#' @param Dx_table Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+#' * `'Combine_Dx_CCI_INSPQ18'`
+#' * `'Charlson_Dx_CCI_INSPQ18'`
+#' * `'Elixhauser_Dx_CCI_INSPQ18'`
+#' * `'Charlson_Dx_UManitoba16'`
+#' @param scores Nom de la table à utiliser pour le calcul des indicateurs. Voir les éléments de la liste `ComorbidityWeights`.
+#' * `'CCI_INSPQ_2018_CIM9'`
+#' * `'CCI_INSPQ_2018_CIM10'`
+#' * `'UManitoba_2016'`
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
+#' @param exclu_diagn Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de `Dx_table` pour connaître les valeurs permises.
 #' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'
-#' @return `data.table` avec les colonnes `ID`, `Charlson` (selon `method`), `Elixhauser` (selon `method`), `Combined` (selon `method`), et tous les codes de diagnostic indiquant leur poids.
+#' @return `data.table`
 #' @import data.table
 #' @encoding UTF-8
 #' @export
 comorbidity <- function(
   dt, ID, DIAGN, DATE_DX, SOURCE,
   n1 = 30, n2 = 730,
-  method = c('Charlson', 'Elixhauser'), scores = 'CIM10',
-  confirm_sourc = list(`MED-ECHO` = 1, BDCU = 2, SMOD = 2),
+  Dx_table = 'Comorbidity_Dx_CCI_INSPQ18', scores = 'CCI_INSPQ_2018_CIM10',
+  confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
+  exclu_diagn = NULL,
   keep_confirm_data = FALSE
 ) {
 
@@ -49,27 +58,19 @@ comorbidity <- function(
   }
 
   ### Ajouter le score aux diagn
-  dt <- inesss::Comorbidity_weights[, .(DIAGN = DIAGN_CODE, val = get(scores))][dt, on = .(DIAGN)]
+  dt <- inesss::ComorbidityWeights[[scores]][, .(DIAGN = DIAGN_CODE, POIDS)][dt, on = .(DIAGN)]
 
   ### Mettre une colonne par diagn
-  dt <- dcast(dt, ID ~ DIAGN, value.var = "val")
+  dt <- dcast(dt, ID ~ DIAGN, value.var = "POIDS")
   dt <- replace_NA_in_dt(dt, 0L)
 
   ### Calculer les scores
-  dt <- comorbidity.scores(dt, method)
-
-  ### Ordre des colonnes
-  part1 <- c("ID",
-             {if ("Charlson" %in% names(dt)) "Charlson" else NULL},
-             {if ("Elixhauser" %in% names(dt)) "Elixhauser" else NULL},
-             {if ("Combined" %in% names(dt)) "Combined" else NULL})
-  part2 <- names(dt)[!names(dt) %in% part1]
-  setcolorder(dt, c(part1, part2))
+  dt <- comorbidity.scores(dt, Dx_table, exclu_diagn)
 
   ### Information dans les attributs
   attr(dt, "infos") <- list(
     CreateDate = Sys.Date(),  # date de création
-    Method = method,  # méthode utilisée
+    Dx_table = Dx_table,  # table utilisée
     Scores = scores,  # score utilisé
     ConfirmSources = confirm_sourc,  # confiance des sources
     nJours = sort(c(n1, n2))  # jours utilisés pour l'intervalle de confirmation
@@ -82,8 +83,7 @@ comorbidity <- function(
 
 }
 
-#' Comorbidity
-#'
+#' @title comorbidity
 #' @import data.table
 #' @encoding UTF-8
 #' @keywords internal
@@ -108,7 +108,7 @@ comorbidity.confirm_diagn <- function(dt, n1, n2, confirm_sourc) {
   for (desc in names(confirm_sourc)) {
     dt[SOURCE == desc, tri := confirm_sourc[[desc]]]
   }
-  setkey(dt, ID, DIAGN, DATE_DX, tri, SOURCE)  # tri croissant
+  setkey(dt, ID, DIAGN, DATE_DX, tri, SOURCE)
   dt[, tri := NULL]
 
   ### Conserver un data pour les informations
@@ -197,44 +197,33 @@ comorbidity.confirm_sourc_names <- function(confirm_sourc, val) {
   })))
 
 }
-#' Comorbidity
-#'
 #' @import data.table
 #' @encoding UTF-8
 #' @keywords internal
-comorbidity.scores <- function(dt, method) {
-  ### Calcul des indicateurs Charlson et Elixhauser
+comorbidity.scores <- function(dt, Dx_table, exclu_diagn) {
+  Dx_table_name <- Dx_table
+  Dx_table <- SQL_comorbidity_diagn.select_Dx_table(Dx_table)
 
-  if ("Charlson" %in% method) {
-    # Créer les colonnes si elles n'existent pas
-    cols <- names(inesss::Charlson_diagn_codes)  # colonnes nécessaires
-    for (col in cols) {  # ajouter la colonne si elle n'est pas présente
-      if (!col %in% names(dt)) {
-        dt[, (col) := 0L]
-      }
+  ### Ajouter les colonnes manquantes - sauf exclusions
+  cols <- names(Dx_table)
+  if (!is.null(exclu_diagn)) {
+    cols <- cols[!cols %in% exclu_diagn]
+  }
+  for (col in cols) {
+    if (!col %in% names(dt)) {
+      dt[, (col) := 0L]
     }
-    # Calcul du score
-    dt[, Charlson := rowSums(dt[, cols, with = FALSE])]
   }
 
-  if ("Elixhauser" %in% method) {
-    cols <- names(inesss::Elixhauser_diagn_codes)
-    for (col in cols) {
-      if (!col %in% names(dt)) {
-        dt[, (col) := 0L]
-      }
-    }
-    dt[, Elixhauser := rowSums(dt[, cols, with = FALSE])]
-  }
-
-  if (all(c("Charlson", "Elixhauser") %in% method)) {
-    cols <- names(inesss::Comorbidity_diagn_codes)
-    for (col in cols) {
-      if (!col %in% names(dt)) {
-        dt[, (col) := 0L]
-      }
-    }
-    dt[, Combined := rowSums(dt[, cols, with = FALSE])]
+  ### Calcul du score
+  if (Dx_table_name == "Combine_Dx_CCI_INSPQ18") {
+    dt[, Charlson_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Charlson_Dx_CCI_INSPQ18), with = FALSE])]
+    dt[, Elixhauser_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Elixhauser_Dx_CCI_INSPQ18), with = FALSE])]
+    dt[, Combine_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Combine_Dx_CCI_INSPQ18), with = FALSE])]
+    setcolorder(dt, c("ID", "Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18", cols))
+  } else {
+    dt[, (Dx_table_name) := rowSums(dt[, names(Dx_table), with = FALSE])]
+    setcolorder(dt, c("ID", Dx_table_name, cols))
   }
 
   return(dt)
