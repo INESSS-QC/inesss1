@@ -10,11 +10,210 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  echo = FALSE
 )
 ```
 
-```{r setup}
+```{r setup, message=FALSE, warning=FALSE}
 library(inesss)
+library(lubridate)
+library(data.table)
+library(kableExtra)
 ```
+
+# Arguments utilisés
+Supposons les arguments suivant :
+```{r, echo=TRUE}
+Dx_table = 'Combine_Dx_CCI_INSPQ18'
+CIM = c('CIM9', 'CIM10')
+scores = 'CCI_INSPQ_2018_CIM10'
+lookup = 2
+n1 = 30; n2 = 730
+dt_source = c('V_DIAGN_SEJ_HOSP_CM',
+              'V_SEJ_SERV_HOSP_CM',
+              'V_EPISO_SOIN_DURG_CM',
+              'I_SMOD_SERV_MD_CM')
+dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO',
+               V_SEJ_SERV_HOSP_CM = 'MEDECHO',
+               V_EPISO_SOIN_DURG_CM = 'BDCU',
+               I_SMOD_SERV_MD_CM = 'SMOD')
+confirm_sourc = list(MEDECHO = 1,
+                     BDCU = 2,
+                     SMOD = 2)
+obstetric_exclu = TRUE
+exclu_diagn = c('drug', 'ld')
+keep_confirm_data = TRUE
+```
+
+
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
+
+
+# Arrangement de la table
+* Sélectionner les colonnes nécessaires.
+* Sélectionner la première date (la plus ancienne) s'il y en a plusieurs pour un même individu.
+* Supprimer les observations où le numéro d'identification ou la date indexe sont absents.
+```{r}
+dt <- data.table(
+  ID = as.integer(c(1, 1, 2, 3, 4, NA, NA)),
+  DATE_INDEX = c("2020-01-01", "2020-02-07", "2020-12-31", "2020-02-14", NA, "2020-03-07", NA),
+  SEXE = c("F", "F", "M", NA, "F", "F", "M"),
+  AGE = as.integer(c(55, 55, 41, NA, 45, 69, 81))
+)
+kable(dt, "html", caption = "AVANT", booktabs = TRUE) %>% kable_styling()
+
+ID_col = "ID"
+DATE_INDEX_col = "DATE_INDEX"
+### Code de la fonction
+dt <- dt[, c(ID_col, DATE_INDEX_col), with = FALSE]  # sélection des colonnes
+setnames(dt, names(dt), c("ID", "DATE_INDEX"))  # renommer les colonnes
+setkey(dt)
+if (!lubridate::is.Date(dt$DATE_INDEX)) {
+  dt[, DATE_INDEX := lubridate::as_date(DATE_INDEX)]  # convertir au format date
+}
+# Supprimer les NAs
+dt <- dt[complete.cases(dt)]
+# Conserver la première date index de chaque ID s'ils ne sont pas unique
+idx <- rmNA(dt[, .I[.N > 1], .(ID)]$V1)
+if (length(idx)) {
+  dt <- dt[dt[, .I[1], .(ID)]$V1]
+}
+
+kable(dt, "html", caption = "APRÈS", booktabs = TRUE) %>% kable_styling()
+```
+
+
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
+
+
+# Extraction des diagnostics
+* Pour tous les individus, extractions des diagnostics entre le `2017-12-02` (`min(DATE_INDEX) - lookup - n1`) et le `2020-12-31` (`max(DATE_INDEX)`). Les valeurs incohérentes seront supprimées plus tard.  
+`2017-12-02 = 2018-01-01 - n1` : Une date du mois de décembre 2017 pourrait confirmer un code ayant une date en janvier 2018. Seuls les éléments de `confirm_sourc` égale à 2 (ceux nécessitant une confirmation) seront conservé si la date de diagnostic est plus petite que `min(DATE_INDEX)`.
+```{r}
+DIAGN <- data.table(
+  ID = 1L,
+  DATE_DX = as.Date(c("2019-06-24", "2018-04-15", "2020-05-01", "2018-12-20", "2017-12-20", "2017-12-14")),
+  DIAGN = c("hyp"),
+  SOURCE = c("MEDECHO", "MEDECHO", "BDCU", "SMOD", "BDCU", "MEDECHO")
+)
+dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
+setkey(dt)
+kable(dt, "html", caption = "DIAGNOSTICS D'HYPERTENSION", booktabs = TRUE) %>% kable_styling()
+```
+* Supprimer les dates de diagnostics où l'élément de `confirm_sourc` égale 1 et est plus petit que `min(DATE_INDEX) - lookup`.
+* Supprimer les dates de diagnostics plus grand que la date indexe.
+```{r}
+dt <- dt[DATE_INDEX - lubridate::years(lookup) - n1 <= DATE_DX & DATE_DX <= DATE_INDEX]
+# Supprimer les dates < (DATE_INDEX - lookup) dont la source a une confirmation = 1
+sourc <- inesss:::comorbidity.confirm_sourc_names(confirm_sourc, 1)
+if (length(sourc)) {
+  idx <- intersect(
+    dt[, .I[SOURCE %in% sourc]],
+    dt[, .I[DATE_DX < DATE_INDEX - lubridate::years(lookup)]]
+  )
+  if (length(idx)) {
+    dt <- dt[!idx]
+  }
+}
+dt
+```
+
+
+## Exclusion des diagnostics
+* `exclu_diagn = c('drug', 'ld')` indique que *drug abuse* et *liver disease* ne seront pas considérés dans l'analyse. `'drug'` et `'ld'` sont des élément de `Combine_Dx_CCI_INSPQ18`.
+
+**AVANT**
+```{r, echo=FALSE}
+names(Combine_Dx_CCI_INSPQ18)
+```
+**APRÈS**
+```{r, echo=FALSE}
+names(Combine_Dx_CCI_INSPQ18[!names(Combine_Dx_CCI_INSPQ18) %in% exclu_diagn])
+```
+
+
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
+
+
+# Requêtes SQL
+* `dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM', 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM')`
+
+## V_DIAGN_SEJ_HOSP_CM
+```{sql, eval=FALSE, echo=TRUE}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_COD_DIAGN_MDCAL_CLINQ like any ('K25%', 'K26%', 'K27%', 'K28%')
+    and SHOP_DAT_DEPAR_SEJ_HOSP between '2018-01-01' and '2020-12-31'
+    and SHOP_TYP_DIAGN_SEJ_HOSP in c('A', 'P', 'S');
+```
+
+## V_SEJ_SERV_HOSP_CM
+```{sql, eval=FALSE, echo=TRUE}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_COD_DIAGN_MDCAL_CLINQ like any ('K25%', 'K26%', 'K27%', 'K28%')
+    and SHOP_DAT_DEPAR_SEJ_HOSP between '2018-01-01' and '2020-12-31';
+```
+
+## V_EPISO_SOIN_DURG_CM
+```{sql, eval=FALSE, echo=TRUE}
+select SURG_NO_INDIV_BEN_BANLS as ID,
+       SURG_DH_DEPAR_USAG_DURG as DATE_DX
+from RES_SSS.V_EPISO_SOIN_DURG_CM
+where SURG_COD_DIAGN_MDCAL_CLINQ like any ('K25%', 'K26%', 'K27%', 'K28%')
+    and SURG_DH_DEPAR_USAG_DURG between To_Date('2018-01-01') and To_Date('2020-12-31');
+```
+
+## I_SMOD_SERV_MD_CM
+```{sql, eval=FALSE, echo=TRUE}
+select SMOD_NO_INDIV_BEN_BANLS as ID,
+       SMOD_DAT_SERV as DATE_DX
+from PROD.I_SMOD_SERV_MD_C
+where SMOD_COD_DIAGN_PRIMR like any ('K25%', 'K26%', 'K27%', 'K28%')
+    and SMOD_COD_STA_DECIS = 'PAY'
+    and SMOD_DAT_SERV between '2018-01-01' and '2020-12-31';
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

@@ -17,8 +17,8 @@ datas_inesss <- function() {
     dashboardSidebar(
       sidebarMenu(
         menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-        # menuItem("Pop_QC", tabName = "Pop_QC"),
-        # menuItem("RLS_convert", tabName = "RLS_convert"),
+        menuItem("Pop_QC", tabName = "Pop_QC"),
+        menuItem("RLS_convert", tabName = "RLS_convert"),
         menuItem("V_DEM_PAIMT_MED_CM", tabName = "V_DEM_PAIMT_MED_CM"),
         menuItem("V_DENOM_COMNE_MED", tabName = "V_DENOM_COMNE_MED"),
         menuItem("V_DES_COD", tabName = "V_DES_COD"),
