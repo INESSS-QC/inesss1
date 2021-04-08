@@ -1,7 +1,7 @@
 Librairie [`inesss` v.0.7.1](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
 
-### v0.7.1
+### [v0.7.1](https://github.com/INESSS-QC/inesss1/pull/15)
 
 -   SQL\_comorbidity() :
     `lubridate::years(lookup) - n1 modifié par %m-% months(lookup*12) - n2`  
