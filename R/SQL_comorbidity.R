@@ -25,6 +25,7 @@
 #' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.
 #' * Tous les diagnostics ainsi que leur poids (score).
 #' @import data.table
+#' @import lubridate
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
@@ -43,6 +44,12 @@ SQL_comorbidity <- function(
   if (!"info" %in% names(attributes(conn))) {
     stop("Erreur de connexion.")
   } else {
+
+    if (n1 > n2) {  # safe
+      n1_copy <- n1
+      n1 <- n2
+      n2 <- n1_copy
+    }
 
     ### Arranger dataset
     if (!is.data.table(dt)) {  # convertir data.table
@@ -69,7 +76,7 @@ SQL_comorbidity <- function(
     DIAGN <- SQL_comorbidity_diagn(
       conn,
       cohort = cohort,
-      debut = min(dt$DATE_INDEX) - lubridate::years(lookup) - n1,
+      debut = min(dt$DATE_INDEX) %m-% months(lookup*12) - n2,
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
@@ -79,9 +86,10 @@ SQL_comorbidity <- function(
     ### Filtrer dt pour en faire l'analyse
     # Supprimer les diagnostics qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
     dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
-    dt <- dt[DATE_INDEX - lubridate::years(lookup) - n1 <= DATE_DX & DATE_DX <= DATE_INDEX]
+    dt <- dt[DATE_INDEX %m-% months(lookup*12) - n2 <= DATE_DX & DATE_DX <= DATE_INDEX]  # [index-X{ans}-n2{jours}; index]
+    setkey(dt, ID, DIAGN, DATE_DX)
     # Supprimer les dates < (DATE_INDEX - lookup) dont la source a une confirmation = 1
-    sourc <- comorbidity.confirm_sourc_names(confirm_sourc, 1)
+    sourc <- inesss:::comorbidity.confirm_sourc_names(confirm_sourc, 1)
     if (length(sourc)) {
       idx <- intersect(
         dt[, .I[SOURCE %in% sourc]],
@@ -91,10 +99,27 @@ SQL_comorbidity <- function(
         dt <- dt[!idx]
       }
     }
-    # Exclusion des cas gestationnelles
+
+    ### Exclusion des cas gestationnelles
     if (obstetric_exclu) {
-      dt <- SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
+      dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
     }
+
+    ### Dx confirmé par un Dx dans l'intervalle
+    for (desc in names(confirm_sourc)) {  # Trier les données selon l'importance des sources
+      dt[SOURCE == desc, tri := confirm_sourc[[desc]]]
+    }
+    setkey(dt, ID, DIAGN, DATE_DX, tri, SOURCE)
+    dt[, tri := NULL]
+    dt[, row := 1:nrow(dt)]
+    dates_b4 <- dt[DATE_DX < DATE_INDEX %m-% months(lookup*12)]
+    dates_after <- dt[DATE_DX >= DATE_INDEX %m-% months(lookup*12), .(ID, DATE_DX2 = DATE_DX, DIAGN, row2 = row)]
+    dates_b4 <- dates_after[dates_b4, on = .(ID, DIAGN), allow.cartesian = TRUE, nomatch = 0]
+    dates_b4 <- dates_b4[DATE_DX + n2 >= DATE_DX2]
+    dates_b4[, confirm := DATE_DX2 - DATE_DX]
+    dates_b4 <- dates_b4[n1 <= confirm & confirm <= n2]
+    dates_b4 <- dates_b4[dates_b4[, .I[1], .(ID, DIAGN)]$V1]
+    dt <- dt[sunique(c(dates_after$row2, dates_b4$row))]
 
     ### Calcul des scores
     dt <- comorbidity(
