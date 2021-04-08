@@ -25,7 +25,7 @@
 #' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.
 #' * Tous les diagnostics ainsi que leur poids (score).
 #' @import data.table
-#' @import lubridate
+#' @importFrom lubridate %m-%
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
@@ -93,7 +93,7 @@ SQL_comorbidity <- function(
     if (length(sourc)) {
       idx <- intersect(
         dt[, .I[SOURCE %in% sourc]],
-        dt[, .I[DATE_DX < DATE_INDEX - lubridate::years(lookup)]]
+        dt[, .I[DATE_DX < DATE_INDEX %m-% months(lookup*12)]]
       )
       if (length(idx)) {
         dt <- dt[!idx]
