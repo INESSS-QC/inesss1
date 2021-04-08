@@ -1,5 +1,14 @@
-Librairie [`inesss` v.0.7.0](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.7.1](https://github.com/INESSS-QC/inesss1)
 ------------------------------------------------------------------
+
+### v0.7.1
+
+-   SQL\_comorbidity() :
+    `lubridate::years(lookup) - n1 modifié par %m-% months(lookup*12) - n2`  
+    %m-% ne renvoie pas d’erreur lorsque la date est le 29 février.  
+    Une date peut en confirmer une autre lorsque c’est dans l’intervalle
+    \[n1;n2\]. Puisque n2 \> n1, c’est cette valeur qui doit être
+    utilisée.
 
 ### [v0.7.0](https://github.com/INESSS-QC/inesss1/pull/14)
 
