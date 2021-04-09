@@ -156,7 +156,7 @@ query_naif_switch1 <- function(
     "),\n",
     "OLD_USER as (\n",
     "    select distinct(A.ID)\n",
-    "    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V\n",
+    "    from ALL_USER as A left join PROD.V_DEM_PAIMT_MED_CM as V\n",
     "        on A.ID = V.SMED_NO_INDIV_BEN_BANLS\n",
     "    where V.SMED_DAT_SERV between (A.DATE_INDEX - ",njours_sans_conso,") and (A.DATE_INDEX - 1)\n",
     "        and V.",query_naif_switch1.var_type_rx(type_rx)," in (",
@@ -197,7 +197,7 @@ query_naif_switch1 <- function(
     indent("select"),"count(*) as NBRE_RX,\n",  # nombre de services/prescriptions
     indent("select"),"sum(SMED_QTE_MED) as QTE_MED,\n",  # quantité du médicament ou de la fourniture dispensé
     indent("select"),"sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n",  # durée de traitement en jours
-    "from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V\n",
+    "from NAIF_SWITCH as N left join PROD.V_DEM_PAIMT_MED_CM as V\n",
     "    on N.ID = V.SMED_NO_INDIV_BEN_BANLS\n",
     "where V.SMED_DAT_SERV between '",debut,"' and '",fin,"'\n",
     "    and V.",query_naif_switch1.var_type_rx(type_rx)," in (",

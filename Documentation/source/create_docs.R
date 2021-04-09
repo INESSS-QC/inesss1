@@ -11,17 +11,13 @@ devtools::build_manual(path = "Documentation")
 
 # Build Vignettes ---------------------------------------------------------
 devtools::build_vignettes()
-
-
-# Vignettes ---------------------------------------------------------------
-for (file in list.files("vignettes")) {
-  if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".xlsx") {
+for (file in list.files("doc")) {
+  if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".html") {
+    file.copy(from = paste0("doc/",file),
+              to = paste0("Documentation/Vignettes/",file))
+  } else {
     next
   }
-  render(
-    input = paste0("vignettes/",file),
-    output_dir = "Documentation/Vignettes"
-  )
 }
 
 
