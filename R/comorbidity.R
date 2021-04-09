@@ -217,12 +217,24 @@ comorbidity.scores <- function(dt, Dx_table, exclu_diagn) {
 
   ### Calcul du score
   if (Dx_table_name == "Combine_Dx_CCI_INSPQ18") {
-    dt[, Charlson_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Charlson_Dx_CCI_INSPQ18), with = FALSE])]
-    dt[, Elixhauser_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Elixhauser_Dx_CCI_INSPQ18), with = FALSE])]
-    dt[, Combine_Dx_CCI_INSPQ18 := rowSums(dt[, names(inesss::Combine_Dx_CCI_INSPQ18), with = FALSE])]
+    charl_cols <- names(inesss::Charlson_Dx_CCI_INSPQ18)
+    elix_cols <- names(inesss::Elixhauser_Dx_CCI_INSPQ18)
+    comb_cols <- names(inesss::Combine_Dx_CCI_INSPQ18)
+    if (!is.null(exclu_diagn)) {
+      charl_cols <- charl_cols[!charl_cols %in% exclu_diagn]
+      elix_cols <- elix_cols[!elix_cols %in% exclu_diagn]
+      comb_cols <- comb_cols[!comb_cols %in% exclu_diagn]
+    }
+    dt[, Charlson_Dx_CCI_INSPQ18 := rowSums(dt[, charl_cols, with = FALSE])]
+    dt[, Elixhauser_Dx_CCI_INSPQ18 := rowSums(dt[, elix_cols, with = FALSE])]
+    dt[, Combine_Dx_CCI_INSPQ18 := rowSums(dt[, comb_cols, with = FALSE])]
     setcolorder(dt, c("ID", "Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18", cols))
   } else {
-    dt[, (Dx_table_name) := rowSums(dt[, names(Dx_table), with = FALSE])]
+    score_cols <- names(Dx_table)
+    if (is.null(exclu_diagn)) {
+      score_cols <- score_cols[!score_cols %in% exclu_diagn]
+    }
+    dt[, (Dx_table_name) := rowSums(dt[, score_cols, with = FALSE])]
     setcolorder(dt, c("ID", Dx_table_name, cols))
   }
 

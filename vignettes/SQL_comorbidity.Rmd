@@ -28,17 +28,11 @@ library(readxl)
 
 ```
 
-# Introduction
-Les exemples ci-dessous utilisent le code de la fonction `SQL_comorbidity` sur des tables fictives pour montrer la méthode utilisée.
-
-
-<p style="margin-bottom:3cm">
-
-
 # Arguments utilisés
+Liste des arguments utilisés pour les exemples.
 ```{r, echo=TRUE}
-ID = "ID"
-DATE_INDEX = "DATE_INDEX"
+ID = 'ID'
+DATE_INDEX = 'DATE_INDEX'
 Dx_table = 'Combine_Dx_CCI_INSPQ18'
 CIM = c('CIM9', 'CIM10')
 scores = 'CCI_INSPQ_2018_CIM10'
@@ -67,13 +61,13 @@ keep_confirm_data = TRUE
 
 # Arrangement de la table
 * Sélectionner les colonnes nécessaires.
-* Sélectionner la première date indexe (la plus ancienne) s'il y en a plusieurs pour un même individu.
-* Supprimer les observations où le numéro d'identification ou la date indexe sont absents.
+* Sélectionner la première date de référence (la plus ancienne) s'il y en a plusieurs pour un même individu.
+* Supprimer les observations où le numéro d'identification ou la date de référence sont absents.
 
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`1-unique`
-dt
+dt[]
 ```
 
 **APRÈS**
@@ -97,8 +91,7 @@ if (length(idx)) {
 
 ### Cohorte d'étude
 cohort <- dt$ID
-
-dt
+dt[]
 ```
 
 
@@ -132,7 +125,7 @@ names(Dx_table)
 ```
 
 ## CIM = c('CIM9', 'CIM10')
-Il est possible de choisir entre les code CIM9, CIM10 ou les deux. Ici on sélectionne les deux types de codes et on va les chercher dans toutes les bases de données `dt_source`. Voici un aperçu des codes recherchés des trois premiers éléments :
+Il est possible de choisir entre les codes CIM9, CIM10 ou les deux. Ici on sélectionne les deux types de codes et on va les chercher dans toutes les bases de données `dt_source`. Voici un aperçu des codes recherchés des trois premiers éléments :
 ```{r}
 # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
 # de classification de code.
@@ -227,47 +220,47 @@ where SMOD_COD_DIAGN_PRIMR like any (...)
 
 # Filtrer les diagnostics *incohérents*
 
-**Rappel dates indexes**
+**Rappel dates de références**
 ```{r}
-dt
+dt[]
 ```
 Considérant que :
 
-1. Les dates indexes sont comprises entre le 2020-01-01 et le 2020-12-31.
-2. `lookup = 2` ans. 
+1. Les dates de références sont comprises entre le 2020-01-01 et le 2020-12-31.
+2. `lookup=2` ans. 
 3. Au moins un élément de `confirm_sourc` égale 2.
 
 on va donc extraire tous les codes provenant de `Dx_table` entre le 2016-01-02 et le 2020-12-31 pour chaque individu.
 
-> [{`min(DATE_INDEX)` $-$ `lookup` $-$ `n2`}; {`max(DATE_INDEX)`}]  
-> [{2020-01-01 $- 2$ans $- 730$jours}; {2020-12-31}]  
+> [{`min(DATE_INDEX)`$-$`lookup`$-$`n2`}; {`max(DATE_INDEX)`}]  
+> [{2020-01-01$-2$ans$-730$jours}; {2020-12-31}]  
 > [2016-01-02; 2020-12-31]
 
 Soustraire `n2` est important, car une date ayant comme valeur 2018-01-01 pourrait être confirmée par une autre date qui la précède ayant comme valeur
 
-> [{2018-01-01 $-$ `n2`}; {2018-01-01 $-$ `n1`}]  
+> [{2018-01-01$-$`n2`}; {2018-01-01$-$`n1`}]  
 > [2016-01-02; 2017-12-02].
 
-Cette extraction implique qu'un individu ayant une date indexe le 2020-01-01 pourrait avoir des dates de diagnostics comprises entre le 2020-01-01 et le 2020-12-31. Puisqu'on cherche des dates antérieures à la date indexe, les dates supérieures à 2020-01-01 doivent être exclus de l'analyse. De la même manière, un individu ayant une date indexe le 2020-12-31 pourrait avoir des dates inférieures à `2020-12-31 - 2ans - 730jours`.
+Cette extraction implique qu'un individu ayant une date de référence le 2020-01-01 pourrait avoir des dates de diagnostics comprises entre le 2020-01-01 et le 2020-12-31. Puisqu'on cherche des dates antérieures à la date de référence, les dates supérieures à 2020-01-01 doivent être exclues de l'analyse. De la même manière, un individu ayant une date de référence le 2020-12-31 pourrait avoir des dates inférieures à `2020-12-31$-2$ans$-730$jours`.
 
-Puisque les dates inférieures à `DATE_INDEX - lookup` servent uniquement à confirmer un autre diagnostics, les diagnostics où `confirm_sourc = 1` et la date est plus petite que `DATE_INDEX - lookup` ne seront pas utilisés, donc supprimé de la table d'analyse.
+Puisque les dates inférieures à `DATE_INDEX$-$lookup` servent uniquement à confirmer un autre diagnostic, les diagnostics où `confirm_sourc` égalent 1 et où la date est plus petite que `DATE_INDEX$-$lookup` ne seront pas utilisés. Ils seront donc supprimés de la table d'analyse.
 
-## Exemples
+<p style="margin-bottom:1cm">
 
 **AVANT**
 ```{r}
-dt
+dt[]
 ```
 
 **DIAGNOSTICS**
 ```{r}
 DIAGN <- inesss:::vignettes_datas$SQL_comorbidity$`2-filtDx`
-DIAGN
+DIAGN[]
 ```
 
-1. La ligne 1 sera supprimée, car `confirm_sourc(MEDECHO = 1)` et `DATE_DX < DATE_INDEX - lookup`.
-2. La ligne 5 sera supprimée, car `DATE_DX > DATE_INDEX`.
-3. Les lignes 6 et 7 seront supprimées, car `DATE_DX < DATE_INDEX - lookup - n2`.
+1. La ligne 1 sera supprimée, car `confirm_sourc=list(MEDECHO=1)` et `DATE_DX`<`DATE_INDEX`$-$`lookup`.
+2. La ligne 5 sera supprimée, car `DATE_DX`>`DATE_INDEX`.
+3. Les lignes 6 et 7 seront supprimées, car `DATE_DX`<`DATE_INDEX`$-$`lookup`$-$`n2`.
 4. ID#3 est temporairement exclu de l'analyse, car il n'y a pas de diagnostics à analyser.
 
 **APRÈS**
@@ -288,7 +281,7 @@ if (length(sourc)) {
     dt <- dt[!idx]
   }
 }
-dt
+dt[]
 ```
 
 
@@ -296,24 +289,24 @@ dt
 <p style="margin-bottom:3cm">
 
 
-# Exclusion Cas Obstétriques (`obstetric_exclu = TRUE`)
-Un diagnostic de diabète (`diab`, `diabwc`) ou d'hypertension (`hyp`) enregistré au fichier des hospitalisations à l'intérieur d'une période de 120 jours avant ou de 180 jours après un enregistrement relié à une grossesse ou à un accouchement est considéré comme un diagnostic de type gestationnel. Ce diagnostic est alors supprimé si `obstetric_exclu = TRUE`.
+# Exclusions Cas Obstétriques (`obstetric_exclu=TRUE`)
+Un diagnostic de diabète (`diab`, `diabwc`) ou d'hypertension (`hyp`) enregistré au fichier des hospitalisations à l'intérieur d'une période de 120 jours avant ou de 180 jours après un enregistrement relié à une grossesse ou à un accouchement est considéré comme un diagnostic de type gestationnel. Ce diagnostic est alors supprimé si `obstetric_exclu=TRUE`.
 
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`3.1-Obstetric`
-dt
+dt[]
 ```
 
 **DX OBSTETRIC**
 ```{r}
 dt_gross <- inesss:::vignettes_datas$SQL_comorbidity$`3.2-Obstetric`
-dt_gross
+dt_gross[]
 ```
 
-Pour qu'un diagnostic le 2019-01-01 soit conservé, il ne faut pas qu'il y ait de cas gestationnel 180 jours avant ou 120 jours après
+Pour qu'un diagnostic le 2019-01-01 soit conservé, il ne faut pas qu'il y ait de cas gestationnel 180 jours avant ou 120 jours après.
 
-> [{2019-01-01 $- 180$jours}; {2019-01-01 $+ 120$jours}]  
+> [{2019-01-01$-180$jours}; {2019-01-01$+120$jours}]  
 > [2018-07-05; 2019-05-01]
 
 1. ID#1 sera supprimé, car sur la limite 2018-07-05.
@@ -335,7 +328,7 @@ dt_diab_hyp <- dt_diab_hyp[  # supprimer les diagn qui ont au moins un cas de gr
 ]
 dt_diab_hyp <- unique(dt_diab_hyp[, .(ID, DATE_DX, DIAGN)])  # un seul cas par date et diagn
 dt <- dt[!dt_diab_hyp, on = .(ID, DATE_DX, DIAGN)]  # exclure de dt les observations qui sont présentes dans dt_diab_hyp
-dt
+dt[]
 ```
 
 ## Codes de diagnostics de type gestationnel
@@ -350,7 +343,7 @@ Obstetrics_diagn_codes$obstetric
 
 
 # Priorisation des sources
-Si différentes sources indique un même diagnostic et une même date, on priorise la source où `confirm_sourc` égale 1, puis 2.
+Si différentes sources indiquent une même date pour un même diagnostic, on priorise la source où `confirm_sourc` égale 1, puis 2.
 ```{r, echo=TRUE}
 confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2)
 ```
@@ -358,7 +351,7 @@ confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2)
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`4-priorSourc`
-dt
+dt[]
 ```
 **APRÈS**
 ```{r}
@@ -367,7 +360,7 @@ for (desc in names(confirm_sourc)) {  # Trier les données selon l'importance de
 }
 setkey(dt, ID, DIAGN, DATE_DX, tri, SOURCE)
 dt[, tri := NULL]
-dt
+dt[]
 ```
 
 
@@ -376,18 +369,18 @@ dt
 
 
 # Dx < DATE_DX $-$ lookup
-La table d'analyse peut contenir des dates qui sont inférieures à la période d'étude. Si la période d'étude est entre le 2018-01-01 et le 2019-12-31, on ne veut pas qu'une date en 2017 confirme une autre date en 2017, on veut plutôt que les dates en 2017 confirment celles en 2018 et 2019.  
-On va donc regarder en 2018 et 2019 quelles sont les dates qui sont confirmées par une date qui se situe avant la période d'étude. Dans un but d'optimisation, seule la première date qui confirme une autre date sera conservée.
+La table d'analyse peut contenir des dates qui sont inférieures à la période d'étude. Si la période d'étude est entre le 2018-01-01 et le 2019-12-31, on ne veut pas qu'une date en 2016 ou 2017 confirme une autre date de cette même période. On veut plutôt que les dates en 2018 ou 2019 confirment celles en 2016 ou 2017.  
+On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d'étude) qui confirment une date en 2016 ou 2017 (avant la période d'étude). Dans un but d'optimisation, seule la première date confirmée sera conservée.
 
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`5-filtConfirm`
-dt
+dt[]
 ```
-Sachant que `n1 = 30` et `n2 = 730`
+Sachant que `n1=30` et `n2=730`
 
 1. Ligne2 confirme Ligne1, mais les deux précèdent la période d'étude.
-2. Ligne3 confirm Ligne1
+2. Ligne3 confirme Ligne1
 3. Ligne4 confirme Ligne2, mais on conservera seulement Ligne1.
 4. Ligne7 confirme Ligne5
 5. Ligne9 et Ligne10 ne confirment pas Ligne8.
@@ -408,7 +401,7 @@ if (nrow(dates_b4)) {
     dt[, row := NULL]
   }
 }
-dt
+dt[]
 ```
 
 
@@ -416,8 +409,8 @@ dt
 <p style="margin-bottom:3cm">
 
 
-# Conformation des diagnostics
-Si l'élément de `confirm_sourc` égale 2 (`BDCU` et `SMOD`), le diagnostic provenant de cette source a besoin d'être confirmé par une date précédente. Ces sources peuvent se confirmer entre elles.
+# Confirmation des diagnostics
+Si `keep_confirm_data=TRUE`, la table de confirmation est accessible via les attributs (`attributes()`).
 
 ## MEDECHO (1)
 Les sources ayant `confirm_sourc=1` sont utilisées directement.
@@ -425,7 +418,7 @@ Les sources ayant `confirm_sourc=1` sont utilisées directement.
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`6.1-conf`
-dt
+dt[]
 ```
 
 **APRÈS**
@@ -441,7 +434,7 @@ Les sources ayant `confirm_sourc=2` doivent être confirmées.
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`6.2-conf`
-dt
+dt[]
 ```
 
 **APRÈS**
@@ -457,7 +450,7 @@ MEDECHO peut confirmer la date d'un BDCU ou d'un SMOD.
 **AVANT**
 ```{r}
 dt <- inesss:::vignettes_datas$SQL_comorbidity$`6.3-conf`
-dt
+dt[]
 ```
 
 **APRÈS**
@@ -468,43 +461,120 @@ dt[]
 ```
 
 
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
 
 
+# Poids des diagnostics
+L'argument `scores` permet de choisir la table des poids des diagnostics à utiliser.
+
+**AVANT**
+```{r}
+dt[DIAGN == "diab", DIAGN := "aids"]
+dt[DIAGN == "hyp", DIAGN := "metacanc"]
+dt[DIAGN == "diabwc", DIAGN := "fed"]
+dt[]
+```
+
+**CCI_INSPQ_2018_CIM10**
+```{r}
+ComorbidityWeights$CCI_INSPQ_2018_CIM10
+```
+
+**APRÈS**
+```{r}
+dt <- inesss::ComorbidityWeights[[scores]][, .(DIAGN = DIAGN_CODE, POIDS)][dt, on = .(DIAGN)]
+dt[]
+```
+
+Arrangement de la table pour avoir une colonne par diagnostic
+```{r}
+dt <- dcast(dt, ID ~ DIAGN, value.var = "POIDS")
+dt <- inesss:::replace_NA_in_dt(dt, 0L)
+dt[]
+```
 
 
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
 
 
+# Calcul des *scores*
+Ajout de tous les diagnostics présents dans `Dx_table='Combine_Dx_CCI_INSPQ18'` en excluant `exclu_diagn=c('drug','ld')`.  
+Puisque la table des codes de diagnostics utilisée est `Combine_Dx_CCI_INSPQ18`, calcul du *score* pour `Charlson_Dx_CCI_INSPQ18`, `Elixhauser_Dx_CCI_INSPQ18` et les deux combinés.  
+Le *score* est la somme des poids de chaque diagnostic.
+
+**AVANT**
+```{r}
+dt <- inesss:::vignettes_datas$SQL_comorbidity$`7-poids`
+dt[]
+```
+
+**APRÈS**
+```{r}
+Dx_table_name <- "Combine_Dx_CCI_INSPQ18"  # argument nécessaire
+
+### Ajouter les colonnes manquantes - sauf exclusions
+cols <- names(Dx_table)
+if (!is.null(exclu_diagn)) {
+  cols <- cols[!cols %in% exclu_diagn]
+}
+for (col in cols) {
+  if (!col %in% names(dt)) {
+    dt[, (col) := 0L]
+  }
+}
+
+### Calcul du score
+if (Dx_table_name == "Combine_Dx_CCI_INSPQ18") {
+  charl_cols <- names(inesss::Charlson_Dx_CCI_INSPQ18)
+  elix_cols <- names(inesss::Elixhauser_Dx_CCI_INSPQ18)
+  comb_cols <- names(inesss::Combine_Dx_CCI_INSPQ18)
+  if (!is.null(exclu_diagn)) {
+    charl_cols <- charl_cols[!charl_cols %in% exclu_diagn]
+    elix_cols <- elix_cols[!elix_cols %in% exclu_diagn]
+    comb_cols <- comb_cols[!comb_cols %in% exclu_diagn]
+  }
+  dt[, Charlson_Dx_CCI_INSPQ18 := rowSums(dt[, charl_cols, with = FALSE])]
+  dt[, Elixhauser_Dx_CCI_INSPQ18 := rowSums(dt[, elix_cols, with = FALSE])]
+  dt[, Combine_Dx_CCI_INSPQ18 := rowSums(dt[, comb_cols, with = FALSE])]
+  setcolorder(dt, c("ID", "Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18", cols))
+} else {
+  score_cols <- names(Dx_table)
+  if (is.null(exclu_diagn)) {
+    score_cols <- score_cols[!score_cols %in% exclu_diagn]
+  }
+  dt[, (Dx_table_name) := rowSums(dt[, score_cols, with = FALSE])]
+  setcolorder(dt, c("ID", Dx_table_name, cols))
+}
+
+dt[]
+```
 
 
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
 
 
+# Ajouts des individus manquants
+Les individus de la cohorte d'étude qui ne sont pas dans le tableau d'analyse ont en fait un *score* de zéro. Ces individus sont manuellement ajoutés.
 
+**AVANT**
+```{r}
+dt[]
+```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+**APRÈS**
+```{r}
+cohort <- 1:3
+ids_2_add <- cohort[!cohort %in% dt$ID]
+if (length(ids_2_add)) {
+  dt <- rbind(dt, data.table(ID = ids_2_add), fill = TRUE)
+  # Remplacer les NA par 0
+  for (col in names(dt)[names(dt) != "ID"]) {
+    set(dt, which(is.na(dt[[col]])), col, 0L)
+  }
+}
+setkey(dt, ID)
+dt[]
+```

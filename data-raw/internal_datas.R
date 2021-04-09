@@ -1,6 +1,7 @@
 library(usethis)
 library(readxl)
 library(data.table)
+library(lubridate)
 
 # fct_values --------------------------------------------------------------
 ### Valeurs possible des arguments des fonctions
@@ -70,7 +71,8 @@ vignettes_datas <- list(
       dt <- as.data.table(read_xlsx("vignettes/SQL_comorbidity.xlsx", "6.3-conf"))
       dt[, `:=` (DATE_DX = as_date(DATE_DX),
                  DATE_INDEX = as_date(DATE_INDEX))]
-    }
+    },
+    `7-poids` = as.data.table(read_xlsx("vignettes/SQL_comorbidity.xlsx", "7-poids"))
   )
 )
 

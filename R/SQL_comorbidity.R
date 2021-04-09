@@ -108,7 +108,7 @@ SQL_comorbidity <- function(
       dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
     }
 
-    ### Dx confirmé par un Dx dans l'intervalle
+    ### Dx confirmé par un Dx dans l'intervalle qui précède la période d'étude
     for (desc in names(confirm_sourc)) {  # Trier les données selon l'importance des sources
       dt[SOURCE == desc, tri := confirm_sourc[[desc]]]
     }
