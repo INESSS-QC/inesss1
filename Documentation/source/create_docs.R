@@ -14,12 +14,15 @@ devtools::build_vignettes()
 
 
 # Vignettes ---------------------------------------------------------------
-# for (file in list.files("vignettes")) {
-#   render(
-#     input = paste0("vignettes/",file),
-#     output_dir = "Documentation/Vignettes"
-#   )
-# }
+for (file in list.files("vignettes")) {
+  if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".xlsx") {
+    next
+  }
+  render(
+    input = paste0("vignettes/",file),
+    output_dir = "Documentation/Vignettes"
+  )
+}
 
 
 # Formulaire --------------------------------------------------------------

@@ -39,7 +39,7 @@ SQL_comorbidity_diagn <- function(
     stop("Erreur de connexion.")
   } else {
 
-    Dx_table <- SQL_comorbidity_diagn.select_Dx_table(Dx_table)
+    Dx_table <- inesss:::SQL_comorbidity_diagn.select_Dx_table(Dx_table)
     # Exclusion des diagnostiques
     if (!is.null(exclu_diagn)) {
       Dx_table <- Dx_table[!names(Dx_table) %in% exclu_diagn]

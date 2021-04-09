@@ -57,12 +57,11 @@ SQL_comorbidity <- function(
     }
     dt <- dt[, c(ID, DATE_INDEX), with = FALSE]  # sélection des colonnes
     setnames(dt, names(dt), c("ID", "DATE_INDEX"))  # renommer les colonnes
-    setkey(dt)
-    if (!lubridate::is.Date(dt$DATE_INDEX)) {
-      dt[, DATE_INDEX := lubridate::as_date(DATE_INDEX)]  # convertir au format date
+    setkey(dt)  # tri ID+DATE_INDEX
+    if (!lubridate::is.Date(dt$DATE_INDEX)) {  # Convertir au format DATE la colonne DATE_INDEX
+      dt[, DATE_INDEX := lubridate::as_date(DATE_INDEX)]
     }
-    # Supprimer les NAs
-    dt <- dt[complete.cases(dt)]
+    dt <- dt[complete.cases(dt)]  # Supprimer les NAs
     # Conserver la première date index de chaque ID s'ils ne sont pas unique
     idx <- rmNA(dt[, .I[.N > 1], .(ID)]$V1)
     if (length(idx)) {
@@ -70,13 +69,17 @@ SQL_comorbidity <- function(
     }
 
     ### Cohorte d'étude
-    cohort <- sunique(dt$ID)
+    cohort <- dt$ID
 
     ### Extraction des diagnostics dans les années désirées
     DIAGN <- SQL_comorbidity_diagn(
       conn,
       cohort = cohort,
-      debut = min(dt$DATE_INDEX) %m-% months(lookup*12) - n2,
+      debut = lubridate::as_date(ifelse(
+        2 %in% unlist(confirm_sourc),
+        min(dt$DATE_INDEX) %m-% months(lookup*12) - n2,
+        min(dt$DATE_INDEX) %m-% months(lookup*12)
+      )),
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
@@ -105,7 +108,7 @@ SQL_comorbidity <- function(
       dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
     }
 
-    ### Dx confirmé par un Dx dans l'intervalle
+    ### Dx confirmé par un Dx dans l'intervalle qui précède la période d'étude
     for (desc in names(confirm_sourc)) {  # Trier les données selon l'importance des sources
       dt[SOURCE == desc, tri := confirm_sourc[[desc]]]
     }
@@ -113,13 +116,18 @@ SQL_comorbidity <- function(
     dt[, tri := NULL]
     dt[, row := 1:nrow(dt)]
     dates_b4 <- dt[DATE_DX < DATE_INDEX %m-% months(lookup*12)]
-    dates_after <- dt[DATE_DX >= DATE_INDEX %m-% months(lookup*12), .(ID, DATE_DX2 = DATE_DX, DIAGN, row2 = row)]
-    dates_b4 <- dates_after[dates_b4, on = .(ID, DIAGN), allow.cartesian = TRUE, nomatch = 0]
-    dates_b4 <- dates_b4[DATE_DX + n2 >= DATE_DX2]
-    dates_b4[, confirm := DATE_DX2 - DATE_DX]
-    dates_b4 <- dates_b4[n1 <= confirm & confirm <= n2]
-    dates_b4 <- dates_b4[dates_b4[, .I[1], .(ID, DIAGN)]$V1]
-    dt <- dt[sunique(c(dates_after$row2, dates_b4$row))]
+    if (nrow(dates_b4)) {
+      dates_after <- dt[DATE_DX >= DATE_INDEX %m-% months(lookup*12), .(ID, DATE_DX2 = DATE_DX, DIAGN, row2 = row)]
+      dates_b4 <- dates_after[dates_b4, on = .(ID, DIAGN), allow.cartesian = TRUE, nomatch = 0]
+      dates_b4 <- dates_b4[DATE_DX + n2 >= DATE_DX2]
+      dates_b4[, confirm := DATE_DX2 - DATE_DX]
+      dates_b4 <- dates_b4[n1 <= confirm & confirm <= n2]
+      if (nrow(dates_b4)) {
+        dates_b4 <- dates_b4[dates_b4[, .I[1], .(ID, DIAGN)]$V1]
+        dt <- dt[sunique(c(dates_after$row2, dates_b4$row))]
+        dt[, row := NULL]
+      }
+    }
 
     ### Calcul des scores
     dt <- comorbidity(
