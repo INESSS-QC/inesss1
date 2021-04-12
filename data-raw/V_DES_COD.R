@@ -36,3 +36,5 @@ fct <- function(need_conn = FALSE) {
 
 V_DES_COD <- fct()
 use_data(V_DES_COD, overwrite = TRUE)
+
+rm(V_DES_COD)

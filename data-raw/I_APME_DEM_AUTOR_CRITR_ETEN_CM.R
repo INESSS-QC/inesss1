@@ -25,8 +25,8 @@ des_court_indcn_recnu <- function() {
     ))
 
     ### Extraction
-    DT <- vector("list", length(years))
     years <- (year(iter_vars$MIN_DAT)):(year(iter_vars$MAX_DAT))
+    DT <- vector("list", length(years))
     i <- 1L
     for (yr in years) {
       DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -98,3 +98,5 @@ I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
 use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
+
+rm(I_APME_DEM_AUTOR_CRITR_ETEN_CM)

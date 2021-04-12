@@ -18,3 +18,5 @@ for (i in 1:length(Obstetrics_Dx)) {
 
 attr(Obstetrics_Dx, "MaJ") <- Sys.Date()
 use_data(Obstetrics_Dx, overwrite = TRUE)
+
+rm(Obstetrics_Dx)

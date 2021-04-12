@@ -439,3 +439,5 @@ V_DEM_PAIMT_MED_CM$COD_STA_DECIS <- cod_sta_decis()
 attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()  # date de création
 
 use_data(V_DEM_PAIMT_MED_CM, overwrite = TRUE)
+
+rm(V_DEM_PAIMT_MED_CM)

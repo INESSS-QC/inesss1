@@ -334,7 +334,7 @@ dt[]
 ## Codes de diagnostics de type gestationnel
 Les arguments `CIM` et `dt_sourc` sont utilisés de la même manière que décrit précédemment.
 ```{r}
-Obstetrics_diagn_codes$obstetric
+Obstetrics_Dx$obstetric
 ```
 
 

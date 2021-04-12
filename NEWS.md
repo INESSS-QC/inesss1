@@ -1,4 +1,5 @@
-## Librairie [`inesss` v.0.7.2](https://github.com/INESSS-QC/inesss1)
+Librairie [`inesss` v.0.7.3](https://github.com/INESSS-QC/inesss1)
+------------------------------------------------------------------
 
 ### [v0.7.2](https://github.com/INESSS-QC/inesss1/pull/16)
 
@@ -7,7 +8,7 @@
 
 ### [v0.7.1](https://github.com/INESSS-QC/inesss1/pull/15)
 
--   SQL_comorbidity() :
+-   SQL\_comorbidity() :
     `lubridate::years(lookup) - n1 modifié par %m-% months(lookup*12) - n2`  
     %m-% ne renvoie pas d’erreur lorsque la date est le 29 février.  
     Une date peut en confirmer une autre lorsque c’est dans l’intervalle
@@ -30,7 +31,7 @@
 
 -   Addins `Datas INESSS` qui permet d’explorer les datasets de la
     librairie.
--   MaJ méthode *stat_gen1* : filtre par défaut
+-   MaJ méthode *stat\_gen1* : filtre par défaut
     `where SMED_NBR_JR_DUREE_TRAIT > 0`.
 -   MaJ fonction `SQL_comorbidity` qui avait un message d’erreur lors du
     tri des évènements obstétriques.
@@ -85,8 +86,8 @@
 #### [v0.4.0](https://github.com/INESSS-QC/inesss1/pull/7)
 
 -   `query_stat_gen1()` remplace `stat_gen1_query()`.
--   `SQL_stat_gen1()` utilise l’argument *group_by* au lieu de
-    *result_by*. `group_by='Codes'` au lieu de `'Périodes'`.
+-   `SQL_stat_gen1()` utilise l’argument *group\_by* au lieu de
+    *result\_by*. `group_by='Codes'` au lieu de `'Périodes'`.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
 -   Mise à jour du fichier *AIDE-FORMULAIRE-EXEMPLES-RÉSULTATS.xlsx*.
 -   Data `V_DEM_PAIMT_MED_CM.SMED_COD_DIN`.
@@ -115,9 +116,9 @@
 -   Fonction `formulaire()`.
 -   Fonction `sql_connexion()`.
 -   Fonction `sql_stat_gen1()`.
--   Création du fichier *AIDE-FORMULAIRE_2021-01-06.pdf*.
--   Création du fichier *LISEZ-MOI_2021-01-06.pdf*.
--   Création du fichier *R_RTOOLS_INSTALLATION_2021-01-06.pdf*.
+-   Création du fichier *AIDE-FORMULAIRE\_2021-01-06.pdf*.
+-   Création du fichier *LISEZ-MOI\_2021-01-06.pdf*.
+-   Création du fichier *R\_RTOOLS\_INSTALLATION\_2021-01-06.pdf*.
 -   Exemples au format Excel. Voir fichiers
     *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx* et
     *AIDE-FORMULAIRES-EXEMPLES-RÉSULTATS.xlsx*.
@@ -125,4 +126,4 @@
 
 ### v0.1.1.9000
 
--   Documentation des datas *Pop_QC*, *RLS_convert* et *RLS_list*.
+-   Documentation des datas *Pop\_QC*, *RLS\_convert* et *RLS\_list*.

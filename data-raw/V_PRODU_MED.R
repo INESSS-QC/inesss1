@@ -50,3 +50,5 @@ V_PRODU_MED <- list(
 attr(V_PRODU_MED, "MaJ") <- Sys.Date()
 
 use_data(V_PRODU_MED, overwrite = TRUE)
+
+rm(V_PRODU_MED)

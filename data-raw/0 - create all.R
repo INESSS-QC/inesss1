@@ -4,11 +4,11 @@ library(askpass)
 conn <- SQL_connexion(askpass("User"))  # connexion teradata
 
 files <- c(
-  "Comorbidity_diagn_codes.R",
-  "Comorbidity_weights.R",
+  "Comorbidity_Dx.R",
+  "ComorbidityWeights.R",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
   "internal_datas.R",
-  "Obstetrics_diagn_codes.R",
+  "Obstetrics_Dx.R",
   "Pop_QC.R",
   "RLS_convert.R",
   "RLS_list.R",

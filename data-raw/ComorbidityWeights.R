@@ -30,3 +30,5 @@ setkey(ComorbidityWeights$UManitoba_2016, DIAGN_CODE)
 
 attr(ComorbidityWeights, "MaJ") <- Sys.Date()
 use_data(ComorbidityWeights, overwrite = TRUE)
+
+rm(ComorbidityWeights)
