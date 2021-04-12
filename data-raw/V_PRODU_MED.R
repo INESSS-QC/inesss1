@@ -37,6 +37,8 @@ nom_marq_comrc <- function() {
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
 
+  setkey(DT, DENOM, DIN)
+
   return(DT)
 
 }

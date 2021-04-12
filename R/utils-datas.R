@@ -184,7 +184,7 @@
 #'
 #' @format `list`
 #' \describe{
-#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37934&TypOrigElmVue=D&NoSeqElmOrig=37196}{DES_COURT_INDCN_RECNU}}{Valeurs uniques de la description courte complète de l'indication reconnue de PME.\cr - \code{DES_COURT_INDCN_RECNU} : `character`.}
+#'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37934&TypOrigElmVue=D&NoSeqElmOrig=37196}{DES_COURT_INDCN_RECNU}}{Valeurs uniques de la description courte complète de l'indication reconnue de PME.\cr - \code{DES_COURT_INDCN_RECNU} : Description courte complète de l'indication reconnue. `character`.\cr - \code{DEBUT} : Première année (\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{APME_DAT_STA_DEM_PME}}) où la description courte complète a été inscrite. `integer`.\cr - \code{FIN} : Dernière année (\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{APME_DAT_STA_DEM_PME}}) où la description courte complète a été inscrite. `integer`.}
 #'   \item{\href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{NO_SEQ_INDCN_RECNU_PME}}{Indique la première et la dernière année d'utilisation.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37927&TypOrigElmVue=T&NoSeqElmOrig=9127}{\code{NO_SEQ_INDCN_RECNU}} : Numéro de séquence d'indication reconnue - PME. `integer`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37534&TypOrigElmVue=T&NoSeqElmOrig=9381}{\code{DD_TRAIT_DEM}} : Date de début de traitement demandée. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37537&TypOrigElmVue=T&NoSeqElmOrig=9382}{\code{DF_TRAIT_DEM}} : Date de fin de traitement demandée. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37944&TypOrigElmVue=T&NoSeqElmOrig=9367}{\code{DD_AUTOR}} : Date de début de l'autorisation PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37946&TypOrigElmVue=T&NoSeqElmOrig=9368}{\code{DF_AUTOR}} : Date de fin de l'autorisation PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37943&TypOrigElmVue=T&NoSeqElmOrig=9363}{\code{DD_APLIC_AUTOR}} : Date de début de l'applicabilité de l'autorisation de PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37945&TypOrigElmVue=T&NoSeqElmOrig=9364}{\code{DF_APLIC_AUTOR}} : Date de fin de l'applicabilité de l'autorisation de PME. `character`.\cr - \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM&NoSeqElmVue=37531&TypOrigElmVue=T&NoSeqElmOrig=1872}{\code{DAT_STA_DEM}} : Date de création ou de mise à jour du statut d'une demande d'autorisation correspondant à l'attribution du dernier statut de la demande. `character`.}
 #' }
 #'
@@ -193,6 +193,21 @@
 #' @source \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=2325&NomVue=I%5FAPME%5FDEM%5FAUTOR%5FCRITR%5FETEN%5FCM}{Dictionnaire EI}
 "I_APME_DEM_AUTOR_CRITR_ETEN_CM"
 
+
+
+# Obstetrics_Dx -----------------------------------------------------------
+
+#' Data - Codes diagnostics gestationnels
+#'
+#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics gestationnels pour l'étude de la comorbidité.
+#'
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
+#' @format `list(Dx = list(CIM9, CIM10))`
+#' @encoding UTF-8
+#' @usage data('Obstetrics_Dx')
+#' @encoding UTF-8
+"Obstetrics_Dx"
 
 
 # Pop_QC ------------------------------------------------------------------

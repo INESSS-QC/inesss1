@@ -8,23 +8,45 @@ library(stringr)
 
 des_court_indcn_recnu <- function() {
 
-  years <- 1996:year(Sys.Date())
-  DT <- vector("list", length(years))
-  i <- 1L
-  for (yr in years) {
-    DT[[i]] <- dbGetQuery(conn, statement = paste0(
-      "select distinct(NPME_DES_COURT_INDCN_RECNU) as DES_COURT_INDCN_RECNU\n",
-      "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-      "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, 1, 1),"' and '",date_ymd(yr, 12, 31),"';"
+  ### Vérifier si la variable d'itération contient une valeur nulle
+  verif_iterateur <- dbGetQuery(conn, statement = paste0(
+    "select APME_DAT_STA_DEM_PME as DAT_STA_DEM_PME\n",
+    "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+    "where APME_DAT_STA_DEM_PME is null;"
+  ))
+  if (nrow(verif_iterateur)) {
+    stop("I_APME_DEM_AUTOR_CRITR_ETEN_CM.des_court_indcn_recnu(): itérateur nulle.")
+  } else {
+    ### Années à utiliser pour les itérations
+    iter_vars <- dbGetQuery(conn, statement = paste0(
+      "select min(APME_DAT_STA_DEM_PME) as MIN_DAT,\n",
+      "       max(APME_DAT_STA_DEM_PME) as MAX_DAT\n",
+      "from I_APME_DEM_AUTOR_CRITR_ETEN_CM;"
     ))
-    i <- i + 1L
-  }
-  DT <- rbindlist(DT)
-  DT <- unique(DT)
-  DT <- DT[complete.cases(DT)]
-  setorder(DT, DES_COURT_INDCN_RECNU)
 
-  return(DT)
+    ### Extraction
+    DT <- vector("list", length(years))
+    years <- (year(iter_vars$MIN_DAT)):(year(iter_vars$MAX_DAT))
+    i <- 1L
+    for (yr in years) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct(NPME_DES_COURT_INDCN_RECNU) as DES_COURT_INDCN_RECNU\n",
+        "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+        "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, 1, 1),"' and '",date_ymd(yr, 12, 31),"';"
+      )))
+      DT[[i]][, ANNEE := yr]
+      i <- i + 1L
+    }
+    DT <- rbindlist(DT)
+    setorder(DT, DES_COURT_INDCN_RECNU, ANNEE)
+    DT <- DT[
+      , .(DEBUT = min(ANNEE),
+          FIN = max(ANNEE)),
+      .(DES_COURT_INDCN_RECNU)
+    ]
+
+    return(DT)
+  }
 
 }
 no_seq_indcn_recnu <- function() {
