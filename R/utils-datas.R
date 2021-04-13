@@ -1,4 +1,57 @@
 
+# CIM_correspond ----------------------------------------------------------
+
+#' Data - Correspondance entre CIM9 et CIM10
+#'
+#' Tableau de correspondance entre la CIM-9 et la CIM-10
+#'
+#' @format Tableau de 4 variables et 25866 observations :
+#' \describe{
+#'   \item{CIM9}{Code de diagnostic CIM-9. `character`.}
+#'   \item{CIM9_DESC}{Description du code de diagnostic. `character`.}
+#'   \item{CIM10}{Code de diagnostic CIM-10. `character`.}
+#'   \item{CIM10_DESC}{Description du code de diagnostic. `character`.}
+#' }
+#' @usage data('CIM_correspond')
+#' @encoding UTF-8
+#' @source \href{https://www.ramq.gouv.qc.ca/fr/professionnels/medecins-omnipraticiens/facturation/repertoire-diagnostics/Pages/repertoire-diagnostics.aspx}{Répertoire des diagnostics}.
+"CIM_correspond"
+
+
+# CIM9 ------------------------------------------------------------------
+
+#' Data - Diagnostics CIM-9
+#'
+#' Version légèrement modifiée par la RAMQ pour la facturation.
+#'
+#' @format Tableau de 2 variables et 7184 observations :
+#' \describe{
+#'   \item{CODE}{Code de diagnostic CIM-9. `character`.}
+#'   \item{DIAGNOSTIC}{Description du code de diagnostic. `character`.}
+#' }
+#' @usage data('CIM9')
+#' @encoding UTF-8
+#' @source \href{https://www.ramq.gouv.qc.ca/fr/professionnels/medecins-omnipraticiens/facturation/repertoire-diagnostics/Pages/repertoire-diagnostics.aspx}{Répertoire des diagnostics}.
+"CIM9"
+
+
+# CIM10 -----------------------------------------------------------------
+
+#' Data - Diagnostics CIM-10
+#'
+#' Version légèrement modifiée par la RAMQ pour la facturation.
+#'
+#' @format Tableau de 2 variables et 15487 observations :
+#' \describe{
+#'   \item{CODE}{Code de diagnostic CIM-10. `character`.}
+#'   \item{DIAGNOSTIC}{Description du code de diagnostic. `character`.}
+#' }
+#' @usage data('CIM10')
+#' @encoding UTF-8
+#' @source \href{https://www.ramq.gouv.qc.ca/fr/professionnels/medecins-omnipraticiens/facturation/repertoire-diagnostics/Pages/repertoire-diagnostics.aspx}{Répertoire des diagnostics}.
+"CIM10"
+
+
 # Combine_Dx_CCI_INSPQ18 --------------------------------------------------
 
 #' Data - Codes diagnostics
