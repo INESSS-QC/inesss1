@@ -17,6 +17,7 @@ Imports:
     data.table,
     DBI,
     fs,
+    kableExtra,
     knitr,
     lubridate,
     miniUI,
