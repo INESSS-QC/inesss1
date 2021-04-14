@@ -423,7 +423,7 @@ Charlson_Dx_UManitoba16 <- list(
     CIM9 = c(456, # 4560:4562,
              572 # 5722:5724, 5728),
             ),
-    CIM10 = c(paste0("I", c(852:859, 864, 982)),
+    CIM10 = c(paste0("I", c(850:859, 864, 982)),
               paste0("K", c(704, 711, 721, 729, 765:767)))
   ),
   # Metastatic Carcinoma
@@ -479,7 +479,10 @@ Charlson_Dx_UManitoba16 <- list(
 # SQL regex ---------------------------------------------------------------
 
 ### Ajouter un '%' après chaque code pour pouvoir les utiliser dans du SQL regex
-for (k in c("Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18")) {
+for (k in c("Combine_Dx_CCI_INSPQ18",
+            "Charlson_Dx_CCI_INSPQ18",
+            "Elixhauser_Dx_CCI_INSPQ18",
+            "Charlson_Dx_UManitoba16")) {
   dt <- get(k)
   for (i in 1:length(dt)) {
     for (j in c("CIM9", "CIM10")) {
