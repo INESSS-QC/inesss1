@@ -32,3 +32,5 @@ fct <- function() {
 
 V_DENOM_COMNE_MED <- fct()
 use_data(V_DENOM_COMNE_MED, overwrite = TRUE)
+
+rm(V_DENOM_COMNE_MED)

@@ -1,4 +1,9 @@
-## Librairie [`inesss` v.0.7.2](https://github.com/INESSS-QC/inesss1)
+## Librairie [`inesss` v.0.7.3](https://github.com/INESSS-QC/inesss1)
+
+### v0.7.3
+
+-   MaJ du data `V_DEM_PAIMT_MED_CM`.
+-   Correctifs de la méthode `comorbidity`.
 
 ### [v0.7.2](https://github.com/INESSS-QC/inesss1/pull/16)
 

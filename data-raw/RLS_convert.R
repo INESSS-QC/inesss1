@@ -22,3 +22,5 @@ attr(RLS_convert, "RLS_exclus_value") <- RLS_double
 attr(RLS_convert, "MaJ") <- Sys.Date()
 
 use_data(RLS_convert, overwrite = TRUE)
+
+rm(RLS_convert)

@@ -49,3 +49,5 @@ setkey(dt, GEO, CODE, AN, SEXE, AGE)
 Pop_QC <- copy(dt)
 attr(Pop_QC, "MaJ") <- Sys.Date()
 use_data(Pop_QC, overwrite = TRUE)
+
+rm(Pop_QC)

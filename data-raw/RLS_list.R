@@ -24,3 +24,5 @@ sort(RLS_list)
 attr(RLS_list, "MaJ") <- Sys.Date()  # date dr création
 
 use_data(RLS_list, overwrite = TRUE)
+
+rm(RLS_list)

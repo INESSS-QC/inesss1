@@ -37,6 +37,8 @@ nom_marq_comrc <- function() {
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
 
+  setkey(DT, DENOM, DIN)
+
   return(DT)
 
 }
@@ -48,3 +50,5 @@ V_PRODU_MED <- list(
 attr(V_PRODU_MED, "MaJ") <- Sys.Date()
 
 use_data(V_PRODU_MED, overwrite = TRUE)
+
+rm(V_PRODU_MED)
