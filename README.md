@@ -35,11 +35,12 @@ R version 4.0.5 (2021-03-31)
 ## Librairies
 
 `askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
-v.1.5.0<br> `knitr` v.1.31<br> `lubridate` v.1.7.10<br> `miniUI`
-v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc` v.1.3.1<br> `readxl`
-v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi` v.0.13<br> `shiny`
-v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
-`stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl` v.1.3.1
+v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.31<br> `lubridate`
+v.1.7.10<br> `miniUI` v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc`
+v.1.3.1<br> `readxl` v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi`
+v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles`
+v.0.9.0<br> `stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl`
+v.1.3.1
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
