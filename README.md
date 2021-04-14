@@ -1,7 +1,6 @@
 **inesss v.0.7.3**
 
-Support
-=======
+# Support
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
 conception, écrire un courriel à l’adresse
@@ -10,8 +9,7 @@ conception, écrire un courriel à l’adresse
 La documentation de la librairie est disponible
 [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
 
-Installation de la librairie *inesss*
-=====================================
+# Installation de la librairie *inesss*
 
 Copier les lignes suivantes dans la console de *RStudio* pour installer
 la librairie *inesss*.
@@ -21,24 +19,20 @@ if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_github("INESSS-QC/inesss", upgrade = "never", build_vignettes = T)
 ```
 
-Démarrer le formulaire
-======================
+# Démarrer le formulaire
 
 <img src="Documentation/source/images/formulaire-addin.png" style="width:90.0%" />
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 
-Notes de création
-=================
+# Notes de création
 
-R
--
+## R
 
 R version 4.0.5 (2021-03-31)
 
-Librairies
-----------
+## Librairies
 
 `askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
 v.1.5.0<br> `knitr` v.1.31<br> `lubridate` v.1.7.10<br> `miniUI`
@@ -50,11 +44,9 @@ v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles` v.0.9.0<br>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 
-Autres installations/désinstallations
-=====================================
+# Autres installations/désinstallations
 
-Installation de R
------------------
+## Installation de R
 
 -   Télécharger la version R 4.0.5 en cliquant
     [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe)
@@ -99,8 +91,7 @@ Installation de R
     *msXXX* est votre numéro d’identifiant. Répéter les étapes à partir
     de *Cliquer sur Tools*.
 
-Désinstallation de R
---------------------
+## Désinstallation de R
 
 Suivre les étapes suivantes pour supprimer une ancienne version de R
 installée à partir de la [section 1 *Installation de R*](#inst).
@@ -121,8 +112,7 @@ installée à partir de la [section 1 *Installation de R*](#inst).
     installées. Pour sauver de l’espace disque, il est conseillé de
     supprimer ce dossier (clic droit de la souris, puis supprimer).
 
-Rtools40
---------
+## Rtools40
 
 -   Télécharger *Rtools40* en cliquant
     [ici](https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe).
