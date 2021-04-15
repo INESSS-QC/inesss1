@@ -7,6 +7,7 @@ files <- c(
   # "CIM",
   # "Comorbidity_Dx.R",
   # "ComorbidityWeights.R",
+  # "DBC_TablesV.R",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
   # "internal_datas.R",
   # "Obstetrics_Dx.R",
