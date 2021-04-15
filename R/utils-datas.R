@@ -259,8 +259,25 @@
 #' @format `list(Dx = list(CIM9, CIM10))`
 #' @encoding UTF-8
 #' @usage data('Obstetrics_Dx')
-#' @encoding UTF-8
 "Obstetrics_Dx"
+
+
+
+# DBC_TablesV -------------------------------------------------------------
+
+#' Data - Liste des tables de *EI* RAMQ
+#'
+#' @format `data.table` de 3 variables et 32708 observations
+#' \describe{
+#'   \item{NOM_BD}{Nom de la base de données. Par exemple *PROD*, *RES_SSS*, *DONNE_INESSS*, etc. `character`.}
+#'   \item{NOM_TABLE}{Nom de la table. `character`.}
+#'   \item{TYPE_TABLE}{Type de la table. Voir \href{https://docs.teradata.com/r/EcH18cz_mkFcqxA7GeutqQ/kD2HkTfj10WlyDqsbQrc4w}{TableKind Column} pour plus d'infos. `character`.}
+#' }
+#' @encoding UTF-8
+#' @usage data('DBC_TablesV')
+#' @keywords internal
+"DBC_TablesV"
+
 
 
 # Pop_QC ------------------------------------------------------------------
