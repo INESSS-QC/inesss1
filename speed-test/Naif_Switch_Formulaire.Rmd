@@ -1,0 +1,305 @@
+---
+title: "Naif_Switch_Formulaire"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      comment = "#>",
+                      warning = FALSE,
+                      message = FALSE)
+library(inesss)
+library(odbc)
+library(microbenchmark)
+user <- "ms045"
+pwd <- "SQLpwd007/"
+conn <- SQL_connexion(user, pwd)
+```
+
+### inner join
+```{r, echo=FALSE}
+inner_join <- function() {
+  dbGetQuery(conn, statement = paste0(
+    "with INDCN_USER as (
+	select
+		distinct(APME_NO_INDIV_BEN_BANLS) as ID
+	from
+		I_APME_DEM_AUTOR_CRITR_ETEN_CM
+	where
+		APME_DAT_STA_DEM_PME between '2018-01-01' and '2020-12-31'
+		-- and APME_COD_DIN_DEM in (2269198, 2408082, 2415100, 2422433)
+		and APME_COD_STA_DEM_PME = 'R'
+		and APME_COD_STA_AUTOR_PME = 'AC'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%ostéoporose%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%postménopausique%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%femme%'
+),
+ALL_USER as (
+	select
+		I.ID,
+		min(V.SMED_DAT_SERV) as DATE_INDEX
+	from
+		V_DEM_PAIMT_MED_CM as V inner join INDCN_USER as I
+			on V.SMED_NO_INDIV_BEN_BANLS = I.ID
+	where
+		V.SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+	group by
+		ID
+),
+OLD_USER as (
+	select
+		distinct(A.ID) as ID
+	from
+		ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+			on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+	where
+		V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+),
+NAIF_SWITCH_COHORT as (
+	select ID from ALL_USER
+	except
+	select ID from OLD_USER
+)
+select
+	V.SMED_COD_DENOM_COMNE as DENOM,
+	sum(V.SMED_MNT_AUTOR_MED) as MNT_MED,
+	sum(V.SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+	sum(V.SMED_MNT_AUTOR_FRAIS_SERV + V.SMED_MNT_AUTOR_MED) as MNT_TOT,
+	count(distinct V.SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+	count(*) as NBRE_RX,
+	sum(V.SMED_QTE_MED) as QTE_MED,
+	sum(V.SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from
+	V_DEM_PAIMT_MED_CM as V inner join NAIF_SWITCH_COHORT as N
+		on V.SMED_NO_INDIV_BEN_BANLS = N.ID
+where
+	V.SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+	and V.SMED_COD_DENOM_COMNE in ('47386')
+	and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+	and V.SMED_NBR_JR_DUREE_TRAIT > 0
+group by
+	DENOM;"
+  ))
+}
+```
+```{sql, eval=FALSE}
+with INDCN_USER as (
+	select
+		distinct(APME_NO_INDIV_BEN_BANLS) as ID
+	from
+		I_APME_DEM_AUTOR_CRITR_ETEN_CM
+	where
+		APME_DAT_STA_DEM_PME between '2018-01-01' and '2020-12-31'
+		-- and APME_COD_DIN_DEM in (2269198, 2408082, 2415100, 2422433)
+		and APME_COD_STA_DEM_PME = 'R'
+		and APME_COD_STA_AUTOR_PME = 'AC'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%ostéoporose%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%postménopausique%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%femme%'
+),
+ALL_USER as (
+	select
+		I.ID,
+		min(V.SMED_DAT_SERV) as DATE_INDEX
+	from
+		V_DEM_PAIMT_MED_CM as V inner join INDCN_USER as I
+			on V.SMED_NO_INDIV_BEN_BANLS = I.ID
+	where
+		V.SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+	group by
+		ID
+),
+OLD_USER as (
+	select
+		distinct(A.ID) as ID
+	from
+		ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+			on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+	where
+		V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+),
+NAIF_SWITCH_COHORT as (
+	select ID from ALL_USER
+	except
+	select ID from OLD_USER
+)
+select
+	V.SMED_COD_DENOM_COMNE as DENOM,
+	sum(V.SMED_MNT_AUTOR_MED) as MNT_MED,
+	sum(V.SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+	sum(V.SMED_MNT_AUTOR_FRAIS_SERV + V.SMED_MNT_AUTOR_MED) as MNT_TOT,
+	count(distinct V.SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+	count(*) as NBRE_RX,
+	sum(V.SMED_QTE_MED) as QTE_MED,
+	sum(V.SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from
+	V_DEM_PAIMT_MED_CM as V inner join NAIF_SWITCH_COHORT as N
+		on V.SMED_NO_INDIV_BEN_BANLS = N.ID
+where
+	V.SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+	and V.SMED_COD_DENOM_COMNE in ('47386')
+	and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
+	and V.SMED_NBR_JR_DUREE_TRAIT > 0
+group by
+	DENOM;
+```
+
+
+### where in
+```{r, echo=FALSE}
+where_in <- function() {
+  dbGetQuery(conn, statement = paste0(
+    "with INDCN_USER as (
+	select
+		distinct(APME_NO_INDIV_BEN_BANLS) as ID
+	from
+		I_APME_DEM_AUTOR_CRITR_ETEN_CM
+	where
+		APME_DAT_STA_DEM_PME between '2018-01-01' and '2020-12-31'
+		-- and APME_COD_DIN_DEM in (2269198, 2408082, 2415100, 2422433)
+		and APME_COD_STA_DEM_PME = 'R'
+		and APME_COD_STA_AUTOR_PME = 'AC'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%ostéoporose%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%postménopausique%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%femme%'
+),
+ALL_USER as (
+	select
+		SMED_NO_INDIV_BEN_BANLS as ID,
+		min(SMED_DAT_SERV) as DATE_INDEX
+	from
+		V_DEM_PAIMT_MED_CM
+	where
+		SMED_NO_INDIV_BEN_BANLS in (select ID from INDCN_USER)
+		and SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+		and SMED_COD_DENOM_COMNE in ('47386')
+		and SMED_NBR_JR_DUREE_TRAIT > 0
+		and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+	group by
+		ID
+),
+OLD_USER as (
+	select
+		distinct(A.ID) as ID
+	from
+		ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+			on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+	where
+		V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+),
+NAIF_SWITCH_COHORT as (
+	select ID from ALL_USER
+	except
+	select ID from OLD_USER
+)
+select
+	SMED_COD_DENOM_COMNE as DENOM,
+	sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+	sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+	sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+	count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+	count(*) as NBRE_RX,
+	sum(SMED_QTE_MED) as QTE_MED,
+	sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from
+	V_DEM_PAIMT_MED_CM
+where
+	SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+	and SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+	and SMED_COD_DENOM_COMNE in ('47386')
+	and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+	and SMED_NBR_JR_DUREE_TRAIT > 0
+group by
+	DENOM;"
+  ))
+}
+```
+```{sql, eval=FALSE}
+with INDCN_USER as (
+	select
+		distinct(APME_NO_INDIV_BEN_BANLS) as ID
+	from
+		I_APME_DEM_AUTOR_CRITR_ETEN_CM
+	where
+		APME_DAT_STA_DEM_PME between '2018-01-01' and '2020-12-31'
+		-- and APME_COD_DIN_DEM in (2269198, 2408082, 2415100, 2422433)
+		and APME_COD_STA_DEM_PME = 'R'
+		and APME_COD_STA_AUTOR_PME = 'AC'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%ostéoporose%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%postménopausique%'
+		and lower(NPME_DES_COURT_INDCN_RECNU) like '%femme%'
+),
+ALL_USER as (
+	select
+		SMED_NO_INDIV_BEN_BANLS as ID,
+		min(SMED_DAT_SERV) as DATE_INDEX
+	from
+		V_DEM_PAIMT_MED_CM
+	where
+		SMED_NO_INDIV_BEN_BANLS in (select ID from INDCN_USER)
+		and SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+		and SMED_COD_DENOM_COMNE in ('47386')
+		and SMED_NBR_JR_DUREE_TRAIT > 0
+		and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+	group by
+		ID
+),
+OLD_USER as (
+	select
+		distinct(A.ID) as ID
+	from
+		ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+			on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+	where
+		V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
+		and V.SMED_COD_DENOM_COMNE in ('47386')
+		and V.SMED_NBR_JR_DUREE_TRAIT > 0
+		and (V.SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+),
+NAIF_SWITCH_COHORT as (
+	select ID from ALL_USER
+	except
+	select ID from OLD_USER
+)
+select
+	SMED_COD_DENOM_COMNE as DENOM,
+	sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+	sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+	sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+	count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+	count(*) as NBRE_RX,
+	sum(SMED_QTE_MED) as QTE_MED,
+	sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from
+	V_DEM_PAIMT_MED_CM
+where
+	SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+	and SMED_DAT_SERV between '2018-01-01' and '2020-12-31'
+	and SMED_COD_DENOM_COMNE in ('47386')
+	and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+	and SMED_NBR_JR_DUREE_TRAIT > 0
+group by
+	DENOM;
+```
+
+
+### Speed test
+```{r}
+microbenchmark(inner_join(), where_in(), times = 50)
+```
+
