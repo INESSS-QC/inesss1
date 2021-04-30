@@ -16,8 +16,8 @@ fct_values <- list(
   ),
 
   query_stat_gen1 = list(
-    type_Rx = c("DENOM", "DIN"),
-    group_by = c("Codes", "Teneur", "Format"),
+    type_Rx = c("DENOM", "DIN", "AHFS"),
+    group_by = c("AHFS", "DENOM", "DIN", "AgeServ", "AgeDate", "Teneur", "Format"),
     code_serv_filtre = c("Exclusion", "Inclusion"),
     code_list_filtre = c("Exclusion", "Inclusion")
   )
