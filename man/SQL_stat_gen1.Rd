@@ -27,15 +27,21 @@ SQL_stat_gen1(
 
 \item{type_Rx}{Indique le type de code analysé :
 \itemize{
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
 \item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
-\item{codes}{Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
+\item{codes}{Si \code{type_Rx='AHFS'}, un seul code à inscrire sous la forme de six (6) caractères. Par exemple, inscrire \code{040812} revient à chercher la classe 04, la sous-classe 08 et la sous-sous-classe 12.\cr
+Sinon inscrire le ou les codes à analyser sous la forme d'un \strong{nombre entier}.}
 
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
-\item \code{'Codes'} : Résultats par code analysé.
+\item \code{'AHFS'} : Résultats par code de classe AHFS.
+\item \code{'DENOM'} : Résultats par code de dénomination commune si \code{type_Rx='AHFS'}.
+\item \code{'DIN'} : Résultats par code d'identification du médicament si \code{type_Rx='AHFS'} ou \code{type_Rx='DENOM'}.
+\item \code{'AgeServ'} : Résultats par âge à la date de service (\code{SMED_AGE_BEN_AN_SERV}).
+\item \code{'AgeDate'} : Résultats par âge à une date précise. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
 \item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
 \item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
 }}

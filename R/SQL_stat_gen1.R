@@ -83,6 +83,8 @@ SQL_stat_gen1 <- function(
   if (type_Rx == "DENOM") {
     # DENOM est une chaîne de caractères de longueur 5
     codes <- stringr::str_pad(codes, width = 5, side = "left", pad = "0")
+  } else if (type_Rx == "AHFS") {
+    codes <- stringr::str_pad(codes, width = 6, side = "left", pad = "0")
   }
   # code_list
   if (!is.null(code_list)) {
@@ -96,14 +98,27 @@ SQL_stat_gen1 <- function(
   } else {
     DT <- vector("list", length(debut))  # contiendra les tableaux résultats
     for (i in 1:length(debut)) {
-
-      # Tableau résultat pour la période i
-      dt <- as.data.table(odbc::dbGetQuery(
-        conn = conn,
-        statement = query_stat_gen1(debut[i], fin[i], type_Rx, codes, group_by,
-                                    code_serv, code_serv_filtre,
-                                    code_list, code_list_filtre)
-      ))
+      if (type_Rx == "AHFS") {
+        dt <- vector("list", length(codes))
+        for (j in 1:length(codes)) {
+          sd <- as.data.table(odbc::dbGetQuery(
+            conn = conn,
+            statement = query_stat_gen1(debut[i], fin[i], type_Rx, codes[j], group_by,
+                                        code_serv, code_serv_filtre,
+                                        code_list, code_list_filtre)
+          ))
+          dt[[j]] <- sd
+          j <- j + 1L
+        }
+        dt <- rbindlist(dt)
+      } else {
+        dt <- as.data.table(odbc::dbGetQuery(
+          conn = conn,
+          statement = query_stat_gen1(debut[i], fin[i], type_Rx, codes, group_by,
+                                      code_serv, code_serv_filtre,
+                                      code_list, code_list_filtre)
+        ))
+      }
 
       # Ajouter informations selon le group_by
       dt <- SQL_stat_gen1.infos_query(conn, dt, debut[i], fin[i], type_Rx, codes, group_by)
