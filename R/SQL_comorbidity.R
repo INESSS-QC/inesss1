@@ -87,7 +87,7 @@ SQL_comorbidity <- function(
     )
 
     ### Filtrer dt pour en faire l'analyse
-    # Supprimer les diagnostics qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
+    # Supprimer les diagnostics qui ne sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
     dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
     dt <- dt[DATE_INDEX %m-% months(lookup*12) - n2 <= DATE_DX & DATE_DX <= DATE_INDEX]  # [index-X{ans}-n2{jours}; index]
     setkey(dt, ID, DIAGN, DATE_DX)

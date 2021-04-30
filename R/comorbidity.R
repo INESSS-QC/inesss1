@@ -60,12 +60,18 @@ comorbidity <- function(
   ### Ajouter le score aux diagn
   dt <- inesss::ComorbidityWeights[[scores]][, .(DIAGN = DIAGN_CODE, POIDS)][dt, on = .(DIAGN)]
 
+  ### Compter le nombre de Dx par ID
+  Dx_par_id <- dt[, .(nDx = .N), .(ID)]
+
   ### Mettre une colonne par diagn
   dt <- dcast(dt, ID ~ DIAGN, value.var = "POIDS")
   dt <- replace_NA_in_dt(dt, 0L)
 
   ### Calculer les scores
   dt <- comorbidity.scores(dt, Dx_table, exclu_diagn)
+
+  ### Ajouter le nombre de Dx par ID
+  dt <- Dx_par_id[dt, on = .(ID)]
 
   ### Information dans les attributs
   attr(dt, "infos") <- list(
