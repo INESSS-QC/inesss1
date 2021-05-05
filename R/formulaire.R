@@ -30,7 +30,7 @@ formulaire <- function() {
               "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST"),
       # Statistiques générales
       sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
-              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST")
+              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST", "AGE_DATE")
     ))
   }
   values_Excel_file <- function() {
@@ -48,8 +48,8 @@ formulaire <- function() {
       ),
       # Statistiques générales
       sg1 = list(
-        TYPE_RX = c("DENOM", "DIN"),
-        GROUPER_PAR = c("Codes", "Teneur", "Format"),
+        TYPE_RX = c("AHFS", "DENOM", "DIN"),
+        GROUPER_PAR = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age"),
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
@@ -359,13 +359,18 @@ formulaire <- function() {
     if (!length(code_list)) {
       code_list <- NULL
     }
+    age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
+    if (!length(age_date)) {
+      age_date <- NULL
+    }
 
     # Tableau des résultats
     DT <- SQL_stat_gen1(
       conn = conn, debut = dates_debut, fin = dates_fin,
       type_Rx = type_rx, codes = code_rx, group_by = grpby,
       code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-      code_list = code_list, code_list_filtre = code_list_filtre
+      code_list = code_list, code_list_filtre = code_list_filtre,
+      age_date = age_date
     )
 
     # Mettre sur une page
@@ -378,13 +383,15 @@ formulaire <- function() {
         METHODE = "stat_gen1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
         TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
         CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
-        CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
+        CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list,
+        AGE_DATE = age_date
       ),
       query = query_stat_gen1(  # code SQL de la 1ere période d'étude
         debut = dates_debut[1], fin = dates_fin[1],
         type_Rx = type_rx, codes = code_rx, group_by = grpby,
         code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-        code_list = code_list, code_list_filtre = code_list_filtre
+        code_list = code_list, code_list_filtre = code_list_filtre,
+        age_date = age_date
       )
     ))
 
@@ -458,7 +465,8 @@ formulaire <- function() {
       debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
       type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
       code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
-      code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+      code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
+      age_date = input$sg1_age_date
     )
     return(DT)
 
@@ -795,31 +803,31 @@ formulaire <- function() {
       }
     }
 
-    # CODE_RX
-    if ("CODE_RX" %in% names(dt)) {
-      code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-      if (length(code_rx)) {
-        nbr_NAs <- sum(is.na(code_rx))
-        code_rx <- as.numeric(code_rx)
-        if (sum(is.na(code_rx)) != nbr_NAs) {
-          if (new_error) {
-            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-            new_error <- FALSE
-          }
-          msg_error <- paste0(msg_error,
-                              " -  CODE_RX doit contenir des valeurs numériques.\n"
-          )
-        }
-      } else {
-        if (new_error) {
-          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-          new_error <- FALSE
-        }
-        msg_error <- paste0(msg_error,
-                            " -  CODE_RX doit contenir au moins une valeur.\n"
-        )
-      }
-    }
+    # # CODE_RX
+    # if ("CODE_RX" %in% names(dt)) {
+    #   code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+    #   if (length(code_rx)) {
+    #     nbr_NAs <- sum(is.na(code_rx))
+    #     code_rx <- as.numeric(code_rx)
+    #     if (sum(is.na(code_rx)) != nbr_NAs) {
+    #       if (new_error) {
+    #         msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+    #         new_error <- FALSE
+    #       }
+    #       msg_error <- paste0(msg_error,
+    #                           " -  CODE_RX doit contenir des valeurs numériques.\n"
+    #       )
+    #     }
+    #   } else {
+    #     if (new_error) {
+    #       msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+    #       new_error <- FALSE
+    #     }
+    #     msg_error <- paste0(msg_error,
+    #                         " -  CODE_RX doit contenir au moins une valeur.\n"
+    #     )
+    #   }
+    # }
 
     # GROUPER_PAR
     if ("GROUPER_PAR" %in% names(dt)) {
@@ -855,6 +863,27 @@ formulaire <- function() {
             )
           }
         }
+      }
+    }
+
+    # AGE_DATE
+    age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
+    if (length(age_date) > 1) {
+      if (new_error) {
+        msg_error <- paste0(msg_error, format_xl_err_sh(sh))
+        new_error <- FALSE
+      }
+      msg_error <- paste0(msg_error,
+                          " -  AGE_DATE doit contenir seulement une valeur.\n")
+    } else if (length(age_date)) {
+      age_date <- as_date_excel_chr(age_date)
+      if (anyNA(age_date)) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  AGE_DATE n'est pas une date au format 'AAAA-MM-JJ'.\n")
       }
     }
 
@@ -989,7 +1018,7 @@ formulaire <- function() {
               numericInput("sg1_nb_codes", "Nombre de Codes Rx", value = 1),
               # Sélection du type de code Rx
               selectInput("sg1_type_Rx", "Type de Code Rx",
-                          choices = c("DENOM", "DIN"), selected = "DENOM"),
+                          choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
               # Text inputs où indiquer les codes d'analyse
               uiOutput("sg1_nb_codes")
             ),
@@ -998,9 +1027,11 @@ formulaire <- function() {
               # Grouper par
               checkboxGroupInput(
                 "sg1_group_by", "Grouper par",
-                choices = c("Codes", "Teneur", "Format"),
-                selected = "Codes"
-              )
+                choices = c("AHFS", "DENOM", "DIN", "CodeServ", "CodeList", "Teneur", "Format", "Age"),
+                selected = "DENOM"
+              ),
+              div(style = "margin-top:-10px"),
+              uiOutput("sg1_age_date")
             ),
             column(
               width = 4,
@@ -1272,6 +1303,18 @@ formulaire <- function() {
     output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
 
 
+    # Afficher une date pour le calcul de l'âge
+    output$sg1_age_date <- renderUI({
+      if (any(input$sg1_group_by == "Age")) {
+        return(tagList(
+          dateInput("sg1_age_date", label = "Date pour calcul Âge", value = input$sg1_date1[1])
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+
+
     # En-tête Résultats - Apparaît seulement s'il y a eu une requête
     output$sg1_html_result_section <- renderUI({
       if (sg1_val$show_tab) {
@@ -1351,17 +1394,19 @@ formulaire <- function() {
               DATE_DEBUT = sg1_find_date(input, "deb"),
               DATE_FIN = sg1_find_date(input, "fin"),
               TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
-              RESULTATS_PAR = input$sg1_group_by,
+              GROUPER_PAR = input$sg1_group_by,
               CODE_SERV_FILTRE = input$sg1_code_serv_filter,
               CODE_SERV = adapt_code_serv(input$sg1_code_serv),
               CODE_LIST_FILTRE = input$sg1_code_list_filter,
-              CODE_LIST = input$sg1_code_list
+              CODE_LIST = input$sg1_code_list,
+              AGE_DATE = input$sg1_age_date
             ),
             query = query_stat_gen1(
               debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
               type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
-              code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter
+              code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
+              age_date = input$sg1_age_date
             )
           ),
           save_path = sg1_file_save()
@@ -1391,9 +1436,12 @@ formulaire <- function() {
       # Code SQL associé à la requête demandée
       query_stat_gen1(
         debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-        type_Rx = input$sg1_type_Rx, codes = sort(sg1_find_code(input)), group_by = input$sg1_group_by,
+        type_Rx = input$sg1_type_Rx,
+        codes = ifelse(input$sg1_type_Rx == "AHFS", sort(sg1_find_code(input))[1], sort(sg1_find_code(input))),
+        group_by = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
-        code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter
+        code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter,
+        age_date = input$sg1_age_date
       )
     })
     output$sg1_code_SQL <- renderText({ sg1_code_SQL() })

@@ -28,22 +28,22 @@ SQL_naif_switch1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{codes}{Traitement(s) d'intérêt(s). Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
+\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
 
 \item{grouper_par}{Regrouper (aggréger) les résultats par :
 \itemize{
 \item \code{'Codes'} : Résultats par code analysé.
 }}
 
-\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir \emph{Details}. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
+\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
 
-\item{njours_sans_conso}{Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré \emph{naïf} ou \emph{switch}.}
+\item{njours_sans_conso}{Nombre de jours qu’un individu ne doit pas avoir reçu de traitements avant sa date de référence (date index) pour être considéré \emph{naïf} ou \emph{switch}.}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_serv_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
+\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de listes de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 }

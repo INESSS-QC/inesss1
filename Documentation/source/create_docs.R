@@ -10,11 +10,16 @@ devtools::build_manual(path = "Documentation")
 
 
 # Build Vignettes ---------------------------------------------------------
+if (length(list.files("doc"))) {
+  for (file in list.files("doc")) {
+    unlink(paste0("doc/",file), recursive = TRUE)
+  }
+}
 devtools::build_vignettes()
 for (file in list.files("doc")) {
   if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".html") {
-    file.copy(from = paste0("doc/",file),
-              to = paste0("Documentation/Vignettes/",file))
+    file.copy(from = paste0("doc/",file), to = paste0("Documentation/Vignettes/",file),
+              overwrite = TRUE)
   } else {
     next
   }

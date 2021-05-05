@@ -499,6 +499,27 @@ dt[]
 <p style="margin-bottom:3cm">
 
 
+# Nombre de diagnostics (Dx)
+Compter le nombre de diagnostics peut être utile dans le cas où il y aurait des poids de zéro (0). Permet de différencier deux individus où l'un a un *score* de zéro parce qu'il n'a pas de diagnostics et l'autre parce que les diagnostics qu'il a ont des poids de zéro.  
+La colonne `nDx` sera ajoutée à la fin complètement, après le calcul des *scores*.
+
+**AVANT le calcul du nombre de Dx**
+```{r}
+dt <- inesss:::vignettes_datas$SQL_comorbidity$`8-nDx`
+dt[]
+```
+
+**APRÈS avoir calculé le nombre de Dx**
+```{r}
+Dx_par_id <- dt[, .(nDx = .N), .(ID)]
+Dx_par_id[]
+```
+
+
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
+
+
 # Calcul des *scores*
 Ajout de tous les diagnostics présents dans `Dx_table='Combine_Dx_CCI_INSPQ18'` en excluant `exclu_diagn=c('drug','ld')`.  
 Puisque la table des codes de diagnostics utilisée est `Combine_Dx_CCI_INSPQ18`, calcul du *score* pour `Charlson_Dx_CCI_INSPQ18`, `Elixhauser_Dx_CCI_INSPQ18` et les deux combinés.  
@@ -561,6 +582,9 @@ Les individus de la cohorte d'étude qui ne sont pas dans le tableau d'analyse o
 
 **AVANT**
 ```{r}
+cols <- names(dt)
+dt[, nDx := 6]
+setcolorder(dt, c(cols[1], "nDx", cols[2:34]))
 dt[]
 ```
 

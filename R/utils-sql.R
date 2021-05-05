@@ -24,10 +24,14 @@ from_bd.vue <- function(bd = "PROD", vue) {
 #' @return Quatre (4) espaces répétés `niv` fois.
 #' @keywords internal
 indent <- function(niv = 1) {
-  if (niv == "select") {
+  if (niv < 0) {
+    stop("indent() : niv doit être plus grand ou égal à zéro.")
+  } else if (niv == "select") {
     return("       ")
+  } else if (niv == 0) {
+    return("")
   } else {
-    return(paste0(rep("    ", niv)))
+    return(paste0(rep("    ", niv), collapse = ""))
   }
 }
 

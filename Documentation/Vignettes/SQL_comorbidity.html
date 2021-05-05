@@ -14,7 +14,22 @@
 
 <title>SQL_comorbidity</title>
 
-<script src="data:application/javascript;base64,Ly8gUGFuZG9jIDIuOSBhZGRzIGF0dHJpYnV0ZXMgb24gYm90aCBoZWFkZXIgYW5kIGRpdi4gV2UgcmVtb3ZlIHRoZSBmb3JtZXIgKHRvCi8vIGJlIGNvbXBhdGlibGUgd2l0aCB0aGUgYmVoYXZpb3Igb2YgUGFuZG9jIDwgMi44KS4KZG9jdW1lbnQuYWRkRXZlbnRMaXN0ZW5lcignRE9NQ29udGVudExvYWRlZCcsIGZ1bmN0aW9uKGUpIHsKICB2YXIgaHMgPSBkb2N1bWVudC5xdWVyeVNlbGVjdG9yQWxsKCJkaXYuc2VjdGlvbltjbGFzcyo9J2xldmVsJ10gPiA6Zmlyc3QtY2hpbGQiKTsKICB2YXIgaSwgaCwgYTsKICBmb3IgKGkgPSAwOyBpIDwgaHMubGVuZ3RoOyBpKyspIHsKICAgIGggPSBoc1tpXTsKICAgIGlmICghL15oWzEtNl0kL2kudGVzdChoLnRhZ05hbWUpKSBjb250aW51ZTsgIC8vIGl0IHNob3VsZCBiZSBhIGhlYWRlciBoMS1oNgogICAgYSA9IGguYXR0cmlidXRlczsKICAgIHdoaWxlIChhLmxlbmd0aCA+IDApIGgucmVtb3ZlQXR0cmlidXRlKGFbMF0ubmFtZSk7CiAgfQp9KTsK"></script>
+<script>// Hide empty <a> tag within highlighted CodeBlock for screen reader accessibility (see https://github.com/jgm/pandoc/issues/6352#issuecomment-626106786) -->
+// v0.0.1
+// Written by JooYoung Seo (jooyoung@psu.edu) and Atsushi Yasumoto on June 1st, 2020.
+
+document.addEventListener('DOMContentLoaded', function() {
+  const codeList = document.getElementsByClassName("sourceCode");
+  for (var i = 0; i < codeList.length; i++) {
+    var linkList = codeList[i].getElementsByTagName('a');
+    for (var j = 0; j < linkList.length; j++) {
+      if (linkList[j].innerHTML === "") {
+        linkList[j].setAttribute('aria-hidden', 'true');
+      }
+    }
+  }
+});
+</script>
 
 <style type="text/css">
   code{white-space: pre-wrap;}
@@ -35,19 +50,19 @@
   }
 </style>
 <style type="text/css" data-origin="pandoc">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
+code.sourceCode > span { display: inline-block; line-height: 1.25; }
 code.sourceCode > span { color: inherit; text-decoration: inherit; }
+code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode { white-space: pre; position: relative; }
 div.sourceCode { margin: 1em 0; }
 pre.sourceCode { margin: 0; }
 @media screen {
 div.sourceCode { overflow: auto; }
 }
 @media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+code.sourceCode { white-space: pre-wrap; }
+code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
 }
 pre.numberSource code
   { counter-reset: source-line 0; }
@@ -67,7 +82,7 @@ pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-le
 div.sourceCode
   {   }
 @media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 code span.al { color: #ff0000; font-weight: bold; } /* Alert */
 code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
@@ -125,7 +140,187 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
-<link rel="stylesheet" href="data:text/css,body%20%7B%0Abackground%2Dcolor%3A%20%23fff%3B%0Amargin%3A%201em%20auto%3B%0Amax%2Dwidth%3A%20700px%3B%0Aoverflow%3A%20visible%3B%0Apadding%2Dleft%3A%202em%3B%0Apadding%2Dright%3A%202em%3B%0Afont%2Dfamily%3A%20%22Open%20Sans%22%2C%20%22Helvetica%20Neue%22%2C%20Helvetica%2C%20Arial%2C%20sans%2Dserif%3B%0Afont%2Dsize%3A%2014px%3B%0Aline%2Dheight%3A%201%2E35%3B%0A%7D%0A%23TOC%20%7B%0Aclear%3A%20both%3B%0Amargin%3A%200%200%2010px%2010px%3B%0Apadding%3A%204px%3B%0Awidth%3A%20400px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Aborder%2Dradius%3A%205px%3B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Afont%2Dsize%3A%2013px%3B%0Aline%2Dheight%3A%201%2E3%3B%0A%7D%0A%23TOC%20%2Etoctitle%20%7B%0Afont%2Dweight%3A%20bold%3B%0Afont%2Dsize%3A%2015px%3B%0Amargin%2Dleft%3A%205px%3B%0A%7D%0A%23TOC%20ul%20%7B%0Apadding%2Dleft%3A%2040px%3B%0Amargin%2Dleft%3A%20%2D1%2E5em%3B%0Amargin%2Dtop%3A%205px%3B%0Amargin%2Dbottom%3A%205px%3B%0A%7D%0A%23TOC%20ul%20ul%20%7B%0Amargin%2Dleft%3A%20%2D2em%3B%0A%7D%0A%23TOC%20li%20%7B%0Aline%2Dheight%3A%2016px%3B%0A%7D%0Atable%20%7B%0Amargin%3A%201em%20auto%3B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dcolor%3A%20%23DDDDDD%3B%0Aborder%2Dstyle%3A%20outset%3B%0Aborder%2Dcollapse%3A%20collapse%3B%0A%7D%0Atable%20th%20%7B%0Aborder%2Dwidth%3A%202px%3B%0Apadding%3A%205px%3B%0Aborder%2Dstyle%3A%20inset%3B%0A%7D%0Atable%20td%20%7B%0Aborder%2Dwidth%3A%201px%3B%0Aborder%2Dstyle%3A%20inset%3B%0Aline%2Dheight%3A%2018px%3B%0Apadding%3A%205px%205px%3B%0A%7D%0Atable%2C%20table%20th%2C%20table%20td%20%7B%0Aborder%2Dleft%2Dstyle%3A%20none%3B%0Aborder%2Dright%2Dstyle%3A%20none%3B%0A%7D%0Atable%20thead%2C%20table%20tr%2Eeven%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Ap%20%7B%0Amargin%3A%200%2E5em%200%3B%0A%7D%0Ablockquote%20%7B%0Abackground%2Dcolor%3A%20%23f6f6f6%3B%0Apadding%3A%200%2E25em%200%2E75em%3B%0A%7D%0Ahr%20%7B%0Aborder%2Dstyle%3A%20solid%3B%0Aborder%3A%20none%3B%0Aborder%2Dtop%3A%201px%20solid%20%23777%3B%0Amargin%3A%2028px%200%3B%0A%7D%0Adl%20%7B%0Amargin%2Dleft%3A%200%3B%0A%7D%0Adl%20dd%20%7B%0Amargin%2Dbottom%3A%2013px%3B%0Amargin%2Dleft%3A%2013px%3B%0A%7D%0Adl%20dt%20%7B%0Afont%2Dweight%3A%20bold%3B%0A%7D%0Aul%20%7B%0Amargin%2Dtop%3A%200%3B%0A%7D%0Aul%20li%20%7B%0Alist%2Dstyle%3A%20circle%20outside%3B%0A%7D%0Aul%20ul%20%7B%0Amargin%2Dbottom%3A%200%3B%0A%7D%0Apre%2C%20code%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0Aborder%2Dradius%3A%203px%3B%0Acolor%3A%20%23333%3B%0Awhite%2Dspace%3A%20pre%2Dwrap%3B%20%0A%7D%0Apre%20%7B%0Aborder%2Dradius%3A%203px%3B%0Amargin%3A%205px%200px%2010px%200px%3B%0Apadding%3A%2010px%3B%0A%7D%0Apre%3Anot%28%5Bclass%5D%29%20%7B%0Abackground%2Dcolor%3A%20%23f7f7f7%3B%0A%7D%0Acode%20%7B%0Afont%2Dfamily%3A%20Consolas%2C%20Monaco%2C%20%27Courier%20New%27%2C%20monospace%3B%0Afont%2Dsize%3A%2085%25%3B%0A%7D%0Ap%20%3E%20code%2C%20li%20%3E%20code%20%7B%0Apadding%3A%202px%200px%3B%0A%7D%0Adiv%2Efigure%20%7B%0Atext%2Dalign%3A%20center%3B%0A%7D%0Aimg%20%7B%0Abackground%2Dcolor%3A%20%23FFFFFF%3B%0Apadding%3A%202px%3B%0Aborder%3A%201px%20solid%20%23DDDDDD%3B%0Aborder%2Dradius%3A%203px%3B%0Aborder%3A%201px%20solid%20%23CCCCCC%3B%0Amargin%3A%200%205px%3B%0A%7D%0Ah1%20%7B%0Amargin%2Dtop%3A%200%3B%0Afont%2Dsize%3A%2035px%3B%0Aline%2Dheight%3A%2040px%3B%0A%7D%0Ah2%20%7B%0Aborder%2Dbottom%3A%204px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Apadding%2Dbottom%3A%202px%3B%0Afont%2Dsize%3A%20145%25%3B%0A%7D%0Ah3%20%7B%0Aborder%2Dbottom%3A%202px%20solid%20%23f7f7f7%3B%0Apadding%2Dtop%3A%2010px%3B%0Afont%2Dsize%3A%20120%25%3B%0A%7D%0Ah4%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23f7f7f7%3B%0Amargin%2Dleft%3A%208px%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Ah5%2C%20h6%20%7B%0Aborder%2Dbottom%3A%201px%20solid%20%23ccc%3B%0Afont%2Dsize%3A%20105%25%3B%0A%7D%0Aa%20%7B%0Acolor%3A%20%230033dd%3B%0Atext%2Ddecoration%3A%20none%3B%0A%7D%0Aa%3Ahover%20%7B%0Acolor%3A%20%236666ff%3B%20%7D%0Aa%3Avisited%20%7B%0Acolor%3A%20%23800080%3B%20%7D%0Aa%3Avisited%3Ahover%20%7B%0Acolor%3A%20%23BB00BB%3B%20%7D%0Aa%5Bhref%5E%3D%22http%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0Aa%5Bhref%5E%3D%22https%3A%22%5D%20%7B%0Atext%2Ddecoration%3A%20underline%3B%20%7D%0A%0Acode%20%3E%20span%2Ekw%20%7B%20color%3A%20%23555%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Edt%20%7B%20color%3A%20%23902000%3B%20%7D%20%0Acode%20%3E%20span%2Edv%20%7B%20color%3A%20%2340a070%3B%20%7D%20%0Acode%20%3E%20span%2Ebn%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Efl%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Ech%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Est%20%7B%20color%3A%20%23d14%3B%20%7D%20%0Acode%20%3E%20span%2Eco%20%7B%20color%3A%20%23888888%3B%20font%2Dstyle%3A%20italic%3B%20%7D%20%0Acode%20%3E%20span%2Eot%20%7B%20color%3A%20%23007020%3B%20%7D%20%0Acode%20%3E%20span%2Eal%20%7B%20color%3A%20%23ff0000%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Efu%20%7B%20color%3A%20%23900%3B%20font%2Dweight%3A%20bold%3B%20%7D%20%0Acode%20%3E%20span%2Eer%20%7B%20color%3A%20%23a61717%3B%20background%2Dcolor%3A%20%23e3d2d2%3B%20%7D%20%0A" type="text/css" />
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
 
 
 
@@ -144,67 +339,64 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <ul>
 <li><a href="#arguments-utilisés"><span class="toc-section-number">1</span> Arguments utilisés</a></li>
 <li><a href="#arrangement-de-la-table"><span class="toc-section-number">2</span> Arrangement de la table</a></li>
-<li><a href="#sélection-des-codes-de-diagnostics"><span class="toc-section-number">3</span> Sélection des codes de diagnostics</a>
-<ul>
+<li><a href="#sélection-des-codes-de-diagnostics"><span class="toc-section-number">3</span> Sélection des codes de diagnostics</a><ul>
 <li><a href="#dx_table-combine_dx_cci_inspq18"><span class="toc-section-number">3.1</span> Dx_table = ‘Combine_Dx_CCI_INSPQ18’</a></li>
 <li><a href="#exclu_diagn-cdrug-ld"><span class="toc-section-number">3.2</span> exclu_diagn = c(‘drug’, ‘ld’)</a></li>
 <li><a href="#cim-ccim9-cim10"><span class="toc-section-number">3.3</span> CIM = c(‘CIM9’, ‘CIM10’)</a></li>
 </ul></li>
-<li><a href="#sources-sql-dt_source"><span class="toc-section-number">4</span> Sources SQL (<code>dt_source</code>)</a>
-<ul>
+<li><a href="#sources-sql-dt_source"><span class="toc-section-number">4</span> Sources SQL (<code>dt_source</code>)</a><ul>
 <li><a href="#v_diagn_sej_hosp_cm"><span class="toc-section-number">4.1</span> V_DIAGN_SEJ_HOSP_CM</a></li>
 <li><a href="#v_sej_serv_hosp_cm"><span class="toc-section-number">4.2</span> V_SEJ_SERV_HOSP_CM</a></li>
 <li><a href="#v_episo_soin_durg_cm"><span class="toc-section-number">4.3</span> V_EPISO_SOIN_DURG_CM</a></li>
 <li><a href="#i_smod_serv_md_cm"><span class="toc-section-number">4.4</span> I_SMOD_SERV_MD_CM</a></li>
 </ul></li>
 <li><a href="#filtrer-les-diagnostics-incohérents"><span class="toc-section-number">5</span> Filtrer les diagnostics <em>incohérents</em></a></li>
-<li><a href="#exclusions-cas-obstétriques-obstetric_exclutrue"><span class="toc-section-number">6</span> Exclusions Cas Obstétriques (<code>obstetric_exclu=TRUE</code>)</a>
-<ul>
+<li><a href="#exclusions-cas-obstétriques-obstetric_exclutrue"><span class="toc-section-number">6</span> Exclusions Cas Obstétriques (<code>obstetric_exclu=TRUE</code>)</a><ul>
 <li><a href="#codes-de-diagnostics-de-type-gestationnel"><span class="toc-section-number">6.1</span> Codes de diagnostics de type gestationnel</a></li>
 </ul></li>
 <li><a href="#priorisation-des-sources"><span class="toc-section-number">7</span> Priorisation des sources</a></li>
 <li><a href="#dx-date_dx---lookup"><span class="toc-section-number">8</span> Dx &lt; DATE_DX <span class="math inline">\(-\)</span> lookup</a></li>
-<li><a href="#confirmation-des-diagnostics"><span class="toc-section-number">9</span> Confirmation des diagnostics</a>
-<ul>
+<li><a href="#confirmation-des-diagnostics"><span class="toc-section-number">9</span> Confirmation des diagnostics</a><ul>
 <li><a href="#medecho-1"><span class="toc-section-number">9.1</span> MEDECHO (1)</a></li>
 <li><a href="#bdcu-et-smod-2"><span class="toc-section-number">9.2</span> BDCU et SMOD (2)</a></li>
 <li><a href="#medecho-1-bdcu-2-et-smod-2"><span class="toc-section-number">9.3</span> MEDECHO (1), BDCU (2) et SMOD (2)</a></li>
 </ul></li>
 <li><a href="#poids-des-diagnostics"><span class="toc-section-number">10</span> Poids des diagnostics</a></li>
-<li><a href="#calcul-des-scores"><span class="toc-section-number">11</span> Calcul des <em>scores</em></a></li>
-<li><a href="#ajouts-des-individus-manquants"><span class="toc-section-number">12</span> Ajouts des individus manquants</a></li>
+<li><a href="#nombre-de-diagnostics-dx"><span class="toc-section-number">11</span> Nombre de diagnostics (Dx)</a></li>
+<li><a href="#calcul-des-scores"><span class="toc-section-number">12</span> Calcul des <em>scores</em></a></li>
+<li><a href="#ajouts-des-individus-manquants"><span class="toc-section-number">13</span> Ajouts des individus manquants</a></li>
 </ul>
 </div>
 
-<div id="arguments-utilisés" class="section level1" number="1">
-<h1 number="1"><span class="header-section-number">1</span> Arguments utilisés</h1>
+<div id="arguments-utilisés" class="section level1">
+<h1><span class="header-section-number">1</span> Arguments utilisés</h1>
 <p>Liste des arguments utilisés pour les exemples.</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>ID <span class="ot">=</span> <span class="st">&#39;ID&#39;</span></span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>DATE_INDEX <span class="ot">=</span> <span class="st">&#39;DATE_INDEX&#39;</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>Dx_table <span class="ot">=</span> <span class="st">&#39;Combine_Dx_CCI_INSPQ18&#39;</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>CIM <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;CIM9&#39;</span>, <span class="st">&#39;CIM10&#39;</span>)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>scores <span class="ot">=</span> <span class="st">&#39;CCI_INSPQ_2018_CIM10&#39;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>lookup <span class="ot">=</span> <span class="dv">2</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>n1 <span class="ot">=</span> <span class="dv">30</span>; n2 <span class="ot">=</span> <span class="dv">730</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>dt_source <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;V_DIAGN_SEJ_HOSP_CM&#39;</span>,</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;V_SEJ_SERV_HOSP_CM&#39;</span>,</span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;V_EPISO_SOIN_DURG_CM&#39;</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>              <span class="st">&#39;I_SMOD_SERV_MD_CM&#39;</span>)</span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>dt_desc <span class="ot">=</span> <span class="fu">list</span>(<span class="at">V_DIAGN_SEJ_HOSP_CM =</span> <span class="st">&#39;MEDECHO&#39;</span>,</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>               <span class="at">V_SEJ_SERV_HOSP_CM =</span> <span class="st">&#39;MEDECHO&#39;</span>,</span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>               <span class="at">V_EPISO_SOIN_DURG_CM =</span> <span class="st">&#39;BDCU&#39;</span>,</span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>               <span class="at">I_SMOD_SERV_MD_CM =</span> <span class="st">&#39;SMOD&#39;</span>)</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>confirm_sourc <span class="ot">=</span> <span class="fu">list</span>(<span class="at">MEDECHO =</span> <span class="dv">1</span>,</span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>                     <span class="at">BDCU =</span> <span class="dv">2</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>                     <span class="at">SMOD =</span> <span class="dv">2</span>)</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>obstetric_exclu <span class="ot">=</span> <span class="cn">TRUE</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>exclu_diagn <span class="ot">=</span> <span class="fu">c</span>(<span class="st">&#39;drug&#39;</span>, <span class="st">&#39;ld&#39;</span>)</span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>keep_confirm_data <span class="ot">=</span> <span class="cn">TRUE</span></span></code></pre></div>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a>ID =<span class="st"> &#39;ID&#39;</span></span>
+<span id="cb1-2"><a href="#cb1-2"></a>DATE_INDEX =<span class="st"> &#39;DATE_INDEX&#39;</span></span>
+<span id="cb1-3"><a href="#cb1-3"></a>Dx_table =<span class="st"> &#39;Combine_Dx_CCI_INSPQ18&#39;</span></span>
+<span id="cb1-4"><a href="#cb1-4"></a>CIM =<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;CIM9&#39;</span>, <span class="st">&#39;CIM10&#39;</span>)</span>
+<span id="cb1-5"><a href="#cb1-5"></a>scores =<span class="st"> &#39;CCI_INSPQ_2018_CIM10&#39;</span></span>
+<span id="cb1-6"><a href="#cb1-6"></a>lookup =<span class="st"> </span><span class="dv">2</span></span>
+<span id="cb1-7"><a href="#cb1-7"></a>n1 =<span class="st"> </span><span class="dv">30</span>; n2 =<span class="st"> </span><span class="dv">730</span></span>
+<span id="cb1-8"><a href="#cb1-8"></a>dt_source =<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;V_DIAGN_SEJ_HOSP_CM&#39;</span>,</span>
+<span id="cb1-9"><a href="#cb1-9"></a>              <span class="st">&#39;V_SEJ_SERV_HOSP_CM&#39;</span>,</span>
+<span id="cb1-10"><a href="#cb1-10"></a>              <span class="st">&#39;V_EPISO_SOIN_DURG_CM&#39;</span>,</span>
+<span id="cb1-11"><a href="#cb1-11"></a>              <span class="st">&#39;I_SMOD_SERV_MD_CM&#39;</span>)</span>
+<span id="cb1-12"><a href="#cb1-12"></a>dt_desc =<span class="st"> </span><span class="kw">list</span>(<span class="dt">V_DIAGN_SEJ_HOSP_CM =</span> <span class="st">&#39;MEDECHO&#39;</span>,</span>
+<span id="cb1-13"><a href="#cb1-13"></a>               <span class="dt">V_SEJ_SERV_HOSP_CM =</span> <span class="st">&#39;MEDECHO&#39;</span>,</span>
+<span id="cb1-14"><a href="#cb1-14"></a>               <span class="dt">V_EPISO_SOIN_DURG_CM =</span> <span class="st">&#39;BDCU&#39;</span>,</span>
+<span id="cb1-15"><a href="#cb1-15"></a>               <span class="dt">I_SMOD_SERV_MD_CM =</span> <span class="st">&#39;SMOD&#39;</span>)</span>
+<span id="cb1-16"><a href="#cb1-16"></a>confirm_sourc =<span class="st"> </span><span class="kw">list</span>(<span class="dt">MEDECHO =</span> <span class="dv">1</span>,</span>
+<span id="cb1-17"><a href="#cb1-17"></a>                     <span class="dt">BDCU =</span> <span class="dv">2</span>,</span>
+<span id="cb1-18"><a href="#cb1-18"></a>                     <span class="dt">SMOD =</span> <span class="dv">2</span>)</span>
+<span id="cb1-19"><a href="#cb1-19"></a>obstetric_exclu =<span class="st"> </span><span class="ot">TRUE</span></span>
+<span id="cb1-20"><a href="#cb1-20"></a>exclu_diagn =<span class="st"> </span><span class="kw">c</span>(<span class="st">&#39;drug&#39;</span>, <span class="st">&#39;ld&#39;</span>)</span>
+<span id="cb1-21"><a href="#cb1-21"></a>keep_confirm_data =<span class="st"> </span><span class="ot">TRUE</span></span></code></pre></div>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="arrangement-de-la-table" class="section level1" number="2">
-<h1 number="2"><span class="header-section-number">2</span> Arrangement de la table</h1>
+<div id="arrangement-de-la-table" class="section level1">
+<h1><span class="header-section-number">2</span> Arrangement de la table</h1>
 <ul>
 <li>Sélectionner les colonnes nécessaires.</li>
 <li>Sélectionner la première date de référence (la plus ancienne) s’il y en a plusieurs pour un même individu.</li>
@@ -227,10 +419,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="sélection-des-codes-de-diagnostics" class="section level1" number="3">
-<h1 number="3"><span class="header-section-number">3</span> Sélection des codes de diagnostics</h1>
-<div id="dx_table-combine_dx_cci_inspq18" class="section level2" number="3.1">
-<h2 number="3.1"><span class="header-section-number">3.1</span> Dx_table = ‘Combine_Dx_CCI_INSPQ18’</h2>
+<div id="sélection-des-codes-de-diagnostics" class="section level1">
+<h1><span class="header-section-number">3</span> Sélection des codes de diagnostics</h1>
+<div id="dx_table-combine_dx_cci_inspq18" class="section level2">
+<h2><span class="header-section-number">3.1</span> Dx_table = ‘Combine_Dx_CCI_INSPQ18’</h2>
 <p>Indique le nom de la table à utiliser contenant les codes CIM9 et CIM10. Voici un aperçu des trois premiers éléments :</p>
 <pre><code>#&gt; $aids
 #&gt; $aids$CIM9
@@ -258,8 +450,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; $blane$CIM10
 #&gt; [1] &quot;D500%&quot;</code></pre>
 </div>
-<div id="exclu_diagn-cdrug-ld" class="section level2" number="3.2">
-<h2 number="3.2"><span class="header-section-number">3.2</span> exclu_diagn = c(‘drug’, ‘ld’)</h2>
+<div id="exclu_diagn-cdrug-ld" class="section level2">
+<h2><span class="header-section-number">3.2</span> exclu_diagn = c(‘drug’, ‘ld’)</h2>
 <p>Implique que les codes de diagnostics <code>drug</code> et <code>ld</code> seront exclus de l’analyse.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;    
@@ -275,8 +467,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 #&gt; [19] &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;  
 #&gt; [25] &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
 </div>
-<div id="cim-ccim9-cim10" class="section level2" number="3.3">
-<h2 number="3.3"><span class="header-section-number">3.3</span> CIM = c(‘CIM9’, ‘CIM10’)</h2>
+<div id="cim-ccim9-cim10" class="section level2">
+<h2><span class="header-section-number">3.3</span> CIM = c(‘CIM9’, ‘CIM10’)</h2>
 <p>Il est possible de choisir entre les codes CIM9, CIM10 ou les deux. Ici on sélectionne les deux types de codes et on va les chercher dans toutes les bases de données <code>dt_source</code>. Voici un aperçu des codes recherchés des trois premiers éléments :</p>
 <pre><code>#&gt; $aids
 #&gt; [1] &quot;042%&quot; &quot;043%&quot; &quot;044%&quot; &quot;B20%&quot; &quot;B21%&quot; &quot;B22%&quot; &quot;B23%&quot; &quot;B24%&quot;
@@ -293,11 +485,11 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p style="margin-bottom:3cm">
 </div>
 </div>
-<div id="sources-sql-dt_source" class="section level1" number="4">
-<h1 number="4"><span class="header-section-number">4</span> Sources SQL (<code>dt_source</code>)</h1>
+<div id="sources-sql-dt_source" class="section level1">
+<h1><span class="header-section-number">4</span> Sources SQL (<code>dt_source</code>)</h1>
 <p>Extraction des données pour chaque code de diagnostic médical clinique de la table <code>Dx_table</code> et pour chaque source <code>dt_source</code>.</p>
-<div id="v_diagn_sej_hosp_cm" class="section level2" number="4.1">
-<h2 number="4.1"><span class="header-section-number">4.1</span> V_DIAGN_SEJ_HOSP_CM</h2>
+<div id="v_diagn_sej_hosp_cm" class="section level2">
+<h2><span class="header-section-number">4.1</span> V_DIAGN_SEJ_HOSP_CM</h2>
 <p>Cette structure contient tous les diagnostics associés à un séjour hospitalier.</p>
 <ul>
 <li><code>SHOP_NO_INDIV_BEN_BANLS</code> : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.</li>
@@ -310,43 +502,43 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>S</code> : Secondaire.</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> RES_SSS.V_DIAGN_SEJ_HOSP_CM</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SHOP_TYP_DIAGN_SEJ_HOSP <span class="kw">in</span> c(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;P&#39;</span>, <span class="st">&#39;S&#39;</span>);</span></code></pre></div>
+<div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb8-2"><a href="#cb8-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb8-3"><a href="#cb8-3"></a><span class="kw">from</span> RES_SSS.V_DIAGN_SEJ_HOSP_CM</span>
+<span id="cb8-4"><a href="#cb8-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb8-5"><a href="#cb8-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span></span>
+<span id="cb8-6"><a href="#cb8-6"></a>    <span class="kw">and</span> SHOP_TYP_DIAGN_SEJ_HOSP <span class="kw">in</span> c(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;P&#39;</span>, <span class="st">&#39;S&#39;</span>);</span></code></pre></div>
 </div>
-<div id="v_sej_serv_hosp_cm" class="section level2" number="4.2">
-<h2 number="4.2"><span class="header-section-number">4.2</span> V_SEJ_SERV_HOSP_CM</h2>
+<div id="v_sej_serv_hosp_cm" class="section level2">
+<h2><span class="header-section-number">4.2</span> V_SEJ_SERV_HOSP_CM</h2>
 <p>Cette structure contient les séjours dans un service effectués par l’individu hospitalisé.</p>
 <ul>
 <li><code>SHOP_NO_INDIV_BEN_BANLS</code> : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.</li>
 <li><code>SHOP_DAT_DEPAR_SEJ_HOSP</code> : Date où l’usager quitte l’installation vivant ou décédé.</li>
 <li><code>SHOP_COD_DIAGN_MDCAL_CLINQ</code> : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> RES_SSS.V_SEJ_SERV_HOSP_CM</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">from</span> RES_SSS.V_SEJ_SERV_HOSP_CM</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
 </div>
-<div id="v_episo_soin_durg_cm" class="section level2" number="4.3">
-<h2 number="4.3"><span class="header-section-number">4.3</span> V_EPISO_SOIN_DURG_CM</h2>
+<div id="v_episo_soin_durg_cm" class="section level2">
+<h2><span class="header-section-number">4.3</span> V_EPISO_SOIN_DURG_CM</h2>
 <p>Cette structure contient les épisodes de soins des départements d’urgence de la province.</p>
 <ul>
 <li><code>SURG_NO_INDIV_BEN_BANLS</code> : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.</li>
 <li><code>SURG_DH_DEPAR_USAG_DURG</code> : DateHeure de départ d’un usager de département d’urgence. Cet élément correspond au moment où l’usager quitte physiquement l’urgence. Il correspond donc à la fin de tout traitement dans l’épisode de soins concerné.</li>
 <li><code>SURG_COD_DIAGN_MDCAL_CLINQ</code> : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> SURG_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>       SURG_DH_DEPAR_USAG_DURG <span class="kw">as</span> DATE_DX</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> RES_SSS.V_EPISO_SOIN_DURG_CM</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> SURG_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SURG_DH_DEPAR_USAG_DURG <span class="kw">between</span> <span class="fu">To_Date</span>(<span class="st">&#39;debut&#39;</span>) <span class="kw">and</span> <span class="fu">To_Date</span>(<span class="st">&#39;fin&#39;</span>);</span></code></pre></div>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">select</span> SURG_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb10-2"><a href="#cb10-2"></a>       SURG_DH_DEPAR_USAG_DURG <span class="kw">as</span> DATE_DX</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">from</span> RES_SSS.V_EPISO_SOIN_DURG_CM</span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">where</span> SURG_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="kw">and</span> SURG_DH_DEPAR_USAG_DURG <span class="kw">between</span> <span class="fu">To_Date</span>(<span class="st">&#39;debut&#39;</span>) <span class="kw">and</span> <span class="fu">To_Date</span>(<span class="st">&#39;fin&#39;</span>);</span></code></pre></div>
 </div>
-<div id="i_smod_serv_md_cm" class="section level2" number="4.4">
-<h2 number="4.4"><span class="header-section-number">4.4</span> I_SMOD_SERV_MD_CM</h2>
+<div id="i_smod_serv_md_cm" class="section level2">
+<h2><span class="header-section-number">4.4</span> I_SMOD_SERV_MD_CM</h2>
 <p>Cette vue retourne différentes informations se rapportant aux Services rendus à l’acte par des médecins.</p>
 <ul>
 <li><code>SMOD_NO_INDIV_BEN_BANLS</code> : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.</li>
@@ -357,18 +549,18 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <li><code>PAY</code> : Payé.</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">select</span> SMOD_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>       SMOD_DAT_SERV <span class="kw">as</span> DATE_DX</span>
-<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="kw">from</span> PROD.I_SMOD_SERV_MD_C</span>
-<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="kw">where</span> SMOD_COD_DIAGN_PRIMR <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SMOD_COD_STA_DECIS <span class="op">=</span> <span class="st">&#39;PAY&#39;</span></span>
-<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">and</span> SMOD_DAT_SERV <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">select</span> SMOD_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb11-2"><a href="#cb11-2"></a>       SMOD_DAT_SERV <span class="kw">as</span> DATE_DX</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">from</span> PROD.I_SMOD_SERV_MD_C</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">where</span> SMOD_COD_DIAGN_PRIMR <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>    <span class="kw">and</span> SMOD_COD_STA_DECIS <span class="op">=</span> <span class="st">&#39;PAY&#39;</span></span>
+<span id="cb11-6"><a href="#cb11-6"></a>    <span class="kw">and</span> SMOD_DAT_SERV <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
 </div>
-<div id="filtrer-les-diagnostics-incohérents" class="section level1" number="5">
-<h1 number="5"><span class="header-section-number">5</span> Filtrer les diagnostics <em>incohérents</em></h1>
+<div id="filtrer-les-diagnostics-incohérents" class="section level1">
+<h1><span class="header-section-number">5</span> Filtrer les diagnostics <em>incohérents</em></h1>
 <p><strong>Rappel dates de références</strong></p>
 <pre><code>#&gt;    ID DATE_INDEX
 #&gt; 1:  1 2020-01-01
@@ -424,8 +616,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="exclusions-cas-obstétriques-obstetric_exclutrue" class="section level1" number="6">
-<h1 number="6"><span class="header-section-number">6</span> Exclusions Cas Obstétriques (<code>obstetric_exclu=TRUE</code>)</h1>
+<div id="exclusions-cas-obstétriques-obstetric_exclutrue" class="section level1">
+<h1><span class="header-section-number">6</span> Exclusions Cas Obstétriques (<code>obstetric_exclu=TRUE</code>)</h1>
 <p>Un diagnostic de diabète (<code>diab</code>, <code>diabwc</code>) ou d’hypertension (<code>hyp</code>) enregistré au fichier des hospitalisations à l’intérieur d’une période de 120 jours avant ou de 180 jours après un enregistrement relié à une grossesse ou à un accouchement est considéré comme un diagnostic de type gestationnel. Ce diagnostic est alors supprimé si <code>obstetric_exclu=TRUE</code>.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX  DIAGN  SOURCE DATE_INDEX
@@ -454,8 +646,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <pre><code>#&gt;    ID    DATE_DX  DIAGN  SOURCE DATE_INDEX
 #&gt; 1:  3 2019-01-01 diabwc    SMOD 2020-01-01
 #&gt; 2:  4 2019-01-01   diab MEDECHO 2020-01-01</code></pre>
-<div id="codes-de-diagnostics-de-type-gestationnel" class="section level2" number="6.1">
-<h2 number="6.1"><span class="header-section-number">6.1</span> Codes de diagnostics de type gestationnel</h2>
+<div id="codes-de-diagnostics-de-type-gestationnel" class="section level2">
+<h2><span class="header-section-number">6.1</span> Codes de diagnostics de type gestationnel</h2>
 <p>Les arguments <code>CIM</code> et <code>dt_sourc</code> sont utilisés de la même manière que décrit précédemment.</p>
 <pre><code>#&gt; $CIM9
 #&gt;  [1] &quot;641%&quot; &quot;642%&quot; &quot;643%&quot; &quot;644%&quot; &quot;645%&quot; &quot;646%&quot; &quot;647%&quot; &quot;648%&quot; &quot;649%&quot; &quot;650%&quot;
@@ -476,10 +668,10 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p style="margin-bottom:3cm">
 </div>
 </div>
-<div id="priorisation-des-sources" class="section level1" number="7">
-<h1 number="7"><span class="header-section-number">7</span> Priorisation des sources</h1>
+<div id="priorisation-des-sources" class="section level1">
+<h1><span class="header-section-number">7</span> Priorisation des sources</h1>
 <p>Si différentes sources indiquent une même date pour un même diagnostic, on priorise la source où <code>confirm_sourc</code> égale 1, puis 2.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>confirm_sourc <span class="ot">=</span> <span class="fu">list</span>(<span class="at">MEDECHO =</span> <span class="dv">1</span>, <span class="at">BDCU =</span> <span class="dv">2</span>, <span class="at">SMOD =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>confirm_sourc =<span class="st"> </span><span class="kw">list</span>(<span class="dt">MEDECHO =</span> <span class="dv">1</span>, <span class="dt">BDCU =</span> <span class="dv">2</span>, <span class="dt">SMOD =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
 #&gt; 1:  1 2019-06-06  diab    SMOD 2020-01-01
@@ -497,8 +689,8 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="dx-date_dx---lookup" class="section level1" number="8">
-<h1 number="8"><span class="header-section-number">8</span> Dx &lt; DATE_DX <span class="math inline">\(-\)</span> lookup</h1>
+<div id="dx-date_dx---lookup" class="section level1">
+<h1><span class="header-section-number">8</span> Dx &lt; DATE_DX <span class="math inline">\(-\)</span> lookup</h1>
 <p>La table d’analyse peut contenir des dates qui sont inférieures à la période d’étude. Si la période d’étude est entre le 2018-01-01 et le 2019-12-31, on ne veut pas qu’une date en 2016 ou 2017 confirme une autre date de cette même période. On veut plutôt que les dates en 2018 ou 2019 confirment celles en 2016 ou 2017.<br />
 On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude) qui confirment une date en 2016 ou 2017 (avant la période d’étude). Dans un but d’optimisation, seule la première date confirmée sera conservée.</p>
 <p><strong>AVANT</strong></p>
@@ -533,11 +725,11 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="confirmation-des-diagnostics" class="section level1" number="9">
-<h1 number="9"><span class="header-section-number">9</span> Confirmation des diagnostics</h1>
+<div id="confirmation-des-diagnostics" class="section level1">
+<h1><span class="header-section-number">9</span> Confirmation des diagnostics</h1>
 <p>Si <code>keep_confirm_data=TRUE</code>, la table de confirmation est accessible via les attributs (<code>attributes()</code>).</p>
-<div id="medecho-1" class="section level2" number="9.1">
-<h2 number="9.1"><span class="header-section-number">9.1</span> MEDECHO (1)</h2>
+<div id="medecho-1" class="section level2">
+<h2><span class="header-section-number">9.1</span> MEDECHO (1)</h2>
 <p>Les sources ayant <code>confirm_sourc=1</code> sont utilisées directement.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
@@ -547,8 +739,8 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <pre><code>#&gt;    ID DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1  diab 2019-01-01    MEDECHO 2019-01-01     MEDECHO</code></pre>
 </div>
-<div id="bdcu-et-smod-2" class="section level2" number="9.2">
-<h2 number="9.2"><span class="header-section-number">9.2</span> BDCU et SMOD (2)</h2>
+<div id="bdcu-et-smod-2" class="section level2">
+<h2><span class="header-section-number">9.2</span> BDCU et SMOD (2)</h2>
 <p>Les sources ayant <code>confirm_sourc=2</code> doivent être confirmées.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX  DIAGN SOURCE DATE_INDEX
@@ -567,8 +759,8 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 #&gt; 2:  2    hyp 2019-02-02       BDCU 2019-12-31        BDCU
 #&gt; 3:  3 diabwc 2020-02-01       SMOD 2020-07-20        SMOD</code></pre>
 </div>
-<div id="medecho-1-bdcu-2-et-smod-2" class="section level2" number="9.3">
-<h2 number="9.3"><span class="header-section-number">9.3</span> MEDECHO (1), BDCU (2) et SMOD (2)</h2>
+<div id="medecho-1-bdcu-2-et-smod-2" class="section level2">
+<h2><span class="header-section-number">9.3</span> MEDECHO (1), BDCU (2) et SMOD (2)</h2>
 <p>MEDECHO peut confirmer la date d’un BDCU ou d’un SMOD.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX  DIAGN  SOURCE DATE_INDEX
@@ -588,8 +780,8 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <p style="margin-bottom:3cm">
 </div>
 </div>
-<div id="poids-des-diagnostics" class="section level1" number="10">
-<h1 number="10"><span class="header-section-number">10</span> Poids des diagnostics</h1>
+<div id="poids-des-diagnostics" class="section level1">
+<h1><span class="header-section-number">10</span> Poids des diagnostics</h1>
 <p>L’argument <code>scores</code> permet de choisir la table des poids des diagnostics à utiliser.</p>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
@@ -644,8 +836,25 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="calcul-des-scores" class="section level1" number="11">
-<h1 number="11"><span class="header-section-number">11</span> Calcul des <em>scores</em></h1>
+<div id="nombre-de-diagnostics-dx" class="section level1">
+<h1><span class="header-section-number">11</span> Nombre de diagnostics (Dx)</h1>
+<p>Compter le nombre de diagnostics peut être utile dans le cas où il y aurait des poids de zéro (0). Permet de différencier deux individus où l’un a un <em>score</em> de zéro parce qu’il n’a pas de diagnostics et l’autre parce que les diagnostics qu’il a ont des poids de zéro.<br />
+La colonne <code>nDx</code> sera ajoutée à la fin complètement, après le calcul des <em>scores</em>.</p>
+<p><strong>AVANT le calcul du nombre de Dx</strong></p>
+<pre><code>#&gt;       DIAGN POIDS ID   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
+#&gt; 1:     aids     3  1 2019-01-01    MEDECHO 2019-01-01    MED_ECHO
+#&gt; 2: metacanc     5  1 2019-02-17       BDCU 2019-02-18     MEDECHO
+#&gt; 3:      fed     2  1 2019-03-03       SMOD 2020-04-04        SMOD
+#&gt; 4: metacanc     5  2 2019-02-15       BDCU 2019-12-31        SMOD</code></pre>
+<p><strong>APRÈS avoir calculé le nombre de Dx</strong></p>
+<pre><code>#&gt;    ID nDx
+#&gt; 1:  1   3
+#&gt; 2:  2   1</code></pre>
+<p style="page-break-before: always">
+<p style="margin-bottom:3cm">
+</div>
+<div id="calcul-des-scores" class="section level1">
+<h1><span class="header-section-number">12</span> Calcul des <em>scores</em></h1>
 <p>Ajout de tous les diagnostics présents dans <code>Dx_table=&#39;Combine_Dx_CCI_INSPQ18&#39;</code> en excluant <code>exclu_diagn=c(&#39;drug&#39;,&#39;ld&#39;)</code>.<br />
 Puisque la table des codes de diagnostics utilisée est <code>Combine_Dx_CCI_INSPQ18</code>, calcul du <em>score</em> pour <code>Charlson_Dx_CCI_INSPQ18</code>, <code>Elixhauser_Dx_CCI_INSPQ18</code> et les deux combinés.<br />
 Le <em>score</em> est la somme des poids de chaque diagnostic.</p>
@@ -664,35 +873,35 @@ Le <em>score</em> est la somme des poids de chaque diagnostic.</p>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
-<div id="ajouts-des-individus-manquants" class="section level1" number="12">
-<h1 number="12"><span class="header-section-number">12</span> Ajouts des individus manquants</h1>
+<div id="ajouts-des-individus-manquants" class="section level1">
+<h1><span class="header-section-number">13</span> Ajouts des individus manquants</h1>
 <p>Les individus de la cohorte d’étude qui ne sont pas dans le tableau d’analyse ont en fait un <em>score</em> de zéro. Ces individus sont manuellement ajoutés.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18
-#&gt; 1:  1                     15                      13                        13
-#&gt;    aids alcohol blane canc carit cevd chf coag copd dane dementia depre diab
-#&gt; 1:    3       0     0    3     1    0   0    0    0    0        0     0    0
-#&gt;    diabwc fed hyp hypothy metacanc mi nd obes para pcd psycho pvd rend rheumd
-#&gt; 1:      0   0   0       0        5  2  0    0    0   0      0   0    0      0
-#&gt;    ud valv wloss
-#&gt; 1:  0    0     1</code></pre>
+<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18
+#&gt; 1:  1   6                     15                      13
+#&gt;    Elixhauser_Dx_CCI_INSPQ18 aids alcohol blane canc carit cevd chf coag copd
+#&gt; 1:                        13    3       0     0    3     1    0   0    0    0
+#&gt;    dane dementia depre diab diabwc fed hyp hypothy metacanc mi nd obes para pcd
+#&gt; 1:    0        0     0    0      0   0   0       0        5  2  0    0    0   0
+#&gt;    psycho pvd rend rheumd ud valv wloss
+#&gt; 1:      0   0    0      0  0    0     1</code></pre>
 <p><strong>APRÈS</strong></p>
-<pre><code>#&gt;    ID Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18
-#&gt; 1:  1                     15                      13                        13
-#&gt; 2:  2                      0                       0                         0
-#&gt; 3:  3                      0                       0                         0
-#&gt;    aids alcohol blane canc carit cevd chf coag copd dane dementia depre diab
-#&gt; 1:    3       0     0    3     1    0   0    0    0    0        0     0    0
-#&gt; 2:    0       0     0    0     0    0   0    0    0    0        0     0    0
-#&gt; 3:    0       0     0    0     0    0   0    0    0    0        0     0    0
-#&gt;    diabwc fed hyp hypothy metacanc mi nd obes para pcd psycho pvd rend rheumd
-#&gt; 1:      0   0   0       0        5  2  0    0    0   0      0   0    0      0
-#&gt; 2:      0   0   0       0        0  0  0    0    0   0      0   0    0      0
-#&gt; 3:      0   0   0       0        0  0  0    0    0   0      0   0    0      0
-#&gt;    ud valv wloss
-#&gt; 1:  0    0     1
-#&gt; 2:  0    0     0
-#&gt; 3:  0    0     0</code></pre>
+<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18
+#&gt; 1:  1   6                     15                      13
+#&gt; 2:  2   0                      0                       0
+#&gt; 3:  3   0                      0                       0
+#&gt;    Elixhauser_Dx_CCI_INSPQ18 aids alcohol blane canc carit cevd chf coag copd
+#&gt; 1:                        13    3       0     0    3     1    0   0    0    0
+#&gt; 2:                         0    0       0     0    0     0    0   0    0    0
+#&gt; 3:                         0    0       0     0    0     0    0   0    0    0
+#&gt;    dane dementia depre diab diabwc fed hyp hypothy metacanc mi nd obes para pcd
+#&gt; 1:    0        0     0    0      0   0   0       0        5  2  0    0    0   0
+#&gt; 2:    0        0     0    0      0   0   0       0        0  0  0    0    0   0
+#&gt; 3:    0        0     0    0      0   0   0       0        0  0  0    0    0   0
+#&gt;    psycho pvd rend rheumd ud valv wloss
+#&gt; 1:      0   0    0      0  0    0     1
+#&gt; 2:      0   0    0      0  0    0     0
+#&gt; 3:      0   0    0      0  0    0     0</code></pre>
 </div>
 
 

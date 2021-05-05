@@ -8,14 +8,16 @@
 query_naif_switch1(
   debut,
   fin,
-  type_rx = "DENOM",
+  type_Rx = "DENOM",
   codes,
+  group_by = "DENOM",
   rx_retrospect_a_exclure = NULL,
   njours_sans_conso = 365,
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
   code_list_filtre = "Inclusion",
+  age_date = NULL,
   ...
 )
 }
@@ -24,25 +26,40 @@ query_naif_switch1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{codes}{Traitement(s) d'intérêt(s). Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
+\item{type_Rx}{Indique le type de code analysé :
+\itemize{
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
+\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
+}}
 
-\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir \emph{Details}. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
+\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
 
-\item{njours_sans_conso}{Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré \emph{naïf} ou \emph{switch}.}
+\item{group_by}{Regrouper (aggréger) les résultats par :
+\itemize{
+\item \code{'AHFS'} : Résultats par code de classe AHFS.
+\item \code{'DENOM'} : Résultats par code de dénomination commune si \code{type_Rx='AHFS'}.
+\item \code{'DIN'} : Résultats par code d'identification du médicament si \code{type_Rx='AHFS'} ou \code{type_Rx='DENOM'}.
+\item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}).
+\item \code{'CodeServ'} : Résultats par code de service (\code{SMED_COD_SERV_1}).
+\item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
+\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
+\item \code{'Age'} : Résultats par âge à une date précise. Voir argument \code{age_date}. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
+}}
+
+\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
+
+\item{njours_sans_conso}{Nombre de jours qu’un individu ne doit pas avoir reçu de traitements avant sa date de référence (date index) pour être considéré \emph{naïf} ou \emph{switch}.}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_serv_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
+\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de listes de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{type_Rx}{Indique le type de code analysé :
-\itemize{
-\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
-\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
-}}
+\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}.}
 }
 \value{
 Chaîne de caractères à utiliser dans une requête SQL.
@@ -51,64 +68,13 @@ Chaîne de caractères à utiliser dans une requête SQL.
 Générateur de code SQL pour la méthode \code{naif_switch1}.
 }
 \details{
+\strong{Méthode \code{naif_switch1} :}\cr
+Statistiques descriptives tirées de la vue \code{V_DEM_PAIMT_MED_CM}.\cr\cr
+\strong{\code{codes} :}\cr
+Inscrire les codes sous la forme d'un nombre entier.\cr\cr
 \strong{\code{rx_retrospect_a_exclure} :}\cr
-La période rétrospective est construite à partir des dates de références (index) et de l'argument \code{njours_sans_conso} : \code{[INDEX - njours_sans_conso; INDEX - 1]}.\cr\cr
+La période rétrospective est construite à partir des dates de références (date index) et de l’argument \code{njours_sans_conso} : \link{INDEX -njours_sans_conso; INDEX -1}.\cr\cr
 \strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
 \code{'Inclusion'} exclus les \code{NULL}.
-}
-\examples{
-### DENOM
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DENOM', codes = 47946,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-))
-
-### DIN
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DIN', codes = 2257238,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-))
-
-### Plusieurs codes
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DENOM', codes = c(39, 47135, 48222),
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-))
-
-### rx_retrospect_a_exclure
-# Plusieurs, dont celui inclus dans 'codes'
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DENOM', codes = 47946,
-  rx_retrospect_a_exclure = c(47946, 48222, 48259), njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-))
-# Plusieurs, sans celui inclus dans 'codes'
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DENOM', codes = 47946,
-  rx_retrospect_a_exclure = c(48222, 48259, 43012), njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-))
-
-### Exclusion vs Inclusion
-cat(query_naif_switch1(
-  debut = '2019-01-01', fin = '2019-12-31',
-  type_rx = 'DENOM', codes = 47946,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-  code_list = c('40', '41'), code_list_filtre = 'Inclusion'
-))
 }

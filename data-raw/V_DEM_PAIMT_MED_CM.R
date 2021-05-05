@@ -209,7 +209,7 @@ cod_denom <- function() {
       .(DENOM, NOM_DENOM)
     ]
 
-    setkey(DT, DENOM)
+    setkey(DT, DENOM, DEBUT)
     return(DT)
   }
 
@@ -365,7 +365,7 @@ cod_serv <- function() {
   setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
   DT[, COD_SERV := str_remove_all(COD_SERV, " ")]  # supprimer espaces
 
-  setkey(DT, COD_SERV)
+  setkey(DT, COD_SERV, SERV_1)
 
   return(DT)
 
