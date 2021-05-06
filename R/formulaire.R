@@ -207,7 +207,7 @@ formulaire <- function() {
         msg_error <- paste0(  # si la colonne METHODE
           msg_error,
           sh, " :\n",
-          " -  METHODE est absente.\n",
+          " -  METHODE est absent.\n",
           format_xl_err_nl()
         )
         if (!at_least_1) {
