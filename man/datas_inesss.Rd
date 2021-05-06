@@ -9,3 +9,4 @@ datas_inesss()
 \description{
 Exploration interactive des datasets du package \code{inesss}.
 }
+\keyword{internal}

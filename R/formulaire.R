@@ -6,6 +6,7 @@
 #' Il est conseillé d'utiliser les gabarits Excel pour éviter des erreurs de structures dans les tableaux d'arguments. Les fichiers Excel sont disponibles \href{https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits}{ici}.
 #'
 #' @encoding UTF-8
+#' @keywords internal
 #' @import data.table
 #' @importFrom fs path_home
 #' @importFrom odbc odbc dbConnect dbGetQuery
@@ -15,7 +16,6 @@
 #' @importFrom shinyFiles shinyFilesButton shinyFileChoose shinyFileSave shinySaveButton parseFilePaths parseSavePath getVolumes
 #' @importFrom stringr str_split str_remove_all
 #' @importFrom writexl write_xlsx
-#' @export
 formulaire <- function() {
 
 # Variables ---------------------------------------------------------------

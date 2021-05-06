@@ -4,7 +4,7 @@
 #' @keywords internal
 #' @encoding UTF-8
 formulaire_addin <- function() {
-  return(inesss::formulaire())
+  return(inesss:::formulaire())
 }
 
 #' Addin
@@ -13,5 +13,5 @@ formulaire_addin <- function() {
 #' @keywords internal
 #' @encoding UTF-8
 datas_inesss_addin <- function() {
-  return(inesss::datas_inesss())
+  return(inesss:::datas_inesss())
 }

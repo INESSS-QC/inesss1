@@ -5,7 +5,7 @@
 #' @import data.table
 #' @import shiny
 #' @import shinydashboard
-#' @export
+#' @keywords internal
 datas_inesss <- function() {
 
 # UI ----------------------------------------------------------------------
