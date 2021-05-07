@@ -16,11 +16,11 @@ RLS_exclus <- sort(unique(RLS_double$RLS14[RLS_double$RLS14 %in% RLS_double$RLS1
 DT <- DT[!RLS14 %in% RLS_exclus & !RLS15 %in% RLS_exclus]  # exclure les RLS ne pouvant être converti
 setkey(DT, RLS15)  # tri
 
-RLS_convert <- copy(DT)
-attr(RLS_convert, "RLS_exclus") <- RLS_exclus
-attr(RLS_convert, "RLS_exclus_value") <- RLS_double
-attr(RLS_convert, "MaJ") <- Sys.Date()
+RLS_tab_convert <- copy(DT)
+attr(RLS_tab_convert, "RLS_exclus") <- RLS_exclus
+attr(RLS_tab_convert, "RLS_exclus_value") <- RLS_double
+attr(RLS_tab_convert, "MaJ") <- Sys.Date()
 
-use_data(RLS_convert, overwrite = TRUE)
+use_data(RLS_tab_convert, overwrite = TRUE)
 
-rm(RLS_convert)
+rm(RLS_tab_convert)

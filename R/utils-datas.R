@@ -315,30 +315,6 @@
 "Pop_QC"
 
 
-# RLS_convert -------------------------------------------------------------
-
-#' Data - Correspondance RLS Loi 10
-#'
-#' Établir la correspondance des RLS avant et après l'adoption de la loi 10.
-#'
-#' Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr
-#' `attr(RLS_convert, "RLS_exclus")` indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr
-#' `attr(RLS_convert, "RLS_exclus_value")` renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.\cr\cr
-#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
-#'
-#' @format Tableau de 2 variables et 84 observations :
-#' \describe{
-#'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10. `integer`.}
-#'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10. `integer`.}
-#' }
-#'
-#' @usage data('RLS_convert')
-#' @encoding UTF-8
-#' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10}.\cr
-#' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
-"RLS_convert"
-
-
 # RLS_list ----------------------------------------------------------------
 
 #' Data - Liste des RLS
@@ -352,6 +328,30 @@
 #' @usage data('RLS_list')
 "RLS_list"
 
+
+
+# RLS_tab_convert -------------------------------------------------------------
+
+#' Data - Correspondance RLS Loi 10
+#'
+#' Établir la correspondance des RLS avant et après l'adoption de la loi 10.
+#'
+#' Certains RLS ne peuvent être convertis, car leur valeur se retrouve avant et après l'adoption de la loi 10.\cr
+#' `attr(RLS_tab_convert, "RLS_exclus")` indique les quatre (4) RLS exclus : 611, 612, 1611, 1612.\cr
+#' `attr(RLS_tab_convert, "RLS_exclus_value")` renvoie un tableau indiquant les valeurs avant et après l'adoption de la loi 10 pour ces quatre (4) RLS.\cr\cr
+#' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
+#'
+#' @format Tableau de 2 variables et 84 observations :
+#' \describe{
+#'   \item{RLS14}{Code de RLS **avant** l'adoption de la loi 10. `integer`.}
+#'   \item{RLS15}{Code de RLS **après** l'adoption de la loi 10. `integer`.}
+#' }
+#'
+#' @usage data('RLS_tab_convert')
+#' @encoding UTF-8
+#' @source \href{https://publications.msss.gouv.qc.ca/msss/fichiers/statistiques/decoupage-territorial/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Correspondance Etablissement Public Loi 10}.\cr
+#' \href{https://github.com/INESSS-QC/inesss1/blob/master/inst/extdata/Doc1_Correspondance_Etablissement_Public_Loi_10.xls}{Fichier Excel utilisé}.
+"RLS_tab_convert"
 
 
 # V_DEM_PAIMT_MED_CM ------------------------------------------------------
