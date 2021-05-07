@@ -18,7 +18,7 @@
 #' @importFrom writexl write_xlsx
 formulaire <- function() {
 
-# Variables ---------------------------------------------------------------
+  # Variables ---------------------------------------------------------------
 
   cols_Excel_file <- function() {
     ### Colonnes nécessaires pour chaque méthode
@@ -65,8 +65,16 @@ formulaire <- function() {
       "stat_gen1"
     ))
   }
+  renderDataTable_options <- function() {
+    return(list(
+      lengthMenu = list(c(25, 100, -1), c("25", "100", "All")),
+      pageLength = 100,
+      scrollX = TRUE,
+      searching = FALSE
+    ))
+  }
 
-# Fonctions ---------------------------------------------------------------
+  # Fonctions ---------------------------------------------------------------
 
   adapt_code_serv <- function(code_serv) {
     ### Séparer des groupes de codes de service en valeurs uniques pour les
@@ -746,7 +754,7 @@ formulaire <- function() {
               new_error <- FALSE
             }
             msg_error <- paste0(msg_error,
-              " -  ",col," a au moins une valeur qui n'est pas au format 'AAAA-MM-JJ'.\n"
+                                " -  ",col," a au moins une valeur qui n'est pas au format 'AAAA-MM-JJ'.\n"
             )
           }
         } else {
@@ -756,7 +764,7 @@ formulaire <- function() {
             new_error <- FALSE
           }
           msg_error <- paste0(msg_error,
-            " -  ",col," ne contient pas de valeurs.\n"
+                              " -  ",col," ne contient pas de valeurs.\n"
           )
         }
       }
@@ -772,7 +780,7 @@ formulaire <- function() {
           new_error <- FALSE
         }
         msg_error <- paste0(msg_error,
-          " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
+                            " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
         )
       }
     }
@@ -788,7 +796,7 @@ formulaire <- function() {
               new_error <- FALSE
             }
             msg_error <- paste0(msg_error,
-              " -  ",col," ne contient pas une valeur permise.\n"
+                                " -  ",col," ne contient pas une valeur permise.\n"
             )
           }
         } else {
@@ -797,7 +805,7 @@ formulaire <- function() {
             new_error <- FALSE
           }
           msg_error <- paste0(msg_error,
-            " -  ",col," doit contenir une valeur.\n"
+                              " -  ",col," doit contenir une valeur.\n"
           )
         }
       }
@@ -839,7 +847,7 @@ formulaire <- function() {
             new_error <- FALSE
           }
           msg_error <- paste0(msg_error,
-            " -  GROUPER_PAR ne contient pas une valeur permise.\n"
+                              " -  GROUPER_PAR ne contient pas une valeur permise.\n"
           )
         }
       }
@@ -859,7 +867,7 @@ formulaire <- function() {
               new_error <- FALSE
             }
             msg_error <- paste0(msg_error,
-              " -  ",col," ne contient pas une valeur permise.\n"
+                                " -  ",col," ne contient pas une valeur permise.\n"
             )
           }
         }
@@ -917,42 +925,51 @@ formulaire <- function() {
 
   }
 
-# Datas -------------------------------------------------------------------
+  # Datas -------------------------------------------------------------------
 
   dt_code_list <- create_dt_code_list_med()
   dt_code_serv <- create_dt_code_serv()
 
-# Interface Utilisateur - UI ----------------------------------------------
+
+  # UI ------------------------------------------------------------------------------------------
 
   ui <- dashboardPage(
 
     #### HEADER SECTION
-    dashboardHeader(title = "Requêtes SQL"),
+    dashboardHeader(title = paste0("version ", as.character(packageVersion("inesss")))),
 
     #### SIDEBAR SECTION
     dashboardSidebar(
       sidebarMenu(
-        ## Connexion SQL - tabConn
-        ## Indique si la connexion SQL vers Teradata est faite
+        div(style = "margin-top:10px"),
+        ### Connexion SQL - tabConn
         menuItem("Connexion", tabName = "tabConn"),
 
-        ## Requêtes Excel - tabExcel
-        ## ffectuer une ou des requêtes à partir d'un fichier
-        ## Excel où chaque onglet est un tableau résultat.
-        menuItem("Requêtes via Excel", tabName = "tabExcel"),
+        div(style = "margin-top:30px"),
 
-        ## Statistiques Gérales - tabStatGen1
-        ## Utiliser les arguments du formulaire shiny pour effectuer une requête
-        menuItem("Statistiques générales", tabName = "tabStatGen1")
-      )
+        ### Méthodes
+        menuItem("Requêtes via Excel", tabName = "tabExcel"),
+        menuItem("Statistiques générales", tabName = "tabStatGen1"),
+
+        div(style = "margin-top:30px"),
+
+        ### Tables interactives
+        menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
+        menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
+        menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
+      ),
+      width = 260
     ),
 
     #### BODY SECTION
     dashboardBody(
       tabItems(  # Contenu de chaque section du sidebar
-        ### Connexion SQL - tabConn
-        ### L'utilisateur entre ses informations pour faire la connexion SQL au
-        ### serveur Teradata.
+
+
+        # UI - Connexion ------------------------------------------------------------------------------
+
         tabItem(
           tabName = "tabConn",
           # Informations nécessaires à la connexion
@@ -969,11 +986,8 @@ formulaire <- function() {
         ),
 
 
+        # UI - Requêtes Excel -------------------------------------------------------------------------
 
-
-        ### Requêtes via Excel - tabExcel
-        ### Importer un fichier Excel contenant les arguments et exécuter les
-        ### requêtes, soit chaque onglet
         tabItem(
           tabName = "tabExcel",
           shinyFilesButton(  # bouton pour sélectionner le fichier Excel
@@ -990,12 +1004,8 @@ formulaire <- function() {
         ),
 
 
+        # UI - stat_gen1 ------------------------------------------------------------------------------
 
-
-
-        ### Statistiques générales - tabStatGen1
-        ### Exécuter une requête simple à partir des arguments disponibles dans
-        ### le formulaire.
         tabItem(
           tabName = "tabStatGen1",
 
@@ -1100,6 +1110,60 @@ formulaire <- function() {
             uiOutput("sg1_html_SQL_section"),
             uiOutput("sg1_html_code_SQL")
           )
+        ),
+
+        # UI - I_APME_DEM_AUTOR_CRITR_ETEN_CM ---------------------------------------------------------
+
+        tabItem(
+          tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
+          p("Mise à jour :", attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ")),
+          selectInput(inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
+                      label = "Élément",
+                      choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)),
+          uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
+          dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt")
+        ),
+
+        # UI - V_DEM_PAIMT_MED_CM ---------------------------------------------------------------------
+
+        tabItem(
+          tabName = "tabV_DEM_PAIMT_MED_CM",
+          p("Mise à jour :", attr(V_DEM_PAIMT_MED_CM, "MaJ")),
+          selectInput(inputId = "V_DEM_PAIMT_MED_CM__data",
+                      label = "Élément",
+                      choices = names(inesss::V_DEM_PAIMT_MED_CM)),
+          uiOutput("V_DEM_PAIMT_MED_CM__params"),
+          dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
+        ),
+
+        # UI - V_DENOM_COMNE_MED ----------------------------------------------------------------------
+
+        tabItem(
+          tabName = "tabV_DENOM_COMNE_MED",
+          p("Mise à jour :", attr(V_DENOM_COMNE_MED, "MaJ")),
+          uiOutput("V_DENOM_COMNE_MED__params"),
+          dataTableOutput("V_DENOM_COMNE_MED__dt")
+        ),
+
+        # UI - V_DES_COD ------------------------------------------------------------------------------
+
+        tabItem(
+          tabName = "tabV_DES_COD",
+          p("Mise à jour :", attr(V_DES_COD, "MaJ")),
+          uiOutput("V_DES_COD__params"),
+          dataTableOutput("V_DES_COD__dt")
+        ),
+
+        # UI - V_PRODU_MED ----------------------------------------------------------------------------
+
+        tabItem(
+          tabName = "tabV_PRODU_MED",
+          p("Mise à jour :", attr(V_PRODU_MED, "MaJ")),
+          selectInput(inputId = "V_PRODU_MED__data",
+                      label = "Élément",
+                      choices = names(inesss::V_PRODU_MED)),
+          uiOutput("V_PRODU_MED__params"),
+          dataTableOutput("V_PRODU_MED__dt")
         )
       )
     )
@@ -1107,18 +1171,19 @@ formulaire <- function() {
   )
 
 
-# Server ------------------------------------------------------------------
+  # SERVER ------------------------------------------------------------------
 
   server <- function(input, output, session) {
 
-    #### Fermer l'application lorsque la fenêtre se ferme
+
+    # General -------------------------------------------------------------------------------------
+
+    ### Fermer l'application lorsque la fenêtre se ferme
     session$onSessionEnded(function() {stopApp()})
 
 
+    # Connexion -----------------------------------------------------------------------------------
 
-
-
-    #### CONNEXION SQL - tabConn
     # Valeurs nécessaires à la connexion de teradata
     conn_values <- reactiveValues(
       uid = NULL, pwd = NULL,  # no utilisateur & mot de passe
@@ -1165,10 +1230,8 @@ formulaire <- function() {
     output$sql_is_conn <- renderText({ conn_values$msg })
 
 
+    # Requêtes via Excel --------------------------------------------------------------------------
 
-
-
-    #### REQUÊTES VIA Excel - tabExcel
     # Sélection du fichier Excel
     shinyFileChoose(input, "select_xl_file", roots = Volumes_path())
     select_xl_file <- reactive({ shinyFiles_directories(input$select_xl_file, "file") })  # select_xl_file()datapath indique répertoire + nom du fichier à importer
@@ -1232,8 +1295,9 @@ formulaire <- function() {
 
 
 
+    # stat_gen1 -----------------------------------------------------------------------------------
 
-    #### STATISTIQUE GENERALES - tabStatGen1
+    #### tabStatGen1
     # Variables réactives pour sg1
     sg1_val <- reactiveValues(
       show_query = FALSE,  # afficher la requête ou pas
@@ -1273,7 +1337,6 @@ formulaire <- function() {
       })
     })
 
-
     # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
     # de input$sg1_nb_codes
     sg1_nb_codes <- reactive({
@@ -1282,7 +1345,7 @@ formulaire <- function() {
         updateNumericInput(session, "sg1_nb_codes", value = 1)
       }
       isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-                # dans le textInput sans qu'il y ait de réactivité
+        # dans le textInput sans qu'il y ait de réactivité
         codes_input <- vector("list", length = n)
         # Créer des textInput. Possible de conserver les valeurs précédentes
         # si input$sg1_nb_codes diminue
@@ -1302,7 +1365,6 @@ formulaire <- function() {
     })
     output$sg1_nb_codes <- renderUI({ sg1_nb_codes() })
 
-
     # Afficher une date pour le calcul de l'âge
     output$sg1_age_date <- renderUI({
       if (any(input$sg1_group_by == "Age")) {
@@ -1313,7 +1375,6 @@ formulaire <- function() {
         return(NULL)
       }
     })
-
 
     # En-tête Résultats - Apparaît seulement s'il y a eu une requête
     output$sg1_html_result_section <- renderUI({
@@ -1361,8 +1422,8 @@ formulaire <- function() {
       } else {
         return(NULL)
       }
-      },
-      options = list(scrollX = TRUE)  # scrolling si le tableau est plus large que la fenêtre
+    },
+    options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
     )
 
     # Enregistrer le fichier au format Excel
@@ -1482,9 +1543,567 @@ formulaire <- function() {
       sg1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
     })
 
+
+
+    # I_APME_DEM_AUTOR_CRITR_ETEN_CM --------------------------------------------------------------
+
+    # Paramètres à afficher
+    I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- reactive({
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", "Chaîne de caractères"),
+              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset", "Réinitialiser")
+            )
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU", "NO_SEQ_INDCN_RECNU"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM", "DD_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR", "DD_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR", "DD_APLIC_AUTOR"),
+              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset", "Réinitialiser")
+            ),
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM", "DAT_STA_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM", "DF_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR", "DF_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR", "DF_APLIC_AUTOR")
+            )
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({ I_APME_DEM_AUTOR_CRITR_ETEN_CM__params() })
+    # Tableau
+    I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- reactive({
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
+        search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
+                                                  "\\+"))
+        if (length(search_words) == 1 && search_words == "") {
+          # rien pour le moment...
+        } else {
+          for (i in 1:length(search_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(DES_COURT_INDCN_RECNU), tolower(search_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        return(DT)
+      } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
+        DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
+        for (col in names(DT)) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        return(DT)
+      } else {
+        return(NULL)
+      }
+    })
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- renderDataTable({ I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt() },
+                                                                options = renderDataTable_options())
+    # Réinitialisation
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", value = "")
+    })
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset, {
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR", value = "")
+      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR", value = "")
+    })
+
+
+    # V_DEM_PAIMT_MED_CM ------------------------------------------------------
+
+    # Paramètres à afficher
+    V_DEM_PAIMT_MED_CM__params <- reactive({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DENOM", "DENOM")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__NOM_DENOM", "NOM_DENOM"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DIN", "DIN")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__MARQ_COMRC", "MARQ_COMRC"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_CLA", "AHFS_CLA")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_SCLA", "AHFS_SCLA")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_SSCLA", "AHFS_SSCLA"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_NOM_CLA", "AHFS_NOM_CLA"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_CLA", "AHFS_CLA")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_SCLA", "AHFS_SCLA")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_SSCLA", "AHFS_SSCLA"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_NOM_CLA", "AHFS_NOM_CLA"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_AHFS__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_AHFS__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DENOM", "DENOM")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__NOM_DENOM", "NOM_DENOM"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DIN__DIN", "DIN")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_DIN__MARQ_COMRC", "MARQ_COMRC"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser")
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV", "COD_SERV")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV_DESC", "COD_SERV_DESC")),
+            column(4, checkboxGroupInput("V_DEM_PAIMT_MED_CM__COD_SERV__SERV_FILTER", "Filtrer",
+                                         choices = c("SERV_1", "SERV_2", "SERV_3")))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_SERV__SERV_1", "SERV_1",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1)),
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_SERV__SERV_2", "SERV_2",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1)),
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_SERV__SERV_3", "SERV_3",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_SERV__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__COD_STA_DECIS", "COD_STA_DECIS"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+    output$V_DEM_PAIMT_MED_CM__params <- renderUI({ V_DEM_PAIMT_MED_CM__params() })
+    # Tableau
+    V_DEM_PAIMT_MED_CM__dt <- reactive({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        DT <- inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS
+        for (col in c("DENOM", "DIN", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA", "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        DT <- inesss::V_DEM_PAIMT_MED_CM$COD_AHFS
+        for (col in c("AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA", "AHFS_NOM_CLA")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_AHFS__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_AHFS__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_AHFS__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE)
+        for (col in c("DENOM", "NOM_DENOM")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_DIN)
+        for (col in c("DIN", "MARQ_COMRC")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_DIN__",col)]], "\\+"
+          ))
+          for (i in 1:length(search_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_SERV)
+        for (col in c("COD_SERV", "COD_SERV_DESC")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_SERV__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        for (filt in c("SERV_1", "SERV_2", "SERV_3")) {
+          if (filt %in% input$V_DEM_PAIMT_MED_CM__COD_SERV__SERV_FILTER) {
+            DT[, min_serv := stringr::str_sub(get(filt), 1, 4)]
+            DT[, max_serv := stringr::str_sub(get(filt), 6, 9)]
+            DT <- DT[
+              input[[paste0("V_DEM_PAIMT_MED_CM__COD_SERV__", filt)]][[1]] <= min_serv &
+                max_serv <= input[[paste0("V_DEM_PAIMT_MED_CM__COD_SERV__", filt)]][[2]]
+            ]
+            DT[, `:=` (min_serv = NULL, max_serv = NULL)]
+          }
+        }
+        return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_STA_DECIS)
+        for (col in c("COD_STA_DECIS")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN[[2]]
+        ]
+        return(DT)
+      } else {
+        return(NULL)
+      }
+    })
+    output$V_DEM_PAIMT_MED_CM__dt <- renderDataTable({ V_DEM_PAIMT_MED_CM__dt() },
+                                                     options = renderDataTable_options())
+    # Réinitialisation
+    observeEvent(input$V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__NOM_DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DIN", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__MARQ_COMRC", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_CLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_SCLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_SSCLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__AHFS_NOM_CLA", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_AHFS__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_CLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_SCLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_SSCLA", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_AHFS__AHFS_NOM_CLA", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_AHFS__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_DIN__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DIN", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__MARQ_COMRC", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_SERV__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV_DESC", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_1", value = c(1996, year(Sys.Date())))
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_2", value = c(1996, year(Sys.Date())))
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_3", value = c(1996, year(Sys.Date())))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__SERV_FILTER", selected = character(0))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_STA_DECIS__COD_STA_DECIS", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_STA_DECIS__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__NOM_DENOM", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+
+    # V_DENOM_COMNE_MED -------------------------------------------------------
+
+    # Paramètre à afficher
+    V_DENOM_COMNE_MED__params <- reactive({
+      return(tagList(
+        fluidRow(
+          column(4, textInput("V_DENOM_COMNE_MED__DENOM", "DENOM")),
+          column(4, textInput("V_DENOM_COMNE_MED__NOM_DENOM", "NOM_DENOM/SYNON (Fr/En)"))
+        ),
+        fluidRow(
+          column(4, actionButton("V_DENOM_COMNE_MED__reset", "Réinitialiser"))
+        ),
+        div(style = "margin-top:20px")
+      ))
+    })
+    output$V_DENOM_COMNE_MED__params <- renderUI({ V_DENOM_COMNE_MED__params() })
+    # Tableau
+    V_DENOM_COMNE_MED__dt <- reactive({
+      DT <- copy(inesss::V_DENOM_COMNE_MED)
+      # Recherche DENOM
+      search_words <- unlist(stringr::str_split(
+        input$V_DENOM_COMNE_MED__DENOM, "\\+"
+      ))
+      if (length(search_words) >= 1 && search_words[1] != "") {
+        for (i in 1:length(search_words)) {
+          DT[, paste(i) := stringr::str_detect(tolower(DENOM), tolower(search_words[i]))]
+          DT <- DT[get(paste(i)) == TRUE]
+          DT[, paste(i) := NULL]
+        }
+      }
+      # Recherche mots-clés
+      search_words <- unlist(stringr::str_split(
+        input$V_DENOM_COMNE_MED__NOM_DENOM, "\\+"
+      ))
+      if (length(search_words) >= 1 && search_words[1] != "") {
+        for (i in 1:length(search_words)) {
+          DT[, paste(i) := FALSE]
+          for (col in c("NOM_DENOM", "NOM_DENOM_SYNON", "NOM_DENOM_ANGLAIS", "NOM_DENOM_SYNON_ANGLAIS")) {
+            idx <- DT[, .I[stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]]
+            if (length(idx)) {
+              DT[idx, paste(i) := TRUE]
+            }
+          }
+          DT <- DT[get(paste(i)) == TRUE]
+          DT[, paste(i) := NULL]
+        }
+      }
+      return(DT)
+    })
+    output$V_DENOM_COMNE_MED__dt <- renderDataTable({ V_DENOM_COMNE_MED__dt() },
+                                                    options = renderDataTable_options())
+    # Réinitialisation
+    observeEvent(input$V_DENOM_COMNE_MED__reset, {
+      updateTextInput(session, "V_DENOM_COMNE_MED__DENOM", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__NOM_DENOM", value = "")
+    })
+
+
+    # V_DES_COD ---------------------------------------------------------------
+
+    # Paramètres à afficher
+    V_DES_COD__params <- reactive({
+      return(tagList(
+        fluidRow(
+          column(4, textInput("V_DES_COD__CODE", "CODE")),
+          column(4, textInput("V_DES_COD__TYPE_CODE", "TYPE_CODE")),
+          column(4, textInput("V_DES_COD__CODE_DESC", "CODE_DESC"))
+        ),
+        fluidRow(
+          column(4, actionButton("V_DES_COD__reset", "Réinitialiser"))
+        ),
+        div(style = "margin-top:20px")
+      ))
+    })
+    output$V_DES_COD__params <- renderUI({ V_DES_COD__params() })
+    # Tableau
+    V_DES_COD__dt <- reactive({
+      DT <- inesss::V_DES_COD
+      for (col in c("CODE", "TYPE_CODE", "CODE_DESC")) {
+        search_words <- unlist(stringr::str_split(
+          input[[paste0("V_DES_COD__",col)]], " \\+"
+        ))
+        if (length(search_words) == 1 && search_words == "") {
+          next
+        } else {
+          for (i in 1:length(search_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+      }
+      return(DT)
+    })
+    output$V_DES_COD__dt <- renderDataTable({ V_DES_COD__dt() },
+                                            options = renderDataTable_options())
+    # Réinitialisation
+    observeEvent(input$V_DES_COD__reset, {
+      updateTextInput(session, "V_DES_COD__CODE", value = "")
+      updateTextInput(session, "V_DES_COD__TYPE_CODE", value = "")
+      updateTextInput(session, "V_DES_COD__CODE_DESC", value = "")
+    })
+
+
+    # V_PRODU_MED -------------------------------------------------------------
+
+    # Paramètres à afficher
+    V_PRODU_MED__params <- reactive({
+      if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_PRODU_MED__NOM_MARQ_COMRC__DENOM", "DENOM")),
+            column(4, textInput("V_PRODU_MED__NOM_MARQ_COMRC__DIN", "DIN")),
+            column(4, textInput("V_PRODU_MED__NOM_MARQ_COMRC__NOM_MARQ_COMRC", "NOM_MARQ_COMRC"))
+          ),
+          fluidRow(
+            column(4, actionButton("V_PRODU_MED__NOM_MARQ_COMRC__reset", "Réinitialiser"))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      }
+    })
+    output$V_PRODU_MED__params <- renderUI({ V_PRODU_MED__params() })
+    # Tableau
+    V_PRODU_MED__dt <- reactive({
+      if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
+        DT <- inesss::V_PRODU_MED$NOM_MARQ_COMRC
+        for (col in c("DENOM", "DIN", "NOM_MARQ_COMRC")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_PRODU_MED__NOM_MARQ_COMRC__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+      }
+      return(DT)
+    })
+    output$V_PRODU_MED__dt <- renderDataTable({ V_PRODU_MED__dt() },
+                                              options = renderDataTable_options())
+    # Réinitialisation
+    observeEvent(input$V_PRODU_MED__NOM_MARQ_COMRC__reset, {
+      updateTextInput(session, "V_PRODU_MED__NOM_MARQ_COMRC__DENOM", value = "")
+      updateTextInput(session, "V_PRODU_MED__NOM_MARQ_COMRC__DIN", value = "")
+      updateTextInput(session, "V_PRODU_MED__NOM_MARQ_COMRC__NOM_MARQ_COMRC", value = "")
+    })
+
   }
 
-# Application -------------------------------------------------------------
+  # Application -------------------------------------------------------------
 
   shinyApp(ui, server)
 
