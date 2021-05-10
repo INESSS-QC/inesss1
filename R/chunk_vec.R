@@ -9,7 +9,6 @@
 #' @param n_vals Chaque partie aura au maximum `n_vals` valeurs.
 #'
 #' @return `list` ayant `n_chunks` éléments (ou `as.integer(length(x) / n_vals + 1L)`).
-#' @keywords internal
 #' @export
 #' @examples
 #' chunk_vec(x = 1:10, n_chunks = 3)

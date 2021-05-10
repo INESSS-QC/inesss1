@@ -16,4 +16,3 @@ Emplacement sur le disque dur où le script est sauvegardé.
 \details{
 Si le script n'est pas sauvegardé, retourne \code{NULL}.
 }
-\keyword{internal}

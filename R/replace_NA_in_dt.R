@@ -5,8 +5,8 @@
 #' @param dt Tableau contenant des `NA`s.
 #' @param by Valeur de remplacement.
 #'
-#' @keywords internal
 #' @encoding UTF-8
+#' @export
 replace_NA_in_dt <- function(dt, by) {
 
   if (!data.table::is.data.table(dt)) {

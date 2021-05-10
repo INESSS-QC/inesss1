@@ -6,7 +6,6 @@
 #'
 #' @return CHR. Emplacement du dossier qui contient le script R.
 #'
-#' @keywords internal
 #' @encoding UTF-8
 #' @export
 file_directory <- function(){
