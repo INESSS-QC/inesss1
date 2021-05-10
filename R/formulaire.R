@@ -73,6 +73,24 @@ formulaire <- function() {
       searching = FALSE
     ))
   }
+  saveExcel_button_style <- function() {
+    ### Couleur et format du bouton qui sauvegarde les tableaux
+
+    return(paste0(
+      "color: #ffffff;",
+      "background-color: #006600;",
+      "border-color: #000000;"
+    ))
+  }
+  reset_button_style <- function() {
+    ### Couleur et format du bouton qui réinitialise les arguments
+
+    return(paste0(
+      "color: #ffffff;",
+      "background-color: #990000;",
+      "border-color: #000000;"
+    ))
+  }
 
   # Fonctions ---------------------------------------------------------------
 
@@ -916,12 +934,20 @@ formulaire <- function() {
     ### Répertoires disponible sur l'ordinateur où l'on peut sélectionner ou
     ### enregistrer un fichier.
 
-    return(c(
-      `Bureau` = paste0("C:/Users/",Sys.info()[["login"]],"/Desktop"),
-      `Par défaut` = path_home(),
-      R = R.home(),
-      getVolumes()()
-    ))
+    if (tolower(stringr::str_sub(Sys.info()[["login"]], 1, 2)) == "ms") {
+      return(c(
+        `Bureau` = paste0("C:/Users/",Sys.info()[["login"]],"/Desktop"),
+        `Par défaut` = path_home(),
+        R = R.home(),
+        getVolumes()()
+      ))
+    } else {
+      return(c(
+        `Par défaut` = path_home(),
+        R = R.home(),
+        getVolumes()()
+      ))
+    }
 
   }
 
@@ -1080,12 +1106,7 @@ formulaire <- function() {
             ),
             column(
               width = 3,
-              actionButton(  # Réinitialiser les codes Rx
-                "sg1_reset_args", "Réinitialiser Arguments",
-                style = paste0("color: #ffffff;",
-                               "background-color: #990000;",
-                               "border-color: #000000;")
-              )
+              actionButton("sg1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
             )
           ),
 
@@ -1182,6 +1203,7 @@ formulaire <- function() {
     session$onSessionEnded(function() {stopApp()})
 
 
+
     # Connexion -----------------------------------------------------------------------------------
 
     # Valeurs nécessaires à la connexion de teradata
@@ -1265,9 +1287,7 @@ formulaire <- function() {
           "save_xl_file", "Exécuter requêtes", "Enregistrer sous...",
           filetype = list(`Classeur Excel` = "xlsx"),
           viewtype = "list",
-          style = paste0("color: #ffffff;",
-                         "background-color: #006600;",
-                         "border-color: #000000;")
+          style = saveExcel_button_style()
         ))
       } else {
         return(NULL)
@@ -1434,9 +1454,7 @@ formulaire <- function() {
           "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
           filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
           viewtype = "list",
-          style = paste0("color: #ffffff;",
-                         "background-color: #006600;",
-                         "border-color: #000000;")
+          style = saveExcel_button_style()
         ))
       } else {
         return(NULL)
@@ -1554,9 +1572,20 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", "Chaîne de caractères"),
-              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset", "Réinitialiser")
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", "Chaîne de caractères")
             )
+          ),
+          fluidRow(
+            column(4, actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1569,7 +1598,14 @@ formulaire <- function() {
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM", "DD_TRAIT_DEM"),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR", "DD_AUTOR"),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR", "DD_APLIC_AUTOR"),
-              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset", "Réinitialiser")
+              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset", "Réinitialiser",
+                           style = reset_button_style()),
+              div(style = "margin-top:15px"),
+              shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+                              "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                              filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                              viewtype = "list",
+                              style = saveExcel_button_style())
             ),
             column(
               width = 4,
@@ -1586,8 +1622,9 @@ formulaire <- function() {
       }
     })
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({ I_APME_DEM_AUTOR_CRITR_ETEN_CM__params() })
+
     # Tableau
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- reactive({
+    I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- reactive({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
         search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
@@ -1623,7 +1660,7 @@ formulaire <- function() {
         return(NULL)
       }
     })
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- renderDataTable({ I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt() },
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM_dt <- renderDataTable({ I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt() },
                                                                 options = renderDataTable_options())
     # Réinitialisation
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
@@ -1638,6 +1675,20 @@ formulaire <- function() {
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM", value = "")
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR", value = "")
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR", value = "")
+    })
+    # Sauvegarde de la table
+    shinyFileSave(input, "I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", roots = Volumes_path())
+    I_APME_DEM_AUTOR_CRITR_ETEN_CM_file_save <- reactive({
+      shinyFiles_directories(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM_save, "save")
+    })
+    observeEvent(I_APME_DEM_AUTOR_CRITR_ETEN_CM_file_save(), {
+      if (nrow(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())) {
+        showNotification("Sauvegarde en cours.", id = "I_APME_DEM_AUTOR_CRITR_ETEN_CM_save",
+                         type = "message", duration = NULL)
+        save_Excel(dt = I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),
+                   save_path = I_APME_DEM_AUTOR_CRITR_ETEN_CM_file_save())
+        removeNotification("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save")
+      }
     })
 
 
@@ -1669,7 +1720,16 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            column(4, actionButton("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__reset", "Réinitialiser"))
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__DENOM_DIN_AHFS__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1689,7 +1749,16 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_AHFS__reset", "Réinitialiser"))
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_AHFS__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1705,7 +1774,16 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset", "Réinitialiser"))
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1721,7 +1799,17 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser")
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser",
+                         style = reset_button_style()))
+
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1745,7 +1833,16 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_SERV__reset", "Réinitialiser"))
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_SERV__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1760,7 +1857,16 @@ formulaire <- function() {
                                   sep = "", step = 1))
           ),
           fluidRow(
-            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset", "Réinitialiser"))
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_STA_DECIS__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -1947,6 +2053,21 @@ formulaire <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__NOM_DENOM", value = "")
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DENOM_COMNE__DEBUT_FIN", value = c(1996, year(Sys.Date())))
     })
+    # Sauvegarde de la table
+    shinyFileSave(input, "V_DEM_PAIMT_MED_CM_save", roots = Volumes_path())
+    V_DEM_PAIMT_MED_CM_file_save <- reactive({
+      shinyFiles_directories(input$V_DEM_PAIMT_MED_CM_save, "save")
+    })
+    observeEvent(V_DEM_PAIMT_MED_CM_file_save(), {
+      if (nrow(V_DEM_PAIMT_MED_CM__dt())) {
+        showNotification("Sauvegarde en cours.", id = "V_DEM_PAIMT_MED_CM_save",
+                         type = "message", duration = NULL)
+        save_Excel(dt = V_DEM_PAIMT_MED_CM__dt(),
+                   save_path = V_DEM_PAIMT_MED_CM_file_save())
+        removeNotification("V_DEM_PAIMT_MED_CM_save")
+      }
+    })
+
 
     # V_DENOM_COMNE_MED -------------------------------------------------------
 
@@ -1958,7 +2079,16 @@ formulaire <- function() {
           column(4, textInput("V_DENOM_COMNE_MED__NOM_DENOM", "NOM_DENOM/SYNON (Fr/En)"))
         ),
         fluidRow(
-          column(4, actionButton("V_DENOM_COMNE_MED__reset", "Réinitialiser"))
+          column(4, actionButton("V_DENOM_COMNE_MED__reset", "Réinitialiser",
+                                 style = reset_button_style()))
+        ),
+        div(style = "margin-top:15px"),
+        fluidRow(
+          column(4, shinySaveButton("V_DENOM_COMNE_MED_save", "Sauvegarder Résultats en Excel",
+                                    "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                    filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                    viewtype = "list",
+                                    style = saveExcel_button_style()))
         ),
         div(style = "margin-top:20px")
       ))
@@ -2004,6 +2134,20 @@ formulaire <- function() {
       updateTextInput(session, "V_DENOM_COMNE_MED__DENOM", value = "")
       updateTextInput(session, "V_DENOM_COMNE_MED__NOM_DENOM", value = "")
     })
+    # Sauvegarde de la table
+    shinyFileSave(input, "V_DENOM_COMNE_MED_save", roots = Volumes_path())
+    V_DENOM_COMNE_MED_file_save <- reactive({
+      shinyFiles_directories(input$V_DENOM_COMNE_MED_save, "save")
+    })
+    observeEvent(V_DENOM_COMNE_MED_file_save(), {
+      if (nrow(V_DENOM_COMNE_MED__dt())) {
+        showNotification("Sauvegarde en cours.", id = "V_DENOM_COMNE_MED_save",
+                         type = "message", duration = NULL)
+        save_Excel(dt = V_DENOM_COMNE_MED__dt(), save_path = V_DENOM_COMNE_MED_file_save())
+        removeNotification("V_DENOM_COMNE_MED_save")
+      }
+    }, ignoreInit = TRUE)
+
 
 
     # V_DES_COD ---------------------------------------------------------------
@@ -2017,7 +2161,15 @@ formulaire <- function() {
           column(4, textInput("V_DES_COD__CODE_DESC", "CODE_DESC"))
         ),
         fluidRow(
-          column(4, actionButton("V_DES_COD__reset", "Réinitialiser"))
+          column(4, actionButton("V_DES_COD__reset", "Réinitialiser", style = reset_button_style()))
+        ),
+        div(style = "margin-top:15px"),
+        fluidRow(
+          column(4, shinySaveButton("V_DES_COD_save", "Sauvegarder Résultats en Excel",
+                                    "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                    filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                    viewtype = "list",
+                                    style = saveExcel_button_style()))
         ),
         div(style = "margin-top:20px")
       ))
@@ -2050,6 +2202,19 @@ formulaire <- function() {
       updateTextInput(session, "V_DES_COD__TYPE_CODE", value = "")
       updateTextInput(session, "V_DES_COD__CODE_DESC", value = "")
     })
+    # Sauvegarde de la table
+    shinyFileSave(input, "V_DES_COD_save", roots = Volumes_path())
+    V_DES_COD_file_save <- reactive({
+      shinyFiles_directories(input$V_DES_COD_save, "save")
+    })
+    observeEvent(V_DES_COD_file_save(), {
+      if (nrow(V_DES_COD__dt())) {
+        showNotification("Sauvegarde en cours.", id = "V_DES_COD_save",
+                         type = "message", duration = NULL)
+        save_Excel(dt = V_DES_COD__dt(), save_path = V_DES_COD_file_save())
+        removeNotification("V_DES_COD_save")
+      }
+    }, ignoreInit = TRUE)
 
 
     # V_PRODU_MED -------------------------------------------------------------
@@ -2064,7 +2229,15 @@ formulaire <- function() {
             column(4, textInput("V_PRODU_MED__NOM_MARQ_COMRC__NOM_MARQ_COMRC", "NOM_MARQ_COMRC"))
           ),
           fluidRow(
-            column(4, actionButton("V_PRODU_MED__NOM_MARQ_COMRC__reset", "Réinitialiser"))
+            column(4, actionButton("V_PRODU_MED__NOM_MARQ_COMRC__reset", "Réinitialiser", style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_PRODU_MED_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
           ),
           div(style = "margin-top:20px")
         ))
@@ -2100,6 +2273,19 @@ formulaire <- function() {
       updateTextInput(session, "V_PRODU_MED__NOM_MARQ_COMRC__DIN", value = "")
       updateTextInput(session, "V_PRODU_MED__NOM_MARQ_COMRC__NOM_MARQ_COMRC", value = "")
     })
+    # Sauvegarde de la table
+    shinyFileSave(input, "V_PRODU_MED_save", roots = Volumes_path())
+    V_PRODU_MED_file_save <- reactive({
+      shinyFiles_directories(input$V_PRODU_MED_save, "save")
+    })
+    observeEvent(V_PRODU_MED_file_save(), {
+      if (nrow(V_PRODU_MED__dt())) {
+        showNotification("Sauvegarde en cours.", id = "V_PRODU_MED_save",
+                         type = "message", duration = NULL)
+        save_Excel(dt = V_PRODU_MED__dt(), save_path = V_PRODU_MED_file_save())
+        removeNotification("V_PRODU_MED_save")
+      }
+    }, ignoreInit = TRUE)
 
   }
 
