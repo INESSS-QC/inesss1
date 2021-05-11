@@ -11,6 +11,7 @@ query_naif_switch1(
   type_Rx = "DENOM",
   codes,
   group_by = "DENOM",
+  type_Rx_retro = NULL,
   rx_retrospect_a_exclure = NULL,
   njours_sans_conso = 365,
   code_serv = c("1", "AD"),
@@ -26,7 +27,7 @@ query_naif_switch1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{type_Rx}{Indique le type de code analysé :
+\item{type_Rx}{Typeype de code à analyser. Une valeur parmi :
 \itemize{
 \item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
@@ -45,6 +46,13 @@ query_naif_switch1(
 \item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
 \item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
 \item \code{'Age'} : Résultats par âge à une date précise. Voir argument \code{age_date}. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
+}}
+
+\item{type_Rx_retro}{Type de code à exclure. Une valeur parmi :
+\itemize{
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
+\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
 \item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}

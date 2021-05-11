@@ -12,6 +12,10 @@
 #' `'Exclusion'` inclus les `NULL`\cr
 #' `'Inclusion'` exclus les `NULL`.
 #'
+#' @param type_Rx_retro Type de code à exclure. Une valeur parmi :
+#' * `'AHFS'` : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+#' * `'DENOM'` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
+#' * `'DIN'` : Code d'identification du médicament (`SMED_COD_DIN`).
 #' @param rx_retrospect_a_exclure Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*.
 #' @param njours_sans_conso Nombre de jours qu’un individu ne doit pas avoir reçu de traitements avant sa date de référence (date index) pour être considéré *naïf* ou *switch*.
 #' @inheritParams query_stat_gen1
@@ -20,10 +24,30 @@
 #' @encoding UTF-8
 #' @export
 #' @examples
+#' ### Avantages d'utiliser cat()
+#' # Sans cat()
+#' query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+#'                    type_Rx = 'DIN', codes = c(707503, 707600),
+#'                    group_by = 'DIN')
+#' # Avec cat()
+#' cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+#'                        type_Rx = 'DIN', codes = c(707503, 707600),
+#'                        group_by = 'DIN'))
+#'
+#' ### group_by
+#' # Aucun
+#' cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+#'                        type_Rx = 'DIN', codes = c(707503, 707600),
+#'                        group_by = NULL))
+#' # Tous les group_by
+#' cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+#'                        type_Rx = 'DIN', codes = c(707503, 707600),
+#'                        group_by = c("DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age")))
 query_naif_switch1 <- function(
   debut, fin,
   type_Rx = 'DENOM', codes, group_by = 'DENOM',
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
+  type_Rx_retro = NULL, rx_retrospect_a_exclure = NULL,
+  njours_sans_conso = 365,
   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
   code_list = NULL, code_list_filtre = 'Inclusion',
   age_date = NULL,
@@ -37,8 +61,8 @@ query_naif_switch1 <- function(
     dot_args$verif <- TRUE
   }
   if (dot_args$verif) {
-    query_naif_switch1.verif_args(debut, fin, type_rx, codes,
-                                  rx_retrospect_a_exclure, njours_sans_conso,
+    query_naif_switch1.verif_args(debut, fin, type_Rx, codes, group_by,
+                                  type_Rx_retro,
                                   code_serv, code_serv_filtre,
                                   code_list, code_list_filtre,
                                   age_date)
@@ -47,15 +71,19 @@ query_naif_switch1 <- function(
   ### Arranger les arguments
   # codes
   codes <- sunique(codes)
-  if (type_rx == "DENOM") {
+  if (type_Rx == "DENOM") {
     codes <- stringr::str_pad(codes, width = 5, side = "left", pad = "0")
+  }
+  # type_Rx_retro
+  if (is.null(type_Rx_retro)) {
+    type_Rx_retro <- type_Rx
   }
   # rx_retrospect_a_exclure
   if (is.null(rx_retrospect_a_exclure)) {
     rx_retrospect_a_exclure <- codes
   } else {
     rx_retrospect_a_exclure <- sunique(rx_retrospect_a_exclure)
-    if (type_rx == "DENOM") {
+    if (type_Rx == "DENOM") {
       rx_retrospect_a_exclure <- stringr::str_pad(rx_retrospect_a_exclure, width = 5,
                                                   side = "left", pad = "0")
     }
@@ -130,14 +158,15 @@ query_naif_switch1 <- function(
 
 }
 
-query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
-                                       code_serv, code_serv_filtre,
-                                       code_list, code_list_filtre,
-                                       age_date) {
+query_naif_switch1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
+                                          type_Rx_retro,
+                                          code_serv, code_serv_filtre,
+                                          code_list, code_list_filtre,
+                                          age_date) {
   ### Vérifier les arguments d'entrée
 
   check <- newArgCheck()
-  vals <- inesss:::fct_values$query_stat_gen1  # Possible values
+  vals <- inesss:::fct_values$query_naif_switch1  # Possible values
 
   # debut & fin
   for (val in c("debut", "fin")) {
@@ -152,10 +181,10 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
   # type_Rx
   if (length(type_Rx) == 1) {
     if (!type_Rx %in% vals$type_Rx) {
-      addError("type_Rx n'est pas une valeur permise.", check)
+      addError("type_Rx ne contient pas une valeur permise.", check)
     }
   } else {
-    addError("type_Rx doit être de longueur 1.", check)
+    addError("type_Rx doit être de longueur 1 (une valeur).", check)
   }
 
   # codes
@@ -172,6 +201,17 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
     suppressWarnings({codes <- as.numeric(codes)})
     if (anyNA(codes)) {
       addError("codes doit contenir des valeurs numériques.", check)
+    }
+  }
+
+  # type_Rx_retro
+  if (!is.null(type_Rx_retro)) {
+    if (length(type_Rx_retro) == 1) {
+      if (!any(vals$type_Rx_retro == type_Rx_retro)) {
+        addError("type_Rx_retro ne contient pas une valeur permise.", check)
+      }
+    } else {
+      addError("type_Rx_retro doit être de longueur 1 (une valeur).", check)
     }
   }
 

@@ -24,7 +24,7 @@ query_stat_gen1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{type_Rx}{Indique le type de code analysé :
+\item{type_Rx}{Typeype de code à analyser. Une valeur parmi :
 \itemize{
 \item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).

@@ -11,6 +11,7 @@ fct_values <- list(
   query_naif_switch1 = list(
     type_rx = c("DENOM", "DIN"),
     group_by = c("DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age"),
+    type_Rx_retro = c("AHFS", "DENOM", "DIN"),
     code_serv_filtre = c("Exclusion", "Inclusion"),
     code_list_filtre = c("Exclusion", "Inclusion")
   ),

@@ -13,7 +13,7 @@
 #'
 #' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ` (une seule valeur).
-#' @param type_Rx Indique le type de code analysé :
+#' @param type_Rx Typeype de code à analyser. Une valeur parmi :
 #' * `'AHFS'` : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 #' * `'DENOM'` : Code de dénomination commune (`SMED_COD_DENOM_COMNE`).
 #' * `'DIN'` : Code d'identification du médicament (`SMED_COD_DIN`).
@@ -394,7 +394,7 @@ query_stat_gen1.where_code_list <- function(code_list, code_list_filtre, lvl = 1
   }
 
 }
-query_stat_gen1.group_order_by <- function(type_Rx, group_by, lvl = 1) {
+query_stat_gen1.group_order_by <- function(type_Rx, group_by, lvl = 0) {
   ### Grouper les résultats par...
 
   if (is.null(group_by)) {
