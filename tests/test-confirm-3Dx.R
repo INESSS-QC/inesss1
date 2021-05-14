@@ -29,15 +29,18 @@ DT <- rbindlist(DT)
 #' @param study_end
 #' @param n1
 #' @param n2
-# dt = copy(DT)
-# ID = "Id"
-# DATE = "Date"
-# DIAGN = NULL
-# n1 = 30
-# n2 = 730
-# study_start = "2019-01-01"
-# study_end = "2019-12-31"
-confirme_3_Dx <- function(dt, ID, DATE, DIAGN = NULL, study_start = NULL, study_end = NULL, n1 = 30, n2 = 730) {
+dt = copy(DT)
+ID = "Id"
+DATE = "Date"
+DIAGN = NULL
+n1 = 30
+n2 = 730
+study_start = NULL
+study_end = NULL
+reverse = FALSE
+confirme_3_Dx <- function(dt, ID, DATE, DIAGN = NULL,
+                          study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
+                          reverse = FALSE) {
 
   ### Arranger data
   # Convertir data.table au besoin
@@ -83,23 +86,46 @@ confirme_3_Dx <- function(dt, ID, DATE, DIAGN = NULL, study_start = NULL, study_
 
   ### Confirmation des codes
   confirm_tab <- vector("list", n_iter)  # où stocker les dates confirmées
-  setorder(dt, ID, DIAGN, -DATE)  # tri par date décroissante
+  if (reverse) {
+    setorder(dt, ID, DIAGN, -DATE)
+  } else {
+    setkey(dt, ID, DIAGN, DATE)
+  }
   for (i in 1:n_iter) {
     idx <- dt[, .I[.N >= 3], .(ID, DIAGN)]$V1  # lignes où les ID ont 3 obs ou plus
     if (length(idx)) {
       sd <- dt[idx]  # subset data
       # Trouver 1ère date où la différence = [n1, n2]
-      sd[, diff := - as.integer(DATE - shift(DATE)), .(ID, DIAGN)][is.na(diff), diff := 0L]
+      sd[, diff := as.integer(DATE - shift(DATE)), .(ID, DIAGN)][is.na(diff), diff := 0L]
+      if (reverse) {
+        sd[, diff := -diff]
+      }
       sd[, diff := cumsum(diff), .(ID, DIAGN)]  # nombre de jours cumulés
       # Répéter étape précédente, mais à partir de la date trouvée précédemment
       sd[, DATE2 := DATE][diff < n1, DATE2 := 0L]
-      sd[DATE2 > 0, diff2 := -(DATE2 - max(DATE2)), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
+      if (reverse) {
+        sd[DATE2 > 0, diff2 := -(DATE2 - max(DATE2)), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
+      } else {
+        sd[DATE2 > 0, diff2 := DATE2 - min(DATE2), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
+      }
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
-      sd <- sd[any(diff %in% n1:n2) & any(diff2 %in% n1:n2)]
+      sd[, keep := FALSE]
+      sd[
+        any(diff %in% n1:n2) & any(diff2 %in% n1:n2),
+        keep := TRUE,
+        .(ID, DIAGN)
+      ]
+      sd <- sd[keep == TRUE]
       if (nrow(sd)) {
-        sd[, DATE_REP := max(DATE), .(ID, DIAGN)]  # date de repérage
-        sd[diff >= n1, DATE_CONF1 := max(DATE), .(ID, DIAGN)]  # date qui confirme DATE_REP
-        sd[diff2 >= n1, DATE_CONF2 := max(DATE), .(ID, DIAGN)]  # date qui confirme DATE_CONF1
+        if (reverse) {
+          sd[, DATE_REP := max(DATE), .(ID, DIAGN)]  # date de repérage
+          sd[diff >= n1, DATE_CONF1 := max(DATE), .(ID, DIAGN)]  # date qui confirme DATE_REP
+          sd[diff2 >= n1, DATE_CONF2 := max(DATE), .(ID, DIAGN)]  # date qui confirme DATE_CONF1
+        } else {
+          sd[, DATE_REP := min(DATE), .(ID, DIAGN)]  # date de repérage
+          sd[diff >= n1, DATE_CONF1 := min(DATE), .(ID, DIAGN)]  # date qui confirme DATE_REP
+          sd[diff2 >= n1, DATE_CONF2 := min(DATE), .(ID, DIAGN)]  # date qui confirme DATE_CONF1
+        }
         sd <- sd[
           !is.na(DATE_CONF2),
           .(DATE_REP = unique(DATE_REP),
@@ -140,6 +166,12 @@ confirme_3_Dx <- function(dt, ID, DATE, DIAGN = NULL, study_start = NULL, study_
 test <- confirme_3_Dx(
   dt = DT, ID = "Id", DATE = "Date", DIAGN = NULL,
   study_start = "2019-01-01", study_end = "2019-12-31",
-  n1 = 30, n2 = 730
+  n1 = 30, n2 = 730, reverse = TRUE
+)
+
+test2 <- confirme_3_Dx(
+  dt = DT, ID = "Id", DATE = "Date", DIAGN = NULL,
+  study_start = NULL, study_end = NULL,
+  n1 = 30, n2 = 730, reverse = FALSE
 )
 
