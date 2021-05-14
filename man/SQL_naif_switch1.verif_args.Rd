@@ -8,7 +8,7 @@
 SQL_naif_switch1.verif_args(
   debut,
   fin,
-  type_rx,
+  type_Rx,
   codes,
   grouper_par,
   rx_retrospect_a_exclure,

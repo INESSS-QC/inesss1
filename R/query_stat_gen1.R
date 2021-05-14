@@ -2,10 +2,8 @@
 #'
 #' Générateur de code SQL pour la méthode `stat_gen1`.
 #'
-#' \strong{Méthode `stat_gen1` :}\cr
-#' Statistiques descriptives tirées de la vue `V_DEM_PAIMT_MED_CM`.\cr\cr
 #' \strong{\code{codes} :}\cr
-#' Si `type_Rx='AHFS'`, un seul code à inscrire sous la forme de six (6) caractères. Par exemple, inscrire `040812` revient à chercher la classe 04, la sous-classe 08 et la sous-sous-classe 12. Il est aussi possible de chercher seulement la classe AHFS 04 en inscrivant `04----`. Puisque les deux premiers caractères indique la classe, ceux du milieu la sous-classe et les deux derniers la sous-sous-classe, remplacer une paire de caractères revient à rechercher toutes les classes (ou sous-classe, ou sous-sous-classe).\cr
+#' Si `type_Rx='AHFS'` : codes sous la forme de 6 caractères où les deux premiers caractères représente la classe AHFS, les deux du milieu la sous-classe AHFS et les deux derniers la sous-sous-classe AHFS. Il est possible de remplacer une paire de caractères (\{1, 2\}, \{3, 4\} ou \{5, 6\}) par `'--'` pour rechercher toutes les types de classes. Par exemple, `'04--12'` indique qu'on recherche la classe AHFS 04, toutes les sous-classes AHFS et la sous-sous-classe 12.\cr
 #' Sinon inscrire les codes sous la forme d'un nombre entier.\cr\cr
 #' \strong{`code_serv_filtre`, `code_list_filtre` :}\cr
 #' `'Exclusion'` inclus les `NULL`\cr
@@ -20,8 +18,8 @@
 #' @param codes Le ou les codes à analyser. Voir *Details*.
 #' @param group_by Regrouper (aggréger) les résultats par :
 #' * `'AHFS'` : Résultats par code de classe AHFS.
-#' * `'DENOM'` : Résultats par code de dénomination commune si `type_Rx='AHFS'`.
-#' * `'DIN'` : Résultats par code d'identification du médicament si `type_Rx='AHFS'` ou `type_Rx='DENOM'`.
+#' * `'DENOM'` : Résultats par code de dénomination commune.
+#' * `'DIN'` : Résultats par code d'identification du médicament.
 #' * `'CodeList'` : Résultats par code de catégories de liste de médicaments (`SMED_COD_CATG_LISTE_MED`).
 #' * `'CodeServ'` : Résultats par code de service (`SMED_COD_SERV_1`).
 #' * `'Teneur'` : Résultats par teneur du médicament (`SMED_COD_TENR_MED`) incluant les valeurs absentes.
@@ -31,7 +29,7 @@
 #' @param code_serv_filtre `'Inclusion'` ou `'Exclusion'` des codes de service `code_serv`. Inscrire `code_serv = NULL` s'il n'y a pas de filtre à appliquer.
 #' @param code_list Vecteur de type `character` comprenant le ou les codes de catégories de listes de médicaments (`SMED_COD_CATG_LISTE_MED`) à exclure ou à inclure, sinon inscrire `NULL`.
 #' @param code_list_filtre `'Inclusion'` ou `'Exclusion'` des codes de catégories de liste de médicaments `code_list`. Inscrire `code_list = NULL` s'il n'y a pas de filtre à appliquer.
-#' @param age_date Date à laquelle on calcule l'âge si `group_by` contient `'Age'`.
+#' @param age_date Date à laquelle on calcule l'âge si `group_by` contient `'Age'`. Si `NULL`, aura pour valeur `debut`.
 #'
 #' @return Chaîne de caractères à utiliser dans une requête SQL.
 #' @encoding UTF-8
@@ -39,65 +37,59 @@
 #' @examples
 #' ### Avantages d'utiliser cat()
 #' # Sans cat()
-#' query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                 type_Rx = "DENOM", codes = c(39, 47092, 47135),
-#'                 group_by = "DENOM")
+#' query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                 type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'                 group_by = 'DENOM')
 #' # Avec cat()
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(39, 47092, 47135),
-#'                     group_by = "DENOM"))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'                     group_by = 'DENOM'))
 #'
 #' ### group_by
 #' # Aucun
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(39, 47092, 47135),
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
 #'                     group_by = NULL))
 #' # Tous les group_by
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(39, 47092, 47135),
-#'                     group_by = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age")))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'                     group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')))
 #'
 #' ### AHFS
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "AHFS", codes = 040412,
-#'                     group_by = "AHFS"))
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "AHFS", codes = "04----",
-#'                     group_by = "AHFS"))
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "AHFS", codes = "04--12",
-#'                     group_by = "AHFS"))
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "AHFS", codes = "04--12",
-#'                     group_by = c("AHFS", "DENOM")))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'AHFS', codes = c('040412', '08----'),
+#'                     group_by = 'AHFS'))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'AHFS', codes = '04--12',
+#'                     group_by = 'AHFS'))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'AHFS', codes = '04--12',
+#'                     group_by = c('AHFS', 'DENOM')))
 #'
 #' ### DENOM
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(39, 47092, 47135),
-#'                     group_by = "DENOM"))
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(39, 47092, 47135),
-#'                     group_by = c("DENOM", "DIN")))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'                     group_by = 'DENOM'))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'                     group_by = c('DENOM', 'DIN')))
 #'
 #' ### DIN
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DIN", codes = c(30848, 585092),
-#'                     group_by = "DIN"))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DIN', codes = c(30848, 585092),
+#'                     group_by = 'DIN'))
 #'
 #' ### Age
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DIN", codes = c(30848, 585092),
-#'                     group_by = c("DIN", "Age"), age_date = "2018-01-01"))
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DIN', codes = c(30848, 585092),
+#'                     group_by = c('DIN', 'Age'), age_date = '2018-01-01'))
 #'
-#' ### Exclusion VS Inclusion
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(47092, 47135),
-#'                     group_by = "DENOM",
-#'                     code_serv_filtre = "Exclusion", code_serv = c('1', 'AD')))
-#' cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-#'                     type_Rx = "DENOM", codes = c(47092, 47135),
-#'                     group_by = "DENOM",
-#'                     code_serv_filtre = "Inclusion", code_serv = c('1', 'AD')))
+#' ### Exclusion et Inclusion - code_serv et code_list
+#' cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+#'                     type_Rx = 'DENOM', codes = c(47092, 47135),
+#'                     group_by = 'DENOM',
+#'                     code_serv_filtre = 'Exclusion', code_serv = c('1', 'AD'),
+#'                     code_list_filtre = 'Inclusion', code_list = c('40', '41')))
 query_stat_gen1 <- function(
   debut, fin,
   type_Rx = 'DENOM', codes, group_by = 'DENOM',
@@ -174,11 +166,14 @@ query_stat_gen1 <- function(
 
 }
 
+#' @title query_stat_gen1
+#' @description Vérification des arguments.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
                                        code_serv, code_serv_filtre,
                                        code_list, code_list_filtre,
                                        age_date) {
-  ### Vérifier les arguments d'entrée
 
   check <- newArgCheck()
   vals <- inesss:::fct_values$query_stat_gen1  # Possible values
@@ -206,16 +201,8 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
   if (anyNA(codes)) {
     addError("codes ne peut contenir de NA.", check)
   } else if (type_Rx == "AHFS") {
-    if (length(codes) > 1) {
-      addError("Un seul code AHFS est permis.", check)
-    }
     if (any(nchar(codes) > 6)) {
       addError("codes ne peut contenir plus de 6 caractères lorsque c'est un code AHFS.", check)
-    }
-  } else {
-    suppressWarnings({codes <- as.numeric(codes)})
-    if (anyNA(codes)) {
-      addError("codes doit contenir des valeurs numériques.", check)
     }
   }
 
@@ -257,20 +244,29 @@ query_stat_gen1.verif_args <- function(debut, fin, type_Rx, codes, group_by,
   finishArgCheck(check)
 
 }
+#' @title query_stat_gen1
+#' @description Section *select*, *DATE_DEBUT*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.sel_debut <- function(debut) {
-  ### Sélection de la date de début dans le code SQL.
 
   return(paste0("'",debut,"' as DATE_DEBUT,\n"))
 
 }
+#' @title query_stat_gen1
+#' @description Section *select*, *DATE_FIN*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.sel_fin <- function(fin) {
-  ### Sélection de la date de fin dans le code SQL.
 
   return(paste0("'",fin,"' as DATE_FIN,\n"))
 
 }
+#' @title query_stat_gen1
+#' @description Section *select*, colonnes à inscrire selon le *group_by*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.sel_group_by <- function(group_by, age_date, lvl = 1) {
-  ### Sélection des colonnes selon le group_by
 
   if (any(group_by == "AHFS")) {
     select_cols <- paste0(indent(lvl),"SMED_COD_CLA_AHF as AHFS_CLA,\n",
@@ -320,54 +316,109 @@ query_stat_gen1.sel_group_by <- function(group_by, age_date, lvl = 1) {
   return(select_cols)
 
 }
+#' @title query_stat_gen1
+#' @description Section *from*.
+#' @details Effectuer un *left join* avec *V_FICH_ID_BEN_CM* si on demande l'âge à une date précise.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.from <- function(group_by) {
-  ### Effectuer un left join si on demande l'âge à une date précise
 
   if (any(group_by == "Age")) {
     return(paste0(
       "from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F\n",
-			"    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS\n"
+      "    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS\n"
     ))
   } else {
     return("from PROD.V_DEM_PAIMT_MED_CM\n")
   }
+
 }
+#' @title query_stat_gen1
+#' @description Section *where*, *SMED_DAT_SERV*. Filtrer les dates de services selon la période d'étude.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.where_dates <- function(debut, fin) {
-  ### Filtre les dates de services.
 
   return(paste0("where SMED_DAT_SERV between '",debut,"' and '",fin,"'\n"))
 
 }
+#' @title query_stat_gen1
+#' @description Section *where*, codes Rx.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.where_codes <- function(type_Rx, codes, lvl = 1) {
-  ### Sélection du format du médicament dans le code SQL.
 
   if (type_Rx == "DENOM") {
+
     return(paste0(indent(lvl),"and SMED_COD_DENOM_COMNE in (",qu(codes),")\n"))
+
   } else if (type_Rx == "DIN") {
+
     return(paste0(indent(lvl),"and SMED_COD_DIN in (",paste(codes, collapse = ", "),")\n"))
+
   } else if (type_Rx == "AHFS") {
+
+    ### Extraire la classe, la sous-classe et la sous-sous-classe du code
     ahfs_cla <- stringr::str_sub(codes, 1, 2)
     ahfs_scla <- stringr::str_sub(codes, 3, 4)
     ahfs_sscla <- stringr::str_sub(codes, 5, 6)
-    if (ahfs_cla == "--") {
-      ahfs_where <- NULL
-    } else {
-      ahfs_where <- paste0(indent(),"and SMED_COD_CLA_AHF = ",qu(ahfs_cla),"\n")
+
+    ### Construire le code selon les codes demandés
+    criteres <- vector("character", length(ahfs_cla))
+    for (i in 1:length(ahfs_cla)) {
+      if (ahfs_cla[i] == "--") {
+        sql_cols <- NULL
+        codes_exclus <- NULL
+      } else {
+        sql_cols <- "SMED_COD_CLA_AHF"
+        codes_exclus <- ahfs_cla[i]
+      }
+      if (ahfs_scla[i] != "--") {
+        sql_cols <- c(sql_cols, "SMED_COD_SCLA_AHF")
+        codes_exclus <- c(codes_exclus, ahfs_scla[i])
+      }
+      if (ahfs_sscla[i] != "--") {
+        sql_cols <- c(sql_cols, "SMED_COD_SSCLA_AHF")
+        codes_exclus <- c(codes_exclus, ahfs_sscla[i])
+      }
+      sql_cols <- paste(sql_cols, collapse = " || ")
+      codes_exclus <- paste(codes_exclus, collapse = "")
+
+      if (length(ahfs_cla) == 1) {
+        criteres[i] <- paste0(
+          indent(lvl),"and ",sql_cols," = '",codes_exclus,"'\n"
+        )
+      } else {
+        if (i == 1) {
+          criteres[i] <- paste0(
+            indent(lvl),"and (",sql_cols," = '",codes_exclus,"'\n"
+          )
+        } else if (i == length(ahfs_cla)) {
+          criteres[i] <- paste0(
+            indent(lvl),"     ","or ",sql_cols," = '",codes_exclus,"')\n"
+          )
+        } else {
+          criteres[i] <- paste0(
+            indent(lvl),"     ","or ",sql_cols," = '",codes_exclus,"'\n"
+          )
+        }
+      }
     }
-    if (ahfs_scla != "--") {
-      ahfs_where <- paste0(ahfs_where, indent(),"and SMED_COD_SCLA_AHF = ",qu(ahfs_scla),"\n")
-    }
-    if (ahfs_sscla != "--") {
-      ahfs_where <- paste0(ahfs_where, indent(),"and SMED_COD_SSCLA_AHF = ",qu(ahfs_sscla),"\n")
-    }
-    return(ahfs_where)
+
+    return(paste(criteres, collapse = ""))
+
   } else {
+
     stop("query_stat_gen1.where_codes(): erreur valeur type_Rx.")
+
   }
 
 }
+#' @title query_stat_gen1
+#' @description Section *where*, *SMED_COD_SERV_1*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.where_code_serv <- function(code_serv, code_serv_filtre, lvl = 1) {
-  ### Sélection des codes de service (SMED_COD_SERV_1).
 
   if (is.null(code_serv)) {
     return("")
@@ -380,13 +431,20 @@ query_stat_gen1.where_code_serv <- function(code_serv, code_serv_filtre, lvl = 1
   }
 
 }
+#' @title query_stat_gen1
+#' @description Section *where*, *SMED_COD_CATG_LISTE_MED*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.where_code_list <- function(code_list, code_list_filtre, lvl = 1) {
-  ### Sélection des codes de catégorie de liste de médicaments (SMED_COD_CATG_LISTE_MED).
 
   if (is.null(code_list)) {
     return("")
   } else if (code_list_filtre == "Exclusion") {
-    return(paste0(indent(lvl),"and (SMED_COD_CATG_LISTE_MED not in (",qu(code_list),") or SMED_COD_CATG_LISTE_MED is null)\n"))
+    return(paste0(
+      indent(lvl),
+      "and (SMED_COD_CATG_LISTE_MED not in (",qu(code_list),
+      ") or SMED_COD_CATG_LISTE_MED is null)\n"
+    ))
   } else if (code_list_filtre == "Inclusion") {
     return(paste0(indent(lvl),"and SMED_COD_CATG_LISTE_MED in (",qu(code_list),")\n"))
   } else {
@@ -394,8 +452,11 @@ query_stat_gen1.where_code_list <- function(code_list, code_list_filtre, lvl = 1
   }
 
 }
+#' @title query_stat_gen1
+#' @description Section *group by* et *order by*. Générer le code SQL en fonction des variables demandées dans le *group by*.
+#' @keywords internal
+#' @encoding UTF-8
 query_stat_gen1.group_order_by <- function(type_Rx, group_by, lvl = 0) {
-  ### Grouper les résultats par...
 
   if (is.null(group_by)) {
     return("")

@@ -6,18 +6,20 @@
 \title{Naïfs et Switchs}
 \usage{
 SQL_naif_switch1(
-  conn,
+  conn = NULL,
   debut,
   fin,
-  type_rx = "DENOM",
+  type_Rx = "DENOM",
   codes,
-  grouper_par = NULL,
+  group_by = "DENOM",
+  type_Rx_retro = NULL,
   rx_retrospect_a_exclure = NULL,
   njours_sans_conso = 365,
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
   code_list_filtre = "Inclusion",
+  age_date = NULL,
   ...
 )
 }
@@ -28,14 +30,34 @@ SQL_naif_switch1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
-
-\item{grouper_par}{Regrouper (aggréger) les résultats par :
+\item{type_Rx}{Type de code à analyser. Une valeur parmi :
 \itemize{
-\item \code{'Codes'} : Résultats par code analysé.
+\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
+\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
-\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
+\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
+
+\item{group_by}{Regrouper (aggréger) les résultats par :
+\itemize{
+\item \code{'AHFS'} : Résultats par code de classe AHFS.
+\item \code{'DENOM'} : Résultats par code de dénomination commune.
+\item \code{'DIN'} : Résultats par code d'identification du médicament.
+\item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments.
+\item \code{'CodeServ'} : Résultats par code de service.
+\item \code{'Teneur'} : Résultats par teneur du médicament.
+\item \code{'Format'} : Résultats par format d'acquisition du médicament.
+\item \code{'Age'} : Résultats par âge à une date précise. Voir argument \code{age_date}. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
+}}
+
+\item{type_Rx_retro}{Type de code à exclure. Si \code{NULL}, prend la valeur de \code{type_Rx}. Une valeur parmi :
+\itemize{
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
+\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
+}}
+
+\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir \emph{Details}. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
 
 \item{njours_sans_conso}{Nombre de jours qu’un individu ne doit pas avoir reçu de traitements avant sa date de référence (date index) pour être considéré \emph{naïf} ou \emph{switch}.}
 
@@ -46,22 +68,34 @@ SQL_naif_switch1(
 \item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de listes de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
+
+\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}. Si \code{NULL}, aura pour valeur \code{debut}.}
 }
 \value{
-\code{data.table} contenant certaines de ces colonnes selon les cas :
+\code{data.table}
 \itemize{
-\item \code{DATE_DEBUT} : Date(s) de début de la période d'étude.
-\item \code{DATE_FIN} : Date(s) de fin de la période d'étude.
-\item \code{MNT_MED} : Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s’il y a lieu) et la part du manufacturier.
-\item \code{MNT_SERV} : Montant de frais de service autorisé par la RAMQ à la date du service.
-\item \code{MNT_TOT} : Somme des variables \code{MNT_MED} et \code{MNT_SERV}.
-\item \code{COHORTE} : Nombre d'individus unique.
-\item \code{NBRE_RX} : Nombre de prescriptions/paiements.
-\item \code{QTE_MED} : Quantité totale des médicaments ou des fournitures dispensés.
-\item \code{DUREE_TX} : Durée de traitement totale des prescriptions en jours.
-\item \code{DENOM} ou \code{DIN} : Code(s) analysé(s) à l’intérieur de la période d’étude.
-\item \code{RX_RETROSPECT_A_EXCLURE} : Code(s) de médicament(s) qui n'ont \emph{jamais} été consommé(s) durant la période rétrospective.
-\item \code{NJOURS_SANS_CONSO} : Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré comme \emph{naïf} ou \emph{switch}.
+\item \strong{\code{DATE_DEBUT} :} Indique la ou les dates de début de la période d'étude.
+\item \strong{\code{DATE_FIN} :} Indique la ou les dates de fin de la période d'étude.
+\item \strong{\code{AHFS_CLA} :} Seulement si \code{group_by} contient \code{'AHFS'}. Code de la classe AHFS.
+\item \strong{\code{AHFS_SCLA} :} Seulement si \code{group_by} contient \code{'AHFS'}. Code de la sous-classe AHFS.
+\item \strong{\code{AHFS_SSCLA} :} Seulement si \code{group_by} contient \code{'AHFS'}. Code de la sous-sous-classe AHFS.
+\item \strong{\code{NOM_AHFS} :} Seulement si \code{group_by} contient \code{'AHFS'}. Nom de la classe AHFS.
+\item \strong{\code{DENOM} :} Seulement si \code{group_by} contient \code{'DENOM'}. Code de dénomination commune.
+\item \strong{\code{NOM_DENOM} :} Seulement si \code{group_by} contient \code{'DENOM'}. Nom de la dénomination commune.
+\item \strong{\code{DIN} :} Seulement si \code{group_by} contient \code{'DIN'}. Code d'identification du médicament.
+\item \strong{\code{NOM_MARQ_COMRC} :} Seulement si \code{group_by} contient \code{'DIN'}. Nom de la marque commerciale.
+\item \strong{\code{CODE_SERV} :} Seulement si \code{group_by} contient \code{'CodeServ'}. Code de service,
+\item **\code{CODE_LIST} : ** Seulement si \code{group_by} contient \code{'CodeList'}. Code de catégorie de listes de médicaments.
+\item \strong{\code{TENEUR} :} Seulement si \code{group_by} contient \code{'Teneur'}. Teneur du médicament.
+\item \strong{\code{FORMAT_ACQ} :} Seulement si \code{group_by} contient \code{'Format'}. Format d'acquisition du médicament.
+\item \strong{\code{AGE} :} Seulement si \code{group_by} contient \code{'Age'}. Age de l'individu à la date \code{age_date}.
+\item \strong{\code{MNT_MED} :} Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227}{\code{SMED_MNT_AUTOR_MED}}. \code{\link{sum(SMED_MNT_AUTOR_MED) as MNT_MED}}.
+\item \strong{\code{MNT_SERV} :} Montant de frais de service autorisé par la RAMQ à la date du service. Voir \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227}{\code{SMED_MNT_AUTOR_FRAIS_SERV}}. \code{\link{sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV}}.
+\item \strong{\code{MNT_TOT} :} Somme des variables \code{MNT_MED} et \code{MNT_SERV}.
+\item \strong{\code{COHORTE} :} Nombre d'individus unique. \code{\link{count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE}}.
+\item \strong{\code{NBRE_RX} :} Nombre de demandes de paiement. \code{\link{count(*) as NBRE_RX}}.
+\item \strong{\code{QTE_MED} :} Quantité totale des médicaments ou des fournitures dispensés. Voir \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247}{SMED_QTE_MED}. \code{\link{sum(SMED_QTE_MED) as QTE_MED}}.
+\item \strong{\code{DUREE_TX} :} Durée de traitement totale des prescriptions en jours. Voir \href{http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443}{SMED_NBR_JR_DUREE_TRAIT}. \code{\link{sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX}}.
 }
 }
 \description{
@@ -71,46 +105,73 @@ Un individu est considéré \emph{switch} lorsqu'il a un traitement pour la prem
 Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
 \details{
-\strong{\code{rx_retrospect_a_exclure} :}\cr
+\strong{rx_retrospect_a_exclure :}\cr
 La période rétrospective est construite à partir des dates de références (index) et de l'argument \code{njours_sans_conso} : \code{[INDEX - njours_sans_conso; INDEX - 1]}.\cr\cr
-\strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
+\strong{code_serv_filtre, code_list_filtre :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
 \code{'Inclusion'} exclus les \code{NULL}.
 }
 \examples{
 \dontrun{
+conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
+
+### group_by
+# Aucun
+ex01 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = NULL
+)
+# Tous les group_by
+ex02 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+  group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')
+)
+
 ### DENOM
-dt1 <- SQL_naif_switch1(
+ex03 <- SQL_naif_switch1(
   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-  type_rx = 'DENOM', codes = c(47873, 47958, 48213), grouper_par = 'Codes',
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM'
 )
-### GROUPER_PAR = NULL - Plusieurs codes pour un meme type de traitement
-dt2 <- SQL_naif_switch1(
-  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-  type_rx = 'DENOM', codes = c(47873, 47958, 48213), grouper_par = NULL,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
-)
+
 ### DIN
-dt3 <- SQL_naif_switch1(
+ex04 <- SQL_naif_switch1(
   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-  type_rx = 'DIN', codes = 2241927, grouper_par = NULL,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'DIN'
 )
-### RX_RETROSPECT_A_EXCLURE conteant plus de valeurs que CODES (avec ou sans les memes valeurs)
-dt4 <- SQL_naif_switch1(
+
+### Exclusions Rx retrospectif
+# AHFS
+ex05 <- SQL_naif_switch1(
   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-  type_rx = 'DIN', codes = c(2257238, 2272903), grouper_par = NULL,
-  rx_retrospect_a_exclure = c(2042479, 2042487, 2257238, 2272903, 2317192, 2317206),
-  njours_sans_conso = 365,
-  code_serv = '1', code_serv_filtre = 'Exclusion',
-  code_list = NULL, code_list_filtre = 'Inclusion'
+  type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+  type_Rx_retro = 'AHFS', rx_retrospect_a_exclure = c('04----', '08--16', '122436')
+)
+# DENOM
+ex06 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+  type_Rx_retro = 'DENOM', rx_retrospect_a_exclure = c(47092, 47135, 47136)
+)
+# DIN
+ex07 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = 47092, group_by = c('DENOM', 'DIN'),
+  type_Rx_retro = 'DIN', rx_retrospect_a_exclure = c(2083523, 2084082, 2240331, 2453312)
+)
+
+### Age
+ex08 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = c('DIN', 'Age'), age_date = '2018-06-05'
+)
+
+### Exclusion VS Inclusion
+ex09 <- SQL_naif_switch1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = c('40', '41'), code_list_filtre = 'Inclusion'
 )
 }
 }

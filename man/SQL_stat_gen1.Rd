@@ -6,12 +6,12 @@
 \title{Statistiques générales}
 \usage{
 SQL_stat_gen1(
-  conn,
+  conn = NULL,
   debut,
   fin,
   type_Rx = "DENOM",
   codes,
-  group_by = NULL,
+  group_by = "DENOM",
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
@@ -65,12 +65,12 @@ Statistiques d'un ou de plusieurs codes de médicaments selon certains critères
 Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
 \details{
-\strong{\code{debut, fin} :}\cr
+\strong{debut, fin :}\cr
 \code{debut} et \code{fin} doivent contenir le même nombre de valeurs.\cr\cr
-\strong{\code{codes} :}\cr
+\strong{codes :}\cr
 Si \code{type_Rx='AHFS'} : codes sous la forme de 6 caractères où les deux premiers caractères représente la classe AHFS, les deux du milieu la sous-classe AHFS et les deux derniers la sous-sous-classe AHFS. Il est possible de remplacer une paire de caractères (\{1, 2\}, \{3, 4\} ou \{5, 6\}) par \code{'--'} pour rechercher toutes les types de classes. Par exemple, \code{'04--12'} indique qu'on recherche la classe AHFS 04, toutes les sous-classes AHFS et la sous-sous-classe 12.\cr
 Sinon : inscrire les codes sous la forme d'un nombre entier.\cr\cr
-\strong{\code{code_serv_filtre, code_list_filtre} :}\cr
+\strong{code_serv_filtre, code_list_filtre :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
 \code{'Inclusion'} exclus les \code{NULL}.\cr\cr
 \strong{Nom des médicaments :}\cr
@@ -80,58 +80,49 @@ Que ce soit pour les codes AHFS (\code{NOM_AHFS}), les DENOM (\code{NOM_DENOM}) 
 \dontrun{
 conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
 
-### Plusieurs periodes d'etude
-ex01 <- SQL_stat_gen1(conn, debut = c('2016-01-01', '2017-01-01', '2018-01-01'),
-                      fin = c('2016-12-31', '2017-12-31', '2018-12-31'),
-                      type_Rx = 'DENOM', codes = 47092)
+### group_by
+# Aucun
+ex01 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = NULL
+)
+# Tous les group_by
+ex02 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+  group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')
+)
 
-### Plusieurs codes dans une meme periode
-ex02 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = c(39, 47092, 47135))
-### Grouper par codes
-# AHFS
-ex03 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'AHFS', codes = c(040412, '08----'),
-                     group_by = 'AHFS')
-# DENOM
-ex04 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = c(39, 47092, 47135),
-                     group_by = 'DENOM')
-# DIN
-ex05 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DIN', codes = c(30848, 585092),
-                     group_by = 'DIN')
-# DENOM & DIN
-ex06 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = c(47092, 47135),
-                     group_by = c('DENOM', 'DIN'))
+### AHFS
+ex03 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'AHFS', codes = c('04----', '08--12', '122426'), group_by = 'AHFS'
+)
 
-### Grouper par - Autres
-# Codes de services
-ex07 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = 47092,
-                     group_by = c('DENOM', 'CodeServ'))
-# Codes de categories de listes de medicaments
-ex08 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = 47092,
-                     group_by = c('DENOM', 'CodeList'))
-# Teneur et Format d'acquisition du medicament
-ex09 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                     type_Rx = 'DENOM', codes = 47092,
-                     group_by = c('DENOM', 'Teneur', 'Format'))
-# Age au 2018-01-01
-ex10 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                      type_Rx = 'DENOM', codes = 47092,
-                      group_by = c('DENOM', 'Age'),
-                      age_date = '2018-01-01')
+### DENOM
+ex04 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = c('DENOM', 'DIN')
+)
 
-### Exclusion VS Inclusion
-# Codes de services
-ex11 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                      type_Rx = 'DENOM', codes = 47092,
-                      code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion')
-ex12 <- SQL_stat_gen1(conn, debut = '2018-01-01', fin = '2018-12-31',
-                      type_Rx = 'DENOM', codes = 47092,
-                      code_serv = c('1', 'AD'), code_serv_filtre = 'Inclusion')
+### DIN
+ex05 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'DIN'
+)
+
+### Age
+ex06 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = c('DIN', 'Age'), age_date = '2018-01-01'
+)
+
+### Exclusion et Inclusion code_serv et code_list
+ex07 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM',
+  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+  code_list = c('40', '41'), code_list_filtre = 'Inclusion'
+)
 }
 }

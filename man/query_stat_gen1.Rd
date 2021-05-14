@@ -36,8 +36,8 @@ query_stat_gen1(
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
 \item \code{'AHFS'} : Résultats par code de classe AHFS.
-\item \code{'DENOM'} : Résultats par code de dénomination commune si \code{type_Rx='AHFS'}.
-\item \code{'DIN'} : Résultats par code d'identification du médicament si \code{type_Rx='AHFS'} ou \code{type_Rx='DENOM'}.
+\item \code{'DENOM'} : Résultats par code de dénomination commune.
+\item \code{'DIN'} : Résultats par code d'identification du médicament.
 \item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}).
 \item \code{'CodeServ'} : Résultats par code de service (\code{SMED_COD_SERV_1}).
 \item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
@@ -53,7 +53,7 @@ query_stat_gen1(
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}.}
+\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}. Si \code{NULL}, aura pour valeur \code{debut}.}
 }
 \value{
 Chaîne de caractères à utiliser dans une requête SQL.
@@ -62,10 +62,8 @@ Chaîne de caractères à utiliser dans une requête SQL.
 Générateur de code SQL pour la méthode \code{stat_gen1}.
 }
 \details{
-\strong{Méthode \code{stat_gen1} :}\cr
-Statistiques descriptives tirées de la vue \code{V_DEM_PAIMT_MED_CM}.\cr\cr
 \strong{\code{codes} :}\cr
-Si \code{type_Rx='AHFS'}, un seul code à inscrire sous la forme de six (6) caractères. Par exemple, inscrire \code{040812} revient à chercher la classe 04, la sous-classe 08 et la sous-sous-classe 12. Il est aussi possible de chercher seulement la classe AHFS 04 en inscrivant \verb{04----}. Puisque les deux premiers caractères indique la classe, ceux du milieu la sous-classe et les deux derniers la sous-sous-classe, remplacer une paire de caractères revient à rechercher toutes les classes (ou sous-classe, ou sous-sous-classe).\cr
+Si \code{type_Rx='AHFS'} : codes sous la forme de 6 caractères où les deux premiers caractères représente la classe AHFS, les deux du milieu la sous-classe AHFS et les deux derniers la sous-sous-classe AHFS. Il est possible de remplacer une paire de caractères (\{1, 2\}, \{3, 4\} ou \{5, 6\}) par \code{'--'} pour rechercher toutes les types de classes. Par exemple, \code{'04--12'} indique qu'on recherche la classe AHFS 04, toutes les sous-classes AHFS et la sous-sous-classe 12.\cr
 Sinon inscrire les codes sous la forme d'un nombre entier.\cr\cr
 \strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
@@ -74,63 +72,57 @@ Sinon inscrire les codes sous la forme d'un nombre entier.\cr\cr
 \examples{
 ### Avantages d'utiliser cat()
 # Sans cat()
-query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                type_Rx = "DENOM", codes = c(39, 47092, 47135),
-                group_by = "DENOM")
+query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                group_by = 'DENOM')
 # Avec cat()
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(39, 47092, 47135),
-                    group_by = "DENOM"))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = 'DENOM'))
 
 ### group_by
 # Aucun
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(39, 47092, 47135),
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
                     group_by = NULL))
 # Tous les group_by
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(39, 47092, 47135),
-                    group_by = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age")))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')))
 
 ### AHFS
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "AHFS", codes = 040412,
-                    group_by = "AHFS"))
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "AHFS", codes = "04----",
-                    group_by = "AHFS"))
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "AHFS", codes = "04--12",
-                    group_by = "AHFS"))
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "AHFS", codes = "04--12",
-                    group_by = c("AHFS", "DENOM")))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = c('040412', '08----'),
+                    group_by = 'AHFS'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = '04--12',
+                    group_by = 'AHFS'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = '04--12',
+                    group_by = c('AHFS', 'DENOM')))
 
 ### DENOM
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(39, 47092, 47135),
-                    group_by = "DENOM"))
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(39, 47092, 47135),
-                    group_by = c("DENOM", "DIN")))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = 'DENOM'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = c('DENOM', 'DIN')))
 
 ### DIN
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DIN", codes = c(30848, 585092),
-                    group_by = "DIN"))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DIN', codes = c(30848, 585092),
+                    group_by = 'DIN'))
 
 ### Age
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DIN", codes = c(30848, 585092),
-                    group_by = c("DIN", "Age"), age_date = "2018-01-01"))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DIN', codes = c(30848, 585092),
+                    group_by = c('DIN', 'Age'), age_date = '2018-01-01'))
 
-### Exclusion VS Inclusion
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(47092, 47135),
-                    group_by = "DENOM",
-                    code_serv_filtre = "Exclusion", code_serv = c('1', 'AD')))
-cat(query_stat_gen1(debut = "2018-01-01", fin = "2018-12-31",
-                    type_Rx = "DENOM", codes = c(47092, 47135),
-                    group_by = "DENOM",
-                    code_serv_filtre = "Inclusion", code_serv = c('1', 'AD')))
+### Exclusion et Inclusion - code_serv et code_list
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(47092, 47135),
+                    group_by = 'DENOM',
+                    code_serv_filtre = 'Exclusion', code_serv = c('1', 'AD'),
+                    code_list_filtre = 'Inclusion', code_list = c('40', '41')))
 }

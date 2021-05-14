@@ -27,9 +27,8 @@ query_naif_switch1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{type_Rx}{Typeype de code à analyser. Une valeur parmi :
+\item{type_Rx}{Type de code à analyser. Une valeur parmi :
 \itemize{
-\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
 \item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
@@ -39,23 +38,23 @@ query_naif_switch1(
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
 \item \code{'AHFS'} : Résultats par code de classe AHFS.
-\item \code{'DENOM'} : Résultats par code de dénomination commune si \code{type_Rx='AHFS'}.
-\item \code{'DIN'} : Résultats par code d'identification du médicament si \code{type_Rx='AHFS'} ou \code{type_Rx='DENOM'}.
-\item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}).
-\item \code{'CodeServ'} : Résultats par code de service (\code{SMED_COD_SERV_1}).
-\item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
-\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
+\item \code{'DENOM'} : Résultats par code de dénomination commune.
+\item \code{'DIN'} : Résultats par code d'identification du médicament.
+\item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments.
+\item \code{'CodeServ'} : Résultats par code de service.
+\item \code{'Teneur'} : Résultats par teneur du médicament.
+\item \code{'Format'} : Résultats par format d'acquisition du médicament.
 \item \code{'Age'} : Résultats par âge à une date précise. Voir argument \code{age_date}. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
 }}
 
-\item{type_Rx_retro}{Type de code à exclure. Une valeur parmi :
+\item{type_Rx_retro}{Type de code à exclure. Si \code{NULL}, prend la valeur de \code{type_Rx}. Une valeur parmi :
 \itemize{
 \item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
 \item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
-\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir Details. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
+\item{rx_retrospect_a_exclure}{Traitement(s) à inclure dans la période rétrospective. Voir \emph{Details}. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme \emph{naïf} ou \emph{switch}.}
 
 \item{njours_sans_conso}{Nombre de jours qu’un individu ne doit pas avoir reçu de traitements avant sa date de référence (date index) pour être considéré \emph{naïf} ou \emph{switch}.}
 
@@ -67,7 +66,7 @@ query_naif_switch1(
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}.}
+\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}. Si \code{NULL}, aura pour valeur \code{debut}.}
 }
 \value{
 Chaîne de caractères à utiliser dans une requête SQL.
@@ -76,13 +75,84 @@ Chaîne de caractères à utiliser dans une requête SQL.
 Générateur de code SQL pour la méthode \code{naif_switch1}.
 }
 \details{
-\strong{Méthode \code{naif_switch1} :}\cr
-Statistiques descriptives tirées de la vue \code{V_DEM_PAIMT_MED_CM}.\cr\cr
-\strong{\code{codes} :}\cr
-Inscrire les codes sous la forme d'un nombre entier.\cr\cr
 \strong{\code{rx_retrospect_a_exclure} :}\cr
-La période rétrospective est construite à partir des dates de références (date index) et de l’argument \code{njours_sans_conso} : \link{INDEX -njours_sans_conso; INDEX -1}.\cr\cr
+La période rétrospective est construite à partir des dates de références (date index) et de l’argument \code{njours_sans_conso} : [INDEX\ifelse{html}{-}{\eqn{-}}njours_sans_conso; INDEX\ifelse{html}{-}{\eqn{-}}1].\cr
+Inscrire les codes AHFS sous la forme de six (6) caractères. Par exemple, inscrire \code{040812} revient à chercher la classe 04, la sous-classe 08 et la sous-sous-classe 12. Il est aussi possible de chercher seulement la classe AHFS 04 en inscrivant \verb{04----}. Puisque les deux premiers caractères indique la classe, ceux du milieu la sous-classe et les deux derniers la sous-sous-classe, remplacer une paire de caractères revient à rechercher toutes les classes (ou sous-classe, ou sous-sous-classe).\cr\cr
 \strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
 \code{'Inclusion'} exclus les \code{NULL}.
+}
+\examples{
+### Avantages d'utiliser cat()
+# Sans cat()
+query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                   type_Rx = 'DIN', codes = c(707503, 707600),
+                   group_by = 'DIN')
+# Avec cat()
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DIN', codes = c(707503, 707600),
+                       group_by = 'DIN'))
+
+### group_by
+# Aucun
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DIN', codes = c(707503, 707600),
+                       group_by = NULL))
+# Tous les group_by
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DIN', codes = c(707503, 707600),
+                       group_by = c("DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age")))
+# Age a une date autre que debut
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DIN', codes = c(707503, 707600),
+                       group_by = c('DENOM', 'Age'),
+                       age_date = '2018-06-15'))
+
+### DENOM
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                       group_by = 'DENOM'))
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                       group_by = c('DENOM', 'DIN')))
+
+### DIN
+### Voir sections plus haut 1) Avantages d'utiliser cat() ou 2) group_by
+
+### Exclusions Rx retrospectif
+# AHFS
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(47092, 47135),
+                       group_by = 'DENOM',
+                       type_Rx_retro = 'AHFS', rx_retrospect_a_exclure = '040408'))
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(47092, 47135),
+                       group_by = 'DENOM',
+                       type_Rx_retro = 'AHFS',
+                       rx_retrospect_a_exclure = c('04----', '08--16', '122436')))
+# DENOM
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(47092, 47135),
+                       group_by = 'DENOM',
+                       type_Rx_retro = 'DENOM',
+                       rx_retrospect_a_exclure = c(47092, 47135, 47136)))
+# DIN
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = 47092,
+                       group_by = 'DENOM',
+                       type_Rx_retro = 'DIN',
+                       rx_retrospect_a_exclure = c(2083523, 2084082, 2240331, 2453312))
+
+### Age
+cat(query_naif_switch1(debut = '2018-01-01', fin = '2018-12-31',
+                       type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                       group_by = c('DENOM', 'DIN', 'Age'), age_date = '2018-01-01'))
+
+### Exclusion VS Inclusion
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+                    code_serv_filtre = 'Exclusion', code_serv = c('1', 'AD')))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+                    code_serv_filtre = 'Inclusion', code_serv = c('1', 'AD')))
 }

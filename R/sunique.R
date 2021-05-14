@@ -8,6 +8,7 @@
 #'
 #' @encoding UTF-8
 #' @export
+#' @examples
 #' x <- sample(c(1:10, NA, NaN))
 #' x
 #'

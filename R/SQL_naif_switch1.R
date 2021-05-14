@@ -5,108 +5,135 @@
 #' Un individu est considéré *switch* lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant *à la même famille*.\cr
 #' Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}}.
 #'
-#' \strong{\code{rx_retrospect_a_exclure} :}\cr
+#' \strong{rx_retrospect_a_exclure :}\cr
 #' La période rétrospective est construite à partir des dates de références (index) et de l'argument `njours_sans_conso` : \code{[INDEX - njours_sans_conso; INDEX - 1]}.\cr\cr
-#' \strong{`code_serv_filtre`, `code_list_filtre` :}\cr
+#' \strong{code_serv_filtre, code_list_filtre :}\cr
 #' `'Exclusion'` inclus les `NULL`\cr
 #' `'Inclusion'` exclus les `NULL`.
 #'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
-#' @param grouper_par Regrouper (aggréger) les résultats par :
-#' * `'Codes'` : Résultats par code analysé.
 #' @inheritParams query_naif_switch1
 #'
-#' @return `data.table` contenant certaines de ces colonnes selon les cas :
-#' * `DATE_DEBUT` : Date(s) de début de la période d'étude.
-#' * `DATE_FIN` : Date(s) de fin de la période d'étude.
-#' * `MNT_MED` : Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s’il y a lieu) et la part du manufacturier.
-#' * `MNT_SERV` : Montant de frais de service autorisé par la RAMQ à la date du service.
-#' * `MNT_TOT` : Somme des variables `MNT_MED` et `MNT_SERV`.
-#' * `COHORTE` : Nombre d'individus unique.
-#' * `NBRE_RX` : Nombre de prescriptions/paiements.
-#' * `QTE_MED` : Quantité totale des médicaments ou des fournitures dispensés.
-#' * `DUREE_TX` : Durée de traitement totale des prescriptions en jours.
-#' * `DENOM` ou `DIN` : Code(s) analysé(s) à l’intérieur de la période d’étude.
-#' * `RX_RETROSPECT_A_EXCLURE` : Code(s) de médicament(s) qui n'ont *jamais* été consommé(s) durant la période rétrospective.
-#' * `NJOURS_SANS_CONSO` : Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré comme *naïf* ou *switch*.
+#' @return `data.table`
+#' * **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
+#' * **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
+#' * **`AHFS_CLA` :** Seulement si `group_by` contient `'AHFS'`. Code de la classe AHFS.
+#' * **`AHFS_SCLA` :** Seulement si `group_by` contient `'AHFS'`. Code de la sous-classe AHFS.
+#' * **`AHFS_SSCLA` :** Seulement si `group_by` contient `'AHFS'`. Code de la sous-sous-classe AHFS.
+#' * **`NOM_AHFS` :** Seulement si `group_by` contient `'AHFS'`. Nom de la classe AHFS.
+#' * **`DENOM` :** Seulement si `group_by` contient `'DENOM'`. Code de dénomination commune.
+#' * **`NOM_DENOM` :** Seulement si `group_by` contient `'DENOM'`. Nom de la dénomination commune.
+#' * **`DIN` :** Seulement si `group_by` contient `'DIN'`. Code d'identification du médicament.
+#' * **`NOM_MARQ_COMRC` :** Seulement si `group_by` contient `'DIN'`. Nom de la marque commerciale.
+#' * **`CODE_SERV` :** Seulement si `group_by` contient `'CodeServ'`. Code de service,
+#' * **`CODE_LIST` : ** Seulement si `group_by` contient `'CodeList'`. Code de catégorie de listes de médicaments.
+#' * **`TENEUR` :** Seulement si `group_by` contient `'Teneur'`. Teneur du médicament.
+#' * **`FORMAT_ACQ` :** Seulement si `group_by` contient `'Format'`. Format d'acquisition du médicament.
+#' * **`AGE` :** Seulement si `group_by` contient `'Age'`. Age de l'individu à la date `age_date`.
+#' * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+#' * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+#' * **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+#' * **`COHORTE` :** Nombre d'individus unique. [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+#' * **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
+#' * **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
+#' * **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
 #' @encoding UTF-8
 #' @import data.table
 #' @export
 #' @examples
 #' \dontrun{
+#' conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
+#'
+#' ### group_by
+#' # Aucun
+#' ex01 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = NULL
+#' )
+#' # Tous les group_by
+#' ex02 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+#'   group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')
+#' )
+#'
 #' ### DENOM
-#' dt1 <- SQL_naif_switch1(
+#' ex03 <- SQL_naif_switch1(
 #'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_rx = 'DENOM', codes = c(47873, 47958, 48213), grouper_par = 'Codes',
-#'   rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-#'   code_serv = '1', code_serv_filtre = 'Exclusion',
-#'   code_list = NULL, code_list_filtre = 'Inclusion'
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM'
 #' )
-#' ### GROUPER_PAR = NULL - Plusieurs codes pour un meme type de traitement
-#' dt2 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_rx = 'DENOM', codes = c(47873, 47958, 48213), grouper_par = NULL,
-#'   rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-#'   code_serv = '1', code_serv_filtre = 'Exclusion',
-#'   code_list = NULL, code_list_filtre = 'Inclusion'
-#' )
+#'
 #' ### DIN
-#' dt3 <- SQL_naif_switch1(
+#' ex04 <- SQL_naif_switch1(
 #'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_rx = 'DIN', codes = 2241927, grouper_par = NULL,
-#'   rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
-#'   code_serv = '1', code_serv_filtre = 'Exclusion',
-#'   code_list = NULL, code_list_filtre = 'Inclusion'
+#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'DIN'
 #' )
-#' ### RX_RETROSPECT_A_EXCLURE conteant plus de valeurs que CODES (avec ou sans les memes valeurs)
-#' dt4 <- SQL_naif_switch1(
+#'
+#' ### Exclusions Rx retrospectif
+#' # AHFS
+#' ex05 <- SQL_naif_switch1(
 #'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_rx = 'DIN', codes = c(2257238, 2272903), grouper_par = NULL,
-#'   rx_retrospect_a_exclure = c(2042479, 2042487, 2257238, 2272903, 2317192, 2317206),
-#'   njours_sans_conso = 365,
-#'   code_serv = '1', code_serv_filtre = 'Exclusion',
-#'   code_list = NULL, code_list_filtre = 'Inclusion'
+#'   type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+#'   type_Rx_retro = 'AHFS', rx_retrospect_a_exclure = c('04----', '08--16', '122436')
+#' )
+#' # DENOM
+#' ex06 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
+#'   type_Rx_retro = 'DENOM', rx_retrospect_a_exclure = c(47092, 47135, 47136)
+#' )
+#' # DIN
+#' ex07 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DENOM', codes = 47092, group_by = c('DENOM', 'DIN'),
+#'   type_Rx_retro = 'DIN', rx_retrospect_a_exclure = c(2083523, 2084082, 2240331, 2453312)
+#' )
+#'
+#' ### Age
+#' ex08 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = c('DIN', 'Age'), age_date = '2018-06-05'
+#' )
+#'
+#' ### Exclusion VS Inclusion
+#' ex09 <- SQL_naif_switch1(
+#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM',
+#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+#'   code_list = c('40', '41'), code_list_filtre = 'Inclusion'
 #' )
 #' }
 SQL_naif_switch1 <- function(
-  conn, debut, fin,
-  type_rx = 'DENOM', codes, grouper_par = NULL,
-  rx_retrospect_a_exclure = NULL, njours_sans_conso = 365,
+  conn = NULL, debut, fin,
+  type_Rx = 'DENOM', codes, group_by = 'DENOM',
+  type_Rx_retro = NULL, rx_retrospect_a_exclure = NULL,
+  njours_sans_conso = 365,
   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
   code_list = NULL, code_list_filtre = 'Inclusion',
+  age_date = NULL,
   ...
 ) {
-
-  if (missing(conn)) {
-    conn <- NULL
-  }
-  dot_args <- list(...)
-
-  ### Vérification des arguments
-  if (!"verif" %in% names(dot_args)) {
-    dot_args$verif <- TRUE  # vérification par défaut
-  }
-  if (dot_args$verif) {
-    SQL_naif_switch1.verif_args(
-      debut, fin, type_rx, codes, grouper_par,
-      rx_retrospect_a_exclure, njours_sans_conso,
-      code_serv, code_serv_filtre, code_list, code_list_filtre
-    )
-  }
 
   ### Arranger les arguments
   # codes
   codes <- sunique(codes)
-  if (type_rx == "DENOM") {
+  if (type_Rx == "DENOM") {
     codes <- stringr::str_pad(codes, width = 5, side = "left", pad = "0")
+  }
+  # type_Rx_retro
+  if (is.null(type_Rx_retro)) {
+    type_Rx_retro <- type_Rx
   }
   # rx_retrospect_a_exclure
   if (is.null(rx_retrospect_a_exclure)) {
     rx_retrospect_a_exclure <- codes
   } else {
     rx_retrospect_a_exclure <- sunique(rx_retrospect_a_exclure)
-    if (type_rx == "DENOM") {
+    if (type_Rx_retro == "DENOM") {
       rx_retrospect_a_exclure <- stringr::str_pad(rx_retrospect_a_exclure, width = 5,
+                                                  side = "left", pad = "0")
+    } else if (type_Rx_retro == "AHFS") {
+      rx_retrospect_a_exclure <- stringr::str_pad(rx_retrospect_a_exclure, width = 6,
                                                   side = "left", pad = "0")
     }
   }
@@ -124,64 +151,47 @@ SQL_naif_switch1 <- function(
   if (is.null(conn) || is.null(attr(conn, "info"))) {
     stop("Erreur de connexion. Vérifier l'identifiant (uid) et le mot de passe (pwd).")
   } else {
-    if (!is.null(grouper_par) && grouper_par == "Codes") {
-      DT <- vector("list", length(debut) * length(codes))
-      k <- 1L
-      for (i in 1:length(debut)) {
-        for (j in 1:length(codes)) {
-          DT[[k]] <- as.data.table(odbc::dbGetQuery(
-            conn = conn,
-            statement = query_naif_switch1(
-              debut = debut[i], fin = fin[i],
-              type_rx = type_rx, codes = codes[j],
-              rx_retrospect_a_exclure = rx_retrospect_a_exclure,
-              njours_sans_conso = njours_sans_conso,
-              code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-              code_list = code_list, code_list_filtre = code_list_filtre
-            )
-          ))
-          # Ajouter les colonnes des codes analysés
-          DT[[k]][, (type_rx) := paste(codes[j], collapse = "; ")]
-          DT[[k]][, RX_RETROSPECT_A_EXCLURE := paste(rx_retrospect_a_exclure, collapse = "; ")]
-          k <- k + 1L
-        }
-      }
-    } else {
-      DT <- vector("list", length(debut))
-      for (i in 1:length(debut)) {
-        DT[[i]] <- as.data.table(odbc::dbGetQuery(
-          conn = conn,
-          statement = query_naif_switch1(
-            debut = debut[i], fin = fin[i],
-            type_rx = type_rx, codes = codes,
-            rx_retrospect_a_exclure = rx_retrospect_a_exclure,
-            njours_sans_conso = njours_sans_conso,
-            code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-            code_list = code_list, code_list_filtre = code_list_filtre
-          )
-        ))
-        # Ajouter les colonnes des codes analysés
-        DT[[i]][, (type_rx) := paste(codes, collapse = "; ")]
-        DT[[i]][, RX_RETROSPECT_A_EXCLURE := paste(rx_retrospect_a_exclure, collapse = "; ")]
-        DT[[i]][, NJOURS_SANS_CONSO := njours_sans_conso]
+
+    DT <- vector("list", length(debut))
+    for (i in 1:length(debut)) {
+      dt <- as.data.table(odbc::dbGetQuery(
+        conn = conn,
+        statement = query_naif_switch1(debut[i], fin[i], type_Rx, codes, group_by,
+                                       type_Rx_retro, rx_retrospect_a_exclure, njours_sans_conso,
+                                       code_serv, code_serv_filtre, code_list, code_list_filtre,
+                                       age_date)
+      ))
+      if (nrow(dt)) {
+        DT[[i]] <- dt
       }
     }
+
     DT <- rbindlist(DT)
-    setorderv(DT, c("DATE_DEBUT", "DATE_FIN", type_rx), order = c(1, -1, 1))
+
+    ### Ajouter le nom des médicaments
+    DT <- SQL_stat_gen1.ajout_nom_codes(DT, group_by)
+
+    ### Ordre des lignes et des colonnes
+    DT <- SQL_stat_gen1.cols_order(DT, group_by)
+    DT <- SQL_stat_gen1.obs_order(DT, group_by)
+
+    ### Format des colonnes
+    if (any(names(DT) == "DENOM")) {
+      DT[, DENOM := as.integer(DENOM)]
+    }
 
     return(DT)
 
   }
 
-
 }
 
 #' @title SQL_naif_switch1
 #' @description Vérification des arguments. Les arguments manquants sont vérifiés dans la fonction \code{\link{query_naif_switch1}}.
-#' @encoding UTF-8
 #' @keywords internal
+#' @encoding UTF-8
 SQL_naif_switch1.verif_args <- function(
-  debut, fin, type_rx, codes, grouper_par,
+  debut, fin, type_Rx, codes, grouper_par,
   rx_retrospect_a_exclure, njours_sans_conso,
   code_serv, code_serv_filtre, code_list, code_list_filtre
 ) {
@@ -208,30 +218,22 @@ SQL_naif_switch1.verif_args <- function(
     addError("debut et fin doivent contenir le même nombre de valeurs.", check)
   }
 
-  # type_rx
-  if (length(type_rx) != 1) {
-    addError("type_rx doit contenir une seule valeur.", check)
+  # type_Rx
+  if (length(type_Rx) != 1) {
+    addError("type_Rx doit contenir une seule valeur.", check)
   }
-  if (!type_rx %in% vals$type_rx) {
-    addError("type_rx ne contient pas une valeur permise.", check)
+  if (!type_Rx %in% vals$type_Rx) {
+    addError("type_Rx ne contient pas une valeur permise.", check)
   }
 
   # codes
   if (length(codes) < 1) {
     addError("codes doit contenir au moins une valeur.", check)
   }
-  if (!is.numeric(codes)) {
-    addError("codes doit contenir des valeurs numériques.", check)
-  }
 
   # grouper_par
   if (!is.null(grouper_par) && !all(grouper_par %in% vals$grouper_par)) {
     addError("grouper_par contient au moins une valeur non permise.", check)
-  }
-
-  # rx_retrospect_a_exclure
-  if (!is.null(rx_retrospect_a_exclure) && !is.numeric(rx_retrospect_a_exclure)) {
-    addError("rx_retrospect_a_exclure doit contenir une valeur numérique.", check)
   }
 
   # njours_sans_conso

@@ -26,11 +26,15 @@ formulaire <- function() {
     return(list(
       # Naifs/Switch
       ns1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
-              "RX_RETROSPECT_A_EXCLURE", "NJOURS_SANS_CONSO",
-              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST"),
+              "TYPE_RX_RETRO", "RX_RETROSPECT_A_EXCLURE", "NJOURS_SANS_CONSO",
+              "CODE_SERV_FILTRE", "CODE_SERV",
+              "CODE_LIST_FILTRE", "CODE_LIST",
+              "AGE_DATE"),
       # Statistiques générales
       sg1 = c("DATE_DEBUT", "DATE_FIN", "TYPE_RX", "CODE_RX", "GROUPER_PAR",
-              "CODE_SERV_FILTRE", "CODE_SERV", "CODE_LIST_FILTRE", "CODE_LIST", "AGE_DATE")
+              "CODE_SERV_FILTRE", "CODE_SERV",
+              "CODE_LIST_FILTRE", "CODE_LIST",
+              "AGE_DATE")
     ))
   }
   values_Excel_file <- function() {
@@ -40,7 +44,8 @@ formulaire <- function() {
       # Naifs/Switch
       ns1 = list(
         TYPE_RX = c("DENOM", "DIN"),
-        GROUPER_PAR = c("Codes"),
+        GROUPER_PAR = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age"),
+        TYPE_RX_RETRO = c("AHFS", "DENOM", "DIN"),
         CODE_SERV_FILTRE = c("Exclusion", "Inclusion"),
         CODE_SERV = c("1", "AD", "L", "M", "M1", "M2", "M3"),
         CODE_LIST_FILTRE = c("Exclusion", "Inclusion"),
@@ -195,10 +200,10 @@ formulaire <- function() {
       }))
 
       if ("METHODE" %in% names(dt)) {
-        method <- str_remove_all(rmNA(dt$METHODE), " ")  # méthode à utiliser
+        method <- stringr::str_remove_all(rmNA(dt$METHODE), " ")  # méthode à utiliser
         # Gérer les erreurs selon le cas
         if (length(method) == 1) {
-          if (method %in% methods_Excel_file()) {
+          if (any(methods_Excel_file() == method)) {
             dt <- cols_select_from_method(dt, method)  # sélection des colonnes en lien avec la méthode
             if (is.null(rmNA(dt$DATE_DEBUT)) && is.null(rmNA(dt$DATE_FIN))) {
               next  # si pas de valeurs, implique que l'onglet ne doit pas être considéré, donc on passe au prochain
@@ -244,7 +249,7 @@ formulaire <- function() {
 
     if (msg_error == "") {
       if (!at_least_1) {
-        return("Aucun onglet ne semble contenir des arguments.")
+        return("Aucun onglet ne semble contenir d'arguments.")
       } else {
         return(NULL)
       }
@@ -296,71 +301,74 @@ formulaire <- function() {
     dates_debut <- as_date_excel_chr(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " "))
     dates_fin <- as_date_excel_chr(stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))
     type_rx <- stringr::str_remove_all(rmNA(dt$TYPE_RX), " ")
-    code_rx <- as.numeric(stringr::str_remove_all(rmNA(dt$CODE_RX), " "))
+    code_rx <- stringr::str_remove_all(rmNA(dt$CODE_RX), " ")
     grpby <- stringr::str_remove_all(rmNA(dt$GROUPER_PAR), " ")
-    if (!length(grpby)) grpby <- NULL
-    rx_retro <- as.numeric(stringr::str_remove_all(rmNA(dt$RX_RETROSPECT_A_EXCLURE), " "))
-    if (!length(rx_retro)) rx_retro <- code_rx
+    if (!length(grpby)) {
+      grpby <- NULL
+    }
+    type_rx_retro <- stringr::str_remove_all(rmNA(dt$TYPE_RX_RETRO), " ")
+    if (!length(type_rx_retro)) {
+      type_rx_retro <- type_rx
+    }
+    rx_retro <- stringr::str_remove_all(rmNA(dt$RX_RETROSPECT_A_EXCLURE), " ")
+    if (!length(rx_retro)) {
+      rx_retro <- code_rx
+    }
     njours_sans_conso <- as.numeric(stringr::str_remove_all(rmNA(dt$NJOURS_SANS_CONSO), " "))
     code_serv_filtre <- stringr::str_remove_all(rmNA(dt$CODE_SERV_FILTRE), " ")
+    if (!length(code_serv_filtre)) {
+      code_serv_filtre <- NULL
+    }
     code_serv <- sort(adapt_code_serv(stringr::str_remove_all(rmNA(dt$CODE_SERV), " ")))
-    if (!length(code_serv)) code_serv <- NULL
+    if (!length(code_serv)) {
+      code_serv <- NULL
+    }
     code_list_filtre <- stringr::str_remove_all(rmNA(dt$CODE_LIST_FILTRE), " ")
+    if (!length(code_list_filtre)) {
+      code_list_filtre <- NULL
+    }
     code_list <- sort(stringr::str_remove_all(rmNA(dt$CODE_LIST), " "))
-    if (!length(code_list)) code_list <- NULL
+    if (!length(code_list)) {
+      code_list <- NULL
+    }
+    age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
+    if (!length(age_date)) {
+      age_date <- dates_debut[1]
+    }
 
     ### Tableau des résultats
     DT <- SQL_naif_switch1(
-      conn, debut = dates_debut, fin = dates_fin,
-      type_rx = type_rx, codes = code_rx, grouper_par = grpby,
-      rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
-      code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-      code_list = code_list, code_list_filtre = code_list_filtre
+      conn,
+      dates_debut, dates_fin,
+      type_rx, code_rx, grpby,
+      type_rx_retro, rx_retro, njours_sans_conso,
+      code_serv, code_serv_filtre,
+      code_list, code_list_filtre,
+      age_date
     )
 
-    ### Résultats sur une page
-    if (is.null(grpby)) {
-      # Pas de regroupement
-      result_page <- create_dt_data_args_query(
-        dt = DT,
-        args_list = list(
-          METHODE = "naif_switch1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-          TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
-          RX_RETROSPECT_A_EXCLURE = rx_retro, NJOURS_SANS_CONSO = njours_sans_conso,
-          CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
-          CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
-        ),
-        query = query_naif_switch1(
-          debut = dates_debut[1], fin = dates_fin[1],
-          type_rx = type_rx, codes = code_rx,
-          rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
-          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-          code_list = code_list, code_list_filtre = code_list_filtre
-        )
+    return(create_dt_data_args_query(
+      dt = DT,
+      args_list = list(
+        METHODE = "naif_switch1",
+        DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
+        TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
+        TYPE_RX_RETRO = type_rx_retro, RX_RETROSPECT_A_EXCLURE = rx_retro,
+        NJOURS_SANS_CONSO = njours_sans_conso,
+        CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = code_serv,
+        CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list,
+        AGE_DATE = age_date
+      ),
+      query = query_naif_switch1(
+        debut = dates_debut[1], fin = dates_fin[1],
+        type_Rx = type_rx, codes = code_rx, group_by = grpby,
+        type_Rx_retro = type_rx_retro, rx_retrospect_a_exclure = rx_retro,
+        njours_sans_conso = njours_sans_conso,
+        code_serv = code_serv, code_serv_filtre = code_serv_filtre,
+        code_list = code_list, code_list_filtre = code_list_filtre,
+        age_date = age_date
       )
-    } else {
-      result_page <- create_dt_data_args_query(
-        # Résultats par code
-        dt = DT,
-        args_list = list(
-          METHODE = "naif_switch1", DATE_DEBUT = dates_debut, DATE_FIN = dates_fin,
-          TYPE_RX = type_rx, CODE_RX = code_rx, GROUPER_PAR = grpby,
-          RX_RETROSPECT_A_EXCLURE = rx_retro, NJOURS_SANS_CONSO = njours_sans_conso,
-          CODE_SERV_FILTRE = code_serv_filtre, CODE_SERV = desadapt_code_serv(code_serv),
-          CODE_LIST_FILTRE = code_list_filtre, CODE_LIST = code_list
-        ),
-        query = query_naif_switch1(
-          # Implique qu'on affiche un exemple de code SQL pour le 1er code seulement
-          debut = dates_debut[1], fin = dates_fin[1],
-          type_rx = type_rx, codes = code_rx[1],
-          rx_retrospect_a_exclure = rx_retro, njours_sans_conso = njours_sans_conso,
-          code_serv = code_serv, code_serv_filtre = code_serv_filtre,
-          code_list = code_list, code_list_filtre = code_list_filtre
-        )
-      )
-    }
-
-    return(result_page)
+    ))
 
   }
   save_xl_file_queries_sg1 <- function(dt, conn) {
@@ -627,17 +635,17 @@ formulaire <- function() {
     if ("CODE_RX" %in% names(dt)) {
       code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
       if (length(code_rx)) {
-        nbr_NAs <- sum(is.na(code_rx))
-        code_rx <- as.numeric(code_rx)
-        if (sum(is.na(code_rx)) != nbr_NAs) {
-          if (new_error) {
-            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-            new_error <- FALSE
-          }
-          msg_error <- paste0(msg_error,
-                              " -  CODE_RX doit contenir des valeurs numériques.\n"
-          )
-        }
+        # nbr_NAs <- sum(is.na(code_rx))
+        # code_rx <- as.numeric(code_rx)
+        # if (sum(is.na(code_rx)) != nbr_NAs) {
+        #   if (new_error) {
+        #     msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+        #     new_error <- FALSE
+        #   }
+        #   msg_error <- paste0(msg_error,
+        #                       " -  CODE_RX doit contenir des valeurs numériques.\n"
+        #   )
+        # }
       } else {
         if (new_error) {
           msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
@@ -665,21 +673,17 @@ formulaire <- function() {
       }
     }
 
-    # RX_RETROSPECT_A_EXCLURE
-    if ("RX_RETROSPECT_A_EXCLURE" %in% names(dt)) {
-      rx_retro <- stringr::str_remove_all(rmNA(dt$RX_RETROSPECT_A_EXCLURE), " ")
-      if (length(rx_retro)) {
-        nbr_NAs <- sum(is.na(rx_retro))
-        rx_retro <- as.numeric(rx_retro)
-        if (sum(is.na(rx_retro)) != nbr_NAs) {
-          if (new_error) {
-            msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-            new_error <- FALSE
-          }
-          msg_error <- paste0(msg_error,
-                              " -  RX_RETROSPECT_A_EXCLURE doit contenir une(des) valeur(s) numérique(s).\n"
-          )
+    # TYPE_RX_RETRO
+    if (any(names(dt) == "TYPE_RX_RETRO")) {
+      type_rx_retro <- str_remove_all(rmNA(dt$TYPE_RX_RETRO), " ")  # extraire la valeur du tableau
+      if (length(type_rx_retro) && !any(vals$TYPE_RX_RETRO == type_rx_retro)) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
         }
+        msg_error <- paste0(msg_error,
+                            " -  TYPE_RX_RETRO ne contient pas une valeur permise.\n"
+        )
       }
     }
 
@@ -727,6 +731,29 @@ formulaire <- function() {
                                 " -  ",col," ne contient pas une valeur permise.\n"
             )
           }
+        }
+      }
+    }
+
+    # AGE_DATE
+    if (any(names(dt) == "AGE_DATE")) {
+      age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
+      if (length(age_date) > 1) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  AGE_DATE doit contenir seulement une valeur.\n")
+      } else if (length(age_date)) {
+        age_date <- as_date_excel_chr(age_date)
+        if (anyNA(age_date)) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  AGE_DATE n'est pas une date au format 'AAAA-MM-JJ'.\n")
         }
       }
     }
@@ -829,31 +856,31 @@ formulaire <- function() {
       }
     }
 
-    # # CODE_RX
-    # if ("CODE_RX" %in% names(dt)) {
-    #   code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
-    #   if (length(code_rx)) {
-    #     nbr_NAs <- sum(is.na(code_rx))
-    #     code_rx <- as.numeric(code_rx)
-    #     if (sum(is.na(code_rx)) != nbr_NAs) {
-    #       if (new_error) {
-    #         msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-    #         new_error <- FALSE
-    #       }
-    #       msg_error <- paste0(msg_error,
-    #                           " -  CODE_RX doit contenir des valeurs numériques.\n"
-    #       )
-    #     }
-    #   } else {
-    #     if (new_error) {
-    #       msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
-    #       new_error <- FALSE
-    #     }
-    #     msg_error <- paste0(msg_error,
-    #                         " -  CODE_RX doit contenir au moins une valeur.\n"
-    #     )
-    #   }
-    # }
+    # CODE_RX
+    if ("CODE_RX" %in% names(dt)) {
+      code_rx <- str_remove_all(rmNA(dt$CODE_RX), " ")
+      if (length(code_rx)) {
+        # nbr_NAs <- sum(is.na(code_rx))
+        # code_rx <- as.numeric(code_rx)
+        # if (sum(is.na(code_rx)) != nbr_NAs) {
+        #   if (new_error) {
+        #     msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+        #     new_error <- FALSE
+        #   }
+        #   msg_error <- paste0(msg_error,
+        #                       " -  CODE_RX doit contenir des valeurs numériques.\n"
+        #   )
+        # }
+      } else {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  CODE_RX doit contenir au moins une valeur.\n"
+        )
+      }
+    }
 
     # GROUPER_PAR
     if ("GROUPER_PAR" %in% names(dt)) {
@@ -893,23 +920,25 @@ formulaire <- function() {
     }
 
     # AGE_DATE
-    age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
-    if (length(age_date) > 1) {
-      if (new_error) {
-        msg_error <- paste0(msg_error, format_xl_err_sh(sh))
-        new_error <- FALSE
-      }
-      msg_error <- paste0(msg_error,
-                          " -  AGE_DATE doit contenir seulement une valeur.\n")
-    } else if (length(age_date)) {
-      age_date <- as_date_excel_chr(age_date)
-      if (anyNA(age_date)) {
+    if (any(names(dt) == "AGE_DATE")) {
+      age_date <- stringr::str_remove_all(rmNA(dt$AGE_DATE), " ")
+      if (length(age_date) > 1) {
         if (new_error) {
           msg_error <- paste0(msg_error, format_xl_err_sh(sh))
           new_error <- FALSE
         }
         msg_error <- paste0(msg_error,
-                            " -  AGE_DATE n'est pas une date au format 'AAAA-MM-JJ'.\n")
+                            " -  AGE_DATE doit contenir seulement une valeur.\n")
+      } else if (length(age_date)) {
+        age_date <- as_date_excel_chr(age_date)
+        if (anyNA(age_date)) {
+          if (new_error) {
+            msg_error <- paste0(msg_error, format_xl_err_sh(sh))
+            new_error <- FALSE
+          }
+          msg_error <- paste0(msg_error,
+                              " -  AGE_DATE n'est pas une date au format 'AAAA-MM-JJ'.\n")
+        }
       }
     }
 
@@ -957,7 +986,7 @@ formulaire <- function() {
   dt_code_serv <- create_dt_code_serv()
 
 
-  # UI ------------------------------------------------------------------------------------------
+  # UI ----------------------------------------------------------------------
 
   ui <- dashboardPage(
 
@@ -1137,7 +1166,6 @@ formulaire <- function() {
 
         tabItem(
           tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
-          p("Mise à jour :", attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ")),
           selectInput(inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                       label = "Élément",
                       choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)),
@@ -1149,7 +1177,6 @@ formulaire <- function() {
 
         tabItem(
           tabName = "tabV_DEM_PAIMT_MED_CM",
-          p("Mise à jour :", attr(V_DEM_PAIMT_MED_CM, "MaJ")),
           selectInput(inputId = "V_DEM_PAIMT_MED_CM__data",
                       label = "Élément",
                       choices = names(inesss::V_DEM_PAIMT_MED_CM)),
@@ -1161,7 +1188,6 @@ formulaire <- function() {
 
         tabItem(
           tabName = "tabV_DENOM_COMNE_MED",
-          p("Mise à jour :", attr(V_DENOM_COMNE_MED, "MaJ")),
           uiOutput("V_DENOM_COMNE_MED__params"),
           dataTableOutput("V_DENOM_COMNE_MED__dt")
         ),
@@ -1170,7 +1196,6 @@ formulaire <- function() {
 
         tabItem(
           tabName = "tabV_DES_COD",
-          p("Mise à jour :", attr(V_DES_COD, "MaJ")),
           uiOutput("V_DES_COD__params"),
           dataTableOutput("V_DES_COD__dt")
         ),
@@ -1179,7 +1204,6 @@ formulaire <- function() {
 
         tabItem(
           tabName = "tabV_PRODU_MED",
-          p("Mise à jour :", attr(V_PRODU_MED, "MaJ")),
           selectInput(inputId = "V_PRODU_MED__data",
                       label = "Élément",
                       choices = names(inesss::V_PRODU_MED)),
@@ -1201,6 +1225,7 @@ formulaire <- function() {
 
     ### Fermer l'application lorsque la fenêtre se ferme
     session$onSessionEnded(function() {stopApp()})
+
 
 
 
@@ -1317,7 +1342,6 @@ formulaire <- function() {
 
     # stat_gen1 -----------------------------------------------------------------------------------
 
-    #### tabStatGen1
     # Variables réactives pour sg1
     sg1_val <- reactiveValues(
       show_query = FALSE,  # afficher la requête ou pas

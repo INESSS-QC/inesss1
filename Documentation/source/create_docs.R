@@ -29,13 +29,13 @@ for (file in list.files("doc")) {
 # Formulaire --------------------------------------------------------------
 render(
   input = "Documentation/source/formulaire.Rmd",
-  output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
+  output_file = paste0("AIDE-FORMULAIRE.pdf"),
   output_dir = "Documentation",
   params = list(conn = conn),
   envir = new.env(), encoding = "UTF-8"
 )
-if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
-  unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
+if (paste0("AIDE-FORMULAIRE.log") %in% list.files("Documentation/source")) {
+  unlink(paste0("Documentation/source/AIDE-FORMULAIRE.log"), recursive = TRUE)
 }
 
 
