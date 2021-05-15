@@ -3,6 +3,7 @@ library(data.table)
 
 conn <- SQL_connexion("ms045")
 
+t1 <- Sys.time()
 DENOM <- rmNA(sunique(V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DENOM))
 DT <- vector("list", length(DENOM))
 i <- 1L
@@ -22,6 +23,8 @@ for (denom in DENOM) {
   i <- i + 1L
 }
 DT <- rbindlist(DT)
+t2 <- Sys.time()
+difftime(t2, t1)
 
 DT <- dt[
   , .(MIN = min(DUREE_TX),
