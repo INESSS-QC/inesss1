@@ -13,7 +13,6 @@
 #'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
 #' @inheritParams query_naif_switch1
-#'
 #' @return `data.table`
 #' * **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
 #' * **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
@@ -30,13 +29,13 @@
 #' * **`TENEUR` :** Seulement si `group_by` contient `'Teneur'`. Teneur du médicament.
 #' * **`FORMAT_ACQ` :** Seulement si `group_by` contient `'Format'`. Format d'acquisition du médicament.
 #' * **`AGE` :** Seulement si `group_by` contient `'Age'`. Age de l'individu à la date `age_date`.
-#' * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
-#' * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+#' * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir la variable `SMED_MNT_AUTOR_MED`.
+#' * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir la variable `SMED_MNT_AUTOR_FRAIS_SERV`.
 #' * **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
-#' * **`COHORTE` :** Nombre d'individus unique. [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
-#' * **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
-#' * **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
-#' * **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
+#' * **`COHORTE` :** Nombre d'individus unique.
+#' * **`NBRE_RX` :** Nombre de demandes de paiement.
+#' * **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir la variable `SMED_QTE_MED`.
+#' * **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir la variable `SMED_NBR_JR_DUREE_TRAIT`.
 #' @encoding UTF-8
 #' @import data.table
 #' @export
@@ -76,6 +75,7 @@
 #'   type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
 #'   type_Rx_retro = 'AHFS', rx_retrospect_a_exclure = c('04----', '08--16', '122436')
 #' )
+#'
 #' # DENOM
 #' ex06 <- SQL_naif_switch1(
 #'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),

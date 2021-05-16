@@ -15,8 +15,8 @@
 #' Que ce soit pour les codes AHFS (`NOM_AHFS`), les DENOM (`NOM_DENOM`) ou les DIN (`NOM_MARQ_COMRC`), **le nom inscrit est toujours celui le plus récent**.
 #'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
-#' @param debut Vecteur contenant la date de début de la ou des périodes d'étude au format `AAAA-MM-JJ`.
-#' @param fin Vecteur contenant la date de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`.
+#' @param debut Vecteur contenant la ou les dates de début des périodes d'étude au format `AAAA-MM-JJ`.
+#' @param fin Vecteur contenant la ou les dates de fin des périodes d'étude au format `AAAA-MM-JJ`.
 #' @param type_Rx Type de code à analyser. Une valeur parmi :
 #' * `'AHFS'` : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 #' * `'DENOM'` : Code de dénomination commune.
