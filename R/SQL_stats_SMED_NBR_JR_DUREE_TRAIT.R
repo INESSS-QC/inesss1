@@ -8,6 +8,7 @@
 #' @param by_code_serv `TRUE` ou `FALSE`. Grouper les résultats par code de services. Par défaut `TRUE`.
 #' @param include_dureeTx_0 `TRUE` ou `FALSE`. Inclure les durées de traitements égale à zéro. Par défaut `FALSE`.
 #'
+#' @return `list`
 #' @import data.table
 #' @encoding UTF-8
 #' @export
@@ -107,7 +108,55 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
 
 # Statistiques --------------------------------------------------------------------------------
 
+  if (by_code_serv) {
+    ll <- vector("list", 4L)
+  } else {
+    ll <- vector("list", 2L)
+  }
 
+  # Statistiques sur toutes les observations
+  ll[[1]] <- DT[
+    , .(MIN = min(DUREE_TRAIT),
+        MOYENNE = mean(DUREE_TRAIT),
+        MEDIANE = median(DUREE_TRAIT),
+        MAX = max(DUREE_TRAIT),
+        N = .N)
+  ]
+
+  # Statistiques par DENOM
+  ll[[2]] <- DT[
+    , .(MIN = min(DUREE_TRAIT),
+        MOYENNE = mean(DUREE_TRAIT),
+        MEDIANE = median(DUREE_TRAIT),
+        MAX = max(DUREE_TRAIT),
+        N = .N),
+    keyby = .(DENOM)
+  ]
+
+  # Statistiques par CODE_SERV
+  if (by_code_serv) {
+    ll[[3]] <- DT[
+      , .(MIN = min(DUREE_TRAIT),
+          MOYENNE = mean(DUREE_TRAIT),
+          MEDIANE = median(DUREE_TRAIT),
+          MAX = max(DUREE_TRAIT),
+          N = .N),
+      keyby = .(CODE_SERV)
+    ]
+    ll[[4]] <- DT[
+      , .(MIN = min(DUREE_TRAIT),
+          MOYENNE = mean(DUREE_TRAIT),
+          MEDIANE = median(DUREE_TRAIT),
+          MAX = max(DUREE_TRAIT),
+          N = .N),
+      keyby = .(DENOM, CODE_SERV)
+    ]
+    names(ll) <- c("Total", "DENOM", "CODE_SERV", "DENOM_CODE_SERV")
+  } else {
+    names(ll) <- c("Total", "DENOM")
+  }
+
+  return(ll)
 
 }
 
