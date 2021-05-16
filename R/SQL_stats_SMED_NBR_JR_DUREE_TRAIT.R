@@ -1,5 +1,7 @@
 #' Statistiques
 #'
+#' Statistiques descriptives de la variable `SMED_NBR_JR_DUREE_TRAIT` de la vue `V_DEM_PAIMT_MED_CM`.
+#'
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
 #' @param debut Date de début de la période d'étute au format `AAAA-MM-JJ`.
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
@@ -10,16 +12,6 @@
 #' @encoding UTF-8
 #' @export
 SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = TRUE, include_dureeTx_0 = FALSE) {
-
-  ###################################################### #
-  # conn <- SQL_connexion("ms045")
-  t1 <- Sys.time()
-  debut = "2020-01-01"
-  fin = "2020-12-31"
-  by_code_serv = TRUE
-  include_dureeTx_0 = FALSE
-  ###################################################### #
-
 
   # Vérification des arguments ----------------------------------------------
 
@@ -110,10 +102,12 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
       }
     }
   }
-
   DT <- rbindlist(DT)
 
-  t2 <- Sys.time()
+
+# Statistiques --------------------------------------------------------------------------------
+
+
 
 }
 
@@ -159,32 +153,3 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT.query <- function(yr, mth, deb_day, fin_day,
   return(query)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
