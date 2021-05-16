@@ -24,6 +24,9 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT(
 
 \item{include_dureeTx_0}{\code{TRUE} ou \code{FALSE}. Inclure les durées de traitements égale à zéro. Par défaut \code{FALSE}.}
 }
+\value{
+\code{list}
+}
 \description{
-Statistiques
+Statistiques descriptives de la variable \code{SMED_NBR_JR_DUREE_TRAIT} de la vue \code{V_DEM_PAIMT_MED_CM}.
 }
