@@ -12,8 +12,10 @@
 SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = TRUE, include_dureeTx_0 = FALSE) {
 
   ###################################################### #
-  debut = "2018-01-01"
-  fin = "2018-01-31"
+  # conn <- SQL_connexion("ms045")
+  t1 <- Sys.time()
+  debut = "2020-01-01"
+  fin = "2020-12-31"
   by_code_serv = TRUE
   include_dureeTx_0 = FALSE
   ###################################################### #
@@ -42,7 +44,8 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
   }
   finishArgCheck(check)
 
-  if (debut < fin) {
+  ### Corriger les dates si debut > fin
+  if (debut > fin) {
     fin_copy <- fin
     fin <- debut
     debut <- fin_copy
@@ -109,6 +112,8 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
   }
 
   DT <- rbindlist(DT)
+
+  t2 <- Sys.time()
 
 }
 
