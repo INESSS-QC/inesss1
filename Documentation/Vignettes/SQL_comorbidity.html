@@ -434,13 +434,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 #&gt; 
 #&gt; $alcohol
 #&gt; $alcohol$CIM9
-#&gt;  [1] &quot;2652%&quot; &quot;2911%&quot; &quot;2912%&quot; &quot;2913%&quot; &quot;2915%&quot; &quot;2916%&quot; &quot;2917%&quot; &quot;2918%&quot; &quot;2919%&quot;
-#&gt; [10] &quot;303%&quot;  &quot;3050%&quot; &quot;3575%&quot; &quot;4255%&quot; &quot;5353%&quot; &quot;5710%&quot; &quot;5711%&quot; &quot;5712%&quot; &quot;5713%&quot;
-#&gt; [19] &quot;980%&quot; 
+#&gt;  [1] &quot;2652%&quot; &quot;2911%&quot; &quot;2912%&quot; &quot;2913%&quot; &quot;2915%&quot; &quot;2916%&quot; &quot;2917%&quot; &quot;2918%&quot; &quot;2919%&quot; &quot;303%&quot;  &quot;3050%&quot;
+#&gt; [12] &quot;3575%&quot; &quot;4255%&quot; &quot;5353%&quot; &quot;5710%&quot; &quot;5711%&quot; &quot;5712%&quot; &quot;5713%&quot; &quot;980%&quot; 
 #&gt; 
 #&gt; $alcohol$CIM10
-#&gt;  [1] &quot;F10%&quot;  &quot;E52%&quot;  &quot;G621%&quot; &quot;I426%&quot; &quot;K292%&quot; &quot;K700%&quot; &quot;K703%&quot; &quot;K709%&quot; &quot;T51%&quot; 
-#&gt; [10] &quot;Z502%&quot; &quot;Z714%&quot; &quot;Z721%&quot;
+#&gt;  [1] &quot;F10%&quot;  &quot;E52%&quot;  &quot;G621%&quot; &quot;I426%&quot; &quot;K292%&quot; &quot;K700%&quot; &quot;K703%&quot; &quot;K709%&quot; &quot;T51%&quot;  &quot;Z502%&quot; &quot;Z714%&quot;
+#&gt; [12] &quot;Z721%&quot;
 #&gt; 
 #&gt; 
 #&gt; $blane
@@ -454,17 +453,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2><span class="header-section-number">3.2</span> exclu_diagn = c(‘drug’, ‘ld’)</h2>
 <p>Implique que les codes de diagnostics <code>drug</code> et <code>ld</code> seront exclus de l’analyse.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;    
-#&gt;  [7] &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot; &quot;depre&quot;   
-#&gt; [13] &quot;diab&quot;     &quot;diabwc&quot;   &quot;drug&quot;     &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot; 
-#&gt; [19] &quot;ld&quot;       &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;    
-#&gt; [25] &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;      
-#&gt; [31] &quot;valv&quot;     &quot;wloss&quot;</code></pre>
+<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;    
+#&gt;  [9] &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot; &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;drug&quot;     &quot;fed&quot;     
+#&gt; [17] &quot;hyp&quot;      &quot;hypothy&quot;  &quot;ld&quot;       &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;    
+#&gt; [25] &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
 <p><strong>APRÈS</strong></p>
-<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;    
-#&gt;  [7] &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot; &quot;depre&quot;   
-#&gt; [13] &quot;diab&quot;     &quot;diabwc&quot;   &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot;  &quot;metacanc&quot;
-#&gt; [19] &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;  
+<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;    
+#&gt;  [9] &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot; &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;fed&quot;      &quot;hyp&quot;     
+#&gt; [17] &quot;hypothy&quot;  &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;  
 #&gt; [25] &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
 </div>
 <div id="cim-ccim9-cim10" class="section level2">
@@ -474,10 +470,9 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 #&gt; [1] &quot;042%&quot; &quot;043%&quot; &quot;044%&quot; &quot;B20%&quot; &quot;B21%&quot; &quot;B22%&quot; &quot;B23%&quot; &quot;B24%&quot;
 #&gt; 
 #&gt; $alcohol
-#&gt;  [1] &quot;2652%&quot; &quot;2911%&quot; &quot;2912%&quot; &quot;2913%&quot; &quot;2915%&quot; &quot;2916%&quot; &quot;2917%&quot; &quot;2918%&quot; &quot;2919%&quot;
-#&gt; [10] &quot;303%&quot;  &quot;3050%&quot; &quot;3575%&quot; &quot;4255%&quot; &quot;5353%&quot; &quot;5710%&quot; &quot;5711%&quot; &quot;5712%&quot; &quot;5713%&quot;
-#&gt; [19] &quot;980%&quot;  &quot;F10%&quot;  &quot;E52%&quot;  &quot;G621%&quot; &quot;I426%&quot; &quot;K292%&quot; &quot;K700%&quot; &quot;K703%&quot; &quot;K709%&quot;
-#&gt; [28] &quot;T51%&quot;  &quot;Z502%&quot; &quot;Z714%&quot; &quot;Z721%&quot;
+#&gt;  [1] &quot;2652%&quot; &quot;2911%&quot; &quot;2912%&quot; &quot;2913%&quot; &quot;2915%&quot; &quot;2916%&quot; &quot;2917%&quot; &quot;2918%&quot; &quot;2919%&quot; &quot;303%&quot;  &quot;3050%&quot;
+#&gt; [12] &quot;3575%&quot; &quot;4255%&quot; &quot;5353%&quot; &quot;5710%&quot; &quot;5711%&quot; &quot;5712%&quot; &quot;5713%&quot; &quot;980%&quot;  &quot;F10%&quot;  &quot;E52%&quot;  &quot;G621%&quot;
+#&gt; [23] &quot;I426%&quot; &quot;K292%&quot; &quot;K700%&quot; &quot;K703%&quot; &quot;K709%&quot; &quot;T51%&quot;  &quot;Z502%&quot; &quot;Z714%&quot; &quot;Z721%&quot;
 #&gt; 
 #&gt; $blane
 #&gt; [1] &quot;28090%&quot; &quot;D500%&quot;</code></pre>
@@ -502,12 +497,20 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>S</code> : Secondaire.</li>
 </ul></li>
 </ul>
+<p><strong>Si date_dx_var = ‘admis’</strong> :</p>
 <div class="sourceCode" id="cb8"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb8-1"><a href="#cb8-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb8-2"><a href="#cb8-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb8-2"><a href="#cb8-2"></a>       SHOP_DAT_ADMIS_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
 <span id="cb8-3"><a href="#cb8-3"></a><span class="kw">from</span> RES_SSS.V_DIAGN_SEJ_HOSP_CM</span>
 <span id="cb8-4"><a href="#cb8-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
 <span id="cb8-5"><a href="#cb8-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span></span>
 <span id="cb8-6"><a href="#cb8-6"></a>    <span class="kw">and</span> SHOP_TYP_DIAGN_SEJ_HOSP <span class="kw">in</span> c(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;P&#39;</span>, <span class="st">&#39;S&#39;</span>);</span></code></pre></div>
+<p><strong>Si date_dx_var = ‘depar’</strong> :</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb9-2"><a href="#cb9-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">from</span> RES_SSS.V_DIAGN_SEJ_HOSP_CM</span>
+<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb9-5"><a href="#cb9-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6"></a>    <span class="kw">and</span> SHOP_TYP_DIAGN_SEJ_HOSP <span class="kw">in</span> c(<span class="st">&#39;A&#39;</span>, <span class="st">&#39;P&#39;</span>, <span class="st">&#39;S&#39;</span>);</span></code></pre></div>
 </div>
 <div id="v_sej_serv_hosp_cm" class="section level2">
 <h2><span class="header-section-number">4.2</span> V_SEJ_SERV_HOSP_CM</h2>
@@ -517,11 +520,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>SHOP_DAT_DEPAR_SEJ_HOSP</code> : Date où l’usager quitte l’installation vivant ou décédé.</li>
 <li><code>SHOP_COD_DIAGN_MDCAL_CLINQ</code> : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.</li>
 </ul>
-<div class="sourceCode" id="cb9"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb9-1"><a href="#cb9-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb9-2"><a href="#cb9-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
-<span id="cb9-3"><a href="#cb9-3"></a><span class="kw">from</span> RES_SSS.V_SEJ_SERV_HOSP_CM</span>
-<span id="cb9-4"><a href="#cb9-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb9-5"><a href="#cb9-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
+<p><strong>Si date_dx_var = ‘admis’</strong> :</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb10-2"><a href="#cb10-2"></a>       SHOP_DAT_ADMIS_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">from</span> RES_SSS.V_SEJ_SERV_HOSP_CM</span>
+<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb10-5"><a href="#cb10-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
+<p><strong>Si date_dx_var = ‘depar’</strong> :</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">select</span> SHOP_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb11-2"><a href="#cb11-2"></a>       SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">as</span> DATE_DX</span>
+<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">from</span> RES_SSS.V_SEJ_SERV_HOSP_CM</span>
+<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">where</span> SHOP_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb11-5"><a href="#cb11-5"></a>    <span class="kw">and</span> SHOP_DAT_DEPAR_SEJ_HOSP <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
 </div>
 <div id="v_episo_soin_durg_cm" class="section level2">
 <h2><span class="header-section-number">4.3</span> V_EPISO_SOIN_DURG_CM</h2>
@@ -531,11 +541,18 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>SURG_DH_DEPAR_USAG_DURG</code> : DateHeure de départ d’un usager de département d’urgence. Cet élément correspond au moment où l’usager quitte physiquement l’urgence. Il correspond donc à la fin de tout traitement dans l’épisode de soins concerné.</li>
 <li><code>SURG_COD_DIAGN_MDCAL_CLINQ</code> : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.</li>
 </ul>
-<div class="sourceCode" id="cb10"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb10-1"><a href="#cb10-1"></a><span class="kw">select</span> SURG_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb10-2"><a href="#cb10-2"></a>       SURG_DH_DEPAR_USAG_DURG <span class="kw">as</span> DATE_DX</span>
-<span id="cb10-3"><a href="#cb10-3"></a><span class="kw">from</span> RES_SSS.V_EPISO_SOIN_DURG_CM</span>
-<span id="cb10-4"><a href="#cb10-4"></a><span class="kw">where</span> SURG_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb10-5"><a href="#cb10-5"></a>    <span class="kw">and</span> SURG_DH_DEPAR_USAG_DURG <span class="kw">between</span> <span class="fu">To_Date</span>(<span class="st">&#39;debut&#39;</span>) <span class="kw">and</span> <span class="fu">To_Date</span>(<span class="st">&#39;fin&#39;</span>);</span></code></pre></div>
+<p><strong>Si date_dx_var = ‘admis’</strong> :</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb12-1"><a href="#cb12-1"></a><span class="kw">select</span> SURG_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb12-2"><a href="#cb12-2"></a>       SURG_DH_PRIS_CHARG_DURG <span class="kw">as</span> DATE_DX</span>
+<span id="cb12-3"><a href="#cb12-3"></a><span class="kw">from</span> RES_SSS.V_EPISO_SOIN_DURG_CM</span>
+<span id="cb12-4"><a href="#cb12-4"></a><span class="kw">where</span> SURG_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb12-5"><a href="#cb12-5"></a>    <span class="kw">and</span> SURG_DH_DEPAR_USAG_DURG <span class="kw">between</span> <span class="fu">To_Date</span>(<span class="st">&#39;debut&#39;</span>) <span class="kw">and</span> <span class="fu">To_Date</span>(<span class="st">&#39;fin&#39;</span>);</span></code></pre></div>
+<p><strong>Si date_dx_var = ‘depar’</strong> :</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb13-1"><a href="#cb13-1"></a><span class="kw">select</span> SURG_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb13-2"><a href="#cb13-2"></a>       SURG_DH_DEPAR_USAG_DURG <span class="kw">as</span> DATE_DX</span>
+<span id="cb13-3"><a href="#cb13-3"></a><span class="kw">from</span> RES_SSS.V_EPISO_SOIN_DURG_CM</span>
+<span id="cb13-4"><a href="#cb13-4"></a><span class="kw">where</span> SURG_COD_DIAGN_MDCAL_CLINQ <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb13-5"><a href="#cb13-5"></a>    <span class="kw">and</span> SURG_DH_DEPAR_USAG_DURG <span class="kw">between</span> <span class="fu">To_Date</span>(<span class="st">&#39;debut&#39;</span>) <span class="kw">and</span> <span class="fu">To_Date</span>(<span class="st">&#39;fin&#39;</span>);</span></code></pre></div>
 </div>
 <div id="i_smod_serv_md_cm" class="section level2">
 <h2><span class="header-section-number">4.4</span> I_SMOD_SERV_MD_CM</h2>
@@ -549,12 +566,12 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <li><code>PAY</code> : Payé.</li>
 </ul></li>
 </ul>
-<div class="sourceCode" id="cb11"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb11-1"><a href="#cb11-1"></a><span class="kw">select</span> SMOD_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
-<span id="cb11-2"><a href="#cb11-2"></a>       SMOD_DAT_SERV <span class="kw">as</span> DATE_DX</span>
-<span id="cb11-3"><a href="#cb11-3"></a><span class="kw">from</span> PROD.I_SMOD_SERV_MD_C</span>
-<span id="cb11-4"><a href="#cb11-4"></a><span class="kw">where</span> SMOD_COD_DIAGN_PRIMR <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
-<span id="cb11-5"><a href="#cb11-5"></a>    <span class="kw">and</span> SMOD_COD_STA_DECIS <span class="op">=</span> <span class="st">&#39;PAY&#39;</span></span>
-<span id="cb11-6"><a href="#cb11-6"></a>    <span class="kw">and</span> SMOD_DAT_SERV <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre class="sourceCode sql"><code class="sourceCode sql"><span id="cb14-1"><a href="#cb14-1"></a><span class="kw">select</span> SMOD_NO_INDIV_BEN_BANLS <span class="kw">as</span> <span class="kw">ID</span>,</span>
+<span id="cb14-2"><a href="#cb14-2"></a>       SMOD_DAT_SERV <span class="kw">as</span> DATE_DX</span>
+<span id="cb14-3"><a href="#cb14-3"></a><span class="kw">from</span> PROD.I_SMOD_SERV_MD_C</span>
+<span id="cb14-4"><a href="#cb14-4"></a><span class="kw">where</span> SMOD_COD_DIAGN_PRIMR <span class="kw">like</span> <span class="kw">any</span> (<span class="op">..</span>.)</span>
+<span id="cb14-5"><a href="#cb14-5"></a>    <span class="kw">and</span> SMOD_COD_STA_DECIS <span class="op">=</span> <span class="st">&#39;PAY&#39;</span></span>
+<span id="cb14-6"><a href="#cb14-6"></a>    <span class="kw">and</span> SMOD_DAT_SERV <span class="kw">between</span> <span class="st">&#39;debut&#39;</span> <span class="kw">and</span> <span class="st">&#39;fin&#39;</span>;</span></code></pre></div>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
@@ -650,20 +667,19 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <h2><span class="header-section-number">6.1</span> Codes de diagnostics de type gestationnel</h2>
 <p>Les arguments <code>CIM</code> et <code>dt_sourc</code> sont utilisés de la même manière que décrit précédemment.</p>
 <pre><code>#&gt; $CIM9
-#&gt;  [1] &quot;641%&quot; &quot;642%&quot; &quot;643%&quot; &quot;644%&quot; &quot;645%&quot; &quot;646%&quot; &quot;647%&quot; &quot;648%&quot; &quot;649%&quot; &quot;650%&quot;
-#&gt; [11] &quot;651%&quot; &quot;652%&quot; &quot;653%&quot; &quot;654%&quot; &quot;655%&quot; &quot;656%&quot; &quot;657%&quot; &quot;658%&quot; &quot;659%&quot; &quot;660%&quot;
-#&gt; [21] &quot;661%&quot; &quot;662%&quot; &quot;663%&quot; &quot;664%&quot; &quot;665%&quot; &quot;666%&quot; &quot;667%&quot; &quot;668%&quot; &quot;669%&quot; &quot;670%&quot;
-#&gt; [31] &quot;671%&quot; &quot;672%&quot; &quot;673%&quot; &quot;674%&quot; &quot;675%&quot; &quot;676%&quot; &quot;V27%&quot;
+#&gt;  [1] &quot;641%&quot; &quot;642%&quot; &quot;643%&quot; &quot;644%&quot; &quot;645%&quot; &quot;646%&quot; &quot;647%&quot; &quot;648%&quot; &quot;649%&quot; &quot;650%&quot; &quot;651%&quot; &quot;652%&quot;
+#&gt; [13] &quot;653%&quot; &quot;654%&quot; &quot;655%&quot; &quot;656%&quot; &quot;657%&quot; &quot;658%&quot; &quot;659%&quot; &quot;660%&quot; &quot;661%&quot; &quot;662%&quot; &quot;663%&quot; &quot;664%&quot;
+#&gt; [25] &quot;665%&quot; &quot;666%&quot; &quot;667%&quot; &quot;668%&quot; &quot;669%&quot; &quot;670%&quot; &quot;671%&quot; &quot;672%&quot; &quot;673%&quot; &quot;674%&quot; &quot;675%&quot; &quot;676%&quot;
+#&gt; [37] &quot;V27%&quot;
 #&gt; 
 #&gt; $CIM10
-#&gt;  [1] &quot;O1%&quot;  &quot;O21%&quot; &quot;O22%&quot; &quot;O23%&quot; &quot;O24%&quot; &quot;O25%&quot; &quot;O26%&quot; &quot;O27%&quot; &quot;O28%&quot; &quot;O29%&quot;
-#&gt; [11] &quot;O30%&quot; &quot;O31%&quot; &quot;O32%&quot; &quot;O33%&quot; &quot;O34%&quot; &quot;O35%&quot; &quot;O36%&quot; &quot;O37%&quot; &quot;O38%&quot; &quot;O39%&quot;
-#&gt; [21] &quot;O40%&quot; &quot;O41%&quot; &quot;O42%&quot; &quot;O43%&quot; &quot;O44%&quot; &quot;O45%&quot; &quot;O46%&quot; &quot;O47%&quot; &quot;O48%&quot; &quot;O49%&quot;
-#&gt; [31] &quot;O50%&quot; &quot;O51%&quot; &quot;O52%&quot; &quot;O53%&quot; &quot;O54%&quot; &quot;O55%&quot; &quot;O56%&quot; &quot;O57%&quot; &quot;O58%&quot; &quot;O59%&quot;
-#&gt; [41] &quot;O60%&quot; &quot;O61%&quot; &quot;O62%&quot; &quot;O63%&quot; &quot;O64%&quot; &quot;O65%&quot; &quot;O66%&quot; &quot;O67%&quot; &quot;O68%&quot; &quot;O69%&quot;
-#&gt; [51] &quot;O70%&quot; &quot;O71%&quot; &quot;O72%&quot; &quot;O73%&quot; &quot;O74%&quot; &quot;O75%&quot; &quot;O76%&quot; &quot;O77%&quot; &quot;O78%&quot; &quot;O79%&quot;
-#&gt; [61] &quot;O80%&quot; &quot;O81%&quot; &quot;O82%&quot; &quot;O83%&quot; &quot;O84%&quot; &quot;O85%&quot; &quot;O86%&quot; &quot;O87%&quot; &quot;O88%&quot; &quot;O89%&quot;
-#&gt; [71] &quot;O90%&quot; &quot;O91%&quot; &quot;O92%&quot; &quot;O93%&quot; &quot;O94%&quot; &quot;O95%&quot; &quot;O98%&quot; &quot;O99%&quot; &quot;Z37%&quot;</code></pre>
+#&gt;  [1] &quot;O1%&quot;  &quot;O21%&quot; &quot;O22%&quot; &quot;O23%&quot; &quot;O24%&quot; &quot;O25%&quot; &quot;O26%&quot; &quot;O27%&quot; &quot;O28%&quot; &quot;O29%&quot; &quot;O30%&quot; &quot;O31%&quot;
+#&gt; [13] &quot;O32%&quot; &quot;O33%&quot; &quot;O34%&quot; &quot;O35%&quot; &quot;O36%&quot; &quot;O37%&quot; &quot;O38%&quot; &quot;O39%&quot; &quot;O40%&quot; &quot;O41%&quot; &quot;O42%&quot; &quot;O43%&quot;
+#&gt; [25] &quot;O44%&quot; &quot;O45%&quot; &quot;O46%&quot; &quot;O47%&quot; &quot;O48%&quot; &quot;O49%&quot; &quot;O50%&quot; &quot;O51%&quot; &quot;O52%&quot; &quot;O53%&quot; &quot;O54%&quot; &quot;O55%&quot;
+#&gt; [37] &quot;O56%&quot; &quot;O57%&quot; &quot;O58%&quot; &quot;O59%&quot; &quot;O60%&quot; &quot;O61%&quot; &quot;O62%&quot; &quot;O63%&quot; &quot;O64%&quot; &quot;O65%&quot; &quot;O66%&quot; &quot;O67%&quot;
+#&gt; [49] &quot;O68%&quot; &quot;O69%&quot; &quot;O70%&quot; &quot;O71%&quot; &quot;O72%&quot; &quot;O73%&quot; &quot;O74%&quot; &quot;O75%&quot; &quot;O76%&quot; &quot;O77%&quot; &quot;O78%&quot; &quot;O79%&quot;
+#&gt; [61] &quot;O80%&quot; &quot;O81%&quot; &quot;O82%&quot; &quot;O83%&quot; &quot;O84%&quot; &quot;O85%&quot; &quot;O86%&quot; &quot;O87%&quot; &quot;O88%&quot; &quot;O89%&quot; &quot;O90%&quot; &quot;O91%&quot;
+#&gt; [73] &quot;O92%&quot; &quot;O93%&quot; &quot;O94%&quot; &quot;O95%&quot; &quot;O98%&quot; &quot;O99%&quot; &quot;Z37%&quot;</code></pre>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
@@ -671,14 +687,14 @@ code > span.er { color: #a61717; background-color: #e3d2d2; }
 <div id="priorisation-des-sources" class="section level1">
 <h1><span class="header-section-number">7</span> Priorisation des sources</h1>
 <p>Si différentes sources indiquent une même date pour un même diagnostic, on priorise la source où <code>confirm_sourc</code> égale 1, puis 2.</p>
-<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1"></a>confirm_sourc =<span class="st"> </span><span class="kw">list</span>(<span class="dt">MEDECHO =</span> <span class="dv">1</span>, <span class="dt">BDCU =</span> <span class="dv">2</span>, <span class="dt">SMOD =</span> <span class="dv">2</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1"></a>confirm_sourc =<span class="st"> </span><span class="kw">list</span>(<span class="dt">MEDECHO =</span> <span class="dv">1</span>, <span class="dt">BDCU =</span> <span class="dv">2</span>, <span class="dt">SMOD =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1 2019-06-06  diab    SMOD 2020-01-01
-#&gt; 2:  1 2019-06-06  diab    BDCU 2020-01-01
+#&gt; 1:  1 2019-06-06  diab    BDCU 2020-01-01
+#&gt; 2:  1 2019-06-06  diab    SMOD 2020-01-01
 #&gt; 3:  2 2019-06-06   hyp    BDCU 2020-01-01
-#&gt; 4:  2 2019-06-06   hyp    SMOD 2020-01-01
-#&gt; 5:  2 2019-06-06   hyp MEDECHO 2020-01-01</code></pre>
+#&gt; 4:  2 2019-06-06   hyp MEDECHO 2020-01-01
+#&gt; 5:  2 2019-06-06   hyp    SMOD 2020-01-01</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
 #&gt; 1:  1 2019-06-06  diab    BDCU 2020-01-01
@@ -732,9 +748,9 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2><span class="header-section-number">9.1</span> MEDECHO (1)</h2>
 <p>Les sources ayant <code>confirm_sourc=1</code> sont utilisées directement.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1 2019-01-01  diab MEDECHO 2020-01-01
-#&gt; 2:  1 2019-06-06  diab    SMOD 2020-01-01</code></pre>
+<pre><code>#&gt;    ID DATE_DX DIAGN  SOURCE DATE_INDEX
+#&gt; 1:  1   17897  diab MEDECHO 2020-01-01
+#&gt; 2:  1   18053  diab    SMOD 2020-01-01</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1  diab 2019-01-01    MEDECHO 2019-01-01     MEDECHO</code></pre>
@@ -743,16 +759,16 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2><span class="header-section-number">9.2</span> BDCU et SMOD (2)</h2>
 <p>Les sources ayant <code>confirm_sourc=2</code> doivent être confirmées.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID    DATE_DX  DIAGN SOURCE DATE_INDEX
-#&gt; 1:  1 2019-01-01   diab   BDCU 2020-01-01
-#&gt; 2:  1 2019-01-15   diab   SMOD 2020-01-01
-#&gt; 3:  1 2019-02-10   diab   SMOD 2020-01-01
-#&gt; 4:  2 2019-02-02    hyp   BDCU 2020-06-06
-#&gt; 5:  2 2019-12-31    hyp   BDCU 2020-06-06
-#&gt; 6:  3 2018-01-01 diabwc   SMOD 2020-12-31
-#&gt; 7:  3 2020-02-01 diabwc   SMOD 2020-12-31
-#&gt; 8:  3 2020-07-20 diabwc   SMOD 2020-12-31
-#&gt; 9:  4 2020-01-01    hyp   SMOD 2020-06-06</code></pre>
+<pre><code>#&gt;    ID DATE_DX  DIAGN SOURCE DATE_INDEX
+#&gt; 1:  1   17897   diab   BDCU 2020-01-01
+#&gt; 2:  1   17911   diab   SMOD 2020-01-01
+#&gt; 3:  1   17937   diab   SMOD 2020-01-01
+#&gt; 4:  2   17929    hyp   BDCU 2020-06-06
+#&gt; 5:  2   18261    hyp   BDCU 2020-06-06
+#&gt; 6:  3   17532 diabwc   SMOD 2020-12-31
+#&gt; 7:  3   18293 diabwc   SMOD 2020-12-31
+#&gt; 8:  3   18463 diabwc   SMOD 2020-12-31
+#&gt; 9:  4   18262    hyp   SMOD 2020-06-06</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID  DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1   diab 2019-01-01       BDCU 2019-02-10        SMOD
@@ -763,14 +779,14 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2><span class="header-section-number">9.3</span> MEDECHO (1), BDCU (2) et SMOD (2)</h2>
 <p>MEDECHO peut confirmer la date d’un BDCU ou d’un SMOD.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID    DATE_DX  DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1 2019-01-01   diab    BDCU 2020-01-01
-#&gt; 2:  1 2019-01-05   diab MEDECHO 2020-01-01
-#&gt; 3:  2 2019-02-02    hyp    BDCU 2020-06-06
-#&gt; 4:  2 2019-02-17    hyp    BDCU 2020-06-06
-#&gt; 5:  2 2019-02-18    hyp MEDECHO 2020-12-31
-#&gt; 6:  3 2019-03-03 diabwc    SMOD 2020-12-31
-#&gt; 7:  3 2020-04-04 diabwc MEDECHO 2020-12-31</code></pre>
+<pre><code>#&gt;    ID DATE_DX  DIAGN  SOURCE DATE_INDEX
+#&gt; 1:  1   17897   diab    BDCU 2020-01-01
+#&gt; 2:  1   17901   diab MEDECHO 2020-01-01
+#&gt; 3:  2   17929    hyp    BDCU 2020-06-06
+#&gt; 4:  2   17944    hyp    BDCU 2020-06-06
+#&gt; 5:  2   17945    hyp MEDECHO 2020-12-31
+#&gt; 6:  3   17958 diabwc    SMOD 2020-12-31
+#&gt; 7:  3   18356 diabwc MEDECHO 2020-12-31</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID  DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1   diab 2019-01-01       BDCU 2019-01-05     MEDECHO
@@ -862,14 +878,12 @@ Le <em>score</em> est la somme des poids de chaque diagnostic.</p>
 <pre><code>#&gt;    ID aids canc carit metacanc mi pvd wloss
 #&gt; 1:  1    3    3     1        5  2   0     1</code></pre>
 <p><strong>APRÈS</strong></p>
-<pre><code>#&gt;    ID Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18
-#&gt; 1:  1                     15                      13                        13
-#&gt;    aids alcohol blane canc carit cevd chf coag copd dane dementia depre diab
-#&gt; 1:    3       0     0    3     1    0   0    0    0    0        0     0    0
-#&gt;    diabwc fed hyp hypothy metacanc mi nd obes para pcd psycho pvd rend rheumd
-#&gt; 1:      0   0   0       0        5  2  0    0    0   0      0   0    0      0
-#&gt;    ud valv wloss
-#&gt; 1:  0    0     1</code></pre>
+<pre><code>#&gt;    ID Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18 aids alcohol
+#&gt; 1:  1                     15                      13                        13    3       0
+#&gt;    blane canc carit cevd chf coag copd dane dementia depre diab diabwc fed hyp hypothy
+#&gt; 1:     0    3     1    0   0    0    0    0        0     0    0      0   0   0       0
+#&gt;    metacanc mi nd obes para pcd psycho pvd rend rheumd ud valv wloss
+#&gt; 1:        5  2  0    0    0   0      0   0    0      0  0    0     1</code></pre>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 </div>
@@ -877,31 +891,25 @@ Le <em>score</em> est la somme des poids de chaque diagnostic.</p>
 <h1><span class="header-section-number">13</span> Ajouts des individus manquants</h1>
 <p>Les individus de la cohorte d’étude qui ne sont pas dans le tableau d’analyse ont en fait un <em>score</em> de zéro. Ces individus sont manuellement ajoutés.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18
-#&gt; 1:  1   6                     15                      13
-#&gt;    Elixhauser_Dx_CCI_INSPQ18 aids alcohol blane canc carit cevd chf coag copd
-#&gt; 1:                        13    3       0     0    3     1    0   0    0    0
-#&gt;    dane dementia depre diab diabwc fed hyp hypothy metacanc mi nd obes para pcd
-#&gt; 1:    0        0     0    0      0   0   0       0        5  2  0    0    0   0
-#&gt;    psycho pvd rend rheumd ud valv wloss
-#&gt; 1:      0   0    0      0  0    0     1</code></pre>
+<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18 aids
+#&gt; 1:  1   6                     15                      13                        13    3
+#&gt;    alcohol blane canc carit cevd chf coag copd dane dementia depre diab diabwc fed hyp
+#&gt; 1:       0     0    3     1    0   0    0    0    0        0     0    0      0   0   0
+#&gt;    hypothy metacanc mi nd obes para pcd psycho pvd rend rheumd ud valv wloss
+#&gt; 1:       0        5  2  0    0    0   0      0   0    0      0  0    0     1</code></pre>
 <p><strong>APRÈS</strong></p>
-<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18
-#&gt; 1:  1   6                     15                      13
-#&gt; 2:  2   0                      0                       0
-#&gt; 3:  3   0                      0                       0
-#&gt;    Elixhauser_Dx_CCI_INSPQ18 aids alcohol blane canc carit cevd chf coag copd
-#&gt; 1:                        13    3       0     0    3     1    0   0    0    0
-#&gt; 2:                         0    0       0     0    0     0    0   0    0    0
-#&gt; 3:                         0    0       0     0    0     0    0   0    0    0
-#&gt;    dane dementia depre diab diabwc fed hyp hypothy metacanc mi nd obes para pcd
-#&gt; 1:    0        0     0    0      0   0   0       0        5  2  0    0    0   0
-#&gt; 2:    0        0     0    0      0   0   0       0        0  0  0    0    0   0
-#&gt; 3:    0        0     0    0      0   0   0       0        0  0  0    0    0   0
-#&gt;    psycho pvd rend rheumd ud valv wloss
-#&gt; 1:      0   0    0      0  0    0     1
-#&gt; 2:      0   0    0      0  0    0     0
-#&gt; 3:      0   0    0      0  0    0     0</code></pre>
+<pre><code>#&gt;    ID nDx Combine_Dx_CCI_INSPQ18 Charlson_Dx_CCI_INSPQ18 Elixhauser_Dx_CCI_INSPQ18 aids
+#&gt; 1:  1   6                     15                      13                        13    3
+#&gt; 2:  2   0                      0                       0                         0    0
+#&gt; 3:  3   0                      0                       0                         0    0
+#&gt;    alcohol blane canc carit cevd chf coag copd dane dementia depre diab diabwc fed hyp
+#&gt; 1:       0     0    3     1    0   0    0    0    0        0     0    0      0   0   0
+#&gt; 2:       0     0    0     0    0   0    0    0    0        0     0    0      0   0   0
+#&gt; 3:       0     0    0     0    0   0    0    0    0        0     0    0      0   0   0
+#&gt;    hypothy metacanc mi nd obes para pcd psycho pvd rend rheumd ud valv wloss
+#&gt; 1:       0        5  2  0    0    0   0      0   0    0      0  0    0     1
+#&gt; 2:       0        0  0  0    0    0   0      0   0    0      0  0    0     0
+#&gt; 3:       0        0  0  0    0    0   0      0   0    0      0  0    0     0</code></pre>
 </div>
 
 

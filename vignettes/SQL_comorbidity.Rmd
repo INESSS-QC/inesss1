@@ -159,6 +159,17 @@ Cette structure contient tous les diagnostics associés à un séjour hospitalie
   + `A` : Admission.
   + `P` : Principal.
   + `S` : Secondaire.
+
+**Si date_dx_var = 'admis'** :
+```{sql, eval=FALSE, echo=TRUE}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_COD_DIAGN_MDCAL_CLINQ like any (...)
+    and SHOP_DAT_DEPAR_SEJ_HOSP between 'debut' and 'fin'
+    and SHOP_TYP_DIAGN_SEJ_HOSP in c('A', 'P', 'S');
+```
+**Si date_dx_var = 'depar'** :
 ```{sql, eval=FALSE, echo=TRUE}
 select SHOP_NO_INDIV_BEN_BANLS as ID,
        SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
@@ -174,6 +185,16 @@ Cette structure contient les séjours dans un service effectués par l'individu 
 * `SHOP_NO_INDIV_BEN_BANLS` : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.
 * `SHOP_DAT_DEPAR_SEJ_HOSP` : Date où l'usager quitte l'installation vivant ou décédé.
 * `SHOP_COD_DIAGN_MDCAL_CLINQ` : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.
+
+**Si date_dx_var = 'admis'** :
+```{sql, eval=FALSE, echo=TRUE}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_COD_DIAGN_MDCAL_CLINQ like any (...)
+    and SHOP_DAT_DEPAR_SEJ_HOSP between 'debut' and 'fin';
+```
+**Si date_dx_var = 'depar'** :
 ```{sql, eval=FALSE, echo=TRUE}
 select SHOP_NO_INDIV_BEN_BANLS as ID,
        SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
@@ -188,6 +209,16 @@ Cette structure contient les épisodes de soins des départements d'urgence de l
 * `SURG_NO_INDIV_BEN_BANLS` : Numéro identifiant de manière unique une personne physique qui est un bénéficiaire du service.
 * `SURG_DH_DEPAR_USAG_DURG` : DateHeure de départ d'un usager de département d'urgence. Cet élément correspond au moment où l'usager quitte physiquement l'urgence. Il correspond donc à la fin de tout traitement dans l'épisode de soins concerné.
 * `SURG_COD_DIAGN_MDCAL_CLINQ` : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.
+
+**Si date_dx_var = 'admis'** :
+```{sql, eval=FALSE, echo=TRUE}
+select SURG_NO_INDIV_BEN_BANLS as ID,
+       SURG_DH_PRIS_CHARG_DURG as DATE_DX
+from RES_SSS.V_EPISO_SOIN_DURG_CM
+where SURG_COD_DIAGN_MDCAL_CLINQ like any (...)
+    and SURG_DH_DEPAR_USAG_DURG between To_Date('debut') and To_Date('fin');
+```
+**Si date_dx_var = 'depar'** :
 ```{sql, eval=FALSE, echo=TRUE}
 select SURG_NO_INDIV_BEN_BANLS as ID,
        SURG_DH_DEPAR_USAG_DURG as DATE_DX
@@ -204,6 +235,7 @@ Cette vue retourne différentes informations se rapportant aux Services rendus �
 * `SMOD_COD_DIAGN_PRIMR` : Code de diagnostic médical clinique. Pour un système de classification donné, chacun des diagnostics définis selon la terminologie ou la codification de la Classification Internationale des Maladies.
 * `SMOD_COD_STA_DECIS` : Code de statut de décision.
   + `PAY` : Payé.
+
 ```{sql, eval=FALSE, echo=TRUE}
 select SMOD_NO_INDIV_BEN_BANLS as ID,
        SMOD_DAT_SERV as DATE_DX

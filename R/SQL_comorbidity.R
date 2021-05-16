@@ -37,7 +37,7 @@ SQL_comorbidity <- function(
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
-  obstetric_exclu = TRUE, exclu_diagn = NULL,
+  date_dx_var = "depar", obstetric_exclu = TRUE, exclu_diagn = NULL,
   verbose = TRUE, keep_confirm_data = FALSE
 ) {
 
@@ -83,6 +83,7 @@ SQL_comorbidity <- function(
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
+      date_dx_var = date_dx_var,
       exclu_diagn = exclu_diagn, verbose = verbose
     )
 

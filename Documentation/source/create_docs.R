@@ -9,22 +9,18 @@ conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 devtools::build_manual(path = "Documentation")
 
 
-# Build Vignettes ---------------------------------------------------------
-if (length(list.files("doc"))) {
-  for (file in list.files("doc")) {
-    unlink(paste0("doc/",file), recursive = TRUE)
-  }
+# Vignettes ---------------------------------------------------------
+files <- list.files("vignettes")
+files <- files[tolower(stringr::str_sub(files, nchar(files) - 3, nchar(files))) == ".rmd"]
+files <- stringr::str_sub(files, 1, nchar(files) - 4)
+for (file in files) {
+  render(
+    input = paste0("vignettes/",file,".Rmd"),
+    output_file = paste0(file,".html"),
+    output_dir = "Documentation/Vignettes",
+    encoding = "UTF-8", envir = new.env()
+  )
 }
-devtools::build_vignettes()
-for (file in list.files("doc")) {
-  if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".html") {
-    file.copy(from = paste0("doc/",file), to = paste0("Documentation/Vignettes/",file),
-              overwrite = TRUE)
-  } else {
-    next
-  }
-}
-
 
 # Formulaire --------------------------------------------------------------
 render(
@@ -47,8 +43,10 @@ render(  # github_document
 )
 render(  # pdf_document
   input = "README.Rmd",
-  output_format = "pdf_document",
-  output_file = paste0("LISEZ-MOI_",Sys.Date(),".pdf"),
+  # output_format = "pdf_document",
+  # output_file = paste0("LISEZ-MOI.pdf"),
+  output_format = "html_document",
+  output_file = paste0("LISEZ-MOI.html"),
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )
@@ -64,8 +62,10 @@ render(
 )
 render(  # pdf_document
   input = "NEWS.Rmd",
-  output_format = "pdf_document",
-  output_file = "inesss-REGISTRE-VERSION.pdf",
+  # output_format = "pdf_document",
+  # output_file = "inesss-REGISTRE-VERSION.pdf",
+  output_format = "html_document",
+  output_file = "inesss-REGISTRE-VERSION.html",
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )
