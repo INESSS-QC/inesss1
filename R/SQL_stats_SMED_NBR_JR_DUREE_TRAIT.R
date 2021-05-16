@@ -1,12 +1,11 @@
 #' Statistiques
 #'
-#' @param conn
-#' @param debut
-#' @param fin
-#' @param by_code_serv
-#' @param include_dureeTx_0
+#' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
+#' @param debut Date de début de la période d'étute au format `AAAA-MM-JJ`.
+#' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
+#' @param by_code_serv `TRUE` ou `FALSE`. Grouper les résultats par code de services. Par défaut `TRUE`.
+#' @param include_dureeTx_0 `TRUE` ou `FALSE`. Inclure les durées de traitements égale à zéro. Par défaut `FALSE`.
 #'
-#' @return
 #' @import data.table
 #' @encoding UTF-8
 #' @export
@@ -43,15 +42,73 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
   }
   finishArgCheck(check)
 
+  if (debut < fin) {
+    fin_copy <- fin
+    fin <- debut
+    debut <- fin_copy
+  }
+
 
   # Extraction des durées ---------------------------------------------------
 
   deb_yr <- year(debut)
   deb_mth <- month(debut)
+  yr <- year(debut)
+  mth <- month(debut)
   fin_yr <- year(fin)
   fin_mth <- month(fin)
   DT <- vector("list", (fin_yr - deb_yr + 1) * 12 - (deb_mth - 1) - (12 - fin_mth))
   i <- 1L
+  loop <- TRUE
+  while (loop) {
+    if (i == 1) {
+      if (deb_yr == fin_yr && deb_mth == fin_mth) {
+        DT[[i]] <- as.data.table(odbc::dbGetQuery(
+          conn, statement = SQL_stats_SMED_NBR_JR_DUREE_TRAIT.query(
+            deb_yr, deb_mth, mday(debut), mday(fin),
+            by_code_serv, include_dureeTx_0
+          )
+        ))
+        loop <- FALSE
+      } else {
+        DT[[i]] <- as.data.table(odbc::dbGetQuery(
+          conn, statement = SQL_stats_SMED_NBR_JR_DUREE_TRAIT.query(
+            deb_yr, deb_mth, mday(debut), "last",
+            by_code_serv, include_dureeTx_0
+          )
+        ))
+        i <- i + 1L
+        mth <- mth + 1L  # appliquer pour le mois suivant
+        if (mth == 13) {  # prochaine année
+          yr <- yr + 1L
+          mth <- 1L
+        }
+      }
+    } else if (yr == fin_yr && mth == fin_mth) {
+      DT[[i]] <- as.data.table(odbc::dbGetQuery(
+        conn, statement = SQL_stats_SMED_NBR_JR_DUREE_TRAIT.query(
+          yr, mth, 1, mday(fin),
+          by_code_serv, include_dureeTx_0
+        )
+      ))
+      loop <- FALSE
+    } else {
+      DT[[i]] <- as.data.table(odbc::dbGetQuery(
+        conn, statement = SQL_stats_SMED_NBR_JR_DUREE_TRAIT.query(
+          yr, mth, 1, "last",
+          by_code_serv, include_dureeTx_0
+        )
+      ))
+      i <- i + 1L
+      mth <- mth + 1L  # appliquer pour le mois suivant
+      if (mth == 13) {  # prochaine année
+        yr <- yr + 1L
+        mth <- 1L
+      }
+    }
+  }
+
+  DT <- rbindlist(DT)
 
 }
 

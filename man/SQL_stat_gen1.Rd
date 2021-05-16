@@ -22,9 +22,9 @@ SQL_stat_gen1(
 \arguments{
 \item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
 
-\item{debut}{Vecteur contenant la date de début de la ou des périodes d'étude au format \code{AAAA-MM-JJ}.}
+\item{debut}{Vecteur contenant la ou les dates de début des périodes d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{fin}{Vecteur contenant la date de fin de la ou des périodes d'étude au format \code{AAAA-MM-JJ}.}
+\item{fin}{Vecteur contenant la ou les dates de fin des périodes d'étude au format \code{AAAA-MM-JJ}.}
 
 \item{type_Rx}{Type de code à analyser. Une valeur parmi :
 \itemize{
