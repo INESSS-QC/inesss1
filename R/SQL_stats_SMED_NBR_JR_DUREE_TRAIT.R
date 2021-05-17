@@ -49,10 +49,11 @@ SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = T
 
   deb_yr <- year(debut)
   deb_mth <- month(debut)
-  yr <- year(debut)
-  mth <- month(debut)
   fin_yr <- year(fin)
   fin_mth <- month(fin)
+
+  yr <- year(debut)
+  mth <- month(debut)
   DT <- vector("list", (fin_yr - deb_yr + 1) * 12 - (deb_mth - 1) - (12 - fin_mth))
   i <- 1L
   loop <- TRUE
