@@ -14,8 +14,8 @@ urlcolor: blue
 header-includes:
   - \usepackage{fancyhdr}
   - \usepackage{booktabs}
-params:
-  conn: ""
+# params:
+#   conn: ""
 ---
 
 \pagestyle{fancy}
@@ -1217,7 +1217,6 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
-Show in New Window
 select
     '2018-01-01' as DATE_DEBUT,
     '2018-12-31' as DATE_FIN,

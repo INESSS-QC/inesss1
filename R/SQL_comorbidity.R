@@ -20,6 +20,7 @@
 #'
 #' @return `data.table` :
 #' * `ID` : Colonne contenant l’identifiant unique de l’usager.
+#' * `nDx` : Nombre de diagnostics associé à l'individu.
 #' * `Charlson` : Indicateur, seulement si `method` contient `'Charlson'`.
 #' * `Elixhauser` : Indicateur, seulement si `method` contient `'Elixhauser'`.
 #' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.

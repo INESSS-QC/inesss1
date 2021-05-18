@@ -273,9 +273,9 @@ Soustraire `n2` est important, car une date ayant comme valeur 2018-01-01 pourra
 > [{2018-01-01$-$`n2`}; {2018-01-01$-$`n1`}]  
 > [2016-01-02; 2017-12-02].
 
-Cette extraction implique qu'un individu ayant une date de référence le 2020-01-01 pourrait avoir des dates de diagnostics comprises entre le 2020-01-01 et le 2020-12-31. Puisqu'on cherche des dates antérieures à la date de référence, les dates supérieures à 2020-01-01 doivent être exclues de l'analyse. De la même manière, un individu ayant une date de référence le 2020-12-31 pourrait avoir des dates inférieures à `2020-12-31$-2$ans$-730$jours`.
+Cette extraction implique qu'un individu ayant une date de référence le 2020-01-01 pourrait avoir des dates de diagnostics comprises entre le 2020-01-01 et le 2020-12-31. Puisqu'on cherche des dates antérieures à la date de référence, les dates supérieures à 2020-01-01 doivent être exclues de l'analyse. De la même manière, un individu ayant une date de référence le 2020-12-31 pourrait avoir des dates inférieures à `2020-12-31`$-2$`ans`$-730$`jours`.
 
-Puisque les dates inférieures à `DATE_INDEX$-$lookup` servent uniquement à confirmer un autre diagnostic, les diagnostics où `confirm_sourc` égalent 1 et où la date est plus petite que `DATE_INDEX$-$lookup` ne seront pas utilisés. Ils seront donc supprimés de la table d'analyse.
+Puisque les dates inférieures à `DATE_INDEX`$-$`lookup` servent uniquement à confirmer un autre diagnostic, les diagnostics où `confirm_sourc` égalent 1 et où la date est plus petite que `DATE_INDEX`$-$`lookup` ne seront pas utilisés. Ils seront donc supprimés de la table d'analyse.
 
 <p style="margin-bottom:1cm">
 

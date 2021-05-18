@@ -29,6 +29,35 @@ remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss",
                        upgrade = "never")
 ```
 
+Documentation
+=============
+
+Les répertoires suivants contiennent toute la documentation en lien avec
+l’utilisation de la librairie R *inesss* :
+
+-   INESSS :
+    `J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss/Documentation`
+-   RAMQ : `V:/GI-Data/_Inscription_Rx/_Rpackage_inesss/Documentation`
+
+Plus particulièrement :
+
+-   **Gabarits et Outils EXCEL :** Fichiers à utiliser pour *Requêtes
+    via Excel* et macros VBA pratiques pour Excel.
+-   **Vignettes :** Fichiers HTML expliquant la ou les méthodes
+    utilisées pour certaines fonctions de la librairie.
+-   **AIDE-FORMULAIRE.pdf :** Comment utiliser le formmulaire interactif
+    et la section *Requêtes via Excel*. Montre également des exemples de
+    code SQL selon les arguments demandés.
+-   **AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx** : Exemple de document à
+    utiliser dans le formulaire interactif à la section *Requêtes via
+    Excel*.
+-   **AIDE-FORMULAIRE-EXEMPLES-RESULTATS.xlsx** : Résultats générés à
+    partir du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
+-   **inesss\_x.y.z :** Documentation complète de la librairie *inesss*
+    où *x.y.z* indique le numéro de version.
+-   **inesss-REGISTRE-VERSION.html :** Registre des versions. Tous les
+    ajouts et les modifications apportés à la librairie y sont inscrits.
+
 Démarrer le formulaire
 ======================
 

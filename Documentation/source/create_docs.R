@@ -27,7 +27,7 @@ render(
   input = "Documentation/source/formulaire.Rmd",
   output_file = paste0("AIDE-FORMULAIRE.pdf"),
   output_dir = "Documentation",
-  params = list(conn = conn),
+  # params = list(conn = conn),
   envir = new.env(), encoding = "UTF-8"
 )
 if (paste0("AIDE-FORMULAIRE.log") %in% list.files("Documentation/source")) {
