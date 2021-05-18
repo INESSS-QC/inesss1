@@ -80,6 +80,7 @@ SQL_comorbidity(
 \code{data.table} :
 \itemize{
 \item \code{ID} : Colonne contenant l’identifiant unique de l’usager.
+\item \code{nDx} : Nombre de diagnostics associé à l'individu.
 \item \code{Charlson} : Indicateur, seulement si \code{method} contient \code{'Charlson'}.
 \item \code{Elixhauser} : Indicateur, seulement si \code{method} contient \code{'Elixhauser'}.
 \item \code{Combined} : Indicateur, seulement si \code{method} contient \code{'Charlson'} et \code{'Elixhauser'}.
