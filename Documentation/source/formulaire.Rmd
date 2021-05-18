@@ -493,7 +493,7 @@ cat(query_naif_switch1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
   type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
   type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  rx_retrospect_a_exclure = c("04----", "08--16", 122436),
   njours_sans_conso = ll$NJOURS_SANS_CONSO,
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
   code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
@@ -996,6 +996,34 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_CLA_AHF as AHFS_CLA,
+    SMED_COD_SCLA_AHF as AHFS_SCLA,
+    SMED_COD_SSCLA_AHF as AHFS_SSCLA,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    SMED_COD_SERV_1 as CODE_SERV,
+    SMED_COD_CATG_LISTE_MED as CODE_LIST,
+    SMED_COD_TENR_MED as TENEUR,
+    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ,
+    (cast(to_date('2018-01-01') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE
+order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE;
 ```
 
 \pagebreak
@@ -1008,7 +1036,7 @@ cat(query_stat_gen1(
 ll <- list(
   METHODE = "stat\\_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "AHFS", CODE_RX = c('04\\texttt{-{}-{}-{}-}', '08\\texttt{-{}-}16', '122436'),
+  TYPE_RX = "AHFS", CODE_RX = c('04\\texttt{-{}-{}-{}-}', '08\\texttt{-{}-}12', '122426'),
   GROUPER_PAR = 'AHFS',
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
   CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
@@ -1025,13 +1053,31 @@ kable_tab(method_args, escape = FALSE)
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx = ll$TYPE_RX, codes = c("04----", "08--12", 122426), group_by = NULL_if_NA(ll$GROUPER_PAR),
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
   code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('04----', '08--12', '122426')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
 ```
 
 \pagebreak
@@ -1066,6 +1112,25 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39, 47092, 47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM, DIN
+order by DENOM, DIN;
 ```
 
 \pagebreak
@@ -1100,6 +1165,24 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DIN
+order by DIN;
 ```
 
 \pagebreak
@@ -1134,6 +1217,27 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+Show in New Window
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    (cast(to_date('2018-01-01') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DIN, AGE
+order by DIN, AGE;
 ```
 
 \pagebreak
@@ -1168,6 +1272,25 @@ cat(query_stat_gen1(
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39, 47092, 47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+    and SMED_COD_CATG_LISTE_MED in ('40', '41')
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
 ```
 
 <!-- \pagebreak -->
