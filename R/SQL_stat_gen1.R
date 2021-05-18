@@ -138,19 +138,24 @@ SQL_stat_gen1 <- function(
 
     DT <- rbindlist(DT)
 
-    ### Ajouter les noms des médicaments
-    DT <- SQL_stat_gen1.ajout_nom_codes(DT, group_by)
 
-    ### Ordre des lignes et des colonnes
-    DT <- SQL_stat_gen1.cols_order(DT, group_by)
-    DT <- SQL_stat_gen1.obs_order(DT, group_by)
+    if (nrow(DT)) {
+      ### Ajouter les noms des médicaments
+      DT <- SQL_stat_gen1.ajout_nom_codes(DT, group_by)
 
-    ### Format des colonnes
-    if (any(names(DT) == "DENOM")) {
-      DT[, DENOM := as.integer(DENOM)]
+      ### Ordre des lignes et des colonnes
+      DT <- SQL_stat_gen1.cols_order(DT, group_by)
+      DT <- SQL_stat_gen1.obs_order(DT, group_by)
+
+      ### Format des colonnes
+      if (any(names(DT) == "DENOM")) {
+        DT[, DENOM := as.integer(DENOM)]
+      }
+
+      return(DT)
+    } else {
+      return(NULL)
     }
-
-    return(DT)
 
   }
 

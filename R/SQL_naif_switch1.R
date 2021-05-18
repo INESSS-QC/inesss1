@@ -169,29 +169,33 @@ SQL_naif_switch1 <- function(
     DT <- rbindlist(DT)
 
     ### Ajouter le nom des médicaments
-    DT <- SQL_stat_gen1.ajout_nom_codes(DT, group_by)
+    if (nrow(DT)) {
+      DT <- SQL_stat_gen1.ajout_nom_codes(DT, group_by)
 
-    ### Ordre des lignes et des colonnes
-    DT <- SQL_stat_gen1.cols_order(DT, group_by)
-    DT <- SQL_stat_gen1.obs_order(DT, group_by)
+      ### Ordre des lignes et des colonnes
+      DT <- SQL_stat_gen1.cols_order(DT, group_by)
+      DT <- SQL_stat_gen1.obs_order(DT, group_by)
 
-    ### Format des colonnes
-    if (any(names(DT) == "DENOM")) {
-      DT[, DENOM := as.integer(DENOM)]
+      ### Format des colonnes
+      if (any(names(DT) == "DENOM")) {
+        DT[, DENOM := as.integer(DENOM)]
+      }
+
+      return(DT)
+    } else {
+      return(NULL)
     }
-
-    return(DT)
 
   }
 
 }
 
 #' @title SQL_naif_switch1
-#' @description Vérification des arguments. Les arguments manquants sont vérifiés dans la fonction \code{\link{query_naif_switch1}}.
+#' @description Vérification des arguments.
 #' @keywords internal
 #' @encoding UTF-8
 SQL_naif_switch1.verif_args <- function(
-  debut, fin, type_Rx, codes, grouper_par,
+  debut, fin, type_Rx, codes, group_by,
   rx_retrospect_a_exclure, njours_sans_conso,
   code_serv, code_serv_filtre, code_list, code_list_filtre
 ) {
@@ -231,9 +235,9 @@ SQL_naif_switch1.verif_args <- function(
     addError("codes doit contenir au moins une valeur.", check)
   }
 
-  # grouper_par
-  if (!is.null(grouper_par) && !all(grouper_par %in% vals$grouper_par)) {
-    addError("grouper_par contient au moins une valeur non permise.", check)
+  # group_by
+  if (!is.null(group_by) && !all(group_by %in% vals$group_by)) {
+    addError("group_by contient au moins une valeur non permise.", check)
   }
 
   # njours_sans_conso

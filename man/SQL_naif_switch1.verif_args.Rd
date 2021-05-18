@@ -10,7 +10,7 @@ SQL_naif_switch1.verif_args(
   fin,
   type_Rx,
   codes,
-  grouper_par,
+  group_by,
   rx_retrospect_a_exclure,
   njours_sans_conso,
   code_serv,
@@ -20,6 +20,6 @@ SQL_naif_switch1.verif_args(
 )
 }
 \description{
-Vérification des arguments. Les arguments manquants sont vérifiés dans la fonction \code{\link{query_naif_switch1}}.
+Vérification des arguments.
 }
 \keyword{internal}

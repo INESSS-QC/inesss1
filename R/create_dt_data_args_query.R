@@ -11,6 +11,11 @@
 #' @import data.table
 create_dt_data_args_query <- function(dt, args_list, query) {
 
+  ### Créer un data si dt = NULL
+  if (is.null(dt)) {
+    dt <- data.table(AVERTISSEMENT = "Aucun résultats à afficher")
+  }
+
   ### Déterminer le nombre de lignes que l'onglet Excel doit avoir.
   query <- data.table(`Requête SQL` = stringr::str_split(query, "\n")[[1]]) # séparer la chaine de caractères en vecteur
   nb_row <- max(nrow(dt), sapply(args_list, length), nrow(query))  # nbre de lignes nécessaires
