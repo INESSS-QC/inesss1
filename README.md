@@ -1,5 +1,3 @@
-**inesss v.1.0.0**
-
 Support
 =======
 
@@ -21,12 +19,10 @@ la librairie *inesss*.
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 
 # Installation pour postes INESSS
-remotes::install_local("J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss",
-                       upgrade = "never")
+remotes::install_local("J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss")
 
 # Installation pour postes RAMQ
-remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss",
-                       upgrade = "never")
+remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss")
 ```
 
 Documentation

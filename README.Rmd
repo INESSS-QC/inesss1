@@ -35,16 +35,6 @@ newpage <- function(space = "3cm") {
 }
 ```
 
-
-```{r}
-# Indiquer la version si c'est en HTML, car le numéro de version ne peut être
-# inscrit dans le nom du fichier.
-if (is_html_output()) {
-  cat(paste0("**inesss v.",as.character(packageVersion("inesss")),"**"))
-}
-```
-
-
 # Support
 Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
 La documentation de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
@@ -57,12 +47,10 @@ Copier les lignes suivantes dans la console de *RStudio* pour installer la libra
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 
 # Installation pour postes INESSS
-remotes::install_local("J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss",
-                       upgrade = "never")
+remotes::install_local("J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss")
 
 # Installation pour postes RAMQ
-remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss",
-                       upgrade = "never")
+remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss")
 ```
 
 # Documentation
