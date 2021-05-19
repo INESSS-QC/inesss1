@@ -2,7 +2,7 @@ library(inesss)
 library(rmarkdown)
 library(stringr)
 library(writexl)
-conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+# conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 
 
 # Build Manual ------------------------------------------------------------

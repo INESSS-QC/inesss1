@@ -12,24 +12,41 @@
 #' @param reverse `TRUE` ou `FALSE`. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.
 #'
 #' @name confirm_nDx
+#' @keywords internal
 #' @encoding UTF-8
-#' @import data.table
+#' @examples
+#' dt_ex <- data.frame(
+#'   id = 1L,
+#'   dates = c("2020-01-01", "2020-01-09", "2020-01-10", "2020-01-15", "2020-01-16",
+#'             "2020-01-20", "2020-01-26", "2020-01-31")
+#' )
+#' ex_2dx <- confirm_2Dx(dt = dt_ex, ID = "id", DATE = "dates",
+#'                       n1 = 10, n2 = 20, reverse = FALSE)
+#' ex_2dx_reverse <- confirm_2Dx(dt = dt_ex, ID = "id", DATE = "dates",
+#'                               n1 = 10, n2 = 20, reverse = TRUE)
+#' ex_3dx <- confirm_3Dx(dt = dt_ex, ID = "id", DATE = "dates",
+#'                       n1 = 10, n2 = 20, reverse = FALSE)
+#' ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = "id", DATE = "dates",
+#'                               n1 = 10, n2 = 20, reverse = TRUE)
+
 
 #' @rdname confirm_nDx
-#' @export
+#' @import data.table
+#' @keywords internal
 confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
 
   ### Arranger data
   # Convertir data.table au besoin
-  if (is.data.table(dt)) {
+  if (!is.data.table(dt)) {
     setDT(dt)
   }
   # Créer colonne facultative DIAGN
   if (is.null(DIAGN)) {
     remove_DIAGN <- TRUE  # indiquera plus tard si on la supprime
     DIAGN <- "DIAGN"
+    dt <- copy(dt)
     dt[, DIAGN := 0L]
   } else {
     remove_DIAGN <- FALSE
@@ -125,20 +142,22 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
 }
 
 #' @rdname confirm_nDx
-#' @export
+#' @import data.table
+#' @keywords internal
 confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
 
   ### Arranger data
   # Convertir data.table au besoin
-  if (is.data.table(dt)) {
+  if (!is.data.table(dt)) {
     setDT(dt)
   }
   # Créer colonne facultative DIAGN
   if (is.null(DIAGN)) {
     remove_DIAGN <- TRUE  # indiquera plus tard si on la supprime
     DIAGN <- "DIAGN"
+    dt <- copy(dt)
     dt[, DIAGN := 0L]
   } else {
     remove_DIAGN <- FALSE
@@ -148,7 +167,7 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
   dt <- unique(dt)  # valeurs uniques
   # Convertir les dates en integer pour meilleure performance
   if (!lubridate::is.Date(dt$DATE)) {
-    dt[, DATE := as_date(DATE)]
+    dt[, DATE := lubridate::as_date(DATE)]
   }
   if (!is.integer(dt$DATE)) {
     dt[, DATE := as.integer(DATE)]
@@ -179,7 +198,7 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
   } else {
     setkey(dt, ID, DIAGN, DATE)
   }
-  for (i in 1:n_iter) {
+  for (i in 1:5) {
     idx <- dt[, .I[.N >= 3], .(ID, DIAGN)]$V1  # lignes où les ID ont 3 obs ou plus
     if (length(idx)) {
       sd <- dt[idx]  # subset data
