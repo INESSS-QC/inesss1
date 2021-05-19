@@ -14,6 +14,7 @@ SQL_obstetric(
     "I_SMOD_SERV_MD_CM"),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MED-ECHO", V_SEJ_SERV_HOSP_CM = "MED-ECHO",
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
+  date_dx_var = "depar",
   verbose = TRUE
 )
 }
@@ -31,6 +32,8 @@ SQL_obstetric(
 \item{dt_source}{Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir \emph{Details}.}
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
+
+\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette \emph{SQL_comorbidity} section 4 \emph{Sources SQL (dt_source)} pour voir le code SQL généré.}
 
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }

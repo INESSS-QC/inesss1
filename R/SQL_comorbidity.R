@@ -107,7 +107,7 @@ SQL_comorbidity <- function(
 
     ### Exclusion des cas gestationnelles
     if (obstetric_exclu) {
-      dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
+      dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, date_dx_var, verbose)
     }
 
     ### Dx confirmé par un Dx dans l'intervalle qui précède la période d'étude
@@ -160,7 +160,7 @@ SQL_comorbidity <- function(
 #' @keywords internal
 #' @import data.table
 #' @encoding UTF-8
-SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, verbose) {
+SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, date_dx_var, verbose) {
   ### Supprimer les cas de diabètes de grosses. Un diagnostic de diabète sera
   ### supprimé s'il se trouve 120 jours avant le diagnostic et 180 jours après.
 
@@ -176,7 +176,7 @@ SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, 
       conn,
       cohort = sunique(dt_diab_hyp$ID),
       debut = min(dt_diab_hyp$DATE_DX) - 180, fin = max(dt_diab_hyp$DATE_DX) + 120,
-      CIM, dt_source, dt_desc, verbose
+      CIM, dt_source, dt_desc, date_dx_var, verbose
     )
 
     ### Arranger le data pour exclusion des diabètes et hypertension de grossesses

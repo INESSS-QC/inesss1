@@ -5,7 +5,15 @@
 \alias{SQL_comorbidity.exclu_diab_gross}
 \title{SQL_comorbidity}
 \usage{
-SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
+SQL_comorbidity.exclu_diab_gross(
+  conn,
+  dt,
+  CIM,
+  dt_source,
+  dt_desc,
+  date_dx_var,
+  verbose
+)
 }
 \description{
 Exclusion des cas de diabète et d'hypertension gestationnel.
