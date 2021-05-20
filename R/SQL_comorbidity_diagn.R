@@ -139,10 +139,14 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, f
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis", "SHOP_DAT_ADMIS_SEJ_HOSP", "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SHOP_DAT_ADMIS_SEJ_HOSP",
+                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
         "from RES_SSS.V_DIAGN_SEJ_HOSP_CM\n",
         "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"'\n",
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SHOP_DAT_ADMIS_SEJ_HOSP",
+                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"'\n",
         "    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');"
       )
     ))
@@ -192,10 +196,14 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fi
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis", "SHOP_DAT_ADMIS_SEJ_HOSP", "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SHOP_DAT_ADMIS_SEJ_HOSP",
+                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
         "from RES_SSS.V_SEJ_SERV_HOSP_CM\n",
         "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"';"
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SHOP_DAT_ADMIS_SEJ_HOSP",
+                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"';"
       )
     ))
     if (!is.null(ids)) {
@@ -297,10 +305,14 @@ SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, 
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SURG_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis", "SURG_DH_PRIS_CHARG_DURG", "SURG_DH_DEPAR_USAG_DURG ")," as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SURG_DHD_EPISO_SOIN_DURG",
+                         "SURG_DH_DEPAR_USAG_DURG ")," as DATE_DX\n",
         "from RES_SSS.V_EPISO_SOIN_DURG_CM\n",
         "where SURG_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SURG_DH_DEPAR_USAG_DURG between To_Date('",deb,"') and To_Date('",fi,"');"
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SURG_DHD_EPISO_SOIN_DURG",
+                          "SURG_DH_DEPAR_USAG_DURG ")," between To_Date('",deb,"') and To_Date('",fi,"');"
       )
     ))
     if (!is.null(ids)) {
