@@ -1,0 +1,48 @@
+---
+title: "confirm_nDx"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{confirm_nDx}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  echo = FALSE
+)
+```
+
+```{r setup}
+library(inesss)
+library(data.table)
+```
+
+# Introduction
+Les fonctions `confirm_2Dx` et `confirm_3Dx` permettent de vérifier si une date de repérage est confirmée par une ou deux dates. Les dates de confirmations doivent se retrouver dans l'intervalle `[n1, n2]` de la date précédente.
+
+
+<!-- <p style="page-break-before: always"> -->
+<p style="margin-bottom:3cm">
+
+
+# Explications
+À partir de la table suivante
+```{r}
+dt <- data.table(
+  ID = 1L,
+  DATE_DX = c("2020-01-01", "2020-01-04", "2020-01-09", "2020-01-10", "2020-01-18",
+              "2020-01-21", "2020-01-25", "2020-01-31")
+)
+dt[]
+```
+
+## confirm_2Dx
+```{r, echo=TRUE, eval=FALSE}
+confirm_2Dx(dt = dt, ID = "ID", DATE = "DATE_DX", DIAGN = NULL,
+            study_start = NULL, study_end = NULL,
+            n1 = 10, n2 = 20, reverse = FALSE)
+```
+
