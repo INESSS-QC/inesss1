@@ -28,11 +28,15 @@
 #'                       n1 = 10, n2 = 20, reverse = FALSE)
 #' ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = "id", DATE = "dates",
 #'                               n1 = 10, n2 = 20, reverse = TRUE)
-
+dt_ex_dx <- data.frame(
+  id = 1L,
+  dates = c("2020-01-01", "2020-01-09", "2020-01-10", "2020-01-15", "2020-01-16",
+            "2020-01-20", "2020-01-26", "2020-01-31"),
+  dx = c("")
+)
 
 #' @rdname confirm_nDx
 #' @import data.table
-#' @keywords internal
 confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
@@ -98,8 +102,10 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
       }
       sd[, diff := cumsum(diff), .(ID, DIAGN)]  # nombre de jours cumulés
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
-      sd[, keep := FALSE]
-      sd[any(diff %in% n1:n2), keep := TRUE, .(ID, DIAGN)]
+      sd[, keep := fcase(any(diff %in% n1:n2), TRUE,
+                         default = FALSE)]
+      # sd[, keep := FALSE]
+      # sd[any(diff %in% n1:n2), keep := TRUE, .(ID, DIAGN)]
       sd <- sd[keep == TRUE]
       if (nrow(sd)) {
         if (reverse) {
@@ -129,12 +135,31 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
     confirm_tab <- confirm_tab[between(DATE_REP, study_start, study_end)]  # dates de repérage dans la période d'étude
     setkey(confirm_tab, ID, DIAGN, DATE_REP)  # trier
     # Arranger le data final
-    confirm_tab[, `:=` (DATE_REP = lubridate::as_date(DATE_REP),
+    confirm_tab[, `:=` (DATE_REP = lubridate::as_date(DATE_REP),  # colonnes au format DATE
                         DATE_CONF1 = lubridate::as_date(DATE_CONF1))]
     if (remove_DIAGN) {
       confirm_tab[, DIAGN := NULL]
     }
+    if (reverse) {
+      if (remove_DIAGN) {
+        setorder(confirm_tab, ID, -DATE_REP)
+      } else {
+        setorder(confirm_tab, ID, DIAGN, -DATE_REP)
+      }
+    } else {
+      if (remove_DIAGN) {
+        setkey(confirm_tab, ID, DATE_REP)
+      } else {
+        setkey(confirm_tab, ID, DIAGN, DATE_REP)
+      }
+    }
+    setnames(confirm_tab, "ID", ID)
+    if (!remove_DIAGN) {
+      setnames(confirm_tab, "DIAGN", DIAGN)
+    }
+
     return(confirm_tab)
+
   } else {
     return(NULL)
   }
@@ -143,7 +168,6 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
 
 #' @rdname confirm_nDx
 #' @import data.table
-#' @keywords internal
 confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
@@ -210,11 +234,13 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
       sd[, diff := cumsum(diff), .(ID, DIAGN)]  # nombre de jours cumulés
       # Répéter étape précédente, mais à partir de la date trouvée précédemment
       sd[, DATE2 := DATE][diff < n1, DATE2 := 0L]
-      if (reverse) {
-        sd[DATE2 > 0, diff2 := -(DATE2 - max(DATE2)), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
-      } else {
-        sd[DATE2 > 0, diff2 := DATE2 - min(DATE2), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
-      }
+      suppressWarnings({  # supprimer message d'avis si aucun DATE2>0 : Dans min(DATE2) : aucun argument trouvé pour min ; Inf est renvoyé
+        if (reverse) {
+          sd[DATE2 > 0, diff2 := -(DATE2 - max(DATE2)), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
+        } else {
+          sd[DATE2 > 0, diff2 := DATE2 - min(DATE2), .(ID, DIAGN)][is.na(diff2), diff2 := 0L]
+        }
+      })
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
       sd[, keep := FALSE]
       sd[
@@ -260,7 +286,26 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
     if (remove_DIAGN) {
       confirm_tab[, DIAGN := NULL]
     }
+    if (reverse) {
+      if (remove_DIAGN) {
+        setorder(confirm_tab, ID, -DATE_REP)
+      } else {
+        setorder(confirm_tab, ID, DIAGN, -DATE_REP)
+      }
+    } else {
+      if (remove_DIAGN) {
+        setkey(confirm_tab, ID, DATE_REP)
+      } else {
+        setkey(confirm_tab, ID, DIAGN, DATE_REP)
+      }
+    }
+    setnames(confirm_tab, "ID", ID)
+    if (!remove_DIAGN) {
+      setnames(confirm_tab, "DIAGN", DIAGN)
+    }
+
     return(confirm_tab)
+
   } else {
     return(NULL)
   }
