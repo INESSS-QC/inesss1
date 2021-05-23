@@ -2,7 +2,7 @@ library(inesss)
 library(rmarkdown)
 library(stringr)
 library(writexl)
-# conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+# conn <- SQL_connexion()
 
 
 # Build Manual ------------------------------------------------------------
@@ -41,7 +41,7 @@ render(  # github_document
   output_file = "README.md",
   envir = new.env(), encoding = "UTF-8"
 )
-render(  # pdf_document
+render(
   input = "README.Rmd",
   # output_format = "pdf_document",
   # output_file = paste0("LISEZ-MOI.pdf"),
@@ -60,7 +60,7 @@ render(
   output_dir = getwd(),
   envir = new.env(), encoding = "UTF-8"
 )
-render(  # pdf_document
+render(
   input = "NEWS.Rmd",
   # output_format = "pdf_document",
   # output_file = "inesss-REGISTRE-VERSION.pdf",

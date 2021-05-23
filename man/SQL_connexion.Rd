@@ -5,10 +5,10 @@
 \alias{SQL_connexion}
 \title{Connexion Teradata}
 \usage{
-SQL_connexion(uid, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1")
+SQL_connexion(uid = NULL, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1")
 }
 \arguments{
-\item{uid}{Identifiant.}
+\item{uid}{Identifiant. Si \code{NULL}, le \emph{user} est demandé lors de l'exécution.}
 
 \item{pwd}{Mot de passe. Si \code{NULL}, le mot de passe est demandé lors de l'exécution.}
 
