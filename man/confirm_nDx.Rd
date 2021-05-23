@@ -54,16 +54,26 @@ Confirmation d'un diagnostic par d'autres diagnostics lorsque ceux-ci se retrouv
 \examples{
 dt_ex <- data.frame(
   id = 1L,
-  dates = c("2020-01-01", "2020-01-09", "2020-01-10", "2020-01-15", "2020-01-16",
-            "2020-01-20", "2020-01-26", "2020-01-31")
+  dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',
+            '2020-01-20', '2020-01-26', '2020-01-31')
 )
-ex_2dx <- confirm_2Dx(dt = dt_ex, ID = "id", DATE = "dates",
+ex_2dx <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
                       n1 = 10, n2 = 20, reverse = FALSE)
-ex_2dx_reverse <- confirm_2Dx(dt = dt_ex, ID = "id", DATE = "dates",
+ex_2dx_reverse <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
                               n1 = 10, n2 = 20, reverse = TRUE)
-ex_3dx <- confirm_3Dx(dt = dt_ex, ID = "id", DATE = "dates",
+ex_3dx <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
                       n1 = 10, n2 = 20, reverse = FALSE)
-ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = "id", DATE = "dates",
+ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
                               n1 = 10, n2 = 20, reverse = TRUE)
+
+### With DIAGN column
+dt_ex_dx <- data.frame(
+  id = 1L,
+  dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',
+            '2020-01-20', '2020-01-26', '2020-01-31'),
+  dx = c(rep('diab', 4), rep('canc', 4))
+)
+ex_2dx_diagn <- confirm_2Dx(dt = dt_ex_dx, ID = 'id', DATE = 'dates', DIAGN = 'dx',
+                            n1 = 10, n2 = 20, reverse = FALSE)
 }
 \keyword{internal}
