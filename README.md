@@ -14,7 +14,7 @@ compressé.
 
 Puisque Microsoft Teams est accessible par un navigateur web, il est
 conseillé d’y avoir déposé le dossier d’installation et de le
-télécharger par la suite. Utile pour utiliser la librairie sur le
+télécharger par la suite si vous voulez utiliser la librairie sur le
 serveur de la RAMQ.
 
 1.  Télécharger sur votre poste le dossier d’installation s’intitulant

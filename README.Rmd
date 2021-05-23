@@ -42,7 +42,7 @@ Pour recevoir les dernières mises à jour de la librairie, demander d'être ajo
 
 
 # Installation de la librairie *inesss*
-Puisque Microsoft Teams est accessible par un navigateur web, il est conseillé d'y avoir déposé le dossier d'installation et de le télécharger par la suite. Utile pour utiliser la librairie sur le serveur de la RAMQ.
+Puisque Microsoft Teams est accessible par un navigateur web, il est conseillé d'y avoir déposé le dossier d'installation et de le télécharger par la suite si vous voulez utiliser la librairie sur le serveur de la RAMQ.
 
 1. Télécharger sur votre poste le dossier d'installation s'intitulant *R_inesss_x.y.z.tar.gz* où `x.y.z` est le numéro de version.
 2. Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss* **en prenant soin d'inscrire le répertoire et le nom du dossier d'installation**, puis appuyer sur *Entrée*.
