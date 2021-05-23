@@ -6,8 +6,8 @@
 #' @param ID Nom de la colonne contenant le numéro d'identification unique des individus.
 #' @param DATE Nom de la colonne contenant la date du diagnostic.
 #' @param DIAGN Facultatif. Nom de la colonne indiquant les codes de diagnostics.
-#' @param study_start Date de début de la période d'étude contenant les dates de repérage. Si `NULL`, aura pour valeur la première date de `dt`, la plus ancienne.
-#' @param study_end Date de fin de la période d'étude contenant les dates de repérage. Si `NULL`, aura pour valeur la dernière date de `dt`, la plus récente.
+#' @param study_start Date de début de la période d'étude **contenant les dates de repérage**. Si `NULL`, aura pour valeur la première date de `dt`, la plus ancienne.
+#' @param study_end Date de fin de la période d'étude **contenant les dates de repérage**. Si `NULL`, aura pour valeur la dernière date de `dt`, la plus récente.
 #' @param n1,n2 Nombre de jours permettant de construire l'intervalle \[n1; n2\] où un code de diagnostic peut en confirmer un autre.
 #' @param reverse `TRUE` ou `FALSE`. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.
 #'
@@ -20,13 +20,13 @@
 #'   dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',
 #'             '2020-01-20', '2020-01-26', '2020-01-31')
 #' )
-#' ex_2dx <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
+#' ex_2dx <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
 #'                       n1 = 10, n2 = 20, reverse = FALSE)
-#' ex_2dx_reverse <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
+#' ex_2dx_reverse <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
 #'                               n1 = 10, n2 = 20, reverse = TRUE)
 #' ex_3dx <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
 #'                       n1 = 10, n2 = 20, reverse = FALSE)
-#' ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
+#' ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
 #'                               n1 = 10, n2 = 20, reverse = TRUE)
 #'
 #' ### With DIAGN column
@@ -38,6 +38,14 @@
 #' )
 #' ex_2dx_diagn <- confirm_2Dx(dt = dt_ex_dx, ID = 'id', DATE = 'dates', DIAGN = 'dx',
 #'                             n1 = 10, n2 = 20, reverse = FALSE)
+#'
+#' ### study_start & study_end
+#' ex_studydates <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
+#'                              study_start = '2020-01-10', study_end = '2020-01-20',
+#'                              n1 = 10, n2 = 20, reverse = FALSE)
+#' ex_studydates_rev <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
+#'                                  study_start = '2020-01-10', study_end = '2020-01-20',
+#'                                  n1 = 10, n2 = 20, reverse = TRUE)
 
 
 #' @rdname confirm_nDx
