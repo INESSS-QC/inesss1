@@ -1,3 +1,5 @@
+inesss 1.0.0
+
 # Support
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
@@ -12,13 +14,9 @@ compressé.
 
 # Installation de la librairie *inesss*
 
-Puisque Microsoft Teams est accessible par un navigateur web, il est
-conseillé d’y avoir déposé le dossier d’installation et de le
-télécharger par la suite si vous voulez utiliser la librairie sur le
-serveur de la RAMQ.
-
-1.  Télécharger sur votre poste le dossier d’installation s’intitulant
-    *R_inesss_x.y.z.tar.gz* où `x.y.z` est le numéro de version.
+1.  Télécharger sur votre poste le dossier d’installation en
+    <a download="R_inesss_v1.0.0.zip" href="https://github.com/INESSS-QC/inesss1/archive/refs/heads/master.zip">cliquant
+    ici</a>.
 2.  Copier les lignes suivantes dans la console de *RStudio* pour
     installer la librairie *inesss* **en prenant soin d’inscrire le
     répertoire et le nom du dossier d’installation**, puis appuyer sur
@@ -29,13 +27,13 @@ serveur de la RAMQ.
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 
 # Installation de la librairie R inesss
-remotes::install_local("Inscrire/le/répertoire/du/dossier/R_inesss_x.y.z.tar.gz", upgrade = "never")
+remotes::install_local("Inscrire/le/répertoire/du/dossier/inesss1-master.zip", upgrade = "never")
 ```
 
 **Exemple**
 
 ``` r
-remotes::install_local("E:/Desktop/MonDossier/Rpackages/R_inesss_1.0.0.tar.gz", upgrade = "never")
+remotes::install_local("E:/Desktop/MonDossier/Rpackages/inesss1-master.zip", upgrade = "never")
 ```
 
 # Documentation

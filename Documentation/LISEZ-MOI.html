@@ -171,6 +171,7 @@ pre code {
 </div>
 
 
+<p>inesss 1.0.0</p>
 <div id="support" class="section level1">
 <h1>Support</h1>
 <p>Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à <code>guillaume.boucher@inesss.qc.ca</code> et indiquer l’objet <code>librairie inesss</code>.<br />
@@ -179,18 +180,17 @@ Pour recevoir les dernières mises à jour de la librairie, demander d’être a
 </div>
 <div id="installation-de-la-librairie-inesss" class="section level1">
 <h1>Installation de la librairie <em>inesss</em></h1>
-<p>Puisque Microsoft Teams est accessible par un navigateur web, il est conseillé d’y avoir déposé le dossier d’installation et de le télécharger par la suite si vous voulez utiliser la librairie sur le serveur de la RAMQ.</p>
 <ol style="list-style-type: decimal">
-<li>Télécharger sur votre poste le dossier d’installation s’intitulant <em>R_inesss_x.y.z.tar.gz</em> où <code>x.y.z</code> est le numéro de version.</li>
+<li>Télécharger sur votre poste le dossier d’installation en <a download="R_inesss_v1.0.0.zip" href="https://github.com/INESSS-QC/inesss1/archive/refs/heads/master.zip">cliquant ici</a>.</li>
 <li>Copier les lignes suivantes dans la console de <em>RStudio</em> pour installer la librairie <em>inesss</em> <strong>en prenant soin d’inscrire le répertoire et le nom du dossier d’installation</strong>, puis appuyer sur <em>Entrée</em>.</li>
 </ol>
 <pre class="r"><code># Installer le package remotes au besoin :
 if (!&quot;remotes&quot; %in% installed.packages()[,1]) install.packages(&quot;remotes&quot;)
 
 # Installation de la librairie R inesss
-remotes::install_local(&quot;Inscrire/le/répertoire/du/dossier/R_inesss_x.y.z.tar.gz&quot;, upgrade = &quot;never&quot;)</code></pre>
+remotes::install_local(&quot;Inscrire/le/répertoire/du/dossier/inesss1-master.zip&quot;, upgrade = &quot;never&quot;)</code></pre>
 <p><strong>Exemple</strong></p>
-<pre class="r"><code>remotes::install_local(&quot;E:/Desktop/MonDossier/Rpackages/R_inesss_1.0.0.tar.gz&quot;, upgrade = &quot;never&quot;)</code></pre>
+<pre class="r"><code>remotes::install_local(&quot;E:/Desktop/MonDossier/Rpackages/inesss1-master.zip&quot;, upgrade = &quot;never&quot;)</code></pre>
 </div>
 <div id="documentation" class="section level1">
 <h1>Documentation</h1>
