@@ -102,7 +102,9 @@ SQL_comorbidity_diagn <- function(
 #' @encoding UTF-8
 #' @keywords internal
 SQL_comorbidity_diagn.select_Dx_table <- function(Dx_table) {
-  if (Dx_table == "Combine_Dx_CCI_INSPQ18") {
+  if (is.list(Dx_table)) {
+    return(Dx_table)
+  } else if (Dx_table == "Combine_Dx_CCI_INSPQ18") {
     return(inesss::Combine_Dx_CCI_INSPQ18)
   } else if (Dx_table == "Charlson_Dx_CCI_INSPQ18") {
     return(inesss::Charlson_Dx_CCI_INSPQ18)

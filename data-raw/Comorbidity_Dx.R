@@ -504,6 +504,7 @@ use_data(Combine_Dx_CCI_INSPQ18,
          Charlson_Dx_CCI_INSPQ18,
          Elixhauser_Dx_CCI_INSPQ18,
          Charlson_Dx_UManitoba16,
+
          overwrite = TRUE)
 
 rm(Combine_Dx_CCI_INSPQ18, Charlson_Dx_CCI_INSPQ18, Elixhauser_Dx_CCI_INSPQ18, Charlson_Dx_UManitoba16)
