@@ -12,7 +12,7 @@
 #' @examples
 #' date_ymd(2020, 1, 15)
 #' date_ymd(2020, 10, 31)
-#' date_ymd()
+#' date_ymd(2020, 6, 'last')
 #' for (yr in 1996:2004) {
 #'   print(date_ymd(yyyy = yr, mm = 2, dd = 'last'))
 #' }

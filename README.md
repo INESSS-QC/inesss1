@@ -1,23 +1,62 @@
-**inesss v.0.7.3**
-
 # Support
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
-conception, écrire un courriel à l’adresse
-`guillaume.boucher@inesss.qc.ca` et indiquer l’objet
-`librairie inesss`.  
-La documentation de la librairie est disponible
-[ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
+conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et
+indiquer l’objet `librairie inesss`.  
+La documentation à jour de la librairie est disponible
+[ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).  
+Pour recevoir les dernières mises à jour de la librairie, demander
+d’être ajouté à la liste d’envoi. Le courriel envoyé contiendra deux
+dossiers : 1) dossier d’installation; 2) dossier *Documentation*
+compressé.
 
 # Installation de la librairie *inesss*
 
-Copier les lignes suivantes dans la console de *RStudio* pour installer
-la librairie *inesss*.
+Puisque Microsoft Teams est accessible par un navigateur web, il est
+conseillé d’y avoir déposé le dossier d’installation et de le
+télécharger par la suite. Utile pour utiliser la librairie sur le
+serveur de la RAMQ.
+
+1.  Télécharger sur votre poste le dossier d’installation s’intitulant
+    *R_inesss_x.y.z.tar.gz* où `x.y.z` est le numéro de version.
+2.  Copier les lignes suivantes dans la console de *RStudio* pour
+    installer la librairie *inesss* **en prenant soin d’inscrire le
+    répertoire et le nom du dossier d’installation**, puis appuyer sur
+    *Entrée*.
 
 ``` r
+# Installer le package remotes au besoin :
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-remotes::install_github("INESSS-QC/inesss", upgrade = "never", build_vignettes = T)
+
+# Installation de la librairie R inesss
+remotes::install_local("Inscrire/le/répertoire/du/dossier/R_inesss_x.y.z.tar.gz", upgrade = "never")
 ```
+
+**Exemple**
+
+``` r
+remotes::install_local("E:/Desktop/MonDossier/Rpackages/R_inesss_1.0.0.tar.gz", upgrade = "never")
+```
+
+# Documentation
+
+-   **Gabarits et Outils EXCEL :** Fichiers à utiliser pour *Requêtes
+    via Excel* et macros VBA pratiques pour Excel.
+-   **Vignettes :** Fichiers HTML expliquant la ou les méthodes
+    utilisées pour certaines fonctions de la librairie.
+-   **AIDE-FORMULAIRE.pdf :** Comment utiliser le formulaire interactif
+    et la section *Requêtes via Excel*. Montre également des exemples de
+    code SQL selon les arguments demandés.
+-   **AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx** : Exemple de document à
+    utiliser dans le formulaire interactif à la section *Requêtes via
+    Excel*.
+-   **AIDE-FORMULAIRE-EXEMPLES-RESULTATS.xlsx** : Résultats générés à
+    partir du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
+-   **inesss_x.y.z :** Documentation complète de la librairie *inesss*
+    où *x.y.z* indique le numéro de version.
+-   **inesss-REGISTRE-VERSION.html :** Registre des versions. Tous les
+    ajouts et les modifications apportées à la librairie y sont
+    inscrits.
 
 # Démarrer le formulaire
 
@@ -35,12 +74,12 @@ R version 4.0.5 (2021-03-31)
 ## Librairies
 
 `askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
-v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.31<br> `lubridate`
+v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.32<br> `lubridate`
 v.1.7.10<br> `miniUI` v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc`
-v.1.3.1<br> `readxl` v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi`
+v.1.3.2<br> `readxl` v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi`
 v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles`
 v.0.9.0<br> `stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl`
-v.1.3.1
+v.1.4.0
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">

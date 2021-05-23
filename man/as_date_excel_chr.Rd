@@ -11,6 +11,6 @@ as_date_excel_chr(x)
 \item{x}{Vecteur contenant les dates Excel au format entier.}
 }
 \description{
-Convertir une date Excel au format CHR en Date R. Soit une valeur \code{AAAA-MM-JJ} ou un nombre entier, mais au format \code{CHR}.
+Convertir une date Excel au format CHR en Date R. Doit être une valeur \code{AAAA-MM-JJ} ou un nombre entier, mais au format \code{CHR}.
 }
 \keyword{internal}

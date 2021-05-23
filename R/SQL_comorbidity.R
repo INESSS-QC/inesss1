@@ -2,9 +2,9 @@
 #'
 #' Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 #'
-#' \strong{\code{dt} :} Si un `ID` a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
-#' \strong{\code{obstetric_exclu} :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.\cr\cr
-#' \strong{\code{dt_source} :}
+#' \strong{dt :} Si un `ID` a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
+#' \strong{obstetric_exclu :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.\cr\cr
+#' \strong{dt_source :}
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V%5FDIAGN%5FSEJ%5FHOSP%5FCM+%28Diagnostic+s%E9jour+hospitalier%29}{`V_DIAGN_SEJ_HOSP_CM`} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{`V_EPISO_SOIN_DURG_CM`} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
@@ -20,6 +20,7 @@
 #'
 #' @return `data.table` :
 #' * `ID` : Colonne contenant l’identifiant unique de l’usager.
+#' * `nDx` : Nombre de diagnostics associé à l'individu.
 #' * `Charlson` : Indicateur, seulement si `method` contient `'Charlson'`.
 #' * `Elixhauser` : Indicateur, seulement si `method` contient `'Elixhauser'`.
 #' * `Combined` : Indicateur, seulement si `method` contient `'Charlson'` et `'Elixhauser'`.
@@ -37,7 +38,7 @@ SQL_comorbidity <- function(
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
-  obstetric_exclu = TRUE, exclu_diagn = NULL,
+  date_dx_var = "depar", obstetric_exclu = TRUE, exclu_diagn = NULL,
   verbose = TRUE, keep_confirm_data = FALSE
 ) {
 
@@ -83,11 +84,12 @@ SQL_comorbidity <- function(
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
+      date_dx_var = date_dx_var,
       exclu_diagn = exclu_diagn, verbose = verbose
     )
 
     ### Filtrer dt pour en faire l'analyse
-    # Supprimer les diagnostics qui sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
+    # Supprimer les diagnostics qui ne sont pas dans l'intervalle [DATE_INDEX - lookup - n1; DATE_INDEX]
     dt <- DIAGN[dt, on = .(ID), nomatch = 0]  # ajouter les diagn aux dates index en conservant seulement les id présent dans DIAGN et dt
     dt <- dt[DATE_INDEX %m-% months(lookup*12) - n2 <= DATE_DX & DATE_DX <= DATE_INDEX]  # [index-X{ans}-n2{jours}; index]
     setkey(dt, ID, DIAGN, DATE_DX)
@@ -105,7 +107,7 @@ SQL_comorbidity <- function(
 
     ### Exclusion des cas gestationnelles
     if (obstetric_exclu) {
-      dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, verbose)
+      dt <- inesss:::SQL_comorbidity.exclu_diab_gross(conn, dt, CIM, dt_source, dt_desc, date_dx_var, verbose)
     }
 
     ### Dx confirmé par un Dx dans l'intervalle qui précède la période d'étude
@@ -158,7 +160,7 @@ SQL_comorbidity <- function(
 #' @keywords internal
 #' @import data.table
 #' @encoding UTF-8
-SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, verbose) {
+SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, date_dx_var, verbose) {
   ### Supprimer les cas de diabètes de grosses. Un diagnostic de diabète sera
   ### supprimé s'il se trouve 120 jours avant le diagnostic et 180 jours après.
 
@@ -174,7 +176,7 @@ SQL_comorbidity.exclu_diab_gross <- function(conn, dt, CIM, dt_source, dt_desc, 
       conn,
       cohort = sunique(dt_diab_hyp$ID),
       debut = min(dt_diab_hyp$DATE_DX) - 180, fin = max(dt_diab_hyp$DATE_DX) + 120,
-      CIM, dt_source, dt_desc, verbose
+      CIM, dt_source, dt_desc, date_dx_var, verbose
     )
 
     ### Arranger le data pour exclusion des diabètes et hypertension de grossesses

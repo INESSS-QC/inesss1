@@ -35,28 +35,41 @@ newpage <- function(space = "3cm") {
 }
 ```
 
-
-```{r}
-# Indiquer la version si c'est en HTML, car le numéro de version ne peut être
-# inscrit dans le nom du fichier.
-if (is_html_output()) {
-  cat(paste0("**inesss v.",as.character(packageVersion("inesss")),"**"))
-}
-```
-
-
 # Support
-Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
-La documentation de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
+Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
+La documentation à jour de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).  
+Pour recevoir les dernières mises à jour de la librairie, demander d'être ajouté à la liste d'envoi. Le courriel envoyé contiendra deux dossiers : 1) dossier d'installation; 2) dossier *Documentation* compressé.
 
 
 # Installation de la librairie *inesss*
-Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
+Puisque Microsoft Teams est accessible par un navigateur web, il est conseillé d'y avoir déposé le dossier d'installation et de le télécharger par la suite. Utile pour utiliser la librairie sur le serveur de la RAMQ.
+
+1. Télécharger sur votre poste le dossier d'installation s'intitulant *R_inesss_x.y.z.tar.gz* où `x.y.z` est le numéro de version.
+2. Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss* **en prenant soin d'inscrire le répertoire et le nom du dossier d'installation**, puis appuyer sur *Entrée*.
 ```{r, eval=FALSE, echo=TRUE}
+# Installer le package remotes au besoin :
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-remotes::install_github("INESSS-QC/inesss", upgrade = "never", build_vignettes = T)
+
+# Installation de la librairie R inesss
+remotes::install_local("Inscrire/le/répertoire/du/dossier/R_inesss_x.y.z.tar.gz", upgrade = "never")
 ```
 
+**Exemple**
+```{r, eval=FALSE, echo=TRUE}
+remotes::install_local("E:/Desktop/MonDossier/Rpackages/R_inesss_1.0.0.tar.gz", upgrade = "never")
+```
+
+
+# Documentation
+
+* **Gabarits et Outils EXCEL :** Fichiers à utiliser pour *Requêtes via Excel* et macros VBA pratiques pour Excel.
+* **Vignettes :** Fichiers HTML expliquant la ou les méthodes utilisées pour certaines fonctions de la librairie.
+* **AIDE-FORMULAIRE.pdf :** Comment utiliser le formulaire interactif et la section *Requêtes via Excel*. Montre également des exemples de code SQL selon les arguments demandés.
+* **AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx** : Exemple de document à utiliser dans le formulaire interactif à la section *Requêtes via Excel*.
+* **AIDE-FORMULAIRE-EXEMPLES-RESULTATS.xlsx** : Résultats générés à partir du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
+* **inesss_x.y.z :** Documentation complète de la librairie *inesss* où *x.y.z* indique le numéro de version.
+* **inesss-REGISTRE-VERSION.html :** Registre des versions. Tous les ajouts et les modifications apportées à la librairie y sont inscrits.
+  
 
 # Démarrer le formulaire
 ![](Documentation/source/images/formulaire-addin.png){ width=90% }

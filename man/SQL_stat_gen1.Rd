@@ -6,116 +6,123 @@
 \title{Statistiques générales}
 \usage{
 SQL_stat_gen1(
-  conn,
+  conn = NULL,
   debut,
   fin,
   type_Rx = "DENOM",
   codes,
-  group_by = "Codes",
+  group_by = "DENOM",
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
-  code_list_filtre = "Inclusion"
+  code_list_filtre = "Inclusion",
+  age_date = NULL
 )
 }
 \arguments{
 \item{conn}{Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.}
 
-\item{debut}{Date de début de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
+\item{debut}{Vecteur contenant la ou les dates de début des périodes d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
+\item{fin}{Vecteur contenant la ou les dates de fin des périodes d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{type_Rx}{Indique le type de code analysé :
+\item{type_Rx}{Type de code à analyser. Une valeur parmi :
 \itemize{
-\item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
-\item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+\item \code{'DENOM'} : Code de dénomination commune.
+\item \code{'DIN'} : Code d'identification du médicament.
 }}
 
-\item{codes}{Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
+\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
 
-\item{group_by}{Regrouper (aggréger) les résultats par :
+\item{group_by}{Équivalent du \emph{group by} SQL. Regrouper (aggréger) les résultats par :
 \itemize{
-\item \code{'Codes'} : Résultats par code analysé.
-\item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
-\item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
+\item \code{'DENOM'} : Code de dénomination commune.
+\item \code{'DIN'} : Code d'identification du médicament.
+\item \code{'CodeList'} : Code de catégorie de liste de médicament.
+\item \code{'CodeServ'} : Code de service.
+\item \code{'Teneur'} : Teneur du médicament.
+\item \code{'Format'} : Format d'acquisition du médicament.
+\item \code{'Age'} : Âge à une date précise. Combiner avec l'argument \code{age_date}.
 }}
 
-\item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
+\item{code_serv}{Le ou les codes de services à exclure ou inclure, sinon inscrire \code{NULL}. \code{character}.}
 
-\item{code_serv_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
+\item{code_serv_filtre}{\code{'Exclusion'} ou \code{'Inclusion'} des codes de services.}
 
-\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
+\item{code_list}{Le ou les codes de catégorie de listes de médicaments à exclure ou inclure, sinon inscrire \code{NULL}. \code{character}.}
 
-\item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
+\item{code_list_filtre}{\code{'Exclusion'} ou \code{'Inclusion'} des codes de catégories de listes de médicaments.}
+
+\item{age_date}{Date à laquelle on calcul l'âge des individus. À utiliser seulement si \code{group_by} contient \code{'Age'}.}
 }
 \value{
-\code{data.table} contenant certaines de ces colonnes selon les cas :
-\itemize{
-\item \code{DATE_DEBUT} : Date(s) de début de la période d'étude.
-\item \code{DATE_FIN} : Date(s) de fin de la période d'étude.
-\item \code{DENOM} ou \code{DIN} : Code(s) analysé(s) à l’intérieur de la période d’étude.
-\item \code{NOM_DENOM} ou \code{NOM_MARQ_COMRC} : Nom de la dénomination commune ou le nom de la marque de commerce.
-\item \code{TENEUR} : Teneur du médicament.
-\item \code{FORMAT_ACQ} : Format d'acquisition du médicament.
-\item \code{MNT_MED} : Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s’il y a lieu) et la part du manufacturier.
-\item \code{MNT_SERV} : Montant de frais de service autorisé par la RAMQ à la date du service.
-\item \code{MNT_TOT} : Somme des variables \code{MNT_MED} et \code{MNT_SERV}.
-\item \code{COHORTE} : Nombre d'individus unique.
-\item \code{NBRE_RX} : Nombre de prescriptions/paiements.
-\item \code{QTE_MED} : Quantité totale des médicaments ou des fournitures dispensés.
-\item \code{DUREE_TX} : Durée de traitement totale des prescriptions en jours.
-}
+\code{data.table}
 }
 \description{
 Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
 Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
 \details{
-\strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
+\strong{debut, fin :}\cr
+\code{debut} et \code{fin} doivent contenir le même nombre de valeurs.\cr\cr
+\strong{codes :}\cr
+Si \code{type_Rx='AHFS'} : codes sous la forme de 6 caractères où les deux premiers caractères représente la classe AHFS, les deux du milieu la sous-classe AHFS et les deux derniers la sous-sous-classe AHFS. Il est possible de remplacer une paire de caractères (\{1, 2\}, \{3, 4\} ou \{5, 6\}) par \code{'--'} pour rechercher toutes les types de classes. Par exemple, \code{'04--12'} indique qu'on recherche la classe AHFS 04, toutes les sous-classes AHFS et la sous-sous-classe 12.\cr
+Sinon : inscrire les codes sous la forme d'un nombre entier.\cr\cr
+\strong{code_serv_filtre, code_list_filtre :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
-\code{'Inclusion'} exclus les \code{NULL}.
+\code{'Inclusion'} exclus les \code{NULL}.\cr\cr
+\strong{Nom des médicaments :}\cr
+Que ce soit pour les codes AHFS (\code{NOM_AHFS}), les DENOM (\code{NOM_DENOM}) ou les DIN (\code{NOM_MARQ_COMRC}), \strong{le nom inscrit est toujours celui le plus récent}.
 }
 \examples{
 \dontrun{
-### GROUP_BY
-# Aucun group by
-dt1 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'), fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = NULL
+conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
+
+### group_by
+# Aucun
+ex01 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = NULL
 )
-# Codes - DENOM
-dt2 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes'
-)
-# Codes - DIN
-dt3 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'Codes'
-)
-# Codes et Format
-dt4 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = c('Codes', 'Format')
-)
-# Teneur
-dt5 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Teneur'
+# Tous les group_by
+ex02 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+  group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')
 )
 
-### Exclusion & Inclusion
-dt6 <- SQL_stat_gen1(
-  conn = conn,
-  debut = c('2017-01-01', '2018-01-01'),fin = c('2017-12-31', '2018-12-31'),
-  type_Rx = 'DENOM', codes = c(39, 47092, 48222), group_by = 'Codes',
+### AHFS
+ex03 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'AHFS', codes = c('04----', '08--12', '122426'), group_by = 'AHFS'
+)
+
+### DENOM
+ex04 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = c('DENOM', 'DIN')
+)
+
+### DIN
+ex05 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'DIN'
+)
+
+### Age
+ex06 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DIN', codes = c(30848, 585092), group_by = c('DIN', 'Age'), age_date = '2018-01-01'
+)
+
+### Exclusion et Inclusion code_serv et code_list
+ex07 <- SQL_stat_gen1(
+  conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
+  type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM',
   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-  code_list = c('03', '40', '41'), code_list_filtre = 'Inclusion'
+  code_list = c('40', '41'), code_list_filtre = 'Inclusion'
 )
 }
 }

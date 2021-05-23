@@ -1,6 +1,6 @@
 #' Utils
 #'
-#' Convertir une date Excel au format CHR en Date R. Soit une valeur `AAAA-MM-JJ` ou un nombre entier, mais au format `CHR`.
+#' Convertir une date Excel au format CHR en Date R. Doit être une valeur `AAAA-MM-JJ` ou un nombre entier, mais au format `CHR`.
 #'
 #' @param x Vecteur contenant les dates Excel au format entier.
 #' @keywords internal

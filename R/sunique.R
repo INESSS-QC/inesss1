@@ -6,9 +6,15 @@
 #' @param decreasing Ordre décroissant = `TRUE`, sinon `FALSE`.
 #' @param na.last Afficher les `NA` à la fin = `TRUE`, sinon `FALSE`. `NA` n'affiche pas les valeurs `NA`.
 #'
-#' @keywords internal
 #' @encoding UTF-8
 #' @export
+#' @examples
+#' x <- sample(c(1:10, NA, NaN))
+#' x
+#'
+#' sunique(x)
+#' sunique(x, na.last = TRUE)
+#' sunique(x, decreasing = TRUE, na.last = NA)
 sunique <- function(x, decreasing = FALSE, na.last = FALSE) {
 
   return(sort(unique(x), decreasing = decreasing, na.last = na.last))

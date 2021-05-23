@@ -10,14 +10,15 @@ fct_values <- list(
 
   query_naif_switch1 = list(
     type_rx = c("DENOM", "DIN"),
-    grouper_par = c("Codes"),
+    group_by = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age"),
+    type_Rx_retro = c("AHFS", "DENOM", "DIN"),
     code_serv_filtre = c("Exclusion", "Inclusion"),
     code_list_filtre = c("Exclusion", "Inclusion")
   ),
 
   query_stat_gen1 = list(
-    type_Rx = c("DENOM", "DIN"),
-    group_by = c("Codes", "Teneur", "Format"),
+    type_Rx = c("AHFS", "DENOM", "DIN"),
+    group_by = c("AHFS", "DENOM", "DIN", "CodeList", "CodeServ", "Teneur", "Format", "Age"),
     code_serv_filtre = c("Exclusion", "Inclusion"),
     code_list_filtre = c("Exclusion", "Inclusion")
   )
@@ -72,7 +73,17 @@ vignettes_datas <- list(
       dt[, `:=` (DATE_DX = as_date(DATE_DX),
                  DATE_INDEX = as_date(DATE_INDEX))]
     },
-    `7-poids` = as.data.table(read_xlsx("vignettes/SQL_comorbidity.xlsx", "7-poids"))
+    `7-poids` = as.data.table(read_xlsx("vignettes/SQL_comorbidity.xlsx", "7-poids")),
+    `8-nDx` = {
+      dt <- as.data.table(read_xlsx("vignettes/SQL_comorbidity.xlsx", "8-nDx"))
+      dt[, `:=` (DIAGN = as.character(DIAGN),
+                 POIDS = as.integer(POIDS),
+                 ID = as.integer(ID),
+                 DATE_REP = as_date(DATE_REP),
+                 SOURCE_REP = as.character(SOURCE_REP),
+                 DATE_CONF = as_date(DATE_CONF),
+                 SOURCE_CONF = as.character(SOURCE_CONF))]
+    }
   )
 )
 

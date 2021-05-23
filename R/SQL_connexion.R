@@ -2,7 +2,7 @@
 #'
 #' Connexion entre R et SQL Teradata.
 #'
-#' @param uid Identifiant.
+#' @param uid Identifiant. Si `NULL`, le *user* est demandé lors de l'exécution.
 #' @param pwd Mot de passe. Si `NULL`, le mot de passe est demandé lors de l'exécution.
 #' @param dsn **D**ata **S**ource **N**ame. Par défaut `'PEI_PRD'`.
 #' @param encoding `'latin1'` ou `'UTF-8'`. Encodage de la base de données. Par défaut `'latin1'`.
@@ -15,7 +15,12 @@
 #' conn <- SQL_connexion('abc007')
 #' conn <- SQL_connexion(uid = 'abc007', pwd = 'MonMotDePasse', dsn = 'PEI_PRD')
 #' }
-SQL_connexion <- function(uid, pwd = NULL, dsn = 'PEI_PRD', encoding = 'latin1') {
+SQL_connexion <- function(uid = NULL, pwd = NULL, dsn = 'PEI_PRD', encoding = 'latin1') {
+
+  ### Demander user s'il n'est pas inscrit
+  if (is.null(uid)) {
+    uid <- askpass::askpass("User")
+  }
 
   ### Demander le mot de passe s'il n'est pas inscrit
   if (is.null(pwd)) {

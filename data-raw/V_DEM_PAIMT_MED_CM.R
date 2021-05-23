@@ -19,14 +19,10 @@ denom_din_ahfs <- function() {
     "order by DENOM, DATE_DEBUT;"
   )))
   setkey(DENOM_desc, DENOM, DATE_DEBUT)
-  DENOM_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
-  # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
-  # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
-  # en utilisant la seule description possible
-  idx <- DENOM_desc[, .I[.N == 1], .(DENOM)]$V1
-  if (length(idx)) {
-    DENOM_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
-  }
+  DENOM_desc <- DENOM_desc[  # conserver le dernier nom, le plus récent
+    DENOM_desc[, .I[.N], .(DENOM)]$V1,
+    .(DENOM, NOM_DENOM)
+  ]
 
   # DIN
   DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -36,32 +32,12 @@ denom_din_ahfs <- function() {
     "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
     "from V_PRODU_MED;"
   )))
-  DIN_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
   setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
-  # Supprimer les doublons descriptif
-  DIN_desc <- unique(DIN_desc, by = c("DIN", "MARQ_COMRC"))
-  # Regrouper les années qui se chevauchent avec la même description
-  idx <- DIN_desc[, .I[.N >= 2], .(DIN, MARQ_COMRC)]$V1
-  if (length(idx)) {
-    DIN_desc[
-      idx,
-      diff := DATE_DEBUT - shift(DATE_FIN),
-      .(DIN, MARQ_COMRC)
-    ][is.na(diff), diff := 0L]
-    DIN_desc[, period := 0L][diff > 1, period := 1L]
-    DIN_desc[, period := cumsum(period) + 1L, .(DIN, MARQ_COMRC)]
-    DIN_desc <- DIN_desc[
-      , .(DATE_DEBUT = min(DATE_DEBUT),
-          DATE_FIN = max(DATE_FIN)),
-      .( DIN, MARQ_COMRC, period)
-    ][, period := NULL]
-  }
-  # Arranger les années de ceux qui ont seulement une observation pour associer
-  # cette unique descriptio à tous
-  idx <- DIN_desc[, .I[.N == 1], .(DIN, MARQ_COMRC)]$V1
-  if (length(idx)) {
-    DIN_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
-  }
+  DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
+    DIN_desc[, .I[.N], .(DIN)]$V1,
+    .(DIN, MARQ_COMRC)
+  ]
+
   # AHFS
   AHFS_desc <- as.data.table(dbGetQuery(conn, paste0(
     "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
@@ -88,10 +64,7 @@ denom_din_ahfs <- function() {
         "where 	 SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
       dt[, ANNEE := yr]
-      dt <- DENOM_desc[DATE_DEBUT <= yr & yr <= DATE_FIN, .(DENOM, NOM_DENOM)][dt, on = .(DENOM)]  # ajout DENOM desc
-      dt <- DIN_desc[DATE_DEBUT <= yr & yr <= DATE_FIN, .(DIN, MARQ_COMRC)][dt, on = .(DIN)]  # ajouty DIN desc
-      dt <- AHFS_desc[dt, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
-      DT[[i]] <- copy(dt)
+      DT[[i]] <- dt
       i <- i + 1L
     }
   }
@@ -99,9 +72,16 @@ denom_din_ahfs <- function() {
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, NOM_DENOM, MARQ_COMRC, AHFS_NOM_CLA)
+    .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
   setkey(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
+
+  ### Ajouter les noms (les plus récents)
+  colorder <- names(DT)
+  DT <- DENOM_desc[DT, on = .(DENOM)]
+  DT <- DIN_desc[DT, on = .(DIN)]
+  DT <- AHFS_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
+  setcolorder(DT, c(colorder, "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA"))
 
   return(DT)
 
@@ -180,6 +160,7 @@ cod_denom <- function() {
     if (length(idx)) {
       DT_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
     }
+    DT_desc <- DT_desc[, .(ANNEE = DATE_DEBUT:DATE_FIN), .(DENOM, NOM_DENOM)]
 
     to_year <- 1996:year(Sys.Date())
     DT <- vector("list", length(to_year) * 12)
@@ -191,8 +172,8 @@ cod_denom <- function() {
           "from V_DEM_PAIMT_MED_CM\n",
           "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
         )))
-        dt <- DT_desc[DATE_DEBUT <= yr & yr <= DATE_FIN, .(DENOM, NOM_DENOM)][dt, on = .(DENOM)]
         dt[, ANNEE := yr]
+        dt <- DT_desc[, .(DENOM, NOM_DENOM, ANNEE)][dt, on = .(DENOM, ANNEE)]
         DT[[i]] <- dt
         i <- i + 1L
       }
@@ -205,7 +186,7 @@ cod_denom <- function() {
       .(DENOM, NOM_DENOM)
     ]
 
-    setkey(DT, DENOM)
+    setkey(DT, DENOM, DEBUT)
     return(DT)
   }
 
@@ -220,66 +201,20 @@ cod_din <- function() {
   if (nrow(verif_iter)) {
     stop("V_DEM_PAIMT_MED_CM.cod_denom(): iter nulle.")
   } else {
-    ### Description des DENOM
-    query <- paste0(
-      "select NMED_COD_DENOM_COMNE as DENOM,\n",
-      "       NMED_DD_DENOM_COMNE as DATE_DEBUT,\n",
-      "       NMED_DF_DENOM_COMNE as DATE_FIN,\n",
-      "       NMED_NOM_DENOM_COMNE as NOM_DENOM\n",
-      "from PROD.V_DENOM_COMNE_MED\n",
-      "order by DENOM, DATE_DEBUT;"
-    )
-    DENOM_desc <- as.data.table(dbGetQuery(conn, query))
-    setkey(DENOM_desc, DENOM, DATE_DEBUT)
-    DENOM_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
-    # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
-    # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
-    # en utilisant la seule description possible
-    idx <- DENOM_desc[, .I[.N == 1], .(DENOM)]$V1
-    if (length(idx)) {
-      DENOM_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
-    }
+
     ### Description des DIN
     DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
-      "select NMED_COD_DENOM_COMNE as DENOM,\n",
-      "       NMED_COD_DIN as DIN,\n",
+      "select NMED_COD_DIN as DIN,\n",
       "       NMED_DD_PRODU_MED as DATE_DEBUT,\n",
       "       NMED_DF_PRODU_MED as DATE_FIN,\n",
       "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
       "from V_PRODU_MED;"
     )))
-    DIN_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
-    setkey(DIN_desc, DENOM, DIN, DATE_DEBUT, DATE_FIN)
-    # Supprimer les doublons descriptif
-    DIN_desc <- unique(DIN_desc, by = c("DENOM", "DIN", "MARQ_COMRC"))
-    # Regrouper les années qui se chevauchent avec la même description
-    idx <- DIN_desc[, .I[.N >= 2], .(DENOM, DIN, MARQ_COMRC)]$V1
-    if (length(idx)) {
-      DIN_desc[
-        idx,
-        diff := DATE_DEBUT - shift(DATE_FIN),
-        .(DENOM, DIN, MARQ_COMRC)
-      ][is.na(diff), diff := 0L]
-      DIN_desc[, period := 0L][diff > 1, period := 1L]
-      DIN_desc[, period := cumsum(period) + 1L, .(DENOM, DIN, MARQ_COMRC)]
-      DIN_desc <- DIN_desc[
-        , .(DATE_DEBUT = min(DATE_DEBUT),
-            DATE_FIN = max(DATE_FIN)),
-        .(DENOM, DIN, MARQ_COMRC, period)
-      ][, period := NULL]
-    }
-    # Arranger les années de ceux qui ont seulement une observation pour associer
-    # cette unique descriptio à tous
-    idx <- DIN_desc[, .I[.N == 1], .(DENOM, DIN, MARQ_COMRC)]$V1
-    if (length(idx)) {
-      DIN_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
-    }
-
-    ### Description des codes
-    DT_desc <- DENOM_desc[, .(DENOM, NOM_DENOM)][DIN_desc, on = .(DENOM)]
-    DT_desc <- DT_desc[, .(DIN, NOM_DENOM, MARQ_COMRC, DEBUT = DATE_DEBUT, FIN = DATE_FIN)]
-    rm(DENOM_desc, DIN_desc)
-
+    setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
+    DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
+      DIN_desc[, .I[.N], .(DIN)]$V1,
+      .(DIN, MARQ_COMRC)
+    ]
 
     ### Trouver la liste des codes pour chaque année
     to_year <- 1996:year(Sys.Date())  # année à analyser
@@ -296,7 +231,6 @@ cod_din <- function() {
         ))
         if (nrow(dt)) {
           dt[, ANNEE := yr]  # indiquer l'année
-          dt <- DT_desc[DEBUT <= yr & yr <= FIN, .(DIN, NOM_DENOM, MARQ_COMRC)][dt, on = .(DIN)]
           DT[[i]] <- dt
         } else {
           DT[[i]] <- NULL
@@ -305,14 +239,15 @@ cod_din <- function() {
       }
     }
     DT <- rbindlist(DT)  # un seul tableau
-    setkey(DT, DIN, ANNEE)  # trier par DIN + ANNEE
 
     ### Indiquer les années où le code est présent
     DT <- DT[
-      ,.(DEBUT = min(ANNEE), FIN = max(ANNEE)),
-      .(DIN, NOM_DENOM, MARQ_COMRC)
+      , .(DEBUT = min(ANNEE), FIN = max(ANNEE)),
+      .(DIN)
     ]
 
+    ### Ajouter marque commerciale
+    DT <- DIN_desc[DT, on = .(DIN)]
     setkey(DT, DIN)
 
     return(DT)
@@ -384,7 +319,7 @@ cod_serv <- function() {
   setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
   DT[, COD_SERV := str_remove_all(COD_SERV, " ")]  # supprimer espaces
 
-  setkey(DT, COD_SERV)
+  setkey(DT, COD_SERV, SERV_1)
 
   return(DT)
 

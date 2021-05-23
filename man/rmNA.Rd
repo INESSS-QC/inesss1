@@ -13,4 +13,6 @@ rmNA(x)
 \description{
 Supprime les \code{NA}s du vecteur. Renvoie \code{NULL} si aucune valeur.
 }
-\keyword{internal}
+\examples{
+rmNA(c(4, 6, 8, NA, 78, 4, NaN))
+}

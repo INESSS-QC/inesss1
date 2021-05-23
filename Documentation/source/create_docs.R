@@ -2,35 +2,36 @@ library(inesss)
 library(rmarkdown)
 library(stringr)
 library(writexl)
-conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
+# conn <- SQL_connexion()
 
 
 # Build Manual ------------------------------------------------------------
 devtools::build_manual(path = "Documentation")
 
 
-# Build Vignettes ---------------------------------------------------------
-devtools::build_vignettes()
-for (file in list.files("doc")) {
-  if (stringr::str_sub(file, nchar(file) - 4, nchar(file)) == ".html") {
-    file.copy(from = paste0("doc/",file),
-              to = paste0("Documentation/Vignettes/",file))
-  } else {
-    next
-  }
+# Vignettes ---------------------------------------------------------
+files <- list.files("vignettes")
+files <- files[tolower(stringr::str_sub(files, nchar(files) - 3, nchar(files))) == ".rmd"]
+files <- stringr::str_sub(files, 1, nchar(files) - 4)
+for (file in files) {
+  render(
+    input = paste0("vignettes/",file,".Rmd"),
+    output_file = paste0(file,".html"),
+    output_dir = "Documentation/Vignettes",
+    encoding = "UTF-8", envir = new.env()
+  )
 }
-
 
 # Formulaire --------------------------------------------------------------
 render(
   input = "Documentation/source/formulaire.Rmd",
-  output_file = paste0("AIDE-FORMULAIRE_",Sys.Date(),".pdf"),
+  output_file = paste0("AIDE-FORMULAIRE.pdf"),
   output_dir = "Documentation",
-  params = list(conn = conn),
+  # params = list(conn = conn),
   envir = new.env(), encoding = "UTF-8"
 )
-if (paste0("AIDE-FORMULAIRE_",Sys.Date(),".log") %in% list.files("Documentation/source")) {
-  unlink(paste0("Documentation/source/AIDE-FORMULAIRE_",Sys.Date(),".log"), recursive = TRUE)
+if (paste0("AIDE-FORMULAIRE.log") %in% list.files("Documentation/source")) {
+  unlink(paste0("Documentation/source/AIDE-FORMULAIRE.log"), recursive = TRUE)
 }
 
 
@@ -40,10 +41,12 @@ render(  # github_document
   output_file = "README.md",
   envir = new.env(), encoding = "UTF-8"
 )
-render(  # pdf_document
+render(
   input = "README.Rmd",
-  output_format = "pdf_document",
-  output_file = paste0("LISEZ-MOI_",Sys.Date(),".pdf"),
+  # output_format = "pdf_document",
+  # output_file = paste0("LISEZ-MOI.pdf"),
+  output_format = "html_document",
+  output_file = paste0("LISEZ-MOI.html"),
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )
@@ -57,10 +60,12 @@ render(
   output_dir = getwd(),
   envir = new.env(), encoding = "UTF-8"
 )
-render(  # pdf_document
+render(
   input = "NEWS.Rmd",
-  output_format = "pdf_document",
-  output_file = "inesss-REGISTRE-VERSION.pdf",
+  # output_format = "pdf_document",
+  # output_file = "inesss-REGISTRE-VERSION.pdf",
+  output_format = "html_document",
+  output_file = "inesss-REGISTRE-VERSION.html",
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )

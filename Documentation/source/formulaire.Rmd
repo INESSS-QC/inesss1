@@ -5,14 +5,17 @@ date: "`r Sys.Date()`"
 output:
   pdf_document:
     number_sections: true
+    toc: true
+    toc_depth: 4
+toc-title: Table des matières
 classoption: landscape
 geometry: "left=1.5cm,right=1.5cm,top=2.5cm,bottom=1.5cm"
 urlcolor: blue
 header-includes:
   - \usepackage{fancyhdr}
   - \usepackage{booktabs}
-params:
-  conn: ""
+# params:
+#   conn: ""
 ---
 
 \pagestyle{fancy}
@@ -26,7 +29,7 @@ library(data.table)
 library(kableExtra)
 library(knitr)
 library(stringr)
-conn <- params$conn
+# conn <- params$conn
 # conn <- SQL_connexion(askpass::askpass("User"), askpass::askpass("Password"))
 
 # Fonctions internes
@@ -35,9 +38,9 @@ list_as_dt_no_recycled <- inesss:::list_as_dt_no_recycled
 rmNA <- inesss:::rmNA
 
 # Afficher un tableau grâce à kableExtra
-kable_tab <- function(x, scale_down = TRUE) {
+kable_tab <- function(x, scale_down = TRUE, escape = TRUE) {
   p <- kable(x, "latex", booktabs = TRUE, row.names = FALSE, linesep = "",
-             align = "r") %>%
+             align = "r", escape = escape) %>%
     kable_styling(latex_options = rmNA(c("hold_position", "repeat_header",
                                          ifelse(scale_down, "scale_down", NA))))
   return(cat(p))
@@ -80,6 +83,8 @@ NULL_if_NA <- function(x) {
 \newcommand{\nl}{\textcolor{white}{.  }} <!-- 'hack' pour en-tête lvl 4 : nouvelle ligne (\newline) -->
 <!--                -->
 
+\pagebreak
+
 # Démarrer le formulaire
 À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
 
@@ -109,15 +114,15 @@ NULL_if_NA <- function(x) {
 
 
 # Requêtes via Excel
-Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser [les gabarits disponibles](https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits).
+Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser [les gabarits disponibles](https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits%20et%20Outils%20EXCEL).
 
 1. Cliquer sur le bouton *Sélectionner fichier Excel* pour sélectionner le fichier Excel contenant la ou les requêtes à exécuter.
-2. Le répertoire du fichier sélectionné apparaît sous le bouton pour vérifier si c'est le bon fichier à utiliser.
+2. Le répertoire du fichier sélectionné apparaît.
 3. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
-4. Si la structure est acceptée, le message «`Aucune erreur, exécution possible.`» s'affiche. Sinon, le message indique, pour chaque onglet, les erreurs à corriger.
-5. Si la structure est acceptée, le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la ou les requêtes associées aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
+4. Si la ou les structures sont acceptées, le message «`Aucune erreur, exécution possible.`» s'affiche. Sinon, le message indique, pour chaque onglet, la ou les erreurs à corriger.
+5. Le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la ou les requêtes associées aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
 6. Le fichier sauvegardé présente les résultats de la manière suivante :
-    + Les noms des onglets sont les mêmes que ceux du fichier contenant les arguments.
+    + Les onglets possèdent les mêmes noms que ceux du fichier contenant les arguments.
     + À gauche se trouve le tableau des résultats.
     + Au milieu, un rappel des arguments utilisés.
     + À droite, un exemple de code SQL utilisé dans Teradata pour créer le tableau des résultats (uniquement celui de la première période d'étude).
@@ -126,26 +131,43 @@ Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel.
 
 ## Naïf / Switch
 Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.  
-Un individu est considéré comme étant *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements de la même famille.  
-Un individu est considéré comme étant *switch* lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant à la même famille.  
+Un individu est considéré comme étant *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements *de la même famille*.  
+Un individu est considéré comme étant *switch* lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant *à la même famille*.  
 Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#ns1_arguments}
-* **`METHODE` :** Indique la méthode à utiliser, ici `naif_switch1`.
+* **`METHODE` :** Méthode à utiliser, ici `naif_switch1`.
 * **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
 * **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
-* **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
-* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
+* **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
+  + `DENOM` : Code de dénomination commune.
+  + `DIN` : Code d'identification du médicament.
+* **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
 * **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
-    + `Codes` : Résultats pour chaque `CODE_RX`.
+  + `AHFS` : Résultats par code de classe AHFS.
+  + `DENOM` : Résultats par code de dénomination commune.
+  + `DIN` : Résultats par code d'identification du médicament.
+  + `CodeList` : Résultats par code de catégories de liste de médicaments.
+  + `CodeServ` : Résultats par code de service.
+  + `Teneur` : Résultats par teneur du médicament.
+  + `Format` : Résultats par format d'acquisition du médicament.
+  + `Age` : Résultats par âge à une date précise. Voir argument `age_date`. L'âge est calculé à partir de la date de naissance disponible dans la vue `V_FICH_ID_BEN_CM`.
+* **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la valeur de `TYPE_RX`. Une valeur parmi :
+  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
+  + `DENOM` : Code de dénomination commune.
+  + `DIN` : Code d'identification du médicament.
 * **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la période rétrospective. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*. La période rétrospective est construite à partir des dates de références (index) et de l'argument `NJOURS_SANS_CONSO` : [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
 * **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence (index) où un individu ne doit pas avoir consommé `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective (voir `RX_RETROSPECT_A_EXCLURE`).
 * **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
 * **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).  
-Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
 * **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
 * **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).  
-Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+Les valeurs permises sont : `03`, `40` et `41`.
+* **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR` contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
+
+### Détails
+* **`AHFS` :**  Un code complet AHFS est composé de 6 caractères indiquant la classe (caractères 1 et 2), la sous-classe (caractères 3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher toutes les combinaisons possibles, il suffit de remplacer une paire de caractères par `--`. Par exemple, le code AHFS `04----` reviendrait à chercher la classe `04` et toutes les sous-classes et sous-sous-classes qui existent. 
 
 ### Résultats
 Un onglet résultat contient trois (3) éléments :
@@ -153,6 +175,19 @@ Un onglet résultat contient trois (3) éléments :
 #### Tableau des résultats
 * **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
 * **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
+* **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la classe AHFS.
+* **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-classe AHFS.
+* **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-sous-classe AHFS.
+* **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de la classe AHFS.
+* **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de dénomination commune.
+* **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom de la dénomination commune.
+* **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code d'identification du médicament.
+* **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`. Nom de la marque commerciale.
+* **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`. Code de service,
+* **`CODE_LIST` : ** Seulement si `GROUPER_PAR` contient `CodeList`. Code de catégorie de listes de médicaments.
+* **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur du médicament.
+* **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`. Format d'acquisition du médicament.
+* **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de l'individu à la date `AGE_DATE`.
 * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
 * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
 * **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
@@ -160,9 +195,6 @@ Un onglet résultat contient trois (3) éléments :
 * **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
 * **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
 * **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
-* **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude.
-* **`RX_RETROSPECT_A_EXCLURE` :** Code(s) de médicament(s) qui n'ont *jamais* été consommé(s) durant la période rétrospective.
-* **`NJOURS_SANS_CONSO` :** Nombre de jours qu'un individu ne doit pas avoir reçu de traitements avant sa date de référence (index) pour être considéré comme *naïf* ou *switch*.
 
 #### Tableau des arguments
 * Table rappelant les arguments fournis par l'utilisateur à la section [Arguments](#ns1_arguments)
@@ -174,7 +206,7 @@ Un onglet résultat contient trois (3) éléments :
 
 ### Exemples {#ns1_exemples}
 
-#### DENOM --- GROUPER_PAR *Codes*
+#### ex02 --- GROUPER_PAR
 \nl
 
 **Arguments :**
@@ -182,87 +214,92 @@ Un onglet résultat contient trois (3) éléments :
 ll <- list(
   METHODE = "naif_switch1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(47873, 47958, 48213), GROUPER_PAR = "Codes",
-  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
+  GROUPER_PAR = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age'),
+  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_naif_switch1(
-  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
-  njours_sans_conso = ll$NJOURS_SANS_CONSO,
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
-)
-sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seulement le code SQL de la première période et du premier code d'analyse est affiché.
+Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX[1],
-  rx_retrospect_a_exclure = ll$CODE_RX,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
   njours_sans_conso = ll$NJOURS_SANS_CONSO,
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
-    select SMED_NO_INDIV_BEN_BANLS as ID,
-           min(SMED_DAT_SERV) as DATE_INDEX
-    from PROD.V_DEM_PAIMT_MED_CM
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
     where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-        and SMED_COD_DENOM_COMNE in ('47873')
+        and SMED_COD_DENOM_COMNE in ('00039')
         and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
         and SMED_NBR_JR_DUREE_TRAIT > 0
     group by ID
 ),
 OLD_USER as (
-    select distinct(A.ID)
-    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
         on A.ID = V.SMED_NO_INDIV_BEN_BANLS
-    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
-        and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
-        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DENOM_COMNE in ('00039')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
 ),
-NAIF_SWITCH as (
+NAIF_SWITCH_COHORT as (
     select ID from ALL_USER
     except
     select ID from OLD_USER
 )
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
-    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
-where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and V.SMED_COD_DENOM_COMNE in ('47873')
-    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_CLA_AHF as AHFS_CLA,
+    SMED_COD_SCLA_AHF as AHFS_SCLA,
+    SMED_COD_SSCLA_AHF as AHFS_SSCLA,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    SMED_COD_SERV_1 as CODE_SERV,
+    SMED_COD_CATG_LISTE_MED as CODE_LIST,
+    SMED_COD_TENR_MED as TENEUR,
+    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ,
+    (cast(to_date('2018-01-01') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('00039')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE
+order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE;
 ```
 
 \pagebreak
 
-#### GROUPER_PAR *NULL* --- Plusieurs codes pour un même type de traitement.
+#### ex03 --- DENOM
 \nl
 
 **Arguments :**
@@ -270,87 +307,82 @@ where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
 ll <- list(
   METHODE = "naif_switch1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(47873, 47958, 48213), GROUPER_PAR = NA,
-  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
+  GROUPER_PAR = "DENOM",
+  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_naif_switch1(
-  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
-  njours_sans_conso = ll$NJOURS_SANS_CONSO,
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
-)
-sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
   rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
   njours_sans_conso = ll$NJOURS_SANS_CONSO,
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
-    select SMED_NO_INDIV_BEN_BANLS as ID,
-           min(SMED_DAT_SERV) as DATE_INDEX
-    from PROD.V_DEM_PAIMT_MED_CM
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
     where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-        and SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
+        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
         and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
         and SMED_NBR_JR_DUREE_TRAIT > 0
     group by ID
 ),
 OLD_USER as (
-    select distinct(A.ID)
-    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
         on A.ID = V.SMED_NO_INDIV_BEN_BANLS
-    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
-        and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
-        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
 ),
-NAIF_SWITCH as (
+NAIF_SWITCH_COHORT as (
     select ID from ALL_USER
     except
     select ID from OLD_USER
 )
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
-    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
-where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and V.SMED_COD_DENOM_COMNE in ('47873', '47958', '48213')
-    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
 ```
 
 \pagebreak
 
-#### DIN
+#### ex04 --- DIN
 \nl
 
 **Arguments :**
@@ -358,171 +390,499 @@ where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
 ll <- list(
   METHODE = "naif_switch1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DIN", CODE_RX = 2241927, GROUPER_PAR = NA,
-  RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092),
+  GROUPER_PAR = "DIN",
+  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_naif_switch1(
-  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
-  njours_sans_conso = ll$NJOURS_SANS_CONSO,
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
-)
-sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
   rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
   njours_sans_conso = ll$NJOURS_SANS_CONSO,
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
-    select SMED_NO_INDIV_BEN_BANLS as ID,
-           min(SMED_DAT_SERV) as DATE_INDEX
-    from PROD.V_DEM_PAIMT_MED_CM
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
     where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-        and SMED_COD_DENOM_COMNE in ('2241927')
+        and SMED_COD_DIN in (30848, 585092)
         and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
         and SMED_NBR_JR_DUREE_TRAIT > 0
     group by ID
 ),
 OLD_USER as (
-    select distinct(A.ID)
-    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
         on A.ID = V.SMED_NO_INDIV_BEN_BANLS
-    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
-        and V.SMED_COD_DENOM_COMNE in ('2241927')
-        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DIN in (30848, 585092)
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
 ),
-NAIF_SWITCH as (
+NAIF_SWITCH_COHORT as (
     select ID from ALL_USER
     except
     select ID from OLD_USER
 )
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
-    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
-where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and V.SMED_COD_DENOM_COMNE in ('2241927')
-    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DIN
+order by DIN;
 ```
 
 \pagebreak
 
-#### RX_RETROSPECT_A_EXCLURE conteant plus de valeurs que CODES (avec ou sans les memes valeurs)
+#### ex05 --- Exclusion AHFS
 \nl
 
 **Arguments :**
 ```{r}
 ll <- list(
-  METHODE = "naif_switch1",
+  METHODE = "naif\\_switch1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DIN", CODE_RX = c(2257238, 2272903), GROUPER_PAR = NA,
-  RX_RETROSPECT_A_EXCLURE = c(2042479, 2042487, 2257238, 2272903, 2317192, 2317206),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = "DENOM",
+  TYPE_RX_RETRO = "AHFS", RX_RETROSPECT_A_EXCLURE = c('04\\texttt{-{}-{}-{}-}', '08\\texttt{-{}-}16', '122436'),
   NJOURS_SANS_CONSO = 365,
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_naif_switch1(
-  conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-  type_rx = ll$TYPE_RX, codes = ll$CODE_RX, grouper_par = NULL_if_NA(ll$GROUPER_PAR),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
-  njours_sans_conso = ll$NJOURS_SANS_CONSO,
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = ll$CODE_SERV_FILTRE,
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = ll$CODE_LIST_FILTRE
-)
-sg1_format_table(tab_res)  # même format entre naif_switch1 et stat_gen1
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+names(method_args) <- stringr::str_replace_all(names(method_args), "_", "\\\\_")
+kable_tab(method_args, escape = FALSE)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = c("04----", "08--16", 122436),
   njours_sans_conso = ll$NJOURS_SANS_CONSO,
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
-    select SMED_NO_INDIV_BEN_BANLS as ID,
-           min(SMED_DAT_SERV) as DATE_INDEX
-    from PROD.V_DEM_PAIMT_MED_CM
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
     where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-        and SMED_COD_DENOM_COMNE in ('2257238', '2272903')
+        and SMED_COD_DENOM_COMNE in ('47092', '47135')
         and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
         and SMED_NBR_JR_DUREE_TRAIT > 0
     group by ID
 ),
 OLD_USER as (
-    select distinct(A.ID)
-    from ALL_USER As A left join PROD.V_DEM_PAIMT_MED_CM As V
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
         on A.ID = V.SMED_NO_INDIV_BEN_BANLS
-    where V.SMED_DAT_SERV between (A.DATE_INDEX - 365) and (A.DATE_INDEX - 1)
-        and V.SMED_COD_DENOM_COMNE in ('2042479', '2042487', '2257238', '2272903', '2317192', '2317206')
-        and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-        and V.SMED_NBR_JR_DUREE_TRAIT > 0
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and (SMED_COD_CLA_AHF = '04'
+             or SMED_COD_CLA_AHF || SMED_COD_SSCLA_AHF = '0816'
+             or SMED_COD_CLA_AHF || SMED_COD_SCLA_AHF || SMED_COD_SSCLA_AHF = '122436')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
 ),
-NAIF_SWITCH as (
+NAIF_SWITCH_COHORT as (
     select ID from ALL_USER
     except
     select ID from OLD_USER
 )
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from NAIF_SWITCH As N left join PROD.V_DEM_PAIMT_MED_CM as V
-    on N.ID = V.SMED_NO_INDIV_BEN_BANLS
-where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and V.SMED_COD_DENOM_COMNE in ('2257238', '2272903')
-    and (V.SMED_COD_SERV_1 not in ('1') or V.SMED_COD_SERV_1 is null)
-    and V.SMED_NBR_JR_DUREE_TRAIT > 0;
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
+```
+
+\pagebreak
+
+#### ex06 --- Exclusion DENOM
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(47092, 47135), GROUPER_PAR = "DENOM",
+  TYPE_RX_RETRO = "DENOM", RX_RETROSPECT_A_EXCLURE = c(47092, 47135, 47136),
+  NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
+```
+
+**Code SQL :**
+Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('47092', '47135')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DENOM_COMNE in ('47092', '47135', '47136')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH_COHORT as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
+```
+
+\pagebreak
+
+#### ex07 --- Exclusion DIN
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = 47092, GROUPER_PAR = c("DENOM", "DIN"),
+  TYPE_RX_RETRO = "DIN", RX_RETROSPECT_A_EXCLURE = c(2083523, 2084082, 2240331, 2453312),
+  NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
+```
+
+**Code SQL :**
+Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('47092')
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DIN in (2083523, 2084082, 2240331, 2453312)
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH_COHORT as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('47092')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM, DIN
+order by DENOM, DIN;
+```
+
+\pagebreak
+
+#### ex08 --- Age
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = c("DIN", "Age"),
+  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = "2018-06-05"
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
+```
+
+**Code SQL :**
+Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DIN in (30848, 585092)
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DIN in (30848, 585092)
+        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH_COHORT as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    (cast(to_date('2018-06-05') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DIN, AGE
+order by DIN, AGE;
+```
+
+\pagebreak
+
+#### ex09 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "naif_switch1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = c("DENOM"),
+  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("40", "41"),
+  AGE_DATE = NA
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
+```
+
+**Code SQL :**
+Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_naif_switch1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
+  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
+  njours_sans_conso = ll$NJOURS_SANS_CONSO,
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+with ALL_USER as (
+    select
+        SMED_NO_INDIV_BEN_BANLS as ID,
+        min(SMED_DAT_SERV) as DATE_INDEX
+    from V_DEM_PAIMT_MED_CM
+    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+        and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+        and SMED_COD_CATG_LISTE_MED in ('40', '41')
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+    group by ID
+),
+OLD_USER as (
+    select distinct ID
+    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
+        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
+    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
+        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+        and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+        and SMED_COD_CATG_LISTE_MED in ('40', '41')
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+),
+NAIF_SWITCH_COHORT as (
+    select ID from ALL_USER
+    except
+    select ID from OLD_USER
+)
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
+    and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
+    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+    and SMED_COD_CATG_LISTE_MED in ('40', '41')
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM
+order by DENOM;
 ```
 
 
@@ -530,25 +890,43 @@ where V.SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
 
 
 ## Statistiques générales
-Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.  
+Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.
 Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#sg1_arguments}
-* **`METHODE` :** Indique la méthode à utiliser, ici `stat_gen1`.
+* **`METHODE` :** Méthode à utiliser, ici `stat_gen1`.
 * **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
 * **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
-* **`TYPE_RX` :** Distinction entre le code de dénomination commune (`DENOM`) ou le code d'identification du médicament (`DIN`).
-* **`CODE_RX` :** Codes `DENOM` ou `DIN` à analyser. **Inscrire les codes sous la forme d'un nombre entier**.
+* **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
+  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
+  + `DENOM` : Code de dénomination commune.
+  + `DIN` : Code d'identification du médicament.
+* **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
 * **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
-    + `Codes` : Résultats pour chaque `CODE_RX`.
-    + `Teneur` : Résultats par teneur du médicament. Voir [`SMED_COD_TENR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30998&TypOrigElmVue=T&NoSeqElmOrig=1457).
-    + `Format` : Résultats par format d'acquisition du médicament. Voir [`SMED_COD_FORMA_ACQ_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30941&TypOrigElmVue=T&NoSeqElmOrig=1277).
+  + `AHFS` : Résultats par code de classe AHFS.
+  + `DENOM` : Résultats par code de dénomination commune.
+  + `DIN` : Résultats par code d'identification du médicament.
+  + `CodeList` : Résultats par code de catégories de liste de médicaments.
+  + `CodeServ` : Résultats par code de service.
+  + `Teneur` : Résultats par teneur du médicament.
+  + `Format` : Résultats par format d'acquisition du médicament.
+  + `Age` : Résultats par âge à une date précise. Voir argument `age_date`. L'âge est calculé à partir de la date de naissance disponible dans la vue `V_FICH_ID_BEN_CM`.
+* **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la valeur de `TYPE_RX`. Une valeur parmi :
+  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
+  + `DENOM` : Code de dénomination commune.
+  + `DIN` : Code d'identification du médicament.
+* **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la période rétrospective. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*. La période rétrospective est construite à partir des dates de références (index) et de l'argument `NJOURS_SANS_CONSO` : [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
+* **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence (index) où un individu ne doit pas avoir consommé `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective (voir `RX_RETROSPECT_A_EXCLURE`).
 * **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
 * **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).  
-Les valeurs permises sont : `"1"`, `"AD"` et `"L, M, M1 à M3"`.
+Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
 * **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
 * **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).  
-Les valeurs permises sont : `"03"`, `"40"` et `"41"`.
+Les valeurs permises sont : `03`, `40` et `41`.
+* **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR` contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
+
+### Détails
+* **`AHFS` :**  Un code complet AHFS est composé de 6 caractères indiquant la classe (caractères 1 et 2), la sous-classe (caractères 3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher toutes les combinaisons possibles, il suffit de remplacer une paire de caractères par `--`. Par exemple, le code AHFS `04----` reviendrait à chercher la classe `04` et toutes les sous-classes et sous-sous-classes qui existent.
 
 ### Résultats
 Un onglet résultat contient trois (3) éléments :
@@ -556,10 +934,19 @@ Un onglet résultat contient trois (3) éléments :
 #### Tableau des résultats
 * **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
 * **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
-* **`DENOM / DIN` :** Code(s) analysé(s) à l'intérieur de la période d'étude. Si on ne demande pas les résultats par `Codes`, cette colonne se situera à la fin du tableau et tous les codes seront indiqués dans une même cellule.
-* **`NOM_DENOM / NOM_MARQ_COMRC` :** Indique le nom de la dénomination commune si c'est un `DENOM` ou le nom de la marque de commerce si c'est un `DIN`. Conditionnel : demander les résultats par `Codes`.
-* **`TENEUR` :** Teneur du médicament. Conditionnel : demander les résultats par `Teneur`.
-* **`FORMAT_ACQ` :** Format d'acquisition du médicament. Conditionnel : demander les résultats par `Format`.
+* **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la classe AHFS.
+* **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-classe AHFS.
+* **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-sous-classe AHFS.
+* **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de la classe AHFS.
+* **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de dénomination commune.
+* **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom de la dénomination commune.
+* **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code d'identification du médicament.
+* **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`. Nom de la marque commerciale.
+* **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`. Code de service,
+* **`CODE_LIST` : ** Seulement si `GROUPER_PAR` contient `CodeList`. Code de catégorie de listes de médicaments.
+* **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur du médicament.
+* **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`. Format d'acquisition du médicament.
+* **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de l'individu à la date `AGE_DATE`.
 * **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
 * **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
 * **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
@@ -574,13 +961,11 @@ Un onglet résultat contient trois (3) éléments :
 #### Code SQL
 * Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
 
-
 \pagebreak
-
 
 ### Exemples {#sg1_exemples}
 
-#### GROUPER_PAR : Aucune variable.
+#### ex02 --- GROUPER_PAR
 \nl
 
 **Arguments :**
@@ -588,111 +973,116 @@ Un onglet résultat contient trois (3) éléments :
 ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = NA,
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
+  GROUPER_PAR = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age'),
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
-```{r, eval=FALSE}
-# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
-cat(query_stat_gen1(
-  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX,
-  group_by = NULL_if_NA(ll$GROUPER_PAR),
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
-))
-```
-```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
-where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null);
-```
-
-\pagebreak
-
-#### GROUPER_PAR : Codes -- DENOM.
-\nl
-
-**Arguments :**
-```{r}
-ll <- list(
-  METHODE = "stat_gen1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135), GROUPER_PAR = "Codes",
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
-)
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
-```
-
-**Code SQL :**
-Seule la première période est affichée.
+  Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
   type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       SMED_COD_DENOM_COMNE as DENOM,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_CLA_AHF as AHFS_CLA,
+    SMED_COD_SCLA_AHF as AHFS_SCLA,
+    SMED_COD_SSCLA_AHF as AHFS_SSCLA,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    SMED_COD_SERV_1 as CODE_SERV,
+    SMED_COD_CATG_LISTE_MED as CODE_LIST,
+    SMED_COD_TENR_MED as TENEUR,
+    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ,
+    (cast(to_date('2018-01-01') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
 where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
     and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE
+order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENEUR, FORMAT_ACQ, AGE;
+```
+
+\pagebreak
+
+#### ex03 --- AHFS
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat\\_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "AHFS", CODE_RX = c('04\\texttt{-{}-{}-{}-}', '08\\texttt{-{}-}12', '122426'),
+  GROUPER_PAR = 'AHFS',
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+names(method_args) <- stringr::str_replace_all(names(method_args), "_", "\\\\_")
+kable_tab(method_args, escape = FALSE)
+```
+
+**Code SQL :**
+  Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_stat_gen1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = c("04----", "08--12", 122426), group_by = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('04----', '08--12', '122426')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
 group by DENOM
 order by DENOM;
 ```
 
 \pagebreak
 
-#### GROUPER_PAR : Codes -- DIN.
+#### ex04 --- DENOM
 \nl
 
 **Arguments :**
@@ -700,56 +1090,104 @@ order by DENOM;
 ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = "Codes",
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  TYPE_RX = "DENOM", CODE_RX = c('39, 47092, 47135'), GROUPER_PAR = c("DENOM", "DIN"),
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+  Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
   type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       SMED_COD_DIN as DIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM
+where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
+    and SMED_COD_DENOM_COMNE in ('39, 47092, 47135')
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DENOM, DIN
+order by DENOM, DIN;
+```
+
+\pagebreak
+
+#### ex05 --- DIN
+\nl
+
+**Arguments :**
+```{r}
+ll <- list(
+  METHODE = "stat_gen1",
+  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = c("DIN"),
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = NA
+)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
+```
+
+**Code SQL :**
+  Seulement le code SQL de la première période est affiché.
+```{r, eval=FALSE}
+# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
+cat(query_stat_gen1(
+  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
+  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
+  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
+))
+```
+```{sql, echo=TRUE, eval=FALSE}
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
 from PROD.V_DEM_PAIMT_MED_CM
 where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
     and SMED_COD_DIN in (30848, 585092)
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
 group by DIN
 order by DIN;
 ```
 
 \pagebreak
 
-#### GROUPER_PAR : Codes et Format.
+#### ex06 --- Age
 \nl
 
 **Arguments :**
@@ -757,57 +1195,53 @@ order by DIN;
 ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 48222), GROUPER_PAR = c("Codes", "Format"),
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  TYPE_RX = "DIN", CODE_RX = c(30848, 585092), GROUPER_PAR = c('DIN', 'Age'),
+  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
+  AGE_DATE = "2018-01-01"
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+  Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
   type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       SMED_COD_DENOM_COMNE as DENOM,
-       SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DIN as DIN,
+    (cast(to_date('2018-01-01') as int) - cast(F.BENF_DAT_NAISS as int)) / 10000 as AGE,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+from PROD.V_DEM_PAIMT_MED_CM as D left join PROD.V_FICH_ID_BEN_CM as F
+    on D.SMED_NO_INDIV_BEN_BANLS = F.BENF_NO_INDIV_BEN_BANLS
 where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and SMED_COD_DENOM_COMNE in ('00039', '47092', '48222')
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
-group by DENOM, FORMAT_ACQ
-order by DENOM, FORMAT_ACQ;
+    and SMED_COD_DIN in (30848, 585092)
+    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
+    and SMED_NBR_JR_DUREE_TRAIT > 0
+group by DIN, AGE
+order by DIN, AGE;
 ```
 
 \pagebreak
 
-#### GROUPER_PAR : Teneur.
+#### ex07 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
 \nl
 
 **Arguments :**
@@ -815,203 +1249,82 @@ order by DENOM, FORMAT_ACQ;
 ll <- list(
   METHODE = "stat_gen1",
   DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(47092, 48222), GROUPER_PAR = "Teneur",
+  TYPE_RX = "DENOM", CODE_RX = c('39, 47092, 47135'), GROUPER_PAR = c("DENOM"),
   CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
+  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("40", "41"),
+  AGE_DATE = NA
 )
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
+method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
+kable_tab(method_args)
 ```
 
 **Code SQL :**
-Seule la première période est affichée.
+  Seulement le code SQL de la première période est affiché.
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
   debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
   type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
   code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
+  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
+  age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
 ```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       SMED_COD_TENR_MED as TENEUR,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
+select
+    '2018-01-01' as DATE_DEBUT,
+    '2018-12-31' as DATE_FIN,
+    SMED_COD_DENOM_COMNE as DENOM,
+    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
+    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
+    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
+    count(*) as NBRE_RX,
+    sum(SMED_QTE_MED) as QTE_MED,
+    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
 from PROD.V_DEM_PAIMT_MED_CM
 where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and SMED_COD_DENOM_COMNE in ('00039', '47092', '48222')
+    and SMED_COD_DENOM_COMNE in ('39, 47092, 47135')
     and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
-group by TENEUR
-order by TENEUR;
-```
-
-\pagebreak
-
-#### Trimestres
-\nl
-
-**Arguments :**
-```{r}
-ll <- list(
-  METHODE = "stat_gen1",
-  DATE_DEBUT = paste0(2018, c("-01-01", "-04-01", "-07-01", "-10-01")),
-  DATE_FIN = paste0(2018, c("-03-31", "-06-30", "-09-30", "-12-31")),
-  TYPE_RX = "DENOM", CODE_RX = c(47092, 48222), GROUPER_PAR = "Codes",
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA
-)
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
-
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
-```
-
-**Code SQL :**
-Seule la première période est affichée.
-```{r, eval=FALSE}
-# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
-cat(query_stat_gen1(
-  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
-))
-```
-```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-03-31' as DATE_FIN,
-       SMED_COD_DENOM_COMNE as DENOM,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
-where SMED_DAT_SERV between '2018-01-01' and '2018-03-31'
-    and SMED_COD_DENOM_COMNE in ('47092', '48222')
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
+    and SMED_COD_CATG_LISTE_MED in ('40', '41')
+    and SMED_NBR_JR_DUREE_TRAIT > 0
 group by DENOM
 order by DENOM;
 ```
 
-\pagebreak
+<!-- \pagebreak -->
 
-#### Exclusion codes de services et Inclusion codes listes.
-\nl
+<!-- # Statistiques générales -->
+<!-- Formulaire interactif permettant l'inscription d'arguments, l'exécution de la requête et la sauvegarde des résultats à partir de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29). -->
 
-**Arguments :**
-```{r}
-ll <- list(
-  METHODE = "stat_gen1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 48222), GROUPER_PAR = NULL,
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = c("1", "AD"),
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = c("03", "40")
-)
-stat_gen1_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(stat_gen1_args)
-```
+<!-- ![](images/sg1-all.PNG){ height=85% } -->
 
-**Tableau des résultats :**
-```{r}
-tab_res <- SQL_stat_gen1(conn = conn, debut = ll$DATE_DEBUT, fin = ll$DATE_FIN,
-                         type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-                         code_serv = ll$CODE_SERV)
-sg1_format_table(tab_res)
-kable_tab(tab_res)
-```
+<!-- \pagebreak -->
 
-**Code SQL :**
-Seule la première période est affichée.
-```{r, eval=FALSE}
-# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
-cat(query_stat_gen1(
-  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE)
-))
-```
-```{sql, echo=TRUE, eval=FALSE}
-select '2018-01-01' as DATE_DEBUT,
-       '2018-12-31' as DATE_FIN,
-       sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-       sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-       count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-       count(*) as NBRE_RX,
-       sum(SMED_QTE_MED) as QTE_MED,
-       sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
-where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and SMED_COD_DENOM_COMNE in ('00039', '47092', '48222')
-    and (SMED_COD_SERV_1 not in ('1', 'AD') or SMED_COD_SERV_1 is null)
-    and SMED_COD_CATG_LISTE_MED in ('03', '40');
-```
+<!-- ## Arguments -->
+<!-- * **`Nombre de périodes` :** Nombre entier. Indique le nombre de périodes d'étude à analyser. -->
+<!-- * **`Période X` :** Sélectionner ou inscrire manuellement la date de début et de fin de la période d'étude *X*. -->
+<!-- * **`Nombre de Codes Rx` :** Nombre entier. Indique le nombre de `Code Rx` à analyser. -->
+<!-- * **`Type de Code Rx` :** `DENOM` ou `DIN`. Indique le type de `Code Rx` à analyser. -->
+<!--   + `DENOM` : Code de dénomination commune. Voir [SMED_COD_DENOM_COMNE](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233). -->
+<!--   + `DIN` : Code d'identification du médicament. Voir [SMED_COD_DIN](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265). -->
+<!-- * **`Code Rx X` :** Le(s) code(s) de médicament à analyser. Inscrire les codes sous la forme d'un nombre entier. -->
+<!-- * **`Grouper par` :** -->
+<!--     + `Codes` : Résultats pour chaque `Code Rx`. -->
+<!--     + `Teneur` : Résultats par teneur du médicament. Voir [`SMED_COD_TENR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30998&TypOrigElmVue=T&NoSeqElmOrig=1457). -->
+<!--     + `Format` : Résultats par format d'acquisition du médicament. Voir [`SMED_COD_FORMA_ACQ_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30941&TypOrigElmVue=T&NoSeqElmOrig=1277). -->
+<!-- * **`Codes de Service` :** Exclusion ou inclusion des codes de services. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295). -->
+<!-- * **`Code Liste Médicament` :** Exclusion ou inclusion des codes de catégories de listes de médicaments sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245). -->
 
+<!-- * **Bouton Exécuter Requête :** Exécution de la requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous la section *Résultats*. -->
+<!-- * **Bouton Réinitialiser Arguments :** Réinitialisation complète de la page (arguments par défaut). -->
 
+<!-- ## Résultats -->
+<!-- * Tableau des résultats en fonction des arguments sélectionnés. -->
+<!-- * **Bouton Sauvegarder Résultats en Excel :** Ouvre une fenêtre permettant de sauvegarder au format Excel le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier. -->
 
-\pagebreak
+<!-- ## Requête SQL -->
+<!-- * Code SQL utilisé pour créer le tableau des résultats en fonction des arguments sélectionnés. Seul le code de la première période est affiché. -->
 
-
-
-# Statistiques générales
-Formulaire interactif permettant l'inscription d'arguments, l'exécution de la requête et la sauvegarde des résultats à partir de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
-
-![](images/sg1-all.PNG){ height=85% }
-
-\pagebreak
-
-## Arguments
-* **`Nombre de périodes` :** Nombre entier. Indique le nombre de périodes d'étude à analyser.
-* **`Période X` :** Sélectionner ou inscrire manuellement la date de début et de fin de la période d'étude *X*.
-* **`Nombre de Codes Rx` :** Nombre entier. Indique le nombre de `Code Rx` à analyser.
-* **`Type de Code Rx` :** `DENOM` ou `DIN`. Indique le type de `Code Rx` à analyser.
-  + `DENOM` : Code de dénomination commune. Voir [SMED_COD_DENOM_COMNE](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233).
-  + `DIN` : Code d'identification du médicament. Voir [SMED_COD_DIN](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265).
-* **`Code Rx X` :** Le(s) code(s) de médicament à analyser. Inscrire les codes sous la forme d'un nombre entier.
-* **`Grouper par` :**
-    + `Codes` : Résultats pour chaque `Code Rx`.
-    + `Teneur` : Résultats par teneur du médicament. Voir [`SMED_COD_TENR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30998&TypOrigElmVue=T&NoSeqElmOrig=1457).
-    + `Format` : Résultats par format d'acquisition du médicament. Voir [`SMED_COD_FORMA_ACQ_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30941&TypOrigElmVue=T&NoSeqElmOrig=1277).
-* **`Codes de Service` :** Exclusion ou inclusion des codes de services. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).
-* **`Code Liste Médicament` :** Exclusion ou inclusion des codes de catégories de listes de médicaments sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).
-
-* **Bouton Exécuter Requête :** Exécution de la requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous la section *Résultats*.
-* **Bouton Réinitialiser Arguments :** Réinitialisation complète de la page (arguments par défaut).
-
-## Résultats
-* Tableau des résultats en fonction des arguments sélectionnés.
-* **Bouton Sauvegarder Résultats en Excel :** Ouvre une fenêtre permettant de sauvegarder au format Excel le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier.
-
-## Requête SQL
-* Code SQL utilisé pour créer le tableau des résultats en fonction des arguments sélectionnés. Seul le code de la première période est affiché.
-
-## Exemples
-* Voir section *[Requête via Excel > Statistiques générales > Exemples](#sg1_exemples)*.
+<!-- ## Exemples -->
+<!-- * Voir section *[Requête via Excel > Statistiques générales > Exemples](#sg1_exemples)*. -->

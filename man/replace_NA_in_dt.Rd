@@ -15,4 +15,3 @@ replace_NA_in_dt(dt, by)
 \description{
 Remplace les \code{NA}s dans un tableau par \code{by}.
 }
-\keyword{internal}

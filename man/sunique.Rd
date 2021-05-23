@@ -17,4 +17,11 @@ sunique(x, decreasing = FALSE, na.last = FALSE)
 \description{
 Combinaison de \code{sort()} et \code{unique()}.
 }
-\keyword{internal}
+\examples{
+x <- sample(c(1:10, NA, NaN))
+x
+
+sunique(x)
+sunique(x, na.last = TRUE)
+sunique(x, decreasing = TRUE, na.last = NA)
+}

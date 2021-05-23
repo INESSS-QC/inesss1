@@ -19,7 +19,7 @@ SQL_obstetric <- function(
                 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MED-ECHO', V_SEJ_SERV_HOSP_CM = 'MED-ECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
-  verbose = TRUE
+  date_dx_var = "depar", verbose = TRUE
 ) {
 
   ### Arranger les arguments
@@ -59,7 +59,8 @@ SQL_obstetric <- function(
         DT[[i]] <- fct(  # tableau provenant de la requête
           conn = conn, ids = sunique(cohort), diagn = diagn_codes[[dia]],
           debut = debut, fin = fin,
-          diag_desc = dia, sourc_desc = dt_desc[[sour]]
+          diag_desc = dia, sourc_desc = dt_desc[[sour]],
+          date_dx_var = date_dx_var
         )
         t2 <- Sys.time()
         i <- i + 1L

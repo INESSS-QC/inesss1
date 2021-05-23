@@ -4,9 +4,11 @@
 #'
 #' @param x Vecteur.
 #'
-#' @keywords internal
 #' @encoding UTF-8
 #' @export
+#'
+#' @examples
+#' rmNA(c(4, 6, 8, NA, 78, 4, NaN))
 rmNA <- function(x) {
 
   if (anyNA(x)) {

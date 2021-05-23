@@ -10,11 +10,12 @@ query_stat_gen1(
   fin,
   type_Rx = "DENOM",
   codes,
-  group_by = "Codes",
+  group_by = "DENOM",
   code_serv = c("1", "AD"),
   code_serv_filtre = "Exclusion",
   code_list = NULL,
   code_list_filtre = "Inclusion",
+  age_date = NULL,
   ...
 )
 }
@@ -23,28 +24,36 @@ query_stat_gen1(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ} (une seule valeur).}
 
-\item{type_Rx}{Indique le type de code analysé :
+\item{type_Rx}{Typeype de code à analyser. Une valeur parmi :
 \itemize{
+\item \code{'AHFS'} : Code identifiant la classe de médicaments telle que déterminée par l'\emph{American Hospital Formulary Service}.
 \item \code{'DENOM'} : Code de dénomination commune (\code{SMED_COD_DENOM_COMNE}).
 \item \code{'DIN'} : Code d'identification du médicament (\code{SMED_COD_DIN}).
 }}
 
-\item{codes}{Vecteur comprenant le ou les codes d'analyse au format numérique, sans zéros.}
+\item{codes}{Le ou les codes à analyser. Voir \emph{Details}.}
 
 \item{group_by}{Regrouper (aggréger) les résultats par :
 \itemize{
-\item \code{'Codes'} : Résultats par code analysé.
+\item \code{'AHFS'} : Résultats par code de classe AHFS.
+\item \code{'DENOM'} : Résultats par code de dénomination commune.
+\item \code{'DIN'} : Résultats par code d'identification du médicament.
+\item \code{'CodeList'} : Résultats par code de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}).
+\item \code{'CodeServ'} : Résultats par code de service (\code{SMED_COD_SERV_1}).
 \item \code{'Teneur'} : Résultats par teneur du médicament (\code{SMED_COD_TENR_MED}) incluant les valeurs absentes.
 \item \code{'Format'} : Résultats par format d'acquisition du médicament (\code{SMED_COD_FORMA_ACQ_MED}) incluant les valeurs absentes.
+\item \code{'Age'} : Résultats par âge à une date précise. Voir argument \code{age_date}. L'âge est calculé à partir de la date de naissance disponible dans la vue \code{V_FICH_ID_BEN_CM}.
 }}
 
 \item{code_serv}{Vecteur de type \code{character} comprenant le ou les codes de service (\code{SMED_COD_SERV_1}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_serv_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de service \code{code_serv}. Inscrire \code{code_serv = NULL} s'il n'y a pas de filtre à appliquer.}
 
-\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de liste de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
+\item{code_list}{Vecteur de type \code{character} comprenant le ou les codes de catégories de listes de médicaments (\code{SMED_COD_CATG_LISTE_MED}) à exclure ou à inclure, sinon inscrire \code{NULL}.}
 
 \item{code_list_filtre}{\code{'Inclusion'} ou \code{'Exclusion'} des codes de catégories de liste de médicaments \code{code_list}. Inscrire \code{code_list = NULL} s'il n'y a pas de filtre à appliquer.}
+
+\item{age_date}{Date à laquelle on calcule l'âge si \code{group_by} contient \code{'Age'}. Si \code{NULL}, aura pour valeur \code{debut}.}
 }
 \value{
 Chaîne de caractères à utiliser dans une requête SQL.
@@ -53,57 +62,67 @@ Chaîne de caractères à utiliser dans une requête SQL.
 Générateur de code SQL pour la méthode \code{stat_gen1}.
 }
 \details{
-\strong{Méthode \code{stat_gen1} :}\cr
-Statistiques descriptives tirées de la vue \code{V_DEM_PAIMT_MED_CM}.\cr\cr
-\strong{\code{group_by} :} Revient à utiliser la commande \verb{group by} dans le code SQL.\cr\cr
+\strong{\code{codes} :}\cr
+Si \code{type_Rx='AHFS'} : codes sous la forme de 6 caractères où les deux premiers caractères représente la classe AHFS, les deux du milieu la sous-classe AHFS et les deux derniers la sous-sous-classe AHFS. Il est possible de remplacer une paire de caractères (\{1, 2\}, \{3, 4\} ou \{5, 6\}) par \code{'--'} pour rechercher toutes les types de classes. Par exemple, \code{'04--12'} indique qu'on recherche la classe AHFS 04, toutes les sous-classes AHFS et la sous-sous-classe 12.\cr
+Sinon inscrire les codes sous la forme d'un nombre entier.\cr\cr
 \strong{\code{code_serv_filtre}, \code{code_list_filtre} :}\cr
 \code{'Exclusion'} inclus les \code{NULL}\cr
 \code{'Inclusion'} exclus les \code{NULL}.
 }
 \examples{
-### Avantages d'utiliser cat() si c'est pour afficher du code dans la console.
-# Avec cat()
-cat(query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222), group_by = 'Codes',
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
-))
+### Avantages d'utiliser cat()
 # Sans cat()
-query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222), group_by = 'Codes',
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
-)
+query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                group_by = 'DENOM')
+# Avec cat()
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = 'DENOM'))
 
-### GROUP_BY
-# group_by = NULL : resultats par periode d'etude.
-cat(query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
-  group_by = NULL,
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
-))
-# group_by = 'Codes' : resultats par code d'analyse.
-cat(query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
-  group_by = 'Codes',
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
-))
-# group_by = c('Teneur', 'Format') : resultats par teneur et format.
-cat(query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
-  group_by = c('Teneur', 'Format'),
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion'
-))
+### group_by
+# Aucun
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = NULL))
+# Tous les group_by
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')))
 
-### Exclusion VS Inclusion
-cat(query_stat_gen1(
-  debut = '2020-01-01', fin = '2020-12-31',
-  type_Rx = 'DENOM', codes = c(47092, 47135, 48222),
-  group_by = NULL,
-  code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-  code_list = c('40', '41'), code_list_filtre = 'Inclusion'
-))
+### AHFS
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = c('040412', '08----'),
+                    group_by = 'AHFS'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = '04--12',
+                    group_by = 'AHFS'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'AHFS', codes = '04--12',
+                    group_by = c('AHFS', 'DENOM')))
+
+### DENOM
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = 'DENOM'))
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(39, 47092, 47135),
+                    group_by = c('DENOM', 'DIN')))
+
+### DIN
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DIN', codes = c(30848, 585092),
+                    group_by = 'DIN'))
+
+### Age
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DIN', codes = c(30848, 585092),
+                    group_by = c('DIN', 'Age'), age_date = '2018-01-01'))
+
+### Exclusion et Inclusion - code_serv et code_list
+cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
+                    type_Rx = 'DENOM', codes = c(47092, 47135),
+                    group_by = 'DENOM',
+                    code_serv_filtre = 'Exclusion', code_serv = c('1', 'AD'),
+                    code_list_filtre = 'Inclusion', code_list = c('40', '41')))
 }

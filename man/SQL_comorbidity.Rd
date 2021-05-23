@@ -21,6 +21,7 @@ SQL_comorbidity(
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MEDECHO", V_SEJ_SERV_HOSP_CM = "MEDECHO",
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   confirm_sourc = list(MEDECHO = 1, BDCU = 2, SMOD = 2),
+  date_dx_var = "depar",
   obstetric_exclu = TRUE,
   exclu_diagn = NULL,
   verbose = TRUE,
@@ -65,6 +66,8 @@ SQL_comorbidity(
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
 
+\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette \emph{SQL_comorbidity} section 4 \emph{Sources SQL (dt_source)} pour voir le code SQL généré.}
+
 \item{obstetric_exclu}{\code{TRUE} ou \code{FALSE}. Si l'on doit exclure (\code{TRUE}) les diabètes et les hypertensions de type gestationnel. Voir Détails.}
 
 \item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
@@ -77,6 +80,7 @@ SQL_comorbidity(
 \code{data.table} :
 \itemize{
 \item \code{ID} : Colonne contenant l’identifiant unique de l’usager.
+\item \code{nDx} : Nombre de diagnostics associé à l'individu.
 \item \code{Charlson} : Indicateur, seulement si \code{method} contient \code{'Charlson'}.
 \item \code{Elixhauser} : Indicateur, seulement si \code{method} contient \code{'Elixhauser'}.
 \item \code{Combined} : Indicateur, seulement si \code{method} contient \code{'Charlson'} et \code{'Elixhauser'}.
@@ -87,9 +91,9 @@ SQL_comorbidity(
 Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 }
 \details{
-\strong{\code{dt} :} Si un \code{ID} a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
-\strong{\code{obstetric_exclu} :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.\cr\cr
-\strong{\code{dt_source} :}
+\strong{dt :} Si un \code{ID} a plus d'une date index, seule la première, la plus ancienne, sera conservée.\cr\cr
+\strong{obstetric_exclu :} Lorsqu'un cas de diabète ou d'hypertension a lieu 120 jours avant ou 180 jours après un évènement obstétrique, on les considère de type gestationnel. Ces cas sont alors exclus de l'analyse.\cr\cr
+\strong{dt_source :}
 \itemize{
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V\%5FDIAGN\%5FSEJ\%5FHOSP\%5FCM+\%28Diagnostic+s\%E9jour+hospitalier\%29}{\code{V_DIAGN_SEJ_HOSP_CM}} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 \item \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V\%5FSEJ\%5FSERV\%5FHOSP\%5FCM+\%28S\%E9jour+service+hospitalier\%29}{\code{V_SEJ_SERV_HOSP_CM}} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.

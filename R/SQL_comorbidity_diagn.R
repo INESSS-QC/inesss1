@@ -2,7 +2,7 @@
 #'
 #' Extraction SQL des diagnostics pour l'étude de la comorbidité.
 #'
-#' \strong{\code{dt_source} :}
+#' @details \strong{\code{dt_source} :}
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6721&NomVue=V%5FDIAGN%5FSEJ%5FHOSP%5FCM+%28Diagnostic+s%E9jour+hospitalier%29}{`V_DIAGN_SEJ_HOSP_CM`} : Cette structure contient tous les diagnostics associés à un séjour hospitalier.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{`V_EPISO_SOIN_DURG_CM`} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
@@ -16,6 +16,7 @@
 #' @param CIM `'CIM9'`, `'CIM10'` ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la *Classification statistique internationale des maladies et des problèmes de santé connexes* (CIM).
 #' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
 #' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
+#' @param date_dx_var `'admis` ou `'depar'`. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette *SQL_comorbidity* section 4 *Sources SQL (dt_source)* pour voir le code SQL généré.
 #' @param verbose `TRUE` ou `FALSE`. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (`dt_source`). Utile pour suivre le déroulement de l'extraction.
 #'
 #' @return `data.table` de 4 variables :
@@ -28,10 +29,11 @@
 SQL_comorbidity_diagn <- function(
   conn, cohort, debut, fin,
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'),
-  dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM', 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
+  dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
+                'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
-  exclu_diagn = NULL, verbose = TRUE
+  date_dx_var = "depar", exclu_diagn = NULL, verbose = TRUE
 ) {
 
   ### Extraction des diagn
@@ -69,7 +71,8 @@ SQL_comorbidity_diagn <- function(
         DT[[i]] <- fct(  # tableau provenant de la requête
           conn = conn, ids = cohort, diagn = Dx_table[[dia]],
           debut = debut, fin = fin,
-          diag_desc = dia, sourc_desc = dt_desc[[sour]]
+          diag_desc = dia, sourc_desc = dt_desc[[sour]],
+          date_dx_var = date_dx_var
         )
         t2 <- Sys.time()
         i <- i + 1L
@@ -99,7 +102,9 @@ SQL_comorbidity_diagn <- function(
 #' @encoding UTF-8
 #' @keywords internal
 SQL_comorbidity_diagn.select_Dx_table <- function(Dx_table) {
-  if (Dx_table == "Combine_Dx_CCI_INSPQ18") {
+  if (is.list(Dx_table)) {
+    return(Dx_table)
+  } else if (Dx_table == "Combine_Dx_CCI_INSPQ18") {
     return(inesss::Combine_Dx_CCI_INSPQ18)
   } else if (Dx_table == "Charlson_Dx_CCI_INSPQ18") {
     return(inesss::Charlson_Dx_CCI_INSPQ18)
@@ -111,14 +116,11 @@ SQL_comorbidity_diagn.select_Dx_table <- function(Dx_table) {
     stop("SQL_comorbidity_diagn.select_Dx_table(): Dx_table ne contient pas une valeur permise.")
   }
 }
+#' @title SQL_comorbidity_diagn
+#' @description Requête SQL pour extraire les diagnostics de la vue V_DIAGN_SEJ_HOSP_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
-  ### Requête SQL pour extraire les diagnostics de la vue V_DIAGN_SEJ_HOSP_CM
-  ### @conn = Connexion teradata.
-  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
-  ### @diagn = Codes SQL regex à chercher dans la base de données.
-  ### @debut,@fin = Date de début et de période où chercher les informations.
+SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -140,10 +142,14 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, f
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SHOP_DAT_ADMIS_SEJ_HOSP",
+                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
         "from RES_SSS.V_DIAGN_SEJ_HOSP_CM\n",
         "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"'\n",
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SHOP_DAT_ADMIS_SEJ_HOSP",
+                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"'\n",
         "    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');"
       )
     ))
@@ -167,14 +173,11 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, f
   return(DT)
 
 }
+#' @title SQL_comorbidity_diagn
+#' @description Requête SQL pour extraire les diagnostics de la vue V_SEJ_SERV_HOSP_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
-  ### Requête SQL pour extraire les diagnostics de la vue V_SEJ_SERV_HOSP_CM
-  ### @conn = Connexion teradata.
-  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
-  ### @diagn = Codes SQL regex à chercher dans la base de données.
-  ### @debut,@fin = Date de début et de période où chercher les informations.
+SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -196,10 +199,14 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fi
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SHOP_DAT_ADMIS_SEJ_HOSP",
+                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
         "from RES_SSS.V_SEJ_SERV_HOSP_CM\n",
         "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SHOP_DAT_DEPAR_SEJ_HOSP between '",deb,"' and '",fi,"';"
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SHOP_DAT_ADMIS_SEJ_HOSP",
+                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"';"
       )
     ))
     if (!is.null(ids)) {
@@ -222,14 +229,11 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fi
   return(DT)
 
 }
+#' @title SQL_comorbidity_diagn
+#' @description Requête SQL pour extraire les diagnostics de la vue I_SMOD_SERV_MD_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
-  ### Requête SQL pour extraire les diagnostics de la vue V_SEJ_SERV_HOSP_CM
-  ### @conn = Connexion teradata.
-  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
-  ### @diagn = Codes SQL regex à chercher dans la base de données.
-  ### @debut,@fin = Date de début et de période où chercher les informations.
+SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -278,14 +282,11 @@ SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin
   return(DT)
 
 }
+#' @title SQL_comorbidity_diagn
+#' @description Requête SQL pour extraire les diagnostics de la vue V_EPISO_SOIN_DURG_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc) {
-  ### Requête SQL pour extraire les diagnostics de la vue V_SEJ_SERV_HOSP_CM
-  ### @conn = Connexion teradata.
-  ### @ids = Vecteur contenant les numéros des identifiants (cohorte).
-  ### @diagn = Codes SQL regex à chercher dans la base de données.
-  ### @debut,@fin = Date de début et de période où chercher les informations.
+SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -307,10 +308,14 @@ SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, 
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = paste0(
         "select SURG_NO_INDIV_BEN_BANLS as ID,\n",
-        "       SURG_DH_DEPAR_USAG_DURG as DATE_DX\n",
+        "       ",ifelse(date_dx_var == "admis",
+                         "SURG_DHD_EPISO_SOIN_DURG",
+                         "SURG_DH_DEPAR_USAG_DURG ")," as DATE_DX\n",
         "from RES_SSS.V_EPISO_SOIN_DURG_CM\n",
         "where SURG_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and SURG_DH_DEPAR_USAG_DURG between To_Date('",deb,"') and To_Date('",fi,"');"
+        "    and ",ifelse(date_dx_var == "admis",
+                          "SURG_DHD_EPISO_SOIN_DURG",
+                          "SURG_DH_DEPAR_USAG_DURG ")," between To_Date('",deb,"') and To_Date('",fi,"');"
       )
     ))
     if (!is.null(ids)) {
