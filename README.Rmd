@@ -36,30 +36,31 @@ newpage <- function(space = "3cm") {
 ```
 
 # Support
-Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à l'adresse `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
-La documentation de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation)
+Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
+La documentation à jour de la librairie est disponible [ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).  
+Pour recevoir les dernières mises à jour de la librairie, demander d'être ajouté à la liste d'envoi. Le courriel envoyé contiendra deux dossiers : 1) dossier d'installation; 2) dossier *Documentation* compressé.
 
 
 # Installation de la librairie *inesss*
-Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss*.
+Puisque Microsoft Teams est accessible par un navigateur web, il est conseillé d'y avoir déposé le dossier d'installation et de le télécharger par la suite. Utile pour utiliser la librairie sur le serveur de la RAMQ.
+
+1. Télécharger le dossier d'installation s'intitulant *R_inesss_v.x.y.z.tar.gz* où `x.y.z` est le numéro de version.
+2. Copier les lignes suivantes dans la console de *RStudio* pour installer la librairie *inesss* **en prenant soin d'inscrire le répertoire et le nom du dossier d'installation**.
 ```{r, eval=FALSE, echo=TRUE}
 # Installer le package remotes au besoin :
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 
-# Installation pour postes INESSS
-remotes::install_local("J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss")
-
-# Installation pour postes RAMQ
-remotes::install_local("V:/GI-Data/_Inscription_Rx/_Rpackage_inesss")
+# Installation de la librairie R inesss
+remotes::install_local("Inscrire/le/répertoire/du/dossier/R_inesss_v.x.y.z.tar.gz")
 ```
 
+**Exemple**
+```{r, eval=FALSE, echo=TRUE}
+
+```
+
+
 # Documentation
-Les répertoires suivants contiennent toute la documentation en lien avec l'utilisation de la librairie R *inesss* :
-
-* INESSS : `J:/GRP/A/5/A/INSCRIPTION/E_I/_Rpackage_inesss/Documentation`
-* RAMQ : `V:/GI-Data/_Inscription_Rx/_Rpackage_inesss/Documentation`
-
-Plus particulièrement :
 
 * **Gabarits et Outils EXCEL :** Fichiers à utiliser pour *Requêtes via Excel* et macros VBA pratiques pour Excel.
 * **Vignettes :** Fichiers HTML expliquant la ou les méthodes utilisées pour certaines fonctions de la librairie.
