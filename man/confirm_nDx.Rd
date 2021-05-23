@@ -84,4 +84,3 @@ ex_studydates_rev <- confirm_2Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = 
                                  study_start = '2020-01-10', study_end = '2020-01-20',
                                  n1 = 10, n2 = 20, reverse = TRUE)
 }
-\keyword{internal}

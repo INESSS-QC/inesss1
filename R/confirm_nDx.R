@@ -12,7 +12,6 @@
 #' @param reverse `TRUE` ou `FALSE`. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.
 #'
 #' @name confirm_nDx
-#' @keywords internal
 #' @encoding UTF-8
 #' @examples
 #' dt_ex <- data.frame(
@@ -50,6 +49,7 @@
 
 #' @rdname confirm_nDx
 #' @import data.table
+#' @export
 confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
@@ -181,6 +181,7 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
 
 #' @rdname confirm_nDx
 #' @import data.table
+#' @export
 confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
                         study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
                         reverse = FALSE) {
