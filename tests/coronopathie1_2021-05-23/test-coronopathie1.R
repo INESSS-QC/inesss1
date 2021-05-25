@@ -12,7 +12,7 @@ SQL_Dx <- list(
 
 ### Extraction des Dx
 dt_dx <- SQL_diagn(
-  conn, cohort = NULL, debut = "2006-01-01", fin = "2020-12-31",  # voir dernière mise à jour des BD pour la fin
+  conn, cohort = NULL, debut = "2006-01-01", fin = "2021-04-31",  # voir dernière mise à jour des BD pour la fin
   Dx_table = SQL_Dx, CIM = c("CIM9", "CIM10"),
   dt_source = c("V_DIAGN_SEJ_HOSP_CM", "V_SEJ_SERV_HOSP_CM",
                 "V_EPISO_SOIN_DURG_CM", "I_SMOD_SERV_MD_CM"),
@@ -20,7 +20,7 @@ dt_dx <- SQL_diagn(
                  V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   date_dx_var = "depar", exclu_diagn = NULL, verbose = TRUE
 )
-dt_dx <- unique(dt_dx, by = c("ID", "DATE_DX"))  # valeurs unique par ID+DATE -> Dx et source moins importante
+dt_dx <- unique(dt_dx, by = c("ID", "DATE_DX"))  # valeurs unique par ID+DATE -> Dx et source pas importante
 
 ### Confirmation des Dx
 dt_conf <- confirm_2Dx(
@@ -30,7 +30,10 @@ dt_conf <- confirm_2Dx(
 )
 
 ### Dernière date de Dx pour chaque ID
-Dx_last <- dt_dx[dt_dx[, .I[.N], .(ID)]$V1, .(ID, LAST_DATE = DATE_DX)]
+Dx_last <- dt_dx[
+  dt_dx[, .I[.N], .(ID)]$V1,  # no de lignes du dernier Dx
+  .(ID, LAST_DATE = DATE_DX)  # sélection des colonnes
+]
 
 ### Conserver 1ère date confirmée
 dt_conf_1st <- dt_conf[dt_conf[, .I[1], .(ID)]$V1]
