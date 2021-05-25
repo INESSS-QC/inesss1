@@ -19,12 +19,12 @@ SQL_connexion <- function(uid = NULL, pwd = NULL, dsn = 'PEI_PRD', encoding = 'l
 
   ### Demander user s'il n'est pas inscrit
   if (is.null(uid)) {
-    uid <- askpass::askpass("User")
+    uid <- askpass::askpass("Teradata : User")
   }
 
   ### Demander le mot de passe s'il n'est pas inscrit
   if (is.null(pwd)) {
-    pwd <- askpass::askpass("Mot de passe")
+    pwd <- askpass::askpass("Teradata : Mot de passe")
   }
 
   ### Effectuer la connexion et conserver message erreur s'il y en a
