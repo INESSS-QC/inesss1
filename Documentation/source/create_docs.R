@@ -50,6 +50,13 @@ render(
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )
+# render(
+#   input = "README.Rmd",
+#   output_format = "pdf_document",
+#   output_file = paste0("LISEZ-MOI.pdf"),
+#   output_dir = "Documentation",
+#   envir = new.env(), encoding = "UTF-8"
+# )
 
 
 # Registre Versions -------------------------------------------------------
@@ -62,11 +69,16 @@ render(
 )
 render(
   input = "NEWS.Rmd",
-  # output_format = "pdf_document",
-  # output_file = "inesss-REGISTRE-VERSION.pdf",
   output_format = "html_document",
   output_file = "inesss-REGISTRE-VERSION.html",
   output_dir = "Documentation",
   envir = new.env(), encoding = "UTF-8"
 )
+# render(
+#   input = "NEWS.Rmd",
+#   output_format = "pdf_document",
+#   output_file = "inesss-REGISTRE-VERSION.pdf",
+#   output_dir = "Documentation",
+#   envir = new.env(), encoding = "UTF-8"
+# )
 

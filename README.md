@@ -4,36 +4,28 @@ inesss 1.0.0
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
 conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et
-indiquer l’objet `librairie inesss`.  
-La documentation à jour de la librairie est disponible
-[ici](https://github.com/INESSS-QC/inesss1/tree/master/Documentation).  
-Pour recevoir les dernières mises à jour de la librairie, demander
-d’être ajouté à la liste d’envoi. Le courriel envoyé contiendra deux
-dossiers : 1) dossier d’installation; 2) dossier *Documentation*
-compressé.
+indiquer l’objet `librairie inesss`.
 
 # Installation de la librairie *inesss*
 
-1.  Télécharger sur votre poste le dossier d’installation en
-    <a download="R_inesss_v1.0.0.zip" href="https://github.com/INESSS-QC/inesss1/archive/refs/heads/master.zip">cliquant
-    ici</a>.
-2.  Copier les lignes suivantes dans la console de *RStudio* pour
-    installer la librairie *inesss* **en prenant soin d’inscrire le
-    répertoire et le nom du dossier d’installation**, puis appuyer sur
-    *Entrée*.
+-   Joindre le groupe *INESSS - Librairie R inesss* pour avoir accès au
+    fichier d’installation.  
+    Code du groupe : **e7fs8f0**.
+-   Télécharger le fichier *inesss_x.y.z.tar.gz* sur votre poste où
+    *x.y.z* indique le numéro de version.
+-   Copier le code suivant dans la console de RStudio en prenant bien
+    soin d’y inscrire le répertoire complet et le nom du fichier.
 
 ``` r
-# Installer le package remotes au besoin :
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-
-# Installation de la librairie R inesss
-remotes::install_local("Inscrire/le/répertoire/du/dossier/inesss1-master.zip", upgrade = "never")
+remotes::install_local("Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz",
+                       upgrade = "never")
 ```
 
-**Exemple**
+-   Pour avoir accès aux fonctions et aux tables de la librairie :
 
 ``` r
-remotes::install_local("E:/Desktop/MonDossier/Rpackages/inesss1-master.zip", upgrade = "never")
+library(inesss)
 ```
 
 # Documentation
