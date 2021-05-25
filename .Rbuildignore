@@ -5,3 +5,7 @@
 ^data-raw$
 ^doc$
 ^Meta$
+^data-fake$
+^Documentation$
+^speed-test$
+
