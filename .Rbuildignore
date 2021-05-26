@@ -2,10 +2,10 @@
 ^\.Rproj\.user$
 ^LICENSE\.md$
 ^README\.Rmd$
+^data-fake$
 ^data-raw$
 ^doc$
 ^Meta$
-^data-fake$
 ^Documentation$
 ^Zoho$
 ^speed-test$
