@@ -10,7 +10,7 @@
 
 
 
-<meta name="date" content="2021-05-25" />
+<meta name="date" content="2021-05-26" />
 
 <title>INESSS</title>
 
@@ -166,7 +166,7 @@ pre code {
 
 <h1 class="title toc-ignore">INESSS</h1>
 <h3 class="subtitle">v.1.0.0</h3>
-<h4 class="date">2021-05-25</h4>
+<h4 class="date">2021-05-26</h4>
 
 </div>
 
@@ -179,14 +179,11 @@ pre code {
 <div id="installation-de-la-librairie-inesss" class="section level1">
 <h1>Installation de la librairie <em>inesss</em></h1>
 <ul>
-<li>Joindre le groupe <em>INESSS - Librairie R inesss</em> pour avoir accès au fichier d’installation.<br />
-Code du groupe : <strong>e7fs8f0</strong>.</li>
-<li>Télécharger le fichier <em>inesss_x.y.z.tar.gz</em> sur votre poste où <em>x.y.z</em> indique le numéro de version.</li>
+<li>Télécharger le fichier <em>inesss_x.y.z.tar.gz</em> sur votre poste où <em>x.y.z</em> est le numéro de version.</li>
 <li>Copier le code suivant dans la console de RStudio en prenant bien soin d’y inscrire le répertoire complet et le nom du fichier.</li>
 </ul>
 <pre class="r"><code>if (!&quot;remotes&quot; %in% installed.packages()[,1]) install.packages(&quot;remotes&quot;)
-remotes::install_local(&quot;Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz&quot;,
-                       upgrade = &quot;never&quot;)</code></pre>
+remotes::install_local(&quot;Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz&quot;, upgrade = &quot;never&quot;)</code></pre>
 <ul>
 <li>Pour avoir accès aux fonctions et aux tables de la librairie :</li>
 </ul>

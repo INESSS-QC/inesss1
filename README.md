@@ -8,18 +8,14 @@ indiquer l’objet `librairie inesss`.
 
 # Installation de la librairie *inesss*
 
--   Joindre le groupe *INESSS - Librairie R inesss* pour avoir accès au
-    fichier d’installation.  
-    Code du groupe : **e7fs8f0**.
 -   Télécharger le fichier *inesss_x.y.z.tar.gz* sur votre poste où
-    *x.y.z* indique le numéro de version.
+    *x.y.z* est le numéro de version.
 -   Copier le code suivant dans la console de RStudio en prenant bien
     soin d’y inscrire le répertoire complet et le nom du fichier.
 
 ``` r
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
-remotes::install_local("Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz",
-                       upgrade = "never")
+remotes::install_local("Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz", upgrade = "never")
 ```
 
 -   Pour avoir accès aux fonctions et aux tables de la librairie :
