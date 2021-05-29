@@ -29,17 +29,5 @@ file.copy("Documentation/Gabarits et Outils EXCEL/PERSONAL.XLSB-repertoire.txt",
           "Zoho/Outils - Formulaire interactif/PERSONAL.XLSB-repertoire.txt",
           overwrite = TRUE)
 
-### PDF package doc
-file.copy(paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
-          paste0("Zoho/Outils - Formulaire interactif/",
-                 "inesss_",as.character(packageVersion("inesss")),".pdf"),
-          overwrite = TRUE)
-
 
 # Syntaxes et méthodes - Comorbidité - Charlson & Elixhauser ----------------------------------
-
-### PDF package doc
-file.copy(paste0("Documentation/inesss_",as.character(packageVersion("inesss")),".pdf"),
-          paste0("Zoho/Syntaxes et méthodes - Comorbidité - Charlson & Elixhauser/",
-                 "inesss_",as.character(packageVersion("inesss")),".pdf"),
-          overwrite = TRUE)
