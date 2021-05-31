@@ -167,7 +167,7 @@ select SHOP_NO_INDIV_BEN_BANLS as ID,
 from RES_SSS.V_DIAGN_SEJ_HOSP_CM
 where SHOP_COD_DIAGN_MDCAL_CLINQ like any (...)
     and SHOP_DAT_ADMIS_SEJ_HOSP between 'debut' and 'fin'
-    and SHOP_TYP_DIAGN_SEJ_HOSP in c('A', 'P', 'S');
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');
 ```
 **Si date_dx_var = 'depar'** :
 ```{sql, eval=FALSE, echo=TRUE}
@@ -176,7 +176,7 @@ select SHOP_NO_INDIV_BEN_BANLS as ID,
 from RES_SSS.V_DIAGN_SEJ_HOSP_CM
 where SHOP_COD_DIAGN_MDCAL_CLINQ like any (...)
     and SHOP_DAT_DEPAR_SEJ_HOSP between 'debut' and 'fin'
-    and SHOP_TYP_DIAGN_SEJ_HOSP in c('A', 'P', 'S');
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');
 ```
 
 ## V_SEJ_SERV_HOSP_CM
