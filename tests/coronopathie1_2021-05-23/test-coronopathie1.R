@@ -20,7 +20,7 @@ SQL_Dx <- list(
 # ETAPE 1 -----------------------------------------------------------------
 
 # V_DIAGN_SEJ_HOSP_CM - Extraction des Dx
-Dx_etape1 <- as.data.table(dbGetQuery(conn, statement = paste0(
+Dx_etape1.1 <- as.data.table(dbGetQuery(conn, statement = paste0(
   "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
   "       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX\n",
   "from RES_SSS.V_DIAGN_SEJ_HOSP_CM\n",
@@ -28,7 +28,16 @@ Dx_etape1 <- as.data.table(dbGetQuery(conn, statement = paste0(
   "    and SHOP_DAT_ADMIS_SEJ_HOSP between '",debut,"' and '",fin,"'\n",
   "    and SHOP_TYP_DIAGN_SEJ_HOSP in ('P', 'S', 'D');"
 )))
-setkey(Dx_etape1, ID)  # tri
+# V_SEJ_SERV_HOSP_CM - Extraction des Dx
+Dx_etape1.2 <- as.data.table(dbGetQuery(conn, statement = paste0(
+  "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
+  "       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX\n",
+  "from RES_SSS.V_SEJ_SERV_HOSP_CM\n",
+  "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",paste(paste0("'",unlist(SQL_Dx),"'"), collapse = ", "),")\n",
+  "and SHOP_DAT_ADMIS_SEJ_HOSP between '",debut,"' and '",fin,"';"
+)))
+Dx_etape1 <- rbind(Dx_etape1.1, Dx_etape1.2)  # joindre les deux tables ensemble
+setkey(Dx_etape1)  # tri par ID + DATE_DX
 Dx_etape1_1er <- Dx_etape1[, .SD[1], .(ID)]  # Conserver 1re obs de chaque ID
 setnames(Dx_etape1_1er, "DATE_DX", "DI_Hospit")  # renommer les colonnes
 
