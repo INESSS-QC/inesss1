@@ -39,7 +39,7 @@ Dx_etape1.2 <- as.data.table(dbGetQuery(conn, statement = paste0(
 Dx_etape1 <- rbind(Dx_etape1.1, Dx_etape1.2)  # joindre les deux tables ensemble
 setkey(Dx_etape1)  # tri par ID + DATE_DX
 Dx_etape1_1er <- Dx_etape1[, .SD[1], .(ID)]  # Conserver 1re obs de chaque ID
-setnames(Dx_etape1_1er, "DATE_DX", "DI_Hospit")  # renommer les colonnes
+setnames(Dx_etape1_1er, "DATE_DX", "DI_Hospit")  # renommer la colonne
 
 
 # ETAPE 2 -----------------------------------------------------------------
