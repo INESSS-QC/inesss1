@@ -52,7 +52,7 @@ comorbidity(
 
 \item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
 
-\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut (voir fonction \code{base::attributes}) le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table}

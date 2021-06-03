@@ -21,7 +21,7 @@
 #' * `'UManitoba_2016'`
 #' @param confirm_sourc `list` indiquant la *confiance* des `SOURCE`. Si une `SOURCE` doit être confirmée par une autre dans l'intervalle `[n1,n2]`, inscrire `2`, sinon `1`. Inscrire les sources sous le format : `confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)`. `confirm_sourc` doit contenir toutes les valeurs uniques de la colonne `SOURCE`.
 #' @param exclu_diagn Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de `Dx_table` pour connaître les valeurs permises.
-#' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
+#' @param keep_confirm_data `TRUE` ou `FALSE`. Place en attribut (voir fonction `base::attributes`) le data `confirm_data` qui indique la date de repérage et la date de confirmation d'un diagnostic.
 #'
 #' @return `data.table`
 #' @import data.table
@@ -82,7 +82,7 @@ comorbidity <- function(
     nJours = sort(c(n1, n2))  # jours utilisés pour l'intervalle de confirmation
   )
   if (keep_confirm_data) {  # ajouter le data des confirmations de diagn en attribut
-    attr(dt, "infos") <- c(attr(dt, "infos"), list(confirm_data = confirm_data))
+    attr(dt, "confirm_data") <- confirm_data
   }
 
   return(dt)

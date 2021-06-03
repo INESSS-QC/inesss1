@@ -137,6 +137,9 @@ SQL_comorbidity <- function(
       Dx_table, scores, confirm_sourc,
       exclu_diagn, keep_confirm_data
     )
+    # Conserver les attributs pour plus tard
+    attr_infos <- attr(dt, "infos")
+    attr_confirm_data <- attr(dt, "confirm_data")
 
     ### Ajouter les ID manquants
     ids_2_add <- cohort[!cohort %in% dt$ID]
@@ -148,6 +151,12 @@ SQL_comorbidity <- function(
       }
     }
     setkey(dt, ID)
+
+    ### Insérer les attributs dans le data final
+    attr(dt, "infos") <- attr_infos
+    if (keep_confirm_data) {
+      attr(dt, "confirm_data") <- attr_confirm_data
+    }
 
     return(dt)
 

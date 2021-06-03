@@ -74,7 +74,7 @@ SQL_comorbidity(
 
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 
-\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut (voir fonction \code{base::attributes}) le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table} :
