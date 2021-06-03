@@ -16,11 +16,15 @@ header-includes:
   - \usepackage{booktabs}
 # params:
 #   conn: ""
+editor_options: 
+  markdown: 
+    wrap: 72
 ---
 
+```{=tex}
 \pagestyle{fancy}
 \fancyhead[RE,RO]{\leftmark}
-
+```
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE, results = "asis",
                       warning = FALSE, message = FALSE)
@@ -78,138 +82,270 @@ NULL_if_NA <- function(x) {
 }
 ```
 
-
 <!-- LaTeX function -->
-\newcommand{\nl}{\textcolor{white}{.  }} <!-- 'hack' pour en-tête lvl 4 : nouvelle ligne (\newline) -->
+
+\newcommand{\nl}{\textcolor{white}{.  }}
+
+<!-- 'hack' pour en-tête lvl 4 : nouvelle ligne (\newline) -->
+
 <!--                -->
 
 \pagebreak
 
 # Démarrer le formulaire
+
 À partir de *RStudio*, cliquer sur *Addins*, puis sur *Formulaire*.
 
-![](images/formulaire-addin.png){ width=60% }
-
-
+![](images/formulaire-addin.png){width="60%"}
 
 \pagebreak
-
-
 
 # Connexion
+
 Établir une connexion entre *R* et *Teradata*.
 
-1. Inscrire le nom d'utilisateur (commence généralement par *MS*) et le mot de passe.
-2. Cliquer sur le bouton *Connexion*. S'il n'y a pas d'erreur, le mot *Connexion* suivi de la date et l'heure s'affichera. Modifier l'identifiant ou le mot de passe au besoin.
-3. Cliquer sur le bouton *Déconnexion* (ou fermer la fenêtre du formulaire) pour terminer la connexion SQL.
+1.  Inscrire le nom d'utilisateur (commence généralement par *MS*) et le
+    mot de passe.
+2.  Cliquer sur le bouton *Connexion*. S'il n'y a pas d'erreur, le mot
+    *Connexion* suivi de la date et l'heure s'affichera. Modifier
+    l'identifiant ou le mot de passe au besoin.
+3.  Cliquer sur le bouton *Déconnexion* (ou fermer la fenêtre du
+    formulaire) pour terminer la connexion SQL.
 
-**Attention : ** Si le mot de passe est expiré, une fenêtre demandant un nouveau mot de passe apparaîtra **en arrière-plan**. Sélectionner cette fenêtre et entrer le nouveau mot de passe.
+**Attention :** Si le mot de passe est expiré, une fenêtre demandant un
+nouveau mot de passe apparaîtra **en arrière-plan**. Sélectionner cette
+fenêtre et entrer le nouveau mot de passe.
 
-![](images/formulaire-connexion.png){ width=80% }
-
-
+![](images/formulaire-connexion.png){width="80%"}
 
 \pagebreak
 
-
-
 # Requêtes via Excel
-Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier Excel. Chaque onglet doit contenir un tableau indiquant les arguments d'une méthode. Il est fortement conseillé d'utiliser [les gabarits disponibles](https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits%20et%20Outils%20EXCEL).
 
-1. Cliquer sur le bouton *Sélectionner fichier Excel* pour sélectionner le fichier Excel contenant la ou les requêtes à exécuter.
-2. Le répertoire du fichier sélectionné apparaît.
-3. Le programme vérifie si chaque onglet contient un tableau et si sa structure correspond à une méthode existante.
-4. Si la ou les structures sont acceptées, le message «`Aucune erreur, exécution possible.`» s'affiche. Sinon, le message indique, pour chaque onglet, la ou les erreurs à corriger.
-5. Le bouton *Exécuter requêtes* apparaît. Ce bouton permet de sélectionner un répertoire de sauvegarde et d'inscrire le nom du fichier. Lorsque c'est fait, le programme exécute la ou les requêtes associées aux arguments de chaque onglet. Un message en bas à droite indique que l'exécution est en cours et disparaît lorsque c'est terminé.
-6. Le fichier sauvegardé présente les résultats de la manière suivante :
-    + Les onglets possèdent les mêmes noms que ceux du fichier contenant les arguments.
-    + À gauche se trouve le tableau des résultats.
-    + Au milieu, un rappel des arguments utilisés.
-    + À droite, un exemple de code SQL utilisé dans Teradata pour créer le tableau des résultats (uniquement celui de la première période d'étude).
+Exécution d'une ou plusieurs requêtes par l'intermédiaire d'un fichier
+Excel. Chaque onglet doit contenir un tableau indiquant les arguments
+d'une méthode. Il est fortement conseillé d'utiliser [les gabarits
+disponibles](https://github.com/INESSS-QC/inesss1/tree/master/Documentation/Gabarits%20et%20Outils%20EXCEL).
+
+1.  Cliquer sur le bouton *Sélectionner fichier Excel* pour sélectionner
+    le fichier Excel contenant la ou les requêtes à exécuter.
+
+2.  Le répertoire du fichier sélectionné apparaît.
+
+3.  Le programme vérifie si chaque onglet contient un tableau et si sa
+    structure correspond à une méthode existante.
+
+4.  Si la ou les structures sont acceptées, le message
+    «`Aucune erreur, exécution possible.`» s'affiche. Sinon, le message
+    indique, pour chaque onglet, la ou les erreurs à corriger.
+
+5.  Le bouton *Exécuter requêtes* apparaît. Ce bouton permet de
+    sélectionner un répertoire de sauvegarde et d'inscrire le nom du
+    fichier. Lorsque c'est fait, le programme exécute la ou les requêtes
+    associées aux arguments de chaque onglet. Un message en bas à droite
+    indique que l'exécution est en cours et disparaît lorsque c'est
+    terminé.
+
+6.  Le fichier sauvegardé présente les résultats de la manière suivante
+    :
+
+    -   Les onglets possèdent les mêmes noms que ceux du fichier
+        contenant les arguments.
+    -   À gauche se trouve le tableau des résultats.
+    -   Au milieu, un rappel des arguments utilisés.
+    -   À droite, un exemple de code SQL utilisé dans Teradata pour
+        créer le tableau des résultats (uniquement celui de la première
+        période d'étude).
 
 \pagebreak
 
 ## Naïf / Switch
-Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.  
-Un individu est considéré comme étant *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements *de la même famille*.  
-Un individu est considéré comme étant *switch* lorsqu'il a un traitement pour la première fois, mais qu'il a eu un autre traitement dans le passé appartenant *à la même famille*.  
-Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+
+Statistiques générales pour un ou des médicaments à partir d'une cohorte
+consommant ce(s) médicament(s) pour la première fois.
+
+Un individu est considéré comme étant *Naïf* lorsqu'il a un traitement
+pour la première fois et qu'il n'a jamais eu d'autres traitements *de la
+même famille*.
+Pour obtenir les statistiques sur des patients qui prennent un
+médicament et qui sont naïfs à toute la classe, il faut établir
+l'utilisation antérieure de tous les médicaments de la classe (dont le
+traitement interrogé) et exclure tous les patients des cohortes
+analysées.
+
+Un individu est considéré comme étant *Switch* lorsqu'il a un traitement
+pour la première fois, mais qu'il a eu un autre traitement dans le passé
+appartenant *à la même famille*.  
+Pour obtenir les statistiques sur des patients qui ont passé d'un traitement d'une même famille à une autre, il faut établir l'usage antérieur d'un traitement de la même classe (autre que le traitement interrogé) et se restreindre aux patients de la cohorte analysée. Cette requête est crédible seulement si l'utilisateur est certain que les médicaments de la même famille sont mutuellement exclusifs puisqu'on ne vérifie pas dans cette requête si le patient prenait le traitement interrogé dans la période antérieure.
+
+Un individu *NaifSwitch* est considéré comme étant un patient qui prend un traitement pour la première fois et pour lequel nous ne vérifions pas s'il s'agit d'une première consommation de tous les médicaments d'une même famille, ou encore s'il s'agit d'un changement de médicament dans cette famille. Pour obtenir les statistiques sur des patients *NaifSwitch*, il faut établir l'usage antérieur du traitement en question et exclure ces patients de la cohorte analysée.
+
+Vue utilisée :
+[V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#ns1_arguments}
-* **`METHODE` :** Méthode à utiliser, ici `naif_switch1`.
-* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
-* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
-* **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
-  + `DENOM` : Code de dénomination commune.
-  + `DIN` : Code d'identification du médicament.
-* **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
-* **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
-  + `AHFS` : Résultats par code de classe AHFS.
-  + `DENOM` : Résultats par code de dénomination commune.
-  + `DIN` : Résultats par code d'identification du médicament.
-  + `CodeList` : Résultats par code de catégories de liste de médicaments.
-  + `CodeServ` : Résultats par code de service.
-  + `Teneur` : Résultats par teneur du médicament.
-  + `Format` : Résultats par format d'acquisition du médicament.
-  + `Age` : Résultats par âge à une date précise. Voir argument `age_date`. L'âge est calculé à partir de la date de naissance disponible dans la vue `V_FICH_ID_BEN_CM`.
-* **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la valeur de `TYPE_RX`. Une valeur parmi :
-  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
-  + `DENOM` : Code de dénomination commune.
-  + `DIN` : Code d'identification du médicament.
-* **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la période rétrospective. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*. La période rétrospective est construite à partir des dates de références (index) et de l'argument `NJOURS_SANS_CONSO` : [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
-* **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence (index) où un individu ne doit pas avoir consommé `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective (voir `RX_RETROSPECT_A_EXCLURE`).
-* **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
-* **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).  
-Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
-* **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
-* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).  
-Les valeurs permises sont : `03`, `40` et `41`.
-* **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR` contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
+
+-   **`METHODE` :** Méthode à utiliser, ici `naif_switch1`.
+
+-   **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au
+    format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que
+    `DATE_FIN`.
+
+-   **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au
+    format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que
+    `DATE_DEBUT`.
+
+-   **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
+
+    -   `DENOM` : Code de dénomination commune.
+    -   `DIN` : Code d'identification du médicament.
+
+-   **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
+
+-   **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
+
+    -   `AHFS` : Résultats par code de classe AHFS.
+    -   `DENOM` : Résultats par code de dénomination commune.
+    -   `DIN` : Résultats par code d'identification du médicament.
+    -   `CodeList` : Résultats par code de catégories de liste de
+        médicaments.
+    -   `CodeServ` : Résultats par code de service.
+    -   `Teneur` : Résultats par teneur du médicament.
+    -   `Format` : Résultats par format d'acquisition du médicament.
+    -   `Age` : Résultats par âge à une date précise. Voir argument
+        `age_date`. L'âge est calculé à partir de la date de naissance
+        disponible dans la vue `V_FICH_ID_BEN_CM`.
+
+-   **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la
+    valeur de `TYPE_RX`. Une valeur parmi :
+
+    -   `AHFS` : Code identifiant la classe de médicaments telle que
+        déterminée par l'*American Hospital Formulary Service*.
+    -   `DENOM` : Code de dénomination commune.
+    -   `DIN` : Code d'identification du médicament.
+
+-   **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la
+    période rétrospective. Un individu qui a au moins un traitement
+    durant la période rétrospective ne sera pas considéré comme *naïf*
+    ou *switch*. La période rétrospective est construite à partir des
+    dates de références (index) et de l'argument `NJOURS_SANS_CONSO` :
+    [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
+
+-   **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence
+    (index) où un individu ne doit pas avoir consommé
+    `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective
+    (voir `RX_RETROSPECT_A_EXCLURE`).
+
+-   **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de
+    services. Par défaut `Exclusion`. Si aucun filtre, laisser la
+    colonne `CODE_SERV` vide.
+
+-   **`CODE_SERV` :** Le ou les codes de service à exclure ou à inclure
+    (sinon laisser vide). Voir
+    [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).\
+    Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
+
+-   **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de
+    catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun
+    filtre, laisser la colonne `CODE_LIST` vide.
+
+-   **`CODE_LIST` :** Le ou les codes de catégories de liste de
+    médicaments à exclure ou à inclure (sinon laisser vide). Voir
+    [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).\
+    Les valeurs permises sont : `03`, `40` et `41`.
+
+-   **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR`
+    contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
 
 ### Détails
-* **`AHFS` :**  Un code complet AHFS est composé de 6 caractères indiquant la classe (caractères 1 et 2), la sous-classe (caractères 3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher toutes les combinaisons possibles, il suffit de remplacer une paire de caractères par `--`. Par exemple, le code AHFS `04----` reviendrait à chercher la classe `04` et toutes les sous-classes et sous-sous-classes qui existent. 
+
+-   **`AHFS` :** Un code complet AHFS est composé de 6 caractères
+    indiquant la classe (caractères 1 et 2), la sous-classe (caractères
+    3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher
+    toutes les combinaisons possibles, il suffit de remplacer une paire
+    de caractères par `--`. Par exemple, le code AHFS `04----`
+    reviendrait à chercher la classe `04` et toutes les sous-classes et
+    sous-sous-classes qui existent.
 
 ### Résultats
+
 Un onglet résultat contient trois (3) éléments :
 
 #### Tableau des résultats
-* **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
-* **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
-* **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la classe AHFS.
-* **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-classe AHFS.
-* **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-sous-classe AHFS.
-* **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de la classe AHFS.
-* **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de dénomination commune.
-* **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom de la dénomination commune.
-* **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code d'identification du médicament.
-* **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`. Nom de la marque commerciale.
-* **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`. Code de service,
-* **`CODE_LIST` : ** Seulement si `GROUPER_PAR` contient `CodeList`. Code de catégorie de listes de médicaments.
-* **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur du médicament.
-* **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`. Format d'acquisition du médicament.
-* **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de l'individu à la date `AGE_DATE`.
-* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
-* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
-* **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
-* **`COHORTE` :** Nombre d'individus unique. [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
-* **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
-* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
-* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
+
+-   **`DATE_DEBUT` :** Indique la ou les dates de début de la période
+    d'étude.
+-   **`DATE_FIN` :** Indique la ou les dates de fin de la période
+    d'étude.
+-   **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de
+    la classe AHFS.
+-   **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code
+    de la sous-classe AHFS.
+-   **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code
+    de la sous-sous-classe AHFS.
+-   **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de
+    la classe AHFS.
+-   **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de
+    dénomination commune.
+-   **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom
+    de la dénomination commune.
+-   **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code
+    d'identification du médicament.
+-   **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`.
+    Nom de la marque commerciale.
+-   **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`.
+    Code de service,
+-   **`CODE_LIST` :** Seulement si `GROUPER_PAR` contient `CodeList`.
+    Code de catégorie de listes de médicaments.
+-   **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur
+    du médicament.
+-   **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`.
+    Format d'acquisition du médicament.
+-   **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de
+    l'individu à la date `AGE_DATE`.
+-   **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou
+    le produit. Il comprend la part du grossiste (s'il y a lieu) et la
+    part du manufacturier. Voir
+    [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227).
+    [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+-   **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à
+    la date du service. Voir
+    [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227).
+    [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+-   **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+-   **`COHORTE` :** Nombre d'individus unique.
+    [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+-   **`NBRE_RX` :** Nombre de demandes de paiement.
+    [`count(*) as NBRE_RX`].
+-   **`QTE_MED` :** Quantité totale des médicaments ou des fournitures
+    dispensés. Voir
+    [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247).
+    [`sum(SMED_QTE_MED) as QTE_MED`].
+-   **`DUREE_TX` :** Durée de traitement totale des prescriptions en
+    jours. Voir
+    [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443).
+    [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
 
 #### Tableau des arguments
-* Table rappelant les arguments fournis par l'utilisateur à la section [Arguments](#ns1_arguments)
+
+-   Table rappelant les arguments fournis par l'utilisateur à la section
+    [Arguments](#ns1_arguments)
 
 #### Code SQL
-* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
+
+-   Exemple de code SQL généré par les arguments. S'il y a plusieurs
+    périodes d'étude, seul le code de la première période est affiché.
 
 \pagebreak
 
 ### Exemples {#ns1_exemples}
 
 #### ex02 --- GROUPER_PAR
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -225,8 +361,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -240,6 +376,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -300,9 +437,11 @@ order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENE
 \pagebreak
 
 #### ex03 --- DENOM
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -318,8 +457,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -333,6 +472,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -383,9 +523,11 @@ order by DENOM;
 \pagebreak
 
 #### ex04 --- DIN
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -401,8 +543,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -416,6 +558,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -466,9 +609,11 @@ order by DIN;
 \pagebreak
 
 #### ex05 --- Exclusion AHFS
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif\\_switch1",
@@ -485,8 +630,8 @@ names(method_args) <- stringr::str_replace_all(names(method_args), "_", "\\\\_")
 kable_tab(method_args, escape = FALSE)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -500,6 +645,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -552,9 +698,11 @@ order by DENOM;
 \pagebreak
 
 #### ex06 --- Exclusion DENOM
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -570,8 +718,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -585,6 +733,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -635,9 +784,11 @@ order by DENOM;
 \pagebreak
 
 #### ex07 --- Exclusion DIN
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -653,8 +804,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -668,6 +819,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -719,9 +871,11 @@ order by DENOM, DIN;
 \pagebreak
 
 #### ex08 --- Age
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -736,8 +890,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -751,6 +905,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -803,9 +958,11 @@ order by DIN, AGE;
 \pagebreak
 
 #### ex09 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "naif_switch1",
@@ -820,8 +977,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_naif_switch1(
@@ -835,6 +992,7 @@ cat(query_naif_switch1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 with ALL_USER as (
     select
@@ -885,90 +1043,179 @@ group by DENOM
 order by DENOM;
 ```
 
-
 \pagebreak
 
-
 ## Statistiques générales
-Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.
-Vue utilisée : [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
+
+Statistiques d'un ou de plusieurs codes de médicaments selon certains
+critères. Vue utilisée :
+[V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29).
 
 ### Arguments {#sg1_arguments}
-* **`METHODE` :** Méthode à utiliser, ici `stat_gen1`.
-* **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_FIN`.
-* **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que `DATE_DEBUT`.
-* **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
-  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
-  + `DENOM` : Code de dénomination commune.
-  + `DIN` : Code d'identification du médicament.
-* **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
-* **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
-  + `AHFS` : Résultats par code de classe AHFS.
-  + `DENOM` : Résultats par code de dénomination commune.
-  + `DIN` : Résultats par code d'identification du médicament.
-  + `CodeList` : Résultats par code de catégories de liste de médicaments.
-  + `CodeServ` : Résultats par code de service.
-  + `Teneur` : Résultats par teneur du médicament.
-  + `Format` : Résultats par format d'acquisition du médicament.
-  + `Age` : Résultats par âge à une date précise. Voir argument `age_date`. L'âge est calculé à partir de la date de naissance disponible dans la vue `V_FICH_ID_BEN_CM`.
-* **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la valeur de `TYPE_RX`. Une valeur parmi :
-  + `AHFS` : Code identifiant la classe de médicaments telle que déterminée par l'*American Hospital Formulary Service*.
-  + `DENOM` : Code de dénomination commune.
-  + `DIN` : Code d'identification du médicament.
-* **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la période rétrospective. Un individu qui a au moins un traitement durant la période rétrospective ne sera pas considéré comme *naïf* ou *switch*. La période rétrospective est construite à partir des dates de références (index) et de l'argument `NJOURS_SANS_CONSO` : [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
-* **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence (index) où un individu ne doit pas avoir consommé `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective (voir `RX_RETROSPECT_A_EXCLURE`).
-* **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de services. Par défaut `Exclusion`. Si aucun filtre, laisser la colonne `CODE_SERV` vide.
-* **`CODE_SERV` : ** Le ou les codes de service à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).  
-Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
-* **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun filtre, laisser la colonne `CODE_LIST` vide.
-* **`CODE_LIST` : ** Le ou les codes de catégories de liste de médicaments à exclure ou à inclure (sinon laisser vide). Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).  
-Les valeurs permises sont : `03`, `40` et `41`.
-* **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR` contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
+
+-   **`METHODE` :** Méthode à utiliser, ici `stat_gen1`.
+
+-   **`DATE_DEBUT :`** Date(s) de début de la ou des périodes d'étude au
+    format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que
+    `DATE_FIN`.
+
+-   **`DATE_FIN` :** Date(s) de fin de la ou des périodes d'étude au
+    format `AAAA-MM-JJ`. Dois contenir le même nombre de valeurs que
+    `DATE_DEBUT`.
+
+-   **`TYPE_RX` :** Type de code à analyser. Une valeur parmi :
+
+    -   `AHFS` : Code identifiant la classe de médicaments telle que
+        déterminée par l'*American Hospital Formulary Service*.
+    -   `DENOM` : Code de dénomination commune.
+    -   `DIN` : Code d'identification du médicament.
+
+-   **`CODE_RX` :** Codes à analyser selon `TYPE_RX`.
+
+-   **`GROUPER_PAR` :** Afficher (aggréger) les résultats par :
+
+    -   `AHFS` : Résultats par code de classe AHFS.
+    -   `DENOM` : Résultats par code de dénomination commune.
+    -   `DIN` : Résultats par code d'identification du médicament.
+    -   `CodeList` : Résultats par code de catégories de liste de
+        médicaments.
+    -   `CodeServ` : Résultats par code de service.
+    -   `Teneur` : Résultats par teneur du médicament.
+    -   `Format` : Résultats par format d'acquisition du médicament.
+    -   `Age` : Résultats par âge à une date précise. Voir argument
+        `age_date`. L'âge est calculé à partir de la date de naissance
+        disponible dans la vue `V_FICH_ID_BEN_CM`.
+
+-   **`TYPE_RX_RETRO` :** Type de code à exclure. Si vide, prend la
+    valeur de `TYPE_RX`. Une valeur parmi :
+
+    -   `AHFS` : Code identifiant la classe de médicaments telle que
+        déterminée par l'*American Hospital Formulary Service*.
+    -   `DENOM` : Code de dénomination commune.
+    -   `DIN` : Code d'identification du médicament.
+
+-   **`RX_RETROSPECT_A_EXCLURE` :** Traitement(s) à inclure dans la
+    période rétrospective. Un individu qui a au moins un traitement
+    durant la période rétrospective ne sera pas considéré comme *naïf*
+    ou *switch*. La période rétrospective est construite à partir des
+    dates de références (index) et de l'argument `NJOURS_SANS_CONSO` :
+    [`INDEX` - `NJOURS_SANS_CONSO`; `INDEX` - `1`].
+
+-   **`NJOURS_SANS_CONSO` :** Nombre de jours avant la date de référence
+    (index) où un individu ne doit pas avoir consommé
+    `RX_RETROSPECT_A_EXCLURE`. Permet de créer la période rétrospective
+    (voir `RX_RETROSPECT_A_EXCLURE`).
+
+-   **`CODE_SERV_FILTRE` :** `Exclusion` ou `Inclusion` des codes de
+    services. Par défaut `Exclusion`. Si aucun filtre, laisser la
+    colonne `CODE_SERV` vide.
+
+-   **`CODE_SERV` :** Le ou les codes de service à exclure ou à inclure
+    (sinon laisser vide). Voir
+    [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295).\
+    Les valeurs permises sont : `1`, `AD` et `L, M, M1 à M3`.
+
+-   **`CODE_LIST_SERV` :** `Exclusion` ou `Inclusion` des codes de
+    catégorie de listes de médicaments. Par défaut `Inclusion`. Si aucun
+    filtre, laisser la colonne `CODE_LIST` vide.
+
+-   **`CODE_LIST` :** Le ou les codes de catégories de liste de
+    médicaments à exclure ou à inclure (sinon laisser vide). Voir
+    [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245).\
+    Les valeurs permises sont : `03`, `40` et `41`.
+
+-   **`AGE_DATE` :** Date à laquelle on calcule l'âge si `GROUPER_PAR`
+    contient `Age`. Si `NULL`, prend la première valeur de `DATE_DEBUT`.
 
 ### Détails
-* **`AHFS` :**  Un code complet AHFS est composé de 6 caractères indiquant la classe (caractères 1 et 2), la sous-classe (caractères 3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher toutes les combinaisons possibles, il suffit de remplacer une paire de caractères par `--`. Par exemple, le code AHFS `04----` reviendrait à chercher la classe `04` et toutes les sous-classes et sous-sous-classes qui existent.
+
+-   **`AHFS` :** Un code complet AHFS est composé de 6 caractères
+    indiquant la classe (caractères 1 et 2), la sous-classe (caractères
+    3 et 4) et la sous-sous-classe (caractères 5 et 6). Pour rechercher
+    toutes les combinaisons possibles, il suffit de remplacer une paire
+    de caractères par `--`. Par exemple, le code AHFS `04----`
+    reviendrait à chercher la classe `04` et toutes les sous-classes et
+    sous-sous-classes qui existent.
 
 ### Résultats
+
 Un onglet résultat contient trois (3) éléments :
 
 #### Tableau des résultats
-* **`DATE_DEBUT` :** Indique la ou les dates de début de la période d'étude.
-* **`DATE_FIN` :** Indique la ou les dates de fin de la période d'étude.
-* **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la classe AHFS.
-* **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-classe AHFS.
-* **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de la sous-sous-classe AHFS.
-* **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de la classe AHFS.
-* **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de dénomination commune.
-* **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom de la dénomination commune.
-* **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code d'identification du médicament.
-* **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`. Nom de la marque commerciale.
-* **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`. Code de service,
-* **`CODE_LIST` : ** Seulement si `GROUPER_PAR` contient `CodeList`. Code de catégorie de listes de médicaments.
-* **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur du médicament.
-* **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`. Format d'acquisition du médicament.
-* **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de l'individu à la date `AGE_DATE`.
-* **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou le produit. Il comprend la part du grossiste (s'il y a lieu) et la part du manufacturier. Voir [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
-* **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à la date du service. Voir [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227). [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
-* **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
-* **`COHORTE` :** Nombre d'individus unique. [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
-* **`NBRE_RX` :** Nombre de demandes de paiement. [`count(*) as NBRE_RX`].
-* **`QTE_MED` :** Quantité totale des médicaments ou des fournitures dispensés. Voir [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247). [`sum(SMED_QTE_MED) as QTE_MED`].
-* **`DUREE_TX` :** Durée de traitement totale des prescriptions en jours. Voir [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443). [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
+
+-   **`DATE_DEBUT` :** Indique la ou les dates de début de la période
+    d'étude.
+-   **`DATE_FIN` :** Indique la ou les dates de fin de la période
+    d'étude.
+-   **`AHFS_CLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code de
+    la classe AHFS.
+-   **`AHFS_SCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code
+    de la sous-classe AHFS.
+-   **`AHFS_SSCLA` :** Seulement si `GROUPER_PAR` contient `AHFS`. Code
+    de la sous-sous-classe AHFS.
+-   **`NOM_AHFS` :** Seulement si `GROUPER_PAR` contient `AHFS`. Nom de
+    la classe AHFS.
+-   **`DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Code de
+    dénomination commune.
+-   **`NOM_DENOM` :** Seulement si `GROUPER_PAR` contient `DENOM`. Nom
+    de la dénomination commune.
+-   **`DIN` :** Seulement si `GROUPER_PAR` contient `DIN`. Code
+    d'identification du médicament.
+-   **`NOM_MARQ_COMRC` :** Seulement si `GROUPER_PAR` contient `DIN`.
+    Nom de la marque commerciale.
+-   **`CODE_SERV` :** Seulement si `GROUPER_PAR` contient `CodeServ`.
+    Code de service,
+-   **`CODE_LIST` :** Seulement si `GROUPER_PAR` contient `CodeList`.
+    Code de catégorie de listes de médicaments.
+-   **`TENEUR` :** Seulement si `GROUPER_PAR` contient `Teneur`. Teneur
+    du médicament.
+-   **`FORMAT_ACQ` :** Seulement si `GROUPER_PAR` contient `Format`.
+    Format d'acquisition du médicament.
+-   **`AGE` :** Seulement si `GROUPER_PAR` contient `Age`. Age de
+    l'individu à la date `AGE_DATE`.
+-   **`MNT_MED` :** Montant autorisé par la RAMQ pour le médicament ou
+    le produit. Il comprend la part du grossiste (s'il y a lieu) et la
+    part du manufacturier. Voir
+    [`SMED_MNT_AUTOR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227).
+    [`sum(SMED_MNT_AUTOR_MED) as MNT_MED`].
+-   **`MNT_SERV` :** Montant de frais de service autorisé par la RAMQ à
+    la date du service. Voir
+    [`SMED_MNT_AUTOR_FRAIS_SERV`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30973&TypOrigElmVue=T&NoSeqElmOrig=6227).
+    [`sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV`].
+-   **`MNT_TOT` :** Somme des variables `MNT_MED` et `MNT_SERV`.
+-   **`COHORTE` :** Nombre d'individus unique.
+    [`count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE`].
+-   **`NBRE_RX` :** Nombre de demandes de paiement.
+    [`count(*) as NBRE_RX`].
+-   **`QTE_MED` :** Quantité totale des médicaments ou des fournitures
+    dispensés. Voir
+    [SMED_QTE_MED](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30985&TypOrigElmVue=T&NoSeqElmOrig=6247).
+    [`sum(SMED_QTE_MED) as QTE_MED`].
+-   **`DUREE_TX` :** Durée de traitement totale des prescriptions en
+    jours. Voir
+    [SMED_NBR_JR_DUREE_TRAIT](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30979&TypOrigElmVue=T&NoSeqElmOrig=443).
+    [`sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX`].
 
 #### Tableau des arguments
-* Table rappelant les arguments fournis par l'utilisateur à la section [Arguments](#sg1_arguments)
+
+-   Table rappelant les arguments fournis par l'utilisateur à la section
+    [Arguments](#sg1_arguments)
 
 #### Code SQL
-* Exemple de code SQL généré par les arguments. S'il y a plusieurs périodes d'étude, seul le code de la première période est affiché.
+
+-   Exemple de code SQL généré par les arguments. S'il y a plusieurs
+    périodes d'étude, seul le code de la première période est affiché.
 
 \pagebreak
 
 ### Exemples {#sg1_exemples}
 
 #### ex02 --- GROUPER_PAR
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat_gen1",
@@ -983,8 +1230,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -995,6 +1242,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1029,9 +1277,11 @@ order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENE
 \pagebreak
 
 #### ex03 --- AHFS
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat\\_gen1",
@@ -1047,8 +1297,8 @@ names(method_args) <- stringr::str_replace_all(names(method_args), "_", "\\\\_")
 kable_tab(method_args, escape = FALSE)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -1059,6 +1309,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1083,9 +1334,11 @@ order by DENOM;
 \pagebreak
 
 #### ex04 --- DENOM
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat_gen1",
@@ -1099,8 +1352,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -1111,6 +1364,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1136,9 +1390,11 @@ order by DENOM, DIN;
 \pagebreak
 
 #### ex05 --- DIN
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat_gen1",
@@ -1152,8 +1408,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -1164,6 +1420,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1188,9 +1445,11 @@ order by DIN;
 \pagebreak
 
 #### ex06 --- Age
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat_gen1",
@@ -1204,8 +1463,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -1216,6 +1475,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1242,9 +1502,11 @@ order by DIN, AGE;
 \pagebreak
 
 #### ex07 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
-\nl
+
+\textcolor{white}{.  }
 
 **Arguments :**
+
 ```{r}
 ll <- list(
   METHODE = "stat_gen1",
@@ -1258,8 +1520,8 @@ method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
 kable_tab(method_args)
 ```
 
-**Code SQL :**
-  Seulement le code SQL de la première période est affiché.
+**Code SQL :** Seulement le code SQL de la première période est affiché.
+
 ```{r, eval=FALSE}
 # Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
 cat(query_stat_gen1(
@@ -1270,6 +1532,7 @@ cat(query_stat_gen1(
   age_date = NULL_if_NA(ll$AGE_DATE)
 ))
 ```
+
 ```{sql, echo=TRUE, eval=FALSE}
 select
     '2018-01-01' as DATE_DEBUT,
@@ -1295,6 +1558,7 @@ order by DENOM;
 <!-- \pagebreak -->
 
 <!-- # Statistiques générales -->
+
 <!-- Formulaire interactif permettant l'inscription d'arguments, l'exécution de la requête et la sauvegarde des résultats à partir de la vue [V_DEM_PAIMT_MED_CM](http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29). -->
 
 <!-- ![](images/sg1-all.PNG){ height=85% } -->
@@ -1302,29 +1566,47 @@ order by DENOM;
 <!-- \pagebreak -->
 
 <!-- ## Arguments -->
+
 <!-- * **`Nombre de périodes` :** Nombre entier. Indique le nombre de périodes d'étude à analyser. -->
+
 <!-- * **`Période X` :** Sélectionner ou inscrire manuellement la date de début et de fin de la période d'étude *X*. -->
+
 <!-- * **`Nombre de Codes Rx` :** Nombre entier. Indique le nombre de `Code Rx` à analyser. -->
+
 <!-- * **`Type de Code Rx` :** `DENOM` ou `DIN`. Indique le type de `Code Rx` à analyser. -->
+
 <!--   + `DENOM` : Code de dénomination commune. Voir [SMED_COD_DENOM_COMNE](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30994&TypOrigElmVue=T&NoSeqElmOrig=1233). -->
+
 <!--   + `DIN` : Code d'identification du médicament. Voir [SMED_COD_DIN](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30939&TypOrigElmVue=T&NoSeqElmOrig=1265). -->
+
 <!-- * **`Code Rx X` :** Le(s) code(s) de médicament à analyser. Inscrire les codes sous la forme d'un nombre entier. -->
+
 <!-- * **`Grouper par` :** -->
+
 <!--     + `Codes` : Résultats pour chaque `Code Rx`. -->
+
 <!--     + `Teneur` : Résultats par teneur du médicament. Voir [`SMED_COD_TENR_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30998&TypOrigElmVue=T&NoSeqElmOrig=1457). -->
+
 <!--     + `Format` : Résultats par format d'acquisition du médicament. Voir [`SMED_COD_FORMA_ACQ_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30941&TypOrigElmVue=T&NoSeqElmOrig=1277). -->
+
 <!-- * **`Codes de Service` :** Exclusion ou inclusion des codes de services. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_SERV_1`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30954&TypOrigElmVue=T&NoSeqElmOrig=6295). -->
+
 <!-- * **`Code Liste Médicament` :** Exclusion ou inclusion des codes de catégories de listes de médicaments sélectionnés. Il n'y aura pas de filtre si aucune case n'est cochée. Voir [`SMED_COD_CATG_LISTE_MED`](http://intranet/eci/eci2/asp/ECI2P06_ElmSpec.asp?Envir=PROD&min=1&max=10&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29&NoSeqElmVue=30930&TypOrigElmVue=T&NoSeqElmOrig=6245). -->
 
 <!-- * **Bouton Exécuter Requête :** Exécution de la requête SQL à partir des arguments sélectionnés. Une fois complété, le tableau des résultats s'affiche sous la section *Résultats*. -->
+
 <!-- * **Bouton Réinitialiser Arguments :** Réinitialisation complète de la page (arguments par défaut). -->
 
 <!-- ## Résultats -->
+
 <!-- * Tableau des résultats en fonction des arguments sélectionnés. -->
+
 <!-- * **Bouton Sauvegarder Résultats en Excel :** Ouvre une fenêtre permettant de sauvegarder au format Excel le tableau des résultats. Il faut choisir le répertoire de sauvegarde et le nom du fichier. -->
 
 <!-- ## Requête SQL -->
+
 <!-- * Code SQL utilisé pour créer le tableau des résultats en fonction des arguments sélectionnés. Seul le code de la première période est affiché. -->
 
 <!-- ## Exemples -->
+
 <!-- * Voir section *[Requête via Excel > Statistiques générales > Exemples](#sg1_exemples)*. -->
