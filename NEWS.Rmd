@@ -22,6 +22,8 @@ knitr::opts_chunk$set(
 
 ### Version 1.0.0.9000
 * Fonction `SQL_comorbidty` affiche les attributs comme supposé ([Issue#21](https://github.com/INESSS-QC/inesss1/issues/21){target="_blank"}).
+* Documentation
+  + AIDE_FORMULAIRE : Description des *Naïfs* et *Switch* ([Issue#25](https://github.com/INESSS-QC/inesss1/issues/25){target="_blank"}).
 
 ### Version 1.0.0
 #### 2021-05-23
