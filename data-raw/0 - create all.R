@@ -1,7 +1,12 @@
 library(inesss)
 library(askpass)
 
-conn <- SQL_connexion(askpass("User"))  # connexion teradata
+conn <- SQL_connexion()  # connexion teradata
+send_mail <- TRUE
+mail_to <- c(
+  "guillaume.boucher@inesss.qc.ca",
+  "françois-xavier.houde@inesss.qc.ca"
+)
 
 files <- c(
   # "CIM",

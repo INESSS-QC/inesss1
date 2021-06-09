@@ -5,7 +5,10 @@ library(inesss)
 library(askpass)
 library(stringr)
 library(lubridate)
-# conn <- SQL_connexion(askpass("User"))
+# conn <- SQL_connexion()
+
+
+# Fonctions ---------------------------------------------------------------
 
 denom_din_ahfs <- function() {
   ### Description
@@ -361,17 +364,60 @@ cod_sta_decis <- function() {
 }
 
 
-# SAVE --------------------------------------------------------------------
+# Créer dataset -----------------------------------------------------------
 
-V_DEM_PAIMT_MED_CM <- list()
-V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
-V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
-V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
-V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
-V_DEM_PAIMT_MED_CM$COD_SERV <- cod_serv()
-V_DEM_PAIMT_MED_CM$COD_STA_DECIS <- cod_sta_decis()
-
+V_DEM_PAIMT_MED_CM <- list(
+  DENOM_DIN_AHFS = denom_din_ahfs(),
+  COD_AHFS =  cod_ahfs(),
+  COD_DENOM_COMNE = cod_denom(),
+  COD_DIN = cod_din(),
+  COD_SERV = cod_serv(),
+  COD_STA_DECIS = cod_sta_decis()
+)
 attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()  # date de création
+
+
+# Nouvelles valeurs -------------------------------------------------------
+
+new_denom <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM, NOM_DENOM)][
+  !inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM, NOM_DENOM)],
+  on = .(DENOM)
+]
+old_date <- attr(inesss::V_DEM_PAIMT_MED_CM, "MaJ")
+new_denom[, Du := old_date]
+new_denom[, Au := Sys.Date()]
+if (nrow(new_denom)) {
+  write_xlsx(new_denom, paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
+}
+
+
+# Envoyer courriel --------------------------------------------------------
+
+if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
+  # des_court_indcn_recnu
+
+  if (nrow(new_denom)) {
+    # Envoyer un courriel
+    outlook_mail(to = mail_to,
+                 subject = "new_values_DENOM",
+                 body = paste0("Ceci est un message automatisé.\n\n",
+                               "DENOM - Codes de dénomination commune\n",
+                               "Il y a eu des nouvelles valeurs entre le ",
+                               old_date," et le ",Sys.Date(),".\n",
+                               "Voir le fichier en pièce jointe."),
+                 attachments = paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
+  } else {
+    outlook_mail(to = mail_to,
+                 subject = "new_values_DENOM",
+                 body = paste0("Ceci est un message automatisé.\n\n",
+                               "DENOM - Codes de dénomination commune\n",
+                               "Il n'y a pas eu de nouvelle valeurs entre le ",
+                               old_date," et le ",Sys.Date(),"."))
+  }
+}
+
+
+# Save data pour package --------------------------------------------------
 
 use_data(V_DEM_PAIMT_MED_CM, overwrite = TRUE)
 

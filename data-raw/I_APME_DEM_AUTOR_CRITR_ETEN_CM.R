@@ -4,7 +4,11 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(stringr)
-# conn <- SQL_connexion(askpass("User"))
+library(writexl)
+# conn <- SQL_connexion()
+
+
+# Fonctions ---------------------------------------------------------------
 
 des_court_indcn_recnu <- function() {
 
@@ -91,12 +95,55 @@ no_seq_indcn_recnu <- function() {
 
 }
 
+
+# Créer dataset ----------------------------------------------------------
+
 I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
   DES_COURT_INDCN_RECNU = des_court_indcn_recnu(),
   NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu()
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
-use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
 
+# Nouvelles Valeurs -------------------------------------------------------
+
+new_indcn <- I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU[
+  !DES_COURT_INDCN_RECNU %in% inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$DES_COURT_INDCN_RECNU,
+  .(DES_COURT_INDCN_RECNU)
+]
+old_date <- attr(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ")
+new_indcn[, Du := old_date]
+new_indcn[, Au := Sys.Date()]
+if (nrow(new_indcn)) {
+  write_xlsx(new_indcn, paste0("C:/Users/ms045/Desktop/saveAuto/new_indcn_",Sys.Date(),".xlsx"))
+}
+
+# Envoyer courriel --------------------------------------------------------
+
+if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
+  # des_court_indcn_recnu
+
+  if (nrow(new_indcn)) {
+    # Envoyer un courriel
+    outlook_mail(to = mail_to,
+                 subject = "new_values_INDCN_RECNU",
+                 body = paste0("Ceci est un message automatisé.\n\n",
+                               "DES_COURT_INDCN_RECNU - Description courte des indications reconnus\n",
+                               "Il y a eu des nouvelles valeurs entre le ",
+                               old_date," et le ",Sys.Date(),".\n",
+                               "Voir le fichier en pièce jointe."),
+                 attachments = paste0("C:/Users/ms045/Desktop/saveAuto/new_indcn_",Sys.Date(),".xlsx"))
+  } else {
+    outlook_mail(to = mail_to,
+                 subject = "new_values_INDCN_RECNU",
+                 body = paste0("Ceci est un message automatisé.\n\n",
+                               "DES_COURT_INDCN_RECNU - Description courte des indications reconnus\n",
+                               "Il n'y a pas eu de nouvelle valeurs entre le ",
+                               old_date," et le ",Sys.Date(),"."))
+  }
+}
+
+# Save data pour package --------------------------------------------------
+
+use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
 rm(I_APME_DEM_AUTOR_CRITR_ETEN_CM)
