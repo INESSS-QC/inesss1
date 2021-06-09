@@ -1,11 +1,18 @@
-## Librairie <a href="https://github.com/INESSS-QC/inesss1" target="_blank"><code>inesss</code> v.1.0.0.9000</a>
+Librairie <a href="https://github.com/INESSS-QC/inesss1" target="_blank"><code>inesss</code> v.1.0.0.9000</a>
+-------------------------------------------------------------------------------------------------------------
 
 ### Version 1.0.0.9000
 
--   Fonction `SQL_comorbidty` affiche les attributs comme supposé
-    (<a href="https://github.com/INESSS-QC/inesss1/issues/21" target="_blank">Issue#21</a>).
+-   Tables
+    -   Mise à jour des tables (2021-06-08)
+-   Fonctions
+    -   Nouvelle fonction `install_RDCOMClient`.
+    -   Nouvelle fonction `outlook_mail`.
+    -   `SQL_comorbidty` affiche les attributs comme supposé
+        (<a href="https://github.com/INESSS-QC/inesss1/issues/21" target="_blank">Issue#21</a>).
 -   Documentation
-    -   AIDE_FORMULAIRE : Description des *Naïfs* et *Switch*
+    -   AIDE\_FORMULAIRE : Description supplémentaire des *Naïfs* et
+        *Switch*
         (<a href="https://github.com/INESSS-QC/inesss1/issues/25" target="_blank">Issue#25</a>).
 
 ### Version 1.0.0

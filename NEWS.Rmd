@@ -21,6 +21,8 @@ knitr::opts_chunk$set(
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1){target="_blank"}
 
 ### Version 1.0.0.9000
+* Tables
+  + Mise à jour des tables (2021-06-08)
 * Fonctions
   + Nouvelle fonction `install_RDCOMClient`.
   + Nouvelle fonction `outlook_mail`.
