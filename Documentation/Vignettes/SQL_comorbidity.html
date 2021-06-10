@@ -261,13 +261,14 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <h2 number="3.2"><span class="header-section-number">3.2</span> exclu_diagn = c(‘drug’, ‘ld’)</h2>
 <p>Implique que les codes de diagnostics <code>drug</code> et <code>ld</code> seront exclus de l’analyse.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot;
-#&gt; [12] &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;drug&quot;     &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot;  &quot;ld&quot;       &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;      
-#&gt; [23] &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
+<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;    
+#&gt; [11] &quot;dementia&quot; &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;drug&quot;     &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot;  &quot;ld&quot;       &quot;metacanc&quot;
+#&gt; [21] &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;      
+#&gt; [31] &quot;valv&quot;     &quot;wloss&quot;</code></pre>
 <p><strong>APRÈS</strong></p>
-<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;     &quot;dementia&quot;
-#&gt; [12] &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot;  &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;       &quot;obes&quot;     &quot;para&quot;    
-#&gt; [23] &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
+<pre><code>#&gt;  [1] &quot;aids&quot;     &quot;alcohol&quot;  &quot;blane&quot;    &quot;canc&quot;     &quot;carit&quot;    &quot;cevd&quot;     &quot;chf&quot;      &quot;coag&quot;     &quot;copd&quot;     &quot;dane&quot;    
+#&gt; [11] &quot;dementia&quot; &quot;depre&quot;    &quot;diab&quot;     &quot;diabwc&quot;   &quot;fed&quot;      &quot;hyp&quot;      &quot;hypothy&quot;  &quot;metacanc&quot; &quot;mi&quot;       &quot;nd&quot;      
+#&gt; [21] &quot;obes&quot;     &quot;para&quot;     &quot;pcd&quot;      &quot;psycho&quot;   &quot;pvd&quot;      &quot;rend&quot;     &quot;rheumd&quot;   &quot;ud&quot;       &quot;valv&quot;     &quot;wloss&quot;</code></pre>
 </div>
 <div id="cim-ccim9-cim10" class="section level2" number="3.3">
 <h2 number="3.3"><span class="header-section-number">3.3</span> CIM = c(‘CIM9’, ‘CIM10’)</h2>
@@ -493,17 +494,17 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 <div class="sourceCode" id="cb23"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>confirm_sourc <span class="ot">=</span> <span class="fu">list</span>(<span class="at">MEDECHO =</span> <span class="dv">1</span>, <span class="at">BDCU =</span> <span class="dv">2</span>, <span class="at">SMOD =</span> <span class="dv">2</span>)</span></code></pre></div>
 <p><strong>AVANT</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1 2019-06-06  diab    BDCU 2020-01-01
-#&gt; 2:  1 2019-06-06  diab    SMOD 2020-01-01
-#&gt; 3:  2 2019-06-06   hyp MEDECHO 2020-01-01
-#&gt; 4:  2 2019-06-06   hyp    BDCU 2020-01-01
-#&gt; 5:  2 2019-06-06   hyp    SMOD 2020-01-01</code></pre>
+#&gt; 1:  1 2019-06-06  diab    SMOD 2020-01-01
+#&gt; 2:  1 2019-06-06  diab    BDCU 2020-01-01
+#&gt; 3:  2 2019-06-06   hyp    BDCU 2020-01-01
+#&gt; 4:  2 2019-06-06   hyp    SMOD 2020-01-01
+#&gt; 5:  2 2019-06-06   hyp MEDECHO 2020-01-01</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
 #&gt; 1:  1 2019-06-06  diab    BDCU 2020-01-01
 #&gt; 2:  1 2019-06-06  diab    SMOD 2020-01-01
-#&gt; 3:  2 2019-06-06   hyp    BDCU 2020-01-01
-#&gt; 4:  2 2019-06-06   hyp MEDECHO 2020-01-01
+#&gt; 3:  2 2019-06-06   hyp MEDECHO 2020-01-01
+#&gt; 4:  2 2019-06-06   hyp    BDCU 2020-01-01
 #&gt; 5:  2 2019-06-06   hyp    SMOD 2020-01-01</code></pre>
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
@@ -551,9 +552,9 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2 number="9.1"><span class="header-section-number">9.1</span> MEDECHO (1)</h2>
 <p>Les sources ayant <code>confirm_sourc=1</code> sont utilisées directement.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID DATE_DX DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1   17897  diab MEDECHO 2020-01-01
-#&gt; 2:  1   18053  diab    SMOD 2020-01-01</code></pre>
+<pre><code>#&gt;    ID    DATE_DX DIAGN  SOURCE DATE_INDEX
+#&gt; 1:  1 2019-01-01  diab MEDECHO 2020-01-01
+#&gt; 2:  1 2019-06-06  diab    SMOD 2020-01-01</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1  diab 2019-01-01    MEDECHO 2019-01-01     MEDECHO</code></pre>
@@ -562,16 +563,16 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2 number="9.2"><span class="header-section-number">9.2</span> BDCU et SMOD (2)</h2>
 <p>Les sources ayant <code>confirm_sourc=2</code> doivent être confirmées.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID DATE_DX  DIAGN SOURCE DATE_INDEX
-#&gt; 1:  1   17897   diab   BDCU 2020-01-01
-#&gt; 2:  1   17911   diab   SMOD 2020-01-01
-#&gt; 3:  1   17937   diab   SMOD 2020-01-01
-#&gt; 4:  2   17929    hyp   BDCU 2020-06-06
-#&gt; 5:  2   18261    hyp   BDCU 2020-06-06
-#&gt; 6:  3   17532 diabwc   SMOD 2020-12-31
-#&gt; 7:  3   18293 diabwc   SMOD 2020-12-31
-#&gt; 8:  3   18463 diabwc   SMOD 2020-12-31
-#&gt; 9:  4   18262    hyp   SMOD 2020-06-06</code></pre>
+<pre><code>#&gt;    ID    DATE_DX  DIAGN SOURCE DATE_INDEX
+#&gt; 1:  1 2019-01-01   diab   BDCU 2020-01-01
+#&gt; 2:  1 2019-01-15   diab   SMOD 2020-01-01
+#&gt; 3:  1 2019-02-10   diab   SMOD 2020-01-01
+#&gt; 4:  2 2019-02-02    hyp   BDCU 2020-06-06
+#&gt; 5:  2 2019-12-31    hyp   BDCU 2020-06-06
+#&gt; 6:  3 2018-01-01 diabwc   SMOD 2020-12-31
+#&gt; 7:  3 2020-02-01 diabwc   SMOD 2020-12-31
+#&gt; 8:  3 2020-07-20 diabwc   SMOD 2020-12-31
+#&gt; 9:  4 2020-01-01    hyp   SMOD 2020-06-06</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID  DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1   diab 2019-01-01       BDCU 2019-02-10        SMOD
@@ -582,14 +583,14 @@ On va donc vérifier quelles sont les dates en 2018 ou 2019 (période d’étude
 <h2 number="9.3"><span class="header-section-number">9.3</span> MEDECHO (1), BDCU (2) et SMOD (2)</h2>
 <p>MEDECHO peut confirmer la date d’un BDCU ou d’un SMOD.</p>
 <p><strong>AVANT</strong></p>
-<pre><code>#&gt;    ID DATE_DX  DIAGN  SOURCE DATE_INDEX
-#&gt; 1:  1   17897   diab    BDCU 2020-01-01
-#&gt; 2:  1   17901   diab MEDECHO 2020-01-01
-#&gt; 3:  2   17929    hyp    BDCU 2020-06-06
-#&gt; 4:  2   17944    hyp    BDCU 2020-06-06
-#&gt; 5:  2   17945    hyp MEDECHO 2020-12-31
-#&gt; 6:  3   17958 diabwc    SMOD 2020-12-31
-#&gt; 7:  3   18356 diabwc MEDECHO 2020-12-31</code></pre>
+<pre><code>#&gt;    ID    DATE_DX  DIAGN  SOURCE DATE_INDEX
+#&gt; 1:  1 2019-01-01   diab    BDCU 2020-01-01
+#&gt; 2:  1 2019-01-05   diab MEDECHO 2020-01-01
+#&gt; 3:  2 2019-02-02    hyp    BDCU 2020-06-06
+#&gt; 4:  2 2019-02-17    hyp    BDCU 2020-06-06
+#&gt; 5:  2 2019-02-18    hyp MEDECHO 2020-12-31
+#&gt; 6:  3 2019-03-03 diabwc    SMOD 2020-12-31
+#&gt; 7:  3 2020-04-04 diabwc MEDECHO 2020-12-31</code></pre>
 <p><strong>APRÈS</strong></p>
 <pre><code>#&gt;    ID  DIAGN   DATE_REP SOURCE_REP  DATE_CONF SOURCE_CONF
 #&gt; 1:  1   diab 2019-01-01       BDCU 2019-01-05     MEDECHO
