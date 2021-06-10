@@ -72,7 +72,7 @@ Dx_etape2_autre <- SQL_diagn(
 )
 # Combiner les datasets de l'etape 2
 Dx_etape2 <- rbind(Dx_etape2_medecho, Dx_etape2_autre[, .(ID, DATE_DX)])
-setkey(Dx_etape2, ID)  # tri
+setkey(Dx_etape2, ID, DATE_DX)  # tri
 
 ### Confirmation des Dx
 Dx_conf <- confirm_2Dx(
