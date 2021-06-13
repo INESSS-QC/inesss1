@@ -126,3 +126,4 @@ cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
                     code_serv_filtre = 'Exclusion', code_serv = c('1', 'AD'),
                     code_list_filtre = 'Inclusion', code_list = c('40', '41')))
 }
+\keyword{internal}

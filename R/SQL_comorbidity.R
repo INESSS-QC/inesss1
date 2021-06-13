@@ -84,7 +84,7 @@ SQL_comorbidity <- function(
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
-      date_dx_var = date_dx_var,
+      date_dx_var = date_dx_var, typ_diagn = c("A", "P", "S"),
       exclu_diagn = exclu_diagn, verbose = verbose
     )
 

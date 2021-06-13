@@ -16,7 +16,8 @@
 #' @param CIM `'CIM9'`, `'CIM10'` ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la *Classification statistique internationale des maladies et des problèmes de santé connexes* (CIM).
 #' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
 #' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
-#' @param date_dx_var `'admis` ou `'depar'`. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette *SQL_comorbidity* section 4 *Sources SQL (dt_source)* pour voir le code SQL généré.
+#' @param date_dx_var `'admis` ou `'depar'`. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.
+#' @param typ_diagn Type de disgnostic permettant de préciser le genre de diagnostic posé pendant le séjour hospitalier. `A = Admission`, `D = Décès`, `P = Principal` et `S = Secondaire`. Voir la variable `SHOP_TYP_DIAGN_SEJ_HOSP` de la vue `V_DIAGN_SEJ_HOSP_CM`.
 #' @param verbose `TRUE` ou `FALSE`. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (`dt_source`). Utile pour suivre le déroulement de l'extraction.
 #'
 #' @return `data.table` de 4 variables :
@@ -33,7 +34,8 @@ SQL_comorbidity_diagn <- function(
                 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = 'MEDECHO', V_SEJ_SERV_HOSP_CM = 'MEDECHO',
                  V_EPISO_SOIN_DURG_CM = 'BDCU', I_SMOD_SERV_MD_CM = 'SMOD'),
-  date_dx_var = "depar", exclu_diagn = NULL, verbose = TRUE
+  date_dx_var = "depar", typ_diagn = c('A', 'P', 'S'),
+  exclu_diagn = NULL, verbose = TRUE
 ) {
 
   ### Extraction des diagn
@@ -48,8 +50,10 @@ SQL_comorbidity_diagn <- function(
     }
     # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
     # de classification de code.
+    Dx_table_V_DIAGN_SEJ <- Dx_table  # conserver une copie pour l'exception de la table V_DIAGN_SEJ_HOSP_CM
     if (length(CIM) == 1) {
       for (i in names(Dx_table)) {
+        Dx_table_V_DIAGN_SEJ[[i]] <- Dx_table_V_DIAGN_SEJ[[i]][[CIM]]
         Dx_table[[i]] <- Dx_table[[i]][[CIM]]  # conserver seulement CIM9 ou CIM10
       }
     } else {
@@ -65,24 +69,47 @@ SQL_comorbidity_diagn <- function(
       if (verbose) {
         cat(sour, "\n")
       }
-      fct <- get(paste0("SQL_comorbidity_diagn.",sour))  # fonction d'extraction selon la source
-      for (dia in names(Dx_table)) {
-        t1 <- Sys.time()
-        DT[[i]] <- fct(  # tableau provenant de la requête
-          conn = conn, ids = cohort, diagn = Dx_table[[dia]],
-          debut = debut, fin = fin,
-          diag_desc = dia, sourc_desc = dt_desc[[sour]],
-          date_dx_var = date_dx_var
-        )
-        t2 <- Sys.time()
-        i <- i + 1L
-        # Afficher le temps d'exécution
-        if (verbose) {
-          cat(" - ",dia,
-              " (",round(as.numeric(difftime(t2, t1)), 2),
-              " ",attr(difftime(t2, t1), "units"), ")\n",
-              sep = "")
+      # Différencier V_DIAGN_SEJ_HOSP_CM des autres sources
+      if (sour == "V_DIAGN_SEJ_HOSP_CM") {
+        for (dia in names(Dx_table_V_DIAGN_SEJ)) {
+          t1 <- Sys.time()
+          DT[[i]] <- SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM(
+            conn = conn, ids = cohort, diagn = Dx_table_V_DIAGN_SEJ[[dia]],
+            debut = debut, fin = fin,
+            diag_desc = dia, sourc_desc = dt_desc[[sour]],
+            date_dx_var = date_dx_var, typ_diagn = typ_diagn
+          )
+          t2 <- Sys.time()
+          i <- i + 1L
+          # Afficher le temps d'exécution
+          if (verbose) {
+            cat(" - ",dia,
+                " (",round(as.numeric(difftime(t2, t1)), 2),
+                " ",attr(difftime(t2, t1), "units"), ")\n",
+                sep = "")
 
+          }
+        }
+      } else {
+        fct <- get(paste0("SQL_comorbidity_diagn.",sour))  # fonction d'extraction selon la source
+        for (dia in names(Dx_table)) {
+          t1 <- Sys.time()
+          DT[[i]] <- fct(  # tableau provenant de la requête
+            conn = conn, ids = cohort, diagn = Dx_table[[dia]],
+            debut = debut, fin = fin,
+            diag_desc = dia, sourc_desc = dt_desc[[sour]],
+            date_dx_var = date_dx_var
+          )
+          t2 <- Sys.time()
+          i <- i + 1L
+          # Afficher le temps d'exécution
+          if (verbose) {
+            cat(" - ",dia,
+                " (",round(as.numeric(difftime(t2, t1)), 2),
+                " ",attr(difftime(t2, t1), "units"), ")\n",
+                sep = "")
+
+          }
         }
       }
     }
@@ -118,9 +145,13 @@ SQL_comorbidity_diagn.select_Dx_table <- function(Dx_table) {
 }
 #' @title SQL_comorbidity_diagn
 #' @description Requête SQL pour extraire les diagnostics de la vue V_DIAGN_SEJ_HOSP_CM
+#' @param diagn Comparativement aux autres fonctions d'extraction, celle-ci conserve la liste des diagnostics par CIM9 et CIM10 parce qu'il est possible de les séparer. La variable `SHOP_NO_SEQ_SYS_CLA` indique si c'est un CIM9 ou un CIM10, car la vue `V_DIAGN_SEJ_HOSP_CM` peut contenir deux fois le même code de diagnostic appartenant à des CIM différents.
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
+SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(
+  conn, ids, diagn, debut, fin,
+  diag_desc, sourc_desc, date_dx_var, typ_diagn
+) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -138,19 +169,14 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, f
     } else {
       fi <- paste0(yr,"-12-31")
     }
+
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
-      conn = conn, statement = paste0(
-        "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis",
-                         "SHOP_DAT_ADMIS_SEJ_HOSP",
-                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
-        "from RES_SSS.V_DIAGN_SEJ_HOSP_CM\n",
-        "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and ",ifelse(date_dx_var == "admis",
-                          "SHOP_DAT_ADMIS_SEJ_HOSP",
-                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"'\n",
-        "    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S');"
+      conn = conn, statement = query_V_DIAGN_SEJ_HOSP_CM(
+        debut = debut, fin = fin,
+        diagn = diagn,
+        date_dx_var = date_dx_var,
+        typ_diagn = typ_diagn
       )
     ))
     if (!is.null(ids)) {
@@ -177,7 +203,10 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(conn, ids, diagn, debut, f
 #' @description Requête SQL pour extraire les diagnostics de la vue V_SEJ_SERV_HOSP_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
+SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(
+  conn, ids, diagn, debut, fin,
+  diag_desc, sourc_desc, date_dx_var
+) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -197,16 +226,9 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fi
     }
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
-      conn = conn, statement = paste0(
-        "select SHOP_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis",
-                         "SHOP_DAT_ADMIS_SEJ_HOSP",
-                         "SHOP_DAT_DEPAR_SEJ_HOSP")," as DATE_DX\n",
-        "from RES_SSS.V_SEJ_SERV_HOSP_CM\n",
-        "where SHOP_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and ",ifelse(date_dx_var == "admis",
-                          "SHOP_DAT_ADMIS_SEJ_HOSP",
-                          "SHOP_DAT_DEPAR_SEJ_HOSP")," between '",deb,"' and '",fi,"';"
+      conn = conn, statement = query_V_SEJ_SERV_HOSP_CM(
+        debut = debut, fin = fin,
+        diagn = diagn, date_dx_var = date_dx_var
       )
     ))
     if (!is.null(ids)) {
@@ -231,9 +253,13 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(conn, ids, diagn, debut, fi
 }
 #' @title SQL_comorbidity_diagn
 #' @description Requête SQL pour extraire les diagnostics de la vue I_SMOD_SERV_MD_CM
+#' @details L'argument `date_dx_var` n'est pas utilisé dans cette fonction. Il est là pour permettre une boucle avec les autres fonctions de requêtes.
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
+SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(
+  conn, ids, diagn, debut, fin,
+  diag_desc, sourc_desc, date_dx_var
+) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -253,13 +279,9 @@ SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin
     }
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
-      conn = conn, statement = paste0(
-        "select SMOD_NO_INDIV_BEN_BANLS as ID,\n",
-        "       SMOD_DAT_SERV as DATE_DX\n",
-        "from PROD.I_SMOD_SERV_MD_CM\n",
-        "where SMOD_COD_DIAGN_PRIMR like any (",qu(diagn),")\n",
-        "    and SMOD_COD_STA_DECIS = 'PAY'\n",
-        "    and SMOD_DAT_SERV between '",deb,"' and '",fi,"';"
+      conn = conn, statement = query_I_SMOD_SERV_MD_CM(
+        debut = debut, fin = fin,
+        diagn = diagn
       )
     ))
     if (!is.null(ids)) {
@@ -286,7 +308,10 @@ SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(conn, ids, diagn, debut, fin
 #' @description Requête SQL pour extraire les diagnostics de la vue V_EPISO_SOIN_DURG_CM
 #' @keywords internal
 #' @import data.table
-SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, fin, diag_desc, sourc_desc, date_dx_var) {
+SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(
+  conn, ids, diagn, debut, fin,
+  diag_desc, sourc_desc, date_dx_var
+) {
 
   yr_deb <- year(lubridate::as_date(debut))  # 1ere année à extraire
   yr_fin <- year(lubridate::as_date(fin))  # dernière année à extraire
@@ -306,16 +331,9 @@ SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(conn, ids, diagn, debut, 
     }
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
-      conn = conn, statement = paste0(
-        "select SURG_NO_INDIV_BEN_BANLS as ID,\n",
-        "       ",ifelse(date_dx_var == "admis",
-                         "SURG_DHD_EPISO_SOIN_DURG",
-                         "SURG_DH_DEPAR_USAG_DURG ")," as DATE_DX\n",
-        "from RES_SSS.V_EPISO_SOIN_DURG_CM\n",
-        "where SURG_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),")\n",
-        "    and ",ifelse(date_dx_var == "admis",
-                          "SURG_DHD_EPISO_SOIN_DURG",
-                          "SURG_DH_DEPAR_USAG_DURG ")," between To_Date('",deb,"') and To_Date('",fi,"');"
+      conn = conn, statement = query_V_EPISO_SOIN_DURG_CM(
+        debut = debut, fin = fin,
+        diagn = diagn, date_dx_var = date_dx_var
       )
     ))
     if (!is.null(ids)) {

@@ -17,6 +17,7 @@ SQL_comorbidity_diagn(
   dt_desc = list(V_DIAGN_SEJ_HOSP_CM = "MEDECHO", V_SEJ_SERV_HOSP_CM = "MEDECHO",
     V_EPISO_SOIN_DURG_CM = "BDCU", I_SMOD_SERV_MD_CM = "SMOD"),
   date_dx_var = "depar",
+  typ_diagn = c("A", "P", "S"),
   exclu_diagn = NULL,
   verbose = TRUE
 )
@@ -44,7 +45,9 @@ SQL_comorbidity_diagn(
 
 \item{dt_desc}{\code{list} décrivant les bases de données demandées dans \code{dt_source} au format \code{list(BD = 'MaDescription')}. Voir \emph{Details}.}
 
-\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette \emph{SQL_comorbidity} section 4 \emph{Sources SQL (dt_source)} pour voir le code SQL généré.}
+\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.}
+
+\item{typ_diagn}{Type de disgnostic permettant de préciser le genre de diagnostic posé pendant le séjour hospitalier. \code{A = Admission}, \code{D = Décès}, \code{P = Principal} et \code{S = Secondaire}. Voir la variable \code{SHOP_TYP_DIAGN_SEJ_HOSP} de la vue \code{V_DIAGN_SEJ_HOSP_CM}.}
 
 \item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
 

@@ -156,3 +156,4 @@ cat(query_stat_gen1(debut = '2018-01-01', fin = '2018-12-31',
                     type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
                     code_serv_filtre = 'Inclusion', code_serv = c('1', 'AD')))
 }
+\keyword{internal}
