@@ -140,13 +140,13 @@ confirm_2Dx <- function(
           .(ID, DIAGN)
         ]
         confirm_tab[[i]] <- sd
+        if (keep_first) {
+          # Supprimer les ID qui ont déjà une date confirmée
+          dt <- dt[!ID %in% sunique(sd$ID)]
+        }
       }
     } else {
       break
-    }
-    if (keep_first) {
-      # Supprimer les ID qui ont déjà une date confirmée
-      dt <- dt[!ID %in% sunique(sd$ID)]
     }
     if (nrow(dt)) {
       dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne
@@ -234,11 +234,19 @@ confirm_3Dx <- function(
     study_start <- min(dt$DATE)
   } else if (!lubridate::is.Date(study_start)) {
     study_start <- lubridate::as_date(study_start)
+    # Supprimer les dates qui ne concordent pas avec study_start
+    if (!reverse) {
+      dt <- dt[DATE >= study_start]
+    }
   }
   if (is.null(study_end)) {
     study_end <- max(dt$DATE)
   } else if (!lubridate::is.Date(study_end)) {
     study_end <- lubridate::as_date(study_end)
+    # Supprimer les dates qui ne concordent pas avec study_end
+    if (reverse) {
+      dt <- dt[DATE <= study_end]
+    }
   }
 
   ### Nombre d'itérations nécessaires
@@ -298,13 +306,13 @@ confirm_3Dx <- function(
           .(ID, DIAGN)
         ]
         confirm_tab[[i]] <- sd
+        if (keep_first) {
+          # Supprimer les ID qui ont déjà une date confirmée
+          dt <- dt[!ID %in% sunique(sd$ID)]
+        }
       }
     } else {
       break
-    }
-    if (keep_first) {
-      # Supprimer les ID qui ont déjà une date confirmée
-      dt <- dt[!ID %in% sunique(sd$ID)]
     }
     if (nrow(dt)) {
       dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne

@@ -10,10 +10,77 @@ vignette: >
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
-  comment = "#>"
+  comment = "#>",
+  echo = TRUE,
+  eval = TRUE
 )
 ```
 
-```{r setup}
+```{r setup, echo=FALSE}
 library(inesss)
+library(data.table)
 ```
+
+## Data analyse
+```{r, echo=FALSE}
+DT <- data.table(
+  ID = 1L,
+  DATE_DX = c("2020-01-01", "2020-01-05", "2020-01-10", "2020-01-11",
+              "2020-01-15", "2020-01-20", "2020-02-09", "2020-02-10"),
+  DIAGN = c(rep("cancer", 4), rep("cancermeta", 4))
+)
+```
+```{r}
+print(DT)
+```
+
+## Utilisation de base
+```{r}
+dt1 <- confirm_2Dx(dt = DT, ID = "ID", DATE = "DATE_DX", DIAGN = NULL,
+                  study_start = NULL, study_end = NULL,
+                  n1 = 10, n2 = 20,
+                  keep_first = FALSE, reverse = FALSE)
+print(dt1)
+```
+
+## DIAGN
+`cancer` ne pourra pas confirmer `cancermeta`.
+```{r}
+dt2 <- confirm_2Dx(dt = DT, ID = "ID", DATE = "DATE_DX", DIAGN = "DIAGN",
+                  study_start = NULL, study_end = NULL,
+                  n1 = 10, n2 = 20,
+                  keep_first = FALSE, reverse = FALSE)
+print(dt2)
+```
+
+## study_start & study_end
+Conserve `DATE_REP` dans l'intervalle [`study_start`; `study_end`].
+```{r}
+dt3 <- confirm_2Dx(dt = DT, ID = "ID", DATE = "DATE_DX", DIAGN = NULL,
+                  study_start = "2020-01-10", study_end = "2020-01-20",
+                  n1 = 10, n2 = 20,
+                  keep_first = FALSE, reverse = FALSE)
+print(dt3)
+```
+
+## keep_first
+Conserve la première date de repérage confirmée par une autre date.
+```{r}
+dt4 <- confirm_2Dx(dt = DT, ID = "ID", DATE = "DATE_DX", DIAGN = NULL,
+                  study_start = NULL, study_end = NULL,
+                  n1 = 10, n2 = 20,
+                  keep_first = TRUE, reverse = FALSE)
+print(dt4)
+```
+
+## reverse
+La vérification se fait en ordre décroissant, de la date la plus récente à la plus ancienne.
+```{r}
+dt5 <- confirm_2Dx(dt = DT, ID = "ID", DATE = "DATE_DX", DIAGN = NULL,
+                  study_start = NULL, study_end = NULL,
+                  n1 = 10, n2 = 20,
+                  keep_first = FALSE, reverse = TRUE)
+print(dt5)
+```
+
+

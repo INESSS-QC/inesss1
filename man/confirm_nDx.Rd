@@ -16,6 +16,7 @@ confirm_2Dx(
   study_end = NULL,
   n1 = 30,
   n2 = 730,
+  keep_first = FALSE,
   reverse = FALSE
 )
 
@@ -28,6 +29,7 @@ confirm_3Dx(
   study_end = NULL,
   n1 = 30,
   n2 = 730,
+  keep_first = FALSE,
   reverse = FALSE
 )
 }
@@ -45,6 +47,8 @@ confirm_3Dx(
 \item{study_end}{Date de fin de la période d'étude \strong{contenant les dates de repérage}. Si \code{NULL}, aura pour valeur la dernière date de \code{dt}, la plus récente.}
 
 \item{n1, n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
+
+\item{keep_first}{\code{TRUE} ou \code{FALSE}. Permet d'arrêter le processus si on veut conserver la première date qui est confirmée par une autre dans l'intervalle [n1; n2]. Accélère le processus en évitant de confirmer d'autres dates inutilement.}
 
 \item{reverse}{\code{TRUE} ou \code{FALSE}. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.}
 }
