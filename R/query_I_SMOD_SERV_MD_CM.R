@@ -18,7 +18,7 @@ query_I_SMOD_SERV_MD_CM <- function(debut, fin, diagn) {
     "from PROD.I_SMOD_SERV_MD_CM\n",
     "where SMOD_DAT_SERV between '",debut,"' and '",fin,"'\n",
     "    and SMOD_COD_DIAGN_PRIMR like any (",qu(diagn),")\n",
-    "    and SMOD_COD_STA_DECIS = 'PAY';",
+    "    and SMOD_COD_STA_DECIS = 'PAY';"
   ))
 
 }
