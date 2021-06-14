@@ -114,6 +114,7 @@ SQL_comorbidity_diagn <- function(
       }
     }
     DT <- data.table::rbindlist(DT)  # regrouper tous les tableaux en un seul
+    setcolorder(DT, c("ID", "DIAGN", "DATE_DX", "SOURCE"))  # ordre des colonnes
 
     if (nrow(DT)) {
       setkey(DT)  # tri

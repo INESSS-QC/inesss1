@@ -17,7 +17,7 @@ query_V_EPISO_SOIN_DURG_CM <- function(debut, fin, diagn, date_dx_var) {
     "select SURG_NO_INDIV_BEN_BANLS as ID,\n",
     indent("select"),query_V_EPISO_SOIN_DURG_CM.date_dx_var(date_dx_var)," as DATE_DX\n",
     "from RES_SSS.V_EPISO_SOIN_DURG_CM\n",
-    "where ",query_V_EPISO_SOIN_DURG_CM.date_dx_var(date_dx_var)," between '",debut,"' and '",fin,"'\n",
+    "where ",query_V_EPISO_SOIN_DURG_CM.date_dx_var(date_dx_var)," between to_date('",debut,"') and to_date('",fin,"')\n",
     indent(),"and SURG_COD_DIAGN_MDCAL_CLINQ like any (",qu(diagn),");"
   ))
 
