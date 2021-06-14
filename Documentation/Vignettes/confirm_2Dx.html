@@ -141,81 +141,82 @@ code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warni
 
 
 
+<pre><code>#&gt; data.table 1.14.0 using 8 threads (see ?getDTthreads).  Latest news: r-datatable.com</code></pre>
 <div id="data-analyse" class="section level2">
 <h2>Data analyse</h2>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(DT)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID    DATE_DX      DIAGN</span></span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01     cancer</span></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-05     cancer</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-10     cancer</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-11     cancer</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5:  1 2020-01-15 cancermeta</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6:  1 2020-01-20 cancermeta</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7:  1 2020-02-09 cancermeta</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8:  1 2020-02-10 cancermeta</span></span></code></pre></div>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(DT)</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID    DATE_DX      DIAGN</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01     cancer</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-05     cancer</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-10     cancer</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-11     cancer</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 5:  1 2020-01-15 cancermeta</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 6:  1 2020-01-20 cancermeta</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 7:  1 2020-02-09 cancermeta</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 8:  1 2020-02-10 cancermeta</span></span></code></pre></div>
 </div>
 <div id="utilisation-de-base" class="section level2">
 <h2>Utilisation de base</h2>
-<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>dt1 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt1)</span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01 2020-01-11</span></span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-05 2020-01-15</span></span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-10 2020-01-20</span></span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-20 2020-02-09</span></span></code></pre></div>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dt1 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt1)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01 2020-01-11</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-05 2020-01-15</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-10 2020-01-20</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-20 2020-02-09</span></span></code></pre></div>
 </div>
 <div id="diagn" class="section level2">
 <h2>DIAGN</h2>
 <p><code>cancer</code> ne pourra pas confirmer <code>cancermeta</code>.</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dt2 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="st">&quot;DIAGN&quot;</span>,</span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt2)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID      DIAGN   DATE_REP DATE_CONF1</span></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1     cancer 2020-01-01 2020-01-11</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 cancermeta 2020-01-15 2020-02-09</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 cancermeta 2020-01-20 2020-02-09</span></span></code></pre></div>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dt2 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="st">&quot;DIAGN&quot;</span>,</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt2)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID      DIAGN   DATE_REP DATE_CONF1</span></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1     cancer 2020-01-01 2020-01-11</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 cancermeta 2020-01-15 2020-02-09</span></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 cancermeta 2020-01-20 2020-02-09</span></span></code></pre></div>
 </div>
 <div id="study_start-study_end" class="section level2">
 <h2>study_start &amp; study_end</h2>
 <p>Conserve <code>DATE_REP</code> dans l’intervalle [<code>study_start</code>; <code>study_end</code>].</p>
-<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dt3 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="st">&quot;2020-01-10&quot;</span>, <span class="at">study_end =</span> <span class="st">&quot;2020-01-20&quot;</span>,</span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt3)</span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-10 2020-01-20</span></span>
-<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-20 2020-02-09</span></span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dt3 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="st">&quot;2020-01-10&quot;</span>, <span class="at">study_end =</span> <span class="st">&quot;2020-01-20&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt3)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-10 2020-01-20</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-20 2020-02-09</span></span></code></pre></div>
 </div>
 <div id="keep_first" class="section level2">
 <h2>keep_first</h2>
 <p>Conserve la première date de repérage confirmée par une autre date.</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>dt4 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">TRUE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt4)</span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01 2020-01-11</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dt4 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">TRUE</span>, <span class="at">reverse =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt4)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-01-01 2020-01-11</span></span></code></pre></div>
 </div>
 <div id="reverse" class="section level2">
 <h2>reverse</h2>
 <p>La vérification se fait en ordre décroissant, de la date la plus récente à la plus ancienne.</p>
-<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>dt5 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt5)</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-02-09 2020-01-20</span></span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-20 2020-01-10</span></span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-15 2020-01-05</span></span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-11 2020-01-01</span></span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>dt5 <span class="ot">&lt;-</span> <span class="fu">confirm_2Dx</span>(<span class="at">dt =</span> DT, <span class="at">ID =</span> <span class="st">&quot;ID&quot;</span>, <span class="at">DATE =</span> <span class="st">&quot;DATE_DX&quot;</span>, <span class="at">DIAGN =</span> <span class="cn">NULL</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                  <span class="at">study_start =</span> <span class="cn">NULL</span>, <span class="at">study_end =</span> <span class="cn">NULL</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                  <span class="at">n1 =</span> <span class="dv">10</span>, <span class="at">n2 =</span> <span class="dv">20</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                  <span class="at">keep_first =</span> <span class="cn">FALSE</span>, <span class="at">reverse =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="fu">print</span>(dt5)</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt;    ID   DATE_REP DATE_CONF1</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 1:  1 2020-02-09 2020-01-20</span></span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 2:  1 2020-01-20 2020-01-10</span></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 3:  1 2020-01-15 2020-01-05</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a><span class="co">#&gt; 4:  1 2020-01-11 2020-01-01</span></span></code></pre></div>
 </div>
 
 
