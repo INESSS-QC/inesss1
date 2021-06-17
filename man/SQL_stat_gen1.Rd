@@ -61,6 +61,7 @@ SQL_stat_gen1(
 \code{data.table}
 }
 \description{
+inesss v.1.0.0.9000\cr\cr
 Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
 Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
@@ -77,8 +78,8 @@ Sinon : inscrire les codes sous la forme d'un nombre entier.\cr\cr
 Que ce soit pour les codes AHFS (\code{NOM_AHFS}), les DENOM (\code{NOM_DENOM}) ou les DIN (\code{NOM_MARQ_COMRC}), \strong{le nom inscrit est toujours celui le plus récent}.
 }
 \examples{
-\dontrun{
-conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
+\donttest{
+conn <- SQL_connexion()
 
 ### group_by
 # Aucun
