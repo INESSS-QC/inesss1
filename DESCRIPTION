@@ -23,6 +23,7 @@ Imports:
     miniUI,
     parallel,
     odbc,
+    Rd2md,
     readxl,
     rmarkdown,
     rstudioapi,
