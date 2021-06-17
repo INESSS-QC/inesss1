@@ -8,7 +8,6 @@ library(writexl)
 # Build Manual ------------------------------------------------------------
 devtools::build_manual(path = "Documentation")
 
-
 # Vignettes ---------------------------------------------------------
 files <- list.files("vignettes")
 files <- files[tolower(stringr::str_sub(files, nchar(files) - 3, nchar(files))) == ".rmd"]
@@ -81,4 +80,18 @@ render(
 #   output_dir = "Documentation",
 #   envir = new.env(), encoding = "UTF-8"
 # )
+
+
+
+# PDFs_unique ---------------------------------------------------------------------------------
+
+help("SQL_stat_gen1", "inesss", help_type = "pdf", verbose = FALSE)
+files <- c(
+  "SQL_stat_gen1"
+)
+files <- paste0(files,".pdf")
+for (file in files) {
+  file.copy("SQL_stat_gen1.pdf", "Documentation/PDFs_unique/SQL_stat_gen1.pdf")
+  file.remove("SQL_stat_gen1.pdf")
+}
 
