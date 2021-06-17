@@ -85,13 +85,14 @@ render(
 
 # PDFs_unique ---------------------------------------------------------------------------------
 
-help("SQL_stat_gen1", "inesss", help_type = "pdf", verbose = FALSE)
+help("SQL_stat_gen1", "inesss", help_type = "pdf")
 files <- c(
   "SQL_stat_gen1"
 )
 files <- paste0(files,".pdf")
 for (file in files) {
-  file.copy("SQL_stat_gen1.pdf", "Documentation/PDFs_unique/SQL_stat_gen1.pdf")
+  file.copy("SQL_stat_gen1.pdf", "Documentation/PDFs_unique/SQL_stat_gen1.pdf",
+            overwrite = TRUE, recursive = TRUE)
   file.remove("SQL_stat_gen1.pdf")
 }
 
