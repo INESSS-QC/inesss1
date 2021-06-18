@@ -1,4 +1,4 @@
-#' Extraction Dx
+#' Requête Complexe
 #'
 #' Extraction SQL des codes de diagnostics..
 #'

@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_naif_switch1}
 \alias{SQL_naif_switch1}
-\title{Naïfs et Switchs}
+\title{Astuce}
 \usage{
 SQL_naif_switch1(
   conn = NULL,

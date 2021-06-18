@@ -5,7 +5,7 @@
 \alias{confirm_nDx}
 \alias{confirm_2Dx}
 \alias{confirm_3Dx}
-\title{Confirmation Diagnostics}
+\title{Astuce}
 \usage{
 confirm_2Dx(
   dt,

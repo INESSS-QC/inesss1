@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{comorbidity}
 \alias{comorbidity}
-\title{Comorbidity}
+\title{Astuce}
 \usage{
 comorbidity(
   dt,

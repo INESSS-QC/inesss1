@@ -1,4 +1,4 @@
-#' Statistiques générales
+#' Astuce
 #'
 #' inesss v.`r as.character(packageVersion("inesss"))`\cr\cr
 #' Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr

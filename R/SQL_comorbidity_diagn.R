@@ -1,4 +1,4 @@
-#' Extraction - Codes diagn comorbidity
+#' Astuce
 #'
 #' Extraction SQL des diagnostics pour l'étude de la comorbidité.
 #'
@@ -28,7 +28,7 @@
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity_diagn <- function(
-  conn, cohort, debut, fin,
+  conn = SQL_connexion(), cohort, debut, fin,
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'),
   dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',
                 'V_EPISO_SOIN_DURG_CM', 'I_SMOD_SERV_MD_CM'),

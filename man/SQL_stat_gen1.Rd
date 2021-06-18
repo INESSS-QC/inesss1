@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_stat_gen1}
 \alias{SQL_stat_gen1}
-\title{Statistiques générales}
+\title{Astuce}
 \usage{
 SQL_stat_gen1(
   conn = NULL,

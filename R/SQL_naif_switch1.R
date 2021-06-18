@@ -1,4 +1,4 @@
-#' Naïfs et Switchs
+#' Astuce
 #'
 #' Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.\cr
 #' Un individu est considéré *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements *de la même famille*.\cr
@@ -104,7 +104,7 @@
 #' )
 #' }
 SQL_naif_switch1 <- function(
-  conn = NULL, debut, fin,
+  conn = SQL_connexion(), debut, fin,
   type_Rx = 'DENOM', codes, group_by = 'DENOM',
   type_Rx_retro = NULL, rx_retrospect_a_exclure = NULL,
   njours_sans_conso = 365,

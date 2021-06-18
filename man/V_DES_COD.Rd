@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{V_DES_COD}
 \alias{V_DES_COD}
-\title{Data}
+\title{Domaine de valeur}
 \format{
 Tableau de 5 variables :
 \describe{

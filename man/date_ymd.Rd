@@ -2,7 +2,7 @@
 % Please edit documentation in R/date_ymd.R
 \name{date_ymd}
 \alias{date_ymd}
-\title{Date}
+\title{Astuce}
 \usage{
 date_ymd(yyyy, mm, dd)
 }

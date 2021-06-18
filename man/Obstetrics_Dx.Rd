@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Obstetrics_Dx}
 \alias{Obstetrics_Dx}
-\title{Data - Codes diagnostics gestationnels}
+\title{Table ou Liste}
 \format{
 \code{list(Dx = list(CIM9, CIM10))}
 }

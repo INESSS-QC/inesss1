@@ -1,4 +1,4 @@
-#' Utils
+#' Astuce
 #'
 #' Remplace les `NA`s dans un tableau par `by`.
 #'

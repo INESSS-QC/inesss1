@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{outlook_mail}
 \alias{outlook_mail}
-\title{Courriel}
+\title{Astuce}
 \usage{
 outlook_mail(
   to = NULL,

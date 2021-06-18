@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_stats_SMED_NBR_JR_DUREE_TRAIT}
 \alias{SQL_stats_SMED_NBR_JR_DUREE_TRAIT}
-\title{Statistiques}
+\title{Astuces}
 \usage{
 SQL_stats_SMED_NBR_JR_DUREE_TRAIT(
   conn,

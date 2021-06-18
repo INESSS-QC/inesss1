@@ -1,4 +1,4 @@
-#' Utils
+#' Astuce
 #'
 #' Supprime les `NA`s du vecteur. Renvoie `NULL` si aucune valeur.
 #'

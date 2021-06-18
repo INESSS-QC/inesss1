@@ -4,9 +4,9 @@
 \encoding{UTF-8}
 \name{ComorbidityWeights}
 \alias{ComorbidityWeights}
-\title{Data - Poids des codes de diagnostics}
+\title{Table ou Liste}
 \format{
-\code{list} contenant trois (3) tables indiquant la description, le code et le poids :
+\code{list} contenant des \code{data.table} :
 \describe{
 \item{CCI_INSPQ_2018_CIM9}{}
 \item{CCI_INSPQ_2018_CIM10}{}
@@ -20,7 +20,7 @@ Voir la source des datas \code{\link{Combine_Dx_CCI_INSPQ18}}, \code{\link{Charl
 data('ComorbidityWeights')
 }
 \description{
-Data - Poids des codes de diagnostics
+Liste contenant plusieurs tables. Chaque table indique les poids des codes de diagnostics.
 }
 \details{
 L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.

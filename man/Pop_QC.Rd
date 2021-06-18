@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Pop_QC}
 \alias{Pop_QC}
-\title{Data - Estimations et projections de population comparables (1996-2041)}
+\title{Table ou Liste}
 \format{
 Tableau de 8 variables et 2 595 320 observations :
 \describe{

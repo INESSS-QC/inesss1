@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Combine_Dx_CCI_INSPQ18}
 \alias{Combine_Dx_CCI_INSPQ18}
-\title{Data - Codes diagnostics}
+\title{Table ou Liste}
 \format{
 \code{list(Dx = list(CIM9, CIM10))}
 }
@@ -15,7 +15,7 @@
 data('Combine_Dx_CCI_INSPQ18')
 }
 \description{
-Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+Codes SQL à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 }
 \details{
 Contient les codes des datas \code{Charlson_Dx_CCI_INSPQ18} et \code{Elixhauser_Dx_CCI_INSPQ18}.\cr\cr

@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{install_RDCOMClient}
 \alias{install_RDCOMClient}
-\title{Package - Installation}
+\title{Astuce}
 \usage{
 install_RDCOMClient(msg = TRUE)
 }

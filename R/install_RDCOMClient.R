@@ -1,4 +1,4 @@
-#' Package - Installation
+#' Astuce
 #'
 #' Installation de la librairie \href{https://github.com/omegahat/RDCOMClient}{RDCOMCLIENT}. Si elle est déjà installée, le programme demande si on veut la mettre à jour.
 #'

@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{CIM_correspond}
 \alias{CIM_correspond}
-\title{Data - Correspondance entre CIM9 et CIM10}
+\title{Table ou Liste}
 \format{
 Tableau de 4 variables et 25866 observations :
 \describe{

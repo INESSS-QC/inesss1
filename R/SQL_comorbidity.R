@@ -1,4 +1,4 @@
-#' Comorbidity
+#' Requête Complexe
 #'
 #' Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 #'
@@ -30,7 +30,7 @@
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
-  conn,
+  conn = SQL_connexion(),
   dt, ID, DATE_INDEX,
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'), scores = 'CCI_INSPQ_2018_CIM10',
   lookup = 2, n1 = 30, n2 = 730,

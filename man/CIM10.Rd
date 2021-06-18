@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{CIM10}
 \alias{CIM10}
-\title{Data - Diagnostics CIM-10}
+\title{Table ou Liste}
 \format{
 Tableau de 2 variables et 15487 observations :
 \describe{

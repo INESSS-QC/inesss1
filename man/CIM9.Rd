@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{CIM9}
 \alias{CIM9}
-\title{Data - Diagnostics CIM-9}
+\title{Table ou Liste}
 \format{
 Tableau de 2 variables et 7184 observations :
 \describe{

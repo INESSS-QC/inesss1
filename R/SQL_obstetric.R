@@ -12,7 +12,7 @@
 #'
 #' @export
 SQL_obstetric <- function(
-  conn,
+  conn = SQL_connexion(),
   cohort, debut, fin,
   CIM = c('CIM9', 'CIM10'),
   dt_source = c('V_DIAGN_SEJ_HOSP_CM', 'V_SEJ_SERV_HOSP_CM',

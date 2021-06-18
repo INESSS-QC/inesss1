@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Elixhauser_Dx_CCI_INSPQ18}
 \alias{Elixhauser_Dx_CCI_INSPQ18}
-\title{Data - Codes diagnostics}
+\title{Table ou Liste}
 \format{
 \code{list(Dx = list(CIM9, CIM10))}
 }

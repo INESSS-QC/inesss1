@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_diagn}
 \alias{SQL_diagn}
-\title{Extraction Dx}
+\title{Requête Complexe}
 \usage{
 SQL_diagn(
   conn = SQL_connexion(),

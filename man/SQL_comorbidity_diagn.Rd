@@ -3,10 +3,10 @@
 \encoding{UTF-8}
 \name{SQL_comorbidity_diagn}
 \alias{SQL_comorbidity_diagn}
-\title{Extraction - Codes diagn comorbidity}
+\title{Astuce}
 \usage{
 SQL_comorbidity_diagn(
-  conn,
+  conn = SQL_connexion(),
   cohort,
   debut,
   fin,

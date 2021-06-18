@@ -1,4 +1,4 @@
-#' Comorbidity
+#' Astuce
 #'
 #' Calcul des indicateurs de *Charlson*, *Elixhauser* et la combinaison des deux.
 #'

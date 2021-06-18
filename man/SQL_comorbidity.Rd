@@ -3,10 +3,10 @@
 \encoding{UTF-8}
 \name{SQL_comorbidity}
 \alias{SQL_comorbidity}
-\title{Comorbidity}
+\title{Requête Complexe}
 \usage{
 SQL_comorbidity(
-  conn,
+  conn = SQL_connexion(),
   dt,
   ID,
   DATE_INDEX,

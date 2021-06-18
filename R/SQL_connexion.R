@@ -1,4 +1,4 @@
-#' Connexion Teradata
+#' Astuce
 #'
 #' Connexion entre R et SQL Teradata.
 #'
