@@ -120,8 +120,11 @@ confirm_2Dx <- function(
       }
       sd[, diff := cumsum(diff), .(ID, DIAGN)]  # nombre de jours cumulés
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
-      sd[, keep := fcase(any(diff %in% n1:n2), TRUE,
-                         default = FALSE)]
+      sd[
+        , keep := fcase(any(diff %in% n1:n2), TRUE,
+                        default = FALSE),
+        .(ID, DIAGN)
+      ]
       # sd[, keep := FALSE]
       # sd[any(diff %in% n1:n2), keep := TRUE, .(ID, DIAGN)]
       sd <- sd[keep == TRUE]
@@ -283,8 +286,8 @@ confirm_3Dx <- function(
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
       sd[, keep := FALSE]
       sd[
-        any(diff %in% n1:n2) & any(diff2 %in% n1:n2),
-        keep := TRUE,
+        , keep := fcase(any(diff %in% n1:n2) & any(diff2 %in% n1:n2), TRUE,
+                        default = FALSE),
         .(ID, DIAGN)
       ]
       sd <- sd[keep == TRUE]
