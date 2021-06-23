@@ -70,7 +70,7 @@ ex_3dx <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
 ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
                               n1 = 10, n2 = 20, reverse = TRUE)
 
-### With DIAGN column
+### Avec argument DIAGN
 dt_ex_dx <- data.frame(
   id = 1L,
   dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',

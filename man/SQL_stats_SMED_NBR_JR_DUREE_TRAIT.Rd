@@ -6,7 +6,7 @@
 \title{Astuces}
 \usage{
 SQL_stats_SMED_NBR_JR_DUREE_TRAIT(
-  conn,
+  conn = SQL_connexion(),
   debut,
   fin,
   by_code_serv = TRUE,

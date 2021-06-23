@@ -26,12 +26,15 @@ outlook_mail(
 }
 \description{
 Envoyer un courriel à partir de Outlook.\cr
-\strong{ATTENTION} Vérifier l'adresse utilisée s'il y a plusieurs comptes.
+\strong{ATTENTION} Vérifier l'adresse utilisée s'il y a plusieurs comptes.\cr
+La librairie \href{https://github.com/omegahat/RDCOMClient}{RDCOMClient} doit être installée. Voir la fonction \code{\link{install_RDCOMClient}}.
 }
 \examples{
+\donttest{
 outlook_mail(to = "Mon.Directeur@inesss.qc.ca",
              cc = "Mon.Collegue@inesss.qc.ca",
              subject = "Projet1 - Finalisation",
              body = "Bonjour,\n Il faudrait se rencontrer pour en discuter.\n
                      Merci\n\n Mon Nom")
+}
 }

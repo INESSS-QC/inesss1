@@ -20,7 +20,7 @@ Voir la source des datas \code{\link{Combine_Dx_CCI_INSPQ18}}, \code{\link{Charl
 data('ComorbidityWeights')
 }
 \description{
-Liste contenant plusieurs tables. Chaque table indique les poids des codes de diagnostics.
+Liste contenant plusieurs tables. Chaque table indique les poids des codes de diagnostics à utiliser dans l'étude de la comorbidité.
 }
 \details{
 L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.

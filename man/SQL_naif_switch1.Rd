@@ -6,7 +6,7 @@
 \title{Astuce}
 \usage{
 SQL_naif_switch1(
-  conn = NULL,
+  conn = SQL_connexion(),
   debut,
   fin,
   type_Rx = "DENOM",

@@ -5,7 +5,7 @@
 \title{Extraction - Codes diagn obstetriques}
 \usage{
 SQL_obstetric(
-  conn,
+  conn = SQL_connexion(),
   cohort,
   debut,
   fin,
