@@ -105,7 +105,7 @@ SQL_reperage_cond_med <- function(
   setnames(Dx_etape2, c("DATE_REP", "DATE_CONF1"), c("DI_Acte", "DC_Acte"))
 
   if (verbose) {
-    cat("Arrangement de la table finale...")
+    cat("Arrangement de la table finale...\n")
   }
   ### Dernière date Dx de chaque ID
   Dx_recent <- rbind(Dx_etape1_last, Dx_etape2_last)

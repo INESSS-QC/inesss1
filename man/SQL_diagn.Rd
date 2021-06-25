@@ -31,7 +31,7 @@ SQL_diagn(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset contenant la liste des codes de diagnostics à l'étude.
 \itemize{
 \item \code{'Combine_Dx_CCI_INSPQ18'}
 \item \code{'Charlson_Dx_CCI_INSPQ18'}

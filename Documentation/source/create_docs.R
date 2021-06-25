@@ -132,9 +132,11 @@ for (file in paste0(c(
 # Requête Complexe
 help("SQL_comorbidity", "inesss", help_type = "pdf")
 help("SQL_diagn", "inesss", help_type = "pdf")
+help("SQL_reperage_cond_med", "inesss", help_type = "pdf")
 for (file in paste0(c(
   "SQL_comorbidity",
-  "SQL_diagn"
+  "SQL_diagn",
+  "SQL_reperage_cond_med"
 ), ".pdf")) {
   file.copy(file, paste0("Documentation/PDFs_unique/Requete Complexe/",file), overwrite = TRUE)
   file.remove(file)

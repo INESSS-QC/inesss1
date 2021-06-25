@@ -10,7 +10,7 @@
 #' @param DATE_DX Nom de la colonne indiquant la date du diagnostic.
 #' @param SOURCE Nom de la colonne indiquant la provenance du diagnostic.
 #' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
-#' @param Dx_table Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+#' @param Dx_table `list` personnelle contenant les codes de diagnostics ou nom du dataset contenant la liste des codes de diagnostics à l'étude.
 #' * `'Combine_Dx_CCI_INSPQ18'`
 #' * `'Charlson_Dx_CCI_INSPQ18'`
 #' * `'Elixhauser_Dx_CCI_INSPQ18'`

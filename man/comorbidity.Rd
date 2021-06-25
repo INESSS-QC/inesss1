@@ -33,7 +33,7 @@ comorbidity(
 
 \item{n1, n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
-\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset contenant la liste des codes de diagnostics à l'étude.
 \itemize{
 \item \code{'Combine_Dx_CCI_INSPQ18'}
 \item \code{'Charlson_Dx_CCI_INSPQ18'}
