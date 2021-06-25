@@ -114,12 +114,14 @@ SQL_comorbidity_diagn <- function(
       }
     }
     DT <- data.table::rbindlist(DT)  # regrouper tous les tableaux en un seul
-    setcolorder(DT, c("ID", "DIAGN", "DATE_DX", "SOURCE"))  # ordre des colonnes
 
     if (nrow(DT)) {
+      setcolorder(DT, c("ID", "DIAGN", "DATE_DX", "SOURCE"))  # ordre des colonnes
       setkey(DT)  # tri
+      return(DT)
+    } else {
+      return(NULL)
     }
-    return(DT)
 
   }
 
@@ -174,7 +176,7 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM <- function(
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = query_V_DIAGN_SEJ_HOSP_CM(
-        debut = debut, fin = fin,
+        debut = deb, fin = fi,
         diagn = diagn,
         date_dx_var = date_dx_var,
         typ_diagn = typ_diagn
@@ -228,7 +230,7 @@ SQL_comorbidity_diagn.V_SEJ_SERV_HOSP_CM <- function(
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = query_V_SEJ_SERV_HOSP_CM(
-        debut = debut, fin = fin,
+        debut = deb, fin = fi,
         diagn = diagn, date_dx_var = date_dx_var
       )
     ))
@@ -281,7 +283,7 @@ SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM <- function(
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = query_I_SMOD_SERV_MD_CM(
-        debut = debut, fin = fin,
+        debut = deb, fin = fi,
         diagn = diagn
       )
     ))
@@ -333,7 +335,7 @@ SQL_comorbidity_diagn.V_EPISO_SOIN_DURG_CM <- function(
     # Extraction des diagn selon l'année
     DT[[i]] <- as.data.table(odbc::dbGetQuery(
       conn = conn, statement = query_V_EPISO_SOIN_DURG_CM(
-        debut = debut, fin = fin,
+        debut = deb, fin = fi,
         diagn = diagn, date_dx_var = date_dx_var
       )
     ))
