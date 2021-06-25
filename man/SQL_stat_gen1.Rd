@@ -61,7 +61,7 @@ SQL_stat_gen1(
 \code{data.table}
 }
 \description{
-inesss v.1.0.0.9000\cr\cr
+inesss v.1.0.0.9001\cr\cr
 Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
 Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V\%5FDEM\%5FPAIMT\%5FMED\%5FCM+\%28DEMANDES+DE+PAIEMENT+\%2D+PROGRAMME+\%ABMEDICAMENT\%BB\%29}{V_DEM_PAIMT_MED_CM}}.
 }
