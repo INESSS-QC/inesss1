@@ -1,10 +1,12 @@
-## Librairie <a href="https://github.com/INESSS-QC/inesss1" target="_blank"><code>inesss</code> v.1.0.0.9000</a>
+Librairie <a href="https://github.com/INESSS-QC/inesss1" target="_blank"><code>inesss</code> v.1.0.0.9001</a>
+-------------------------------------------------------------------------------------------------------------
 
 ### Version 1.0.0.9000
 
 -   Tables
     -   Mise à jour des tables (2021-06-14)
 -   Fonctions
+    -   Nouvelle fonction `SQL_reperage_cond_med`.
     -   Nouvelle fonction `install_RDCOMClient`.
     -   Nouvelle fonction `outlook_mail`.
     -   Amélioration des fonctions `confirm_nDx`
@@ -12,7 +14,7 @@
     -   `SQL_comorbidty` affiche les attributs comme supposé
         (<a href="https://github.com/INESSS-QC/inesss1/issues/21" target="_blank">Issue#21</a>).
 -   Documentation
-    -   AIDE_FORMULAIRE : Description supplémentaire des *Naïfs* et
+    -   AIDE\_FORMULAIRE : Description supplémentaire des *Naïfs* et
         *Switch*
         (<a href="https://github.com/INESSS-QC/inesss1/issues/25" target="_blank">Issue#25</a>).
     -   Vignette `SQL_diagn`.

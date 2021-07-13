@@ -15,6 +15,7 @@ SQL_reperage_cond_med(
   date_dx_var = "admis",
   n1 = 30,
   n2 = 730,
+  keep_all = FALSE,
   verbose = TRUE
 )
 }
@@ -43,6 +44,8 @@ SQL_reperage_cond_med(
 
 \item{n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
 
+\item{keep_all}{\code{TRUE} ou \code{FALSE}. Par défaut \code{FALSE}. \code{FALSE} supprime toutes les observations où \code{DI_Finale = NA}. \code{TRUE} est utile si on cherche la date la plus récente pour chaque individu.}
+
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \value{
@@ -54,7 +57,7 @@ SQL_reperage_cond_med(
 \item \code{DI_Hospit} : Date d'incidence d'hospitalisation.
 \item \code{DI_Acte} : Date d'incidence acte.
 \item \code{DC_Acte} : Date de confirmation de \code{DI_Acte}.
-\item \code{D_Recent} : Date du diagnostic le plus récent \strong{sans tenir compte de l'algorithme}.
+\item \code{D_Recent} : Date du diagnostic la plus récente \strong{sans tenir compte de l'algorithme}.
 }
 }
 \description{
