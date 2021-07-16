@@ -2,7 +2,8 @@
 #'
 #' Calcul des indicateurs de *Charlson*, *Elixhauser* et la combinaison des deux.
 #'
-#' \strong{\code{confirm_sourc} :} Dans l'exemple `confirm_sourc = list(source1=1, source2=2, source3=2, ...)`, la `source3` pourrait confirmer la `source2` et vice-versa.
+#' \strong{\code{confirm_sourc} :} Dans l'exemple `confirm_sourc = list(source1=1, source2=2, source3=2, ...)`, la `source3` pourrait confirmer la `source2` et vice-versa.\cr\cr
+#' \strong{\code{Dx_table} :} Il n'est pas nécessaire d'inclure un pourcentage à la fin de chaque code. Le programme le fait automatiquement s'il n'y en a pas. Par exemple inscrire le code `I25` et `I25%` revient au même.
 #'
 #' @param dt Dataset ayant au moins les quatre (4) colonnes `ID`, `DIAGN`, `DATE_DX` et `SOURCE`.
 #' @param ID Nom de la colonne indiquant le numéro de l'usager, de l'individu.
@@ -10,7 +11,7 @@
 #' @param DATE_DX Nom de la colonne indiquant la date du diagnostic.
 #' @param SOURCE Nom de la colonne indiquant la provenance du diagnostic.
 #' @param n1,n2 Nombre de jours dans le but de construire l'intervalle `[n1,n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle `[n1,n2]`.
-#' @param Dx_table `list` personnelle contenant les codes de diagnostics ou nom du dataset contenant la liste des codes de diagnostics à l'étude.
+#' @param Dx_table `list` personnelle contenant les codes de diagnostics ou nom du dataset (de la librairie *inesss*) contenant la liste des codes de diagnostics à l'étude.
 #' * `'Combine_Dx_CCI_INSPQ18'`
 #' * `'Charlson_Dx_CCI_INSPQ18'`
 #' * `'Elixhauser_Dx_CCI_INSPQ18'`

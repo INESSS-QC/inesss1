@@ -7,7 +7,7 @@
 #' @inheritParams SQL_diagn
 #' @inheritParams confirm_nDx
 #' @param by_Dx `TRUE` ou `FALSE`. Distinction entre les diagnostics (`TRUE`) ou pas (`FALSE`). La distinction des diagnostics implique une cohorte d'étude pour chaque élément de l'argument `Dx_table`, alors que `FALSE` tous les éléments sont réunis comme si c'était la même maladie.
-#' @param keep_all `TRUE` ou `FALSE`. Par défaut `FALSE`. `FALSE` supprime toutes les observations où `DI_Finale = NA`. `TRUE` est utile si on cherche la date la plus récente pour chaque individu.
+#' @param keep_all `TRUE` ou `FALSE`. Par défaut `FALSE`.\cr`FALSE` supprime toutes les observations où `DI_Finale = NA`.\cr`TRUE` est utile si on cherche la date la plus récente pour chaque individu.
 #'
 #' @return `data.table` :
 #' * `ID` : Identifiant de l'individu.
@@ -20,6 +20,7 @@
 #' @encoding UTF-8
 #' @import data.table
 #' @export
+#' @inherit SQL_comorbidity_diagn examples
 SQL_reperage_cond_med <- function(
   conn = SQL_connexion(),
   debut, fin,

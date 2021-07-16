@@ -7,6 +7,7 @@
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6724&NomVue=V%5FSEJ%5FSERV%5FHOSP%5FCM+%28S%E9jour+service+hospitalier%29}{`V_SEJ_SERV_HOSP_CM`} : Cette structure contient les séjours dans un service effectués par l'individu hospitalisé.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=6687&NomVue=V%5FEPISO%5FSOIN%5FDURG%5FCM+%28%C9pisodes+de+soins+en+D%E9partement+d%27urgence%29}{`V_EPISO_SOIN_DURG_CM`} : Cette structure contient les épisodes de soins des départements d'urgence de la province.
 #' * \href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1797&NomVue=I%5FSMOD%5FSERV%5FMD%5FCM}{`I_SMOD_SERV_MD_CM`} : Cette vue retourne différentes informations se rapportant aux Services rendus à l'acte par des médecins.
+#' \strong{\code{Dx_table} :} Il n'est pas nécessaire d'inclure un pourcentage à la fin de chaque code. Le programme le fait automatiquement s'il n'y en a pas. Par exemple inscrire le code `I25` et `I25%` revient au même.
 #'
 #' @inheritParams comorbidity
 #' @param conn Variable contenant la connexion entre R et Teradata. Voir \code{\link{SQL_connexion}}.
@@ -27,6 +28,21 @@
 #' * **`SOURCE`** : Indique d'où provient l'information. Une valeur parmi `dt_source`.
 #' @encoding UTF-8
 #' @export
+#' @examples
+#' ### Inscription des codes de diagnostics dans Dx_table
+#' # 1 code CIM9 ou CIM10
+#' liste1 = list(CIM9 = "413")
+#' liste2 = list(CIM10 = "I20")
+#' # 1 code de chaque
+#' liste3 = list(CIM9 = "413", CIM10 = "I20")
+#' # Plusieurs codes qui se suivent
+#' liste4 = list(CIM9 = 410:414, CIM10 = paste0("I", 21:25))
+#' # Codes qui ne se suivent pas
+#' liste5 = list(CIM9 = c(410, 412, 414), CIM10 = paste0("I", 21, 23, 25))
+#' # Codes qui se suivent et qui ne se suivent pas
+#' liste6 = list(CIM9 = c(405:410, 412:414),
+#'               CIM10 = c(paste0("I", c(18:21, 23:25)),
+#'                         paste0("K0", c(5:9)), paste0("K", 10:15)))
 SQL_comorbidity_diagn <- function(
   conn = SQL_connexion(), cohort, debut, fin,
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'),
@@ -47,6 +63,18 @@ SQL_comorbidity_diagn <- function(
     # Exclusion des diagnostiques
     if (!is.null(exclu_diagn)) {
       Dx_table <- Dx_table[!names(Dx_table) %in% exclu_diagn]
+    }
+    # Ajouter des pourcentages aux codes s'il n'y en a pas
+    for (i in 1:length(Dx_table)) {
+      for (j in 1:2) {
+        Dx_table[[i]][[j]] <- sapply(Dx_table[[i]][[j]], function(x) {
+          if (!str_detect(x, "%")) {
+            return(paste0(x, "%"))
+          } else {
+            return(x)
+          }
+        })
+      }
     }
     # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
     # de classification de code.

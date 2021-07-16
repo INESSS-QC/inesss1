@@ -26,7 +26,7 @@ SQL_reperage_cond_med(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset (de la librairie \emph{inesss}) contenant la liste des codes de diagnostics à l'étude.
 \itemize{
 \item \code{'Combine_Dx_CCI_INSPQ18'}
 \item \code{'Charlson_Dx_CCI_INSPQ18'}
@@ -44,7 +44,7 @@ SQL_reperage_cond_med(
 
 \item{n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
 
-\item{keep_all}{\code{TRUE} ou \code{FALSE}. Par défaut \code{FALSE}. \code{FALSE} supprime toutes les observations où \code{DI_Finale = NA}. \code{TRUE} est utile si on cherche la date la plus récente pour chaque individu.}
+\item{keep_all}{\code{TRUE} ou \code{FALSE}. Par défaut \code{FALSE}.\cr\code{FALSE} supprime toutes les observations où \code{DI_Finale = NA}.\cr\code{TRUE} est utile si on cherche la date la plus récente pour chaque individu.}
 
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
@@ -65,4 +65,20 @@ Repérage d'une condition médicale.
 }
 \details{
 Détails à venir.
+}
+\examples{
+### Inscription des codes de diagnostics dans Dx_table
+# 1 code CIM9 ou CIM10
+liste1 = list(CIM9 = "413")
+liste2 = list(CIM10 = "I20")
+# 1 code de chaque
+liste3 = list(CIM9 = "413", CIM10 = "I20")
+# Plusieurs codes qui se suivent
+liste4 = list(CIM9 = 410:414, CIM10 = paste0("I", 21:25))
+# Codes qui ne se suivent pas
+liste5 = list(CIM9 = c(410, 412, 414), CIM10 = paste0("I", 21, 23, 25))
+# Codes qui se suivent et qui ne se suivent pas
+liste6 = list(CIM9 = c(405:410, 412:414),
+              CIM10 = c(paste0("I", c(18:21, 23:25)),
+                        paste0("K0", c(5:9)), paste0("K", 10:15)))
 }

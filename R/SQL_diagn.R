@@ -11,6 +11,8 @@
 #' @encoding UTF-8
 #'
 #' @export
+#'
+#' @inherit SQL_comorbidity_diagn examples
 SQL_diagn <- function(
   conn = SQL_connexion(), cohort = NULL, debut, fin,
   Dx_table, CIM = c('CIM9', 'CIM10'),
