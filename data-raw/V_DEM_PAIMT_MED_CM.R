@@ -366,7 +366,6 @@ cod_sta_decis <- function() {
 
 # Créer dataset -----------------------------------------------------------
 
-V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
 V_DEM_PAIMT_MED_CM <- list(
   DENOM_DIN_AHFS = denom_din_ahfs(),
   COD_AHFS =  cod_ahfs(),
