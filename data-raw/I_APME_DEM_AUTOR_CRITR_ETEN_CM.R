@@ -49,7 +49,7 @@ des_court_indcn_recnu <- function() {
       }
     }
     DT <- rbindlist(DT)
-    setKEY(DT, COD_DENOM_COMNE_DEM, COD_DIN_DEM, ANNEE, MOIS)
+    setkey(DT, COD_DENOM_COMNE_DEM, COD_DIN_DEM, ANNEE, MOIS)
 
     return(DT)
   }
