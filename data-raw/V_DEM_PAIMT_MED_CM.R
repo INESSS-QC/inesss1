@@ -366,6 +366,7 @@ cod_sta_decis <- function() {
 
 # Créer dataset -----------------------------------------------------------
 
+V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
 V_DEM_PAIMT_MED_CM <- list(
   DENOM_DIN_AHFS = denom_din_ahfs(),
   COD_AHFS =  cod_ahfs(),
@@ -379,14 +380,30 @@ attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()  # date de création
 
 # Nouvelles valeurs -------------------------------------------------------
 
-new_denom <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM, NOM_DENOM)][
-  !inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM, NOM_DENOM)],
-  on = .(DENOM)
+# Liste des DENOM qui n'étaient pas présents
+new_denom <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)][
+  !inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)], on = .(DENOM)
 ]
-old_date <- attr(inesss::V_DEM_PAIMT_MED_CM, "MaJ")
-new_denom[, Du := old_date]
-new_denom[, Au := Sys.Date()]
+new_denom <- data.table(DENOM = c('00046', '00062', '00067', '46278'))
 if (nrow(new_denom)) {
+  # Ajouter la 1re date inscrite dans la base de données pour les nouveaux new_denom
+  new_denom <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select SMED_COD_DENOM_COMNE as DENOM,\n",
+    "       min(SMED_DAT_SERV) as MIN_DATE_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_COD_DENOM_COMNE in (",qu(new_denom$DENOM),")\n",
+    "group by DENOM\n",
+    "order by DENOM;"
+  )))
+  # Ajouter la description des DENOM
+  DENOM_desc <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[
+    DENOM %in% new_denom$DENOM, .SD[.N], .(DENOM)
+  ][, .(DENOM, NOM_DENOM)]
+  new_denom <- DENOM_desc[new_denom, on = .(DENOM)][, .(DENOM, MIN_DATE_SERV, NOM_DENOM)]
+
+  old_date <- attr(inesss::V_DEM_PAIMT_MED_CM, "MaJ")
+  new_denom[, Du := old_date]
+  new_denom[, Au := Sys.Date()]
   write_xlsx(new_denom, paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
 }
 
