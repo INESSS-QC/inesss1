@@ -30,24 +30,26 @@ des_court_indcn_recnu <- function() {
 
     ### Extraction
     years <- (year(iter_vars$MIN_DAT)):(year(iter_vars$MAX_DAT))
-    DT <- vector("list", length(years))
+    DT <- vector("list", length(years) * 12)
     i <- 1L
     for (yr in years) {
-      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select distinct(NPME_DES_COURT_INDCN_RECNU) as DES_COURT_INDCN_RECNU\n",
-        "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-        "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, 1, 1),"' and '",date_ymd(yr, 12, 31),"';"
-      )))
-      DT[[i]][, ANNEE := yr]
-      i <- i + 1L
+      for (mth in 1:12) {
+        DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+          "select distinct\n",
+          "    APME_COD_DENOM_COMNE_DEM as COD_DENOM_COMNE_DEM,\n",
+          "    APME_COD_DIN_DEM as COD_DIN_DEM,\n",
+          "    extract(year from APME_DAT_STA_DEM_PME) as ANNEE,\n",
+          "    extract(month from APME_DAT_STA_DEM_PME) as MOIS,\n",
+          "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
+          "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+          "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
+          "    and NPME_DES_COURT_INDCN_RECNU is not null;"
+        )))
+        i <- i + 1L
+      }
     }
     DT <- rbindlist(DT)
-    setorder(DT, DES_COURT_INDCN_RECNU, ANNEE)
-    DT <- DT[
-      , .(DEBUT = min(ANNEE),
-          FIN = max(ANNEE)),
-      .(DES_COURT_INDCN_RECNU)
-    ]
+    setKEY(DT, COD_DENOM_COMNE_DEM, COD_DIN_DEM, ANNEE, MOIS)
 
     return(DT)
   }
@@ -104,44 +106,6 @@ I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
-
-# Nouvelles Valeurs -------------------------------------------------------
-
-new_indcn <- I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU[
-  !DES_COURT_INDCN_RECNU %in% inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$DES_COURT_INDCN_RECNU,
-  .(DES_COURT_INDCN_RECNU)
-]
-old_date <- attr(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ")
-new_indcn[, Du := old_date]
-new_indcn[, Au := Sys.Date()]
-if (nrow(new_indcn)) {
-  write_xlsx(new_indcn, paste0("C:/Users/ms045/Desktop/saveAuto/new_indcn_",Sys.Date(),".xlsx"))
-}
-
-# Envoyer courriel --------------------------------------------------------
-
-if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
-  # des_court_indcn_recnu
-
-  if (nrow(new_indcn)) {
-    # Envoyer un courriel
-    outlook_mail(to = mail_to,
-                 subject = "new_values_INDCN_RECNU",
-                 body = paste0("Ceci est un message automatisé.\n\n",
-                               "DES_COURT_INDCN_RECNU - Description courte des indications reconnus\n",
-                               "Il y a eu des nouvelles valeurs entre le ",
-                               old_date," et le ",Sys.Date(),".\n",
-                               "Voir le fichier en pièce jointe."),
-                 attachments = paste0("C:/Users/ms045/Desktop/saveAuto/new_indcn_",Sys.Date(),".xlsx"))
-  } else {
-    outlook_mail(to = mail_to,
-                 subject = "new_values_INDCN_RECNU",
-                 body = paste0("Ceci est un message automatisé.\n\n",
-                               "DES_COURT_INDCN_RECNU - Description courte des indications reconnus\n",
-                               "Il n'y a pas eu de nouvelle valeurs entre le ",
-                               old_date," et le ",Sys.Date(),"."))
-  }
-}
 
 # Save data pour package --------------------------------------------------
 
