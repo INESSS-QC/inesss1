@@ -5,7 +5,6 @@ library(inesss)
 library(askpass)
 library(stringr)
 library(lubridate)
-# conn <- SQL_connexion()
 
 
 # Fonctions ---------------------------------------------------------------
@@ -195,6 +194,7 @@ cod_denom <- function() {
 
 }
 cod_din <- function() {
+
   ### Vérifier si la variable d'itération contient une valeur nulle
   verif_iter <- dbGetQuery(conn, statement = paste0(
     "select distinct(smed_dat_serv) as DATE_SERV\n",
@@ -255,6 +255,85 @@ cod_din <- function() {
 
     return(DT)
   }
+
+}
+denom_din_teneur <- function() {
+
+  # Nom des teneurs
+  nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_TENR_MED as TENEUR,\n",
+    "       NMED_NOM_TENR as NOM_TENEUR\n",
+    "from PROD.V_TENR_MED;"
+  )))
+  setkey(nom_teneur, TENEUR)
+
+  # Table d'analyse
+  years <- 1996:year(Sys.Date())
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    SMED_COD_DENOM_COMNE as DENOM,\n",
+        "    SMED_COD_DIN as DIN,\n",
+        "    SMED_COD_TENR_MED as TENEUR\n",
+        "from PROD.V_DEM_PAIMT_MED_CM\n",
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
+        "    and SMED_COD_TENR_MED is not null;"
+      )))
+      if (nrow(DT[[i]])) {
+        DT[[i]][, ANNEE := yr]
+      }
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)
+  DT <- DT[  # Indiquer la 1re et la dernière année inscrite
+    , .(DEBUT = min(ANNEE),
+        FIN = max(ANNEE)),
+    keyby = .(DENOM, DIN, TENEUR)
+  ]
+
+  # Ajouter le nom de la teneur
+  DT <- nom_teneur[DT, on = .(TENEUR)]
+  setcolorder(DT, c("DENOM", "DIN", "TENEUR", "NOM_TENEUR", "DEBUT", "FIN"))
+  setkey(DT, DENOM, DIN, TENEUR)
+
+  return(DT)
+
+}
+denom_din_format <- function() {
+
+  years <- 1996:year(Sys.Date())
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    SMED_COD_DENOM_COMNE as DENOM,\n",
+        "    SMED_COD_DIN as DIN,\n",
+        "    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ\n",
+        "from PROD.V_DEM_PAIMT_MED_CM\n",
+        "where MED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
+        "    and SMED_COD_FORMA_ACQ_MED is not null;"
+      )))
+      if (nrow(DT[[i]])) {
+        DT[[i]][, ANNEE := yr]
+      }
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)
+  DT <- DT[
+    , .(DEBUT = min(ANNEE),
+        FIN = max(ANNEE)),
+    .(DENOM, DIN, FORMAT_ACQ)
+  ]
+  setkey(DT, DENOM, DIN, FORMAT_ACQ)
+
+  return(DT)
 
 }
 cod_serv <- function() {
@@ -366,19 +445,46 @@ cod_sta_decis <- function() {
 
 # Créer dataset -----------------------------------------------------------
 
-V_DEM_PAIMT_MED_CM <- list(
-  DENOM_DIN_AHFS = denom_din_ahfs(),
-  COD_AHFS =  cod_ahfs(),
-  COD_DENOM_COMNE = cod_denom(),
-  COD_DIN = cod_din(),
-  COD_SERV = cod_serv(),
-  COD_STA_DECIS = cod_sta_decis()
-)
+V_DEM_PAIMT_MED_CM <- list()
+# DENOM_DIN_AHFS
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
+conn <- odbc::dbDisconnect(conn)
+# COD_AHFS
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()()
+conn <- odbc::dbDisconnect(conn)
+# COD_DENOM_COMNE
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
+conn <- odbc::dbDisconnect(conn)
+# COD_DIN
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
+conn <- odbc::dbDisconnect(conn)
+# DENOM_DIN_TENEUR
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR <- denom_din_teneur()
+conn <- odbc::dbDisconnect(conn)
+# DENOM_DIN_FORMAT
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$DENOM_DIN_FORMAT <- denom_din_format()
+conn <- odbc::dbDisconnect(conn)
+# COD_SERV
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_SERV <- cod_serv()
+conn <- odbc::dbDisconnect(conn)
+# COD_STA_DECIS
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_STA_DECIS <- cod_sta_decis()
+conn <- odbc::dbDisconnect(conn)
+
 attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()  # date de création
 
 
 # Nouvelles valeurs -------------------------------------------------------
 
+conn <- SQL_connexion(user, pwd)
 # Liste des DENOM qui n'étaient pas présents
 new_denom <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)][
   !inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)], on = .(DENOM)
@@ -405,6 +511,8 @@ if (nrow(new_denom)) {
   new_denom[, Au := Sys.Date()]
   write_xlsx(new_denom, paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
 }
+
+conn <- odbc::dbDisconnect(conn)
 
 
 # Envoyer courriel --------------------------------------------------------
@@ -433,8 +541,8 @@ if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
 }
 
 
+
 # Save data pour package --------------------------------------------------
 
 use_data(V_DEM_PAIMT_MED_CM, overwrite = TRUE)
-
 rm(V_DEM_PAIMT_MED_CM)

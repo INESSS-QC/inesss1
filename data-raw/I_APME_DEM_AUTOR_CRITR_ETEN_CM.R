@@ -5,7 +5,7 @@ library(askpass)
 library(inesss)
 library(stringr)
 library(writexl)
-# conn <- SQL_connexion()
+conn <- SQL_connexion(user, pwd)
 
 
 # Fonctions ---------------------------------------------------------------
@@ -43,7 +43,8 @@ des_court_indcn_recnu <- function() {
           "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
           "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
           "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
-          "    and NPME_DES_COURT_INDCN_RECNU is not null;"
+          "    and NPME_DES_COURT_INDCN_RECNU is not null\n",
+          "    and APME_COD_DENOM_COMNE_DEM is not null;"
         )))
         i <- i + 1L
       }
@@ -106,6 +107,9 @@ I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
+
+# Fermer la connexion
+conn <- odbc::dbDisconnect(conn)
 
 # Save data pour package --------------------------------------------------
 

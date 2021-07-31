@@ -1,6 +1,9 @@
 library(inesss)
 
-conn <- SQL_connexion()  # connexion teradata
+load("C:/Users/ms045/Desktop/saveAuto/SQLconn_params.rda")  # Paramètres de connexion de MS045
+if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
+if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
+
 send_mail <- TRUE
 mail_to <- c(
   "guillaume.boucher@inesss.qc.ca"

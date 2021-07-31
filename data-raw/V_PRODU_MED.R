@@ -4,7 +4,7 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(lubridate)
-# conn <- SQL_connexion(askpass("User"))
+conn <- SQL_connexion(user, pwd)
 
 nom_marq_comrc <- function() {
 
@@ -43,12 +43,12 @@ nom_marq_comrc <- function() {
 
 }
 
-
 V_PRODU_MED <- list(
   NOM_MARQ_COMRC = nom_marq_comrc()
 )
 attr(V_PRODU_MED, "MaJ") <- Sys.Date()
-
 use_data(V_PRODU_MED, overwrite = TRUE)
-
 rm(V_PRODU_MED)
+
+# Fermer la connexion
+conn <- odbc::dbDisconnect(conn)

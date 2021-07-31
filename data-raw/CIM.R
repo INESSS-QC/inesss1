@@ -2,7 +2,6 @@ library(usethis)
 library(data.table)
 library(readxl)
 
-
 # CIM9 --------------------------------------------------------------------
 
 CIM9 <- as.data.table(read_xlsx(
