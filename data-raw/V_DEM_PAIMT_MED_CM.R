@@ -257,55 +257,11 @@ cod_din <- function() {
   }
 
 }
-denom_din_teneur <- function() {
-
-  # Nom des teneurs
-  nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
-    "select NMED_COD_TENR_MED as TENEUR,\n",
-    "       NMED_NOM_TENR as NOM_TENEUR\n",
-    "from PROD.V_TENR_MED;"
-  )))
-  setkey(nom_teneur, TENEUR)
-
-  # Table d'analyse
-  years <- 1996:year(Sys.Date())
-  DT <- vector("list", length(years) * 12)
-  i <- 1L
-  for (yr in years) {
-    for (mth in 1:12) {
-      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select distinct\n",
-        "    SMED_COD_DENOM_COMNE as DENOM,\n",
-        "    SMED_COD_DIN as DIN,\n",
-        "    SMED_COD_TENR_MED as TENEUR\n",
-        "from PROD.V_DEM_PAIMT_MED_CM\n",
-        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
-        "    and SMED_COD_TENR_MED is not null;"
-      )))
-      if (nrow(DT[[i]])) {
-        DT[[i]][, ANNEE := yr]
-      }
-      i <- i + 1L
-    }
-  }
-  DT <- rbindlist(DT)
-  DT <- DT[  # Indiquer la 1re et la dernière année inscrite
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
-    keyby = .(DENOM, DIN, TENEUR)
-  ]
-
-  # Ajouter le nom de la teneur
-  DT <- nom_teneur[DT, on = .(TENEUR)]
-  setcolorder(DT, c("DENOM", "DIN", "TENEUR", "NOM_TENEUR", "DEBUT", "FIN"))
-  setkey(DT, DENOM, DIN, TENEUR)
-
-  return(DT)
-
-}
-denom_din_format <- function() {
+denom_din_teneur_format <- function() {
 
   years <- 1996:year(Sys.Date())
+
+  # Format d'acquisition du médicament
   DT <- vector("list", length(years) * 12)
   i <- 1L
   for (yr in years) {
@@ -316,22 +272,64 @@ denom_din_format <- function() {
         "    SMED_COD_DIN as DIN,\n",
         "    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ\n",
         "from PROD.V_DEM_PAIMT_MED_CM\n",
-        "where MED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
-        "    and SMED_COD_FORMA_ACQ_MED is not null;"
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
       if (nrow(DT[[i]])) {
         DT[[i]][, ANNEE := yr]
+      } else {
+        DT[[i]] <- NULL
       }
       i <- i + 1L
     }
   }
-  DT <- rbindlist(DT)
+  format_acq <- rbindlist(DT)
+  format_acq <- unique(format_acq)
+  format_acq[, FORMAT_ACQ := as.integer(FORMAT_ACQ)]
+
+  # Teneur du médicament
+  nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_TENR_MED as TENEUR,\n",
+    "       NMED_NOM_TENR as NOM_TENEUR\n",
+    "from PROD.V_TENR_MED;"
+  )))
+  nom_teneur[, TENEUR := as.integer(TENEUR)]
+  setkey(nom_teneur, TENEUR)
+
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    SMED_COD_DENOM_COMNE as DENOM,\n",
+        "    SMED_COD_DIN as DIN,\n",
+        "    SMED_COD_TENR_MED as TENEUR\n",
+        "from PROD.V_DEM_PAIMT_MED_CM\n",
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+      )))
+      if (nrow(DT[[i]])) {
+        DT[[i]][, ANNEE := yr]
+      } else {
+        DT[[i]] <- NULL
+      }
+      i <- i + 1L
+    }
+  }
+  teneur <- rbindlist(DT)
+  teneur <- unique(teneur)
+
+  ### Merge des formats et des teneur
+  DT <- merge(
+    format_acq, teneur,
+    by = c("DENOM", "DIN", "ANNEE"),
+    all = TRUE
+  )
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM, DIN, FORMAT_ACQ)
+    .(DENOM, DIN, TENEUR, FORMAT_ACQ)
   ]
-  setkey(DT, DENOM, DIN, FORMAT_ACQ)
+  setkey(DT, DENOM, DIN, TENEUR, FORMAT_ACQ)
 
   return(DT)
 
@@ -365,7 +363,7 @@ cod_serv <- function() {
   DT <- vector("list", length(to_year) * 3)  # contiendra les tableaux des requêtes
   i <- 1L
   for (c_serv in 1:3) {  # codes de service 1 à 3
-    for (yr in 1996:year(Sys.Date())) {  # mininum DAT_SERV de V_DEM_PAIMT_MED_CM = 1996-01-01
+    for (yr in to_year) {  # mininum DAT_SERV de V_DEM_PAIMT_MED_CM = 1996-01-01
       dt <- as.data.table(dbGetQuery(  # liste unique des codes de service
         conn, paste0(
           "select distinct SMED_COD_SERV_",c_serv," as COD_SERV\n",
@@ -452,7 +450,7 @@ V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
 conn <- odbc::dbDisconnect(conn)
 # COD_AHFS
 conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()()
+V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
 conn <- odbc::dbDisconnect(conn)
 # COD_DENOM_COMNE
 conn <- SQL_connexion(user, pwd)
@@ -462,13 +460,9 @@ conn <- odbc::dbDisconnect(conn)
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
 conn <- odbc::dbDisconnect(conn)
-# DENOM_DIN_TENEUR
+# DENOM_DIN_TENEUR_FORMAT
 conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR <- denom_din_teneur()
-conn <- odbc::dbDisconnect(conn)
-# DENOM_DIN_FORMAT
-conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$DENOM_DIN_FORMAT <- denom_din_format()
+V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORMAT <- denom_din_teneur_format()
 conn <- odbc::dbDisconnect(conn)
 # COD_SERV
 conn <- SQL_connexion(user, pwd)
@@ -489,7 +483,6 @@ conn <- SQL_connexion(user, pwd)
 new_denom <- V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)][
   !inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE[, .(DENOM)], on = .(DENOM)
 ]
-new_denom <- data.table(DENOM = c('00046', '00062', '00067', '46278'))
 if (nrow(new_denom)) {
   # Ajouter la 1re date inscrite dans la base de données pour les nouveaux new_denom
   new_denom <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -517,28 +510,28 @@ conn <- odbc::dbDisconnect(conn)
 
 # Envoyer courriel --------------------------------------------------------
 
-if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
-  # des_court_indcn_recnu
-
-  if (nrow(new_denom)) {
-    # Envoyer un courriel
-    outlook_mail(to = mail_to,
-                 subject = "new_values_DENOM",
-                 body = paste0("Ceci est un message automatisé.\n\n",
-                               "DENOM - Codes de dénomination commune\n",
-                               "Il y a eu des nouvelles valeurs entre le ",
-                               old_date," et le ",Sys.Date(),".\n",
-                               "Voir le fichier en pièce jointe."),
-                 attachments = paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
-  } else {
-    outlook_mail(to = mail_to,
-                 subject = "new_values_DENOM",
-                 body = paste0("Ceci est un message automatisé.\n\n",
-                               "DENOM - Codes de dénomination commune\n",
-                               "Il n'y a pas eu de nouvelle valeurs entre le ",
-                               old_date," et le ",Sys.Date(),"."))
-  }
-}
+# if (send_mail && is.character(mail_to) && length(mail_to) >= 1) {
+#   # des_court_indcn_recnu
+#
+#   if (nrow(new_denom)) {
+#     # Envoyer un courriel
+#     outlook_mail(to = mail_to,
+#                  subject = "new_values_DENOM",
+#                  body = paste0("Ceci est un message automatisé.\n\n",
+#                                "DENOM - Codes de dénomination commune\n",
+#                                "Il y a eu des nouvelles valeurs entre le ",
+#                                old_date," et le ",Sys.Date(),".\n",
+#                                "Voir le fichier en pièce jointe."),
+#                  attachments = paste0("C:/Users/ms045/Desktop/saveAuto/new_denom_",Sys.Date(),".xlsx"))
+#   } else {
+#     outlook_mail(to = mail_to,
+#                  subject = "new_values_DENOM",
+#                  body = paste0("Ceci est un message automatisé.\n\n",
+#                                "DENOM - Codes de dénomination commune\n",
+#                                "Il n'y a pas eu de nouvelle valeurs entre le ",
+#                                old_date," et le ",Sys.Date(),"."))
+#   }
+# }
 
 
 

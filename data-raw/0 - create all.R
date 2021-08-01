@@ -4,11 +4,11 @@ load("C:/Users/ms045/Desktop/saveAuto/SQLconn_params.rda")  # Paramètres de con
 if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
 if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
 
-send_mail <- TRUE
-mail_to <- c(
-  "guillaume.boucher@inesss.qc.ca"
-  # "françois-xavier.houde@inesss.qc.ca"
-)
+# send_mail <- TRUE
+# mail_to <- c(
+#   "guillaume.boucher@inesss.qc.ca"
+#   # "françois-xavier.houde@inesss.qc.ca"
+# )
 
 files <- c(
   "CIM.R",

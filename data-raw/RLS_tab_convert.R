@@ -23,4 +23,4 @@ attr(RLS_tab_convert, "MaJ") <- Sys.Date()
 
 use_data(RLS_tab_convert, overwrite = TRUE)
 
-rm(RLS_tab_convert)
+rm(RLS_tab_convert, RLS_double)
