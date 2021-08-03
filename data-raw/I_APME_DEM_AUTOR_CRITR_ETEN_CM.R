@@ -36,8 +36,8 @@ des_court_indcn_recnu <- function() {
       for (mth in 1:12) {
         DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
           "select distinct\n",
-          "    APME_COD_DENOM_COMNE_DEM as COD_DENOM_COMNE_DEM,\n",
-          "    APME_COD_DIN_DEM as COD_DIN_DEM,\n",
+          "    APME_COD_DENOM_COMNE_DEM as DENOM_DEM,\n",
+          "    APME_COD_DIN_DEM as DIN_DEM,\n",
           "    extract(year from APME_DAT_STA_DEM_PME) as ANNEE,\n",
           "    extract(month from APME_DAT_STA_DEM_PME) as MOIS,\n",
           "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
@@ -50,7 +50,7 @@ des_court_indcn_recnu <- function() {
       }
     }
     DT <- rbindlist(DT)
-    setkey(DT, COD_DENOM_COMNE_DEM, COD_DIN_DEM, ANNEE, MOIS)
+    setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
 
     return(DT)
   }

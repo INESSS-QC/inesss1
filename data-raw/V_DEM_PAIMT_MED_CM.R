@@ -257,7 +257,7 @@ cod_din <- function() {
   }
 
 }
-denom_din_teneur_format <- function() {
+denom_din_teneur_forme <- function() {
 
   years <- 1996:year(Sys.Date())
 
@@ -270,7 +270,7 @@ denom_din_teneur_format <- function() {
         "select distinct\n",
         "    SMED_COD_DENOM_COMNE as DENOM,\n",
         "    SMED_COD_DIN as DIN,\n",
-        "    SMED_COD_FORMA_ACQ_MED as FORMAT_ACQ\n",
+        "    SMED_COD_FORME_MED as FORME\n",
         "from PROD.V_DEM_PAIMT_MED_CM\n",
         "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
@@ -282,9 +282,9 @@ denom_din_teneur_format <- function() {
       i <- i + 1L
     }
   }
-  format_acq <- rbindlist(DT)
-  format_acq <- unique(format_acq)
-  format_acq[, FORMAT_ACQ := as.integer(FORMAT_ACQ)]
+  forme <- rbindlist(DT)
+  forme <- unique(forme)
+  forme[, FORME := as.integer(FORME)]
 
   # Teneur du médicament
   nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -320,16 +320,16 @@ denom_din_teneur_format <- function() {
 
   ### Merge des formats et des teneur
   DT <- merge(
-    format_acq, teneur,
+    forme, teneur,
     by = c("DENOM", "DIN", "ANNEE"),
     all = TRUE
   )
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM, DIN, TENEUR, FORMAT_ACQ)
+    .(DENOM, DIN, TENEUR, FORME)
   ]
-  setkey(DT, DENOM, DIN, TENEUR, FORMAT_ACQ)
+  setkey(DT, DENOM, DIN, TENEUR, FORME)
 
   return(DT)
 
@@ -460,9 +460,9 @@ conn <- odbc::dbDisconnect(conn)
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
 conn <- odbc::dbDisconnect(conn)
-# DENOM_DIN_TENEUR_FORMAT
+# DENOM_DIN_TENEUR_FORME
 conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORMAT <- denom_din_teneur_format()
+V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME <- denom_din_teneur_forme()
 conn <- odbc::dbDisconnect(conn)
 # COD_SERV
 conn <- SQL_connexion(user, pwd)
