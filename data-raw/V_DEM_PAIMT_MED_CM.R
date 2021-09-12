@@ -76,7 +76,8 @@ denom_din_ahfs <- function() {
         FIN = max(ANNEE)),
     .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
-  setkey(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
+  setorder(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
+           na.last = TRUE)
 
   ### Ajouter les noms (les plus récents)
   colorder <- names(DT)
@@ -128,7 +129,8 @@ cod_ahfs <- function() {
   ### Ajouter la description
   DT <- ahfs_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
 
-  setkey(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
+  setorder(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
+           na.last = TRUE)
 
   return(DT)
 
@@ -188,7 +190,7 @@ cod_denom <- function() {
       .(DENOM, NOM_DENOM)
     ]
 
-    setkey(DT, DENOM, DEBUT)
+    setorder(DT, DENOM, DEBUT, na.last = TRUE)
     return(DT)
   }
 
@@ -260,8 +262,19 @@ cod_din <- function() {
 denom_din_teneur_forme <- function() {
 
   years <- 1996:year(Sys.Date())
+  years <- 2019:2020
 
-  # Format d'acquisition du médicament
+  # Nom des formats
+  nom_forme <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_FORME_MED as FORME,\n",
+    "   	  NMED_NOM_FORME as NOM_FORME\n",
+    "from V_FORME_MED\n",
+    "order by FORME;"
+  )))
+  nom_forme[, FORME := as.integer(FORME)]
+  setkey(nom_forme, FORME)
+
+  # Forme des médicaments
   DT <- vector("list", length(years) * 12)
   i <- 1L
   for (yr in years) {
@@ -283,8 +296,12 @@ denom_din_teneur_forme <- function() {
     }
   }
   forme <- rbindlist(DT)
+  setkey(forme, DENOM, DIN, FORME, ANNEE)
   forme <- unique(forme)
   forme[, FORME := as.integer(FORME)]
+
+  # Ajouter le nom des formes
+  forme <- nom_forme[forme, on = .(FORME)]
 
   # Teneur du médicament
   nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -316,7 +333,12 @@ denom_din_teneur_forme <- function() {
     }
   }
   teneur <- rbindlist(DT)
+  teneur[, TENEUR := as.integer(TENEUR)]
   teneur <- unique(teneur)
+  setkey(teneur, DENOM, DIN, TENEUR, ANNEE)
+
+  # Ajouter le nom des teneur
+  teneur <- nom_teneur[teneur, on = .(TENEUR)]
 
   ### Merge des formats et des teneur
   DT <- merge(
@@ -327,9 +349,10 @@ denom_din_teneur_forme <- function() {
   DT <- DT[
     , .(DEBUT = min(ANNEE),
         FIN = max(ANNEE)),
-    .(DENOM, DIN, TENEUR, FORME)
+    .(DENOM, DIN, TENEUR, NOM_TENEUR, FORME, NOM_FORME)
   ]
-  setkey(DT, DENOM, DIN, TENEUR, FORME)
+  setorder(DT, DENOM, DIN, TENEUR, FORME,
+           na.last = TRUE)
 
   return(DT)
 
@@ -399,7 +422,7 @@ cod_serv <- function() {
   setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
   DT[, COD_SERV := str_remove_all(COD_SERV, " ")]  # supprimer espaces
 
-  setkey(DT, COD_SERV, SERV_1)
+  setorder(DT, COD_SERV, SERV_1, na.last = TRUE)
 
   return(DT)
 
