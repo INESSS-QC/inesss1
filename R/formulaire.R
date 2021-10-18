@@ -72,7 +72,7 @@ formulaire <- function() {
   }
   renderDataTable_options <- function() {
     return(list(
-      lengthMenu = list(c(25, 100, -1), c("25", "100", "All")),
+      lengthMenu = list(c(25, 100, -1), c("25", "100", "Tout")),
       pageLength = 100,
       scrollX = TRUE,
       searching = FALSE
@@ -1596,7 +1596,50 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", "Chaîne de caractères")
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom",
+                        "DENOM_DEM")
+            ),
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din",
+                        "DIN_DEM")
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
+                          "Début période - Année",
+                          choices = c(max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
+                          selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+            ),
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
+                          "Début période - Mois",
+                          choices = 1:12, selected = 1)
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
+                          "Fin période - Année",
+                          choices = max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
+                          selected = data.table::year(Sys.Date()))
+            ),
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
+                          "Fin période - Mois",
+                          choices = 1:12, selected = data.table::month(Sys.Date()))
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search",
+                        "DES_COURT_INDCN_RECNU")
             )
           ),
           fluidRow(
@@ -1605,7 +1648,8 @@ formulaire <- function() {
           ),
           div(style = "margin-top:15px"),
           fluidRow(
-            column(4, shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+            column(4, shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save",
+                                      "Sauvegarder Résultats en Excel",
                                       "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
                                       filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
                                       viewtype = "list",
@@ -1618,14 +1662,20 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU", "NO_SEQ_INDCN_RECNU"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM", "DD_TRAIT_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR", "DD_AUTOR"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR", "DD_APLIC_AUTOR"),
-              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset", "Réinitialiser",
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU",
+                        "NO_SEQ_INDCN_RECNU"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM",
+                        "DD_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR",
+                        "DD_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR",
+                        "DD_APLIC_AUTOR"),
+              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset",
+                           "Réinitialiser",
                            style = reset_button_style()),
               div(style = "margin-top:15px"),
-              shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+              shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save",
+                              "Sauvegarder Résultats en Excel",
                               "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
                               filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
                               viewtype = "list",
@@ -1633,10 +1683,14 @@ formulaire <- function() {
             ),
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM", "DAT_STA_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM", "DF_TRAIT_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR", "DF_AUTOR"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR", "DF_APLIC_AUTOR")
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM",
+                        "DAT_STA_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM",
+                        "DF_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR",
+                        "DF_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR",
+                        "DF_APLIC_AUTOR")
             )
           ),
           div(style = "margin-top:20px")
@@ -1651,6 +1705,7 @@ formulaire <- function() {
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- reactive({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
+        # Rechercher les mots-clés de DES_COURT_INDCN_RECNU
         search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
                                                   "\\+"))
         if (length(search_words) == 1 && search_words == "") {
@@ -1662,6 +1717,35 @@ formulaire <- function() {
             DT[, paste(i) := NULL]
           }
         }
+        # Rechercher les DENOM_DEM
+        denom_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom,
+                                                  "\\+"))
+        if (length(denom_words) == 1 && denom_words == "") {
+          # rien pour le moment...
+        } else {
+          for (i in 1:length(denom_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(DENOM_DEM), tolower(denom_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        # Rechercher les DIN_DEM
+        din_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din,
+                                                 "\\+"))
+        if (length(din_words) == 1 && din_words == "") {
+          # rien pour le moment...
+        } else {
+          for (i in 1:length(din_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(DIN_DEM), tolower(din_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        # Période d'étude à analyser
+        DT <- DT[ANNEE >= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut) &
+                   MOIS >= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut) &
+                   ANNEE <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin) &
+                   MOIS <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin)]
         return(DT)
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
@@ -1688,6 +1772,16 @@ formulaire <- function() {
                                                                 options = renderDataTable_options())
     # Réinitialisation
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom", selected = "")
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din", selected = "")
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
+                        selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
+                        selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MOIS))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
+                        selected = max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
+                        selected = data.table::month(Sys.Date()))
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", value = "")
     })
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset, {
@@ -1824,7 +1918,7 @@ formulaire <- function() {
           ),
           fluidRow(
             column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser",
-                         style = reset_button_style()))
+                                   style = reset_button_style()))
 
           ),
           div(style = "margin-top:15px"),
