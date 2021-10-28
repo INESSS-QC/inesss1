@@ -590,8 +590,9 @@ formulaire <- function() {
       }
     }
 
-    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs & debut <= fin
     if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
+      # Même nombre de valeurs
       lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
       lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
       if (lng_deb != lng_fin) {  # si le nbre de valeurs est différent
@@ -601,6 +602,16 @@ formulaire <- function() {
         }
         msg_error <- paste0(msg_error,
                             " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
+        )
+      }
+      # Debut <= Fin
+      if (any(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " ") > stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  DATE_DEBUT doit être plus petit ou égal à DATE_FIN.\n"
         )
       }
     }
@@ -815,7 +826,7 @@ formulaire <- function() {
       }
     }
 
-    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs & Debut <= Fin
     if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
       lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
       lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
@@ -828,6 +839,17 @@ formulaire <- function() {
                             " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
         )
       }
+      # Debut <= Fin
+      if (any(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " ") > stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  DATE_DEBUT doit être plus petit ou égal à DATE_FIN.\n"
+        )
+      }
+
     }
 
     # TYPE_RX, CODE_SERV_FILTRE, CODE_LIST_FILTRE
@@ -1610,8 +1632,8 @@ formulaire <- function() {
               width = 4,
               selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
                           "Début période - Année",
-                          choices = c(max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
-                          selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+                          choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
+                          selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
             ),
             column(
               width = 4,
@@ -1625,7 +1647,7 @@ formulaire <- function() {
               width = 4,
               selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
                           "Fin période - Année",
-                          choices = max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
+                          choices = max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
                           selected = data.table::year(Sys.Date()))
             ),
             column(
@@ -1705,6 +1727,7 @@ formulaire <- function() {
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- reactive({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
+        setkey(DT, DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU, ANNEE, MOIS)
         # Rechercher les mots-clés de DES_COURT_INDCN_RECNU
         search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
                                                   "\\+"))
@@ -1746,6 +1769,13 @@ formulaire <- function() {
                    MOIS >= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut) &
                    ANNEE <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin) &
                    MOIS <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin)]
+        # Regrouper ensemble les dates continues dans le temps
+        DT[, DATE := paste0(ANNEE,"-",stringr::str_pad(MOIS, 2, "left", "0")), .(DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU)]
+        DT <- DT[
+          , .(DEBUT = first(DATE),
+              FIN = last(DATE)),
+          .(DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU)
+        ]
         return(DT)
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
@@ -1775,11 +1805,11 @@ formulaire <- function() {
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom", selected = "")
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din", selected = "")
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
-                        selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+                        selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
-                        selected = min(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MOIS))
+                        selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MOIS))
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
-                        selected = max(I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+                        selected = max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
                         selected = data.table::month(Sys.Date()))
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", value = "")

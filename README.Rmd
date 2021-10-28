@@ -44,7 +44,8 @@ Pour des questions, des commentaires ou pour désigner tout défaut de conceptio
 # Installation de la librairie *inesss*
 
 * Télécharger le fichier *inesss_x.y.z.tar.gz* sur votre poste où *x.y.z* est le numéro de version.
-* Copier le code suivant dans la console de RStudio en prenant bien soin d'y inscrire le répertoire complet et le nom du fichier.
+* Copier le code suivant dans la console de RStudio en prenant bien soin d'y inscrire le répertoire complet et le nom du fichier (**ne pas copier l'exemple**).
+  + Remplacer les `\` par `/` ou `\\`
 ```{r, echo=TRUE, eval=FALSE}
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
 remotes::install_local("Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz", upgrade = "never")

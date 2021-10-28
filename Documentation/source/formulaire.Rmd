@@ -340,7 +340,7 @@ Un onglet résultat contient trois (3) éléments :
 
 ### Exemples {#ns1_exemples}
 
-#### ex02 --- GROUPER_PAR
+#### ex01 --- GROUPER_PAR
 
 \textcolor{white}{.  }
 
@@ -436,93 +436,7 @@ order by AHFS_CLA, AHFS_SCLA, AHFS_SSCLA, DENOM, DIN, CODE_SERV, CODE_LIST, TENE
 
 \pagebreak
 
-#### ex03 --- DENOM
-
-\textcolor{white}{.  }
-
-**Arguments :**
-
-```{r}
-ll <- list(
-  METHODE = "naif_switch1",
-  DATE_DEBUT = c("2018-01-01", "2019-01-01"), DATE_FIN = c("2018-12-31", "2019-12-31"),
-  TYPE_RX = "DENOM", CODE_RX = c(39, 47092, 47135),
-  GROUPER_PAR = "DENOM",
-  TYPE_RX_RETRO = NA, RX_RETROSPECT_A_EXCLURE = NA, NJOURS_SANS_CONSO = 365,
-  CODE_SERV_FILTRE = "Exclusion", CODE_SERV = "1",
-  CODE_LIST_FILTRE = "Inclusion", CODE_LIST = NA,
-  AGE_DATE = NA
-)
-method_args <- replace_NA_in_dt(list_as_dt_no_recycled(ll), by = "")
-kable_tab(method_args)
-```
-
-**Code SQL :** Seulement le code SQL de la première période est affiché.
-
-```{r, eval=FALSE}
-# Code SQL à exécuter, puis copier-coller dans le chunk SQL ci-dessous
-cat(query_naif_switch1(
-  debut = ll$DATE_DEBUT[1], fin = ll$DATE_FIN[1],
-  type_Rx = ll$TYPE_RX, codes = ll$CODE_RX, group_by = NULL_if_NA(ll$GROUPER_PAR),
-  type_Rx_retro = NULL_if_NA(ll$TYPE_RX_RETRO),
-  rx_retrospect_a_exclure = NULL_if_NA(ll$RX_RETROSPECT_A_EXCLURE),
-  njours_sans_conso = ll$NJOURS_SANS_CONSO,
-  code_serv = NULL_if_NA(ll$CODE_SERV), code_serv_filtre = NULL_if_NA(ll$CODE_SERV_FILTRE),
-  code_list = NULL_if_NA(ll$CODE_LIST), code_list_filtre = NULL_if_NA(ll$CODE_LIST_FILTRE),
-  age_date = NULL_if_NA(ll$AGE_DATE)
-))
-```
-
-```{sql, echo=TRUE, eval=FALSE}
-with ALL_USER as (
-    select
-        SMED_NO_INDIV_BEN_BANLS as ID,
-        min(SMED_DAT_SERV) as DATE_INDEX
-    from V_DEM_PAIMT_MED_CM
-    where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
-        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
-        and SMED_NBR_JR_DUREE_TRAIT > 0
-    group by ID
-),
-OLD_USER as (
-    select distinct ID
-    from ALL_USER as A left join V_DEM_PAIMT_MED_CM as V
-        on A.ID = V.SMED_NO_INDIV_BEN_BANLS
-    where SMED_DAT_SERV between (DATE_INDEX - 365) and (DATE_INDEX - 1)
-        and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
-        and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
-        and SMED_NBR_JR_DUREE_TRAIT > 0
-),
-NAIF_SWITCH_COHORT as (
-    select ID from ALL_USER
-    except
-    select ID from OLD_USER
-)
-select
-    '2018-01-01' as DATE_DEBUT,
-    '2018-12-31' as DATE_FIN,
-    SMED_COD_DENOM_COMNE as DENOM,
-    sum(SMED_MNT_AUTOR_MED) as MNT_MED,
-    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,
-    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,
-    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,
-    count(*) as NBRE_RX,
-    sum(SMED_QTE_MED) as QTE_MED,
-    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX
-from PROD.V_DEM_PAIMT_MED_CM
-where SMED_DAT_SERV between '2018-01-01' and '2018-12-31'
-    and SMED_NO_INDIV_BEN_BANLS in (select ID from NAIF_SWITCH_COHORT)
-    and SMED_COD_DENOM_COMNE in ('00039', '47092', '47135')
-    and (SMED_COD_SERV_1 not in ('1') or SMED_COD_SERV_1 is null)
-    and SMED_NBR_JR_DUREE_TRAIT > 0
-group by DENOM
-order by DENOM;
-```
-
-\pagebreak
-
-#### ex04 --- DIN
+#### ex02 --- DIN
 
 \textcolor{white}{.  }
 
@@ -608,7 +522,7 @@ order by DIN;
 
 \pagebreak
 
-#### ex05 --- Exclusion AHFS
+#### ex03 --- Exclusion AHFS
 
 \textcolor{white}{.  }
 
@@ -697,7 +611,7 @@ order by DENOM;
 
 \pagebreak
 
-#### ex06 --- Exclusion DENOM
+#### ex04 --- Exclusion DENOM
 
 \textcolor{white}{.  }
 
@@ -783,7 +697,7 @@ order by DENOM;
 
 \pagebreak
 
-#### ex07 --- Exclusion DIN
+#### ex05 --- Exclusion DIN
 
 \textcolor{white}{.  }
 
@@ -870,7 +784,7 @@ order by DENOM, DIN;
 
 \pagebreak
 
-#### ex08 --- Age
+#### ex06 --- Age
 
 \textcolor{white}{.  }
 
@@ -957,7 +871,7 @@ order by DIN, AGE;
 
 \pagebreak
 
-#### ex09 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
+#### ex07 --- Exclusion et Inclusion - `CODE_SERV` et `CODE_LIST`
 
 \textcolor{white}{.  }
 

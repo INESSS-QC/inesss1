@@ -1,4 +1,4 @@
-inesss 1.0.0.9000
+inesss 1.0.0.9006
 
 # Support
 
@@ -11,7 +11,9 @@ indiquer l’objet `librairie inesss`.
 -   Télécharger le fichier *inesss_x.y.z.tar.gz* sur votre poste où
     *x.y.z* est le numéro de version.
 -   Copier le code suivant dans la console de RStudio en prenant bien
-    soin d’y inscrire le répertoire complet et le nom du fichier.
+    soin d’y inscrire le répertoire complet et le nom du fichier (**ne
+    pas copier l’exemple**).
+    -   Remplacer les `\` par `/` ou `\\`
 
 ``` r
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
@@ -55,17 +57,17 @@ library(inesss)
 
 ## R
 
-R version 4.0.5 (2021-03-31)
+R version 4.1.0 (2021-05-18)
 
 ## Librairies
 
 `askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
-v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.32<br> `lubridate`
-v.1.7.10<br> `miniUI` v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc`
-v.1.3.2<br> `readxl` v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi`
-v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles`
-v.0.9.0<br> `stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl`
-v.1.4.0
+v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.33<br> `lubridate`
+v.1.7.10<br> `miniUI` v.0.1.1.1<br> `parallel` v.4.1.0<br> `odbc`
+v.1.3.2<br> `Rd2md` v.0.0.5<br> `readxl` v.1.3.1<br> `rmarkdown`
+v.2.9<br> `rstudioapi` v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard`
+v.0.7.1<br> `shinyFiles` v.0.9.0<br> `stringr` v.1.4.0<br> `testthat`
+v.3.0.4<br> `writexl` v.1.4.0
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
