@@ -20,7 +20,6 @@
 #' @encoding UTF-8
 #' @import data.table
 #' @export
-#' @inherit SQL_comorbidity_diagn examples
 SQL_reperage_cond_med <- function(
   conn = SQL_connexion(),
   debut, fin,
@@ -125,7 +124,7 @@ SQL_reperage_cond_med <- function(
     Dx_recent <- NULL
   }
 
-  if (!is.null(Dx_Recent)) {
+  if (!is.null(Dx_recent)) {
     setkey(Dx_recent)
     if (by_Dx) {
       Dx_recent <- Dx_recent[, .SD[.N], .(ID, DIAGN)][, .(ID, DIAGN, D_Recent = DATE_DX)]
@@ -135,7 +134,7 @@ SQL_reperage_cond_med <- function(
   }
 
   ### Combiner les datasets pour table finale
-  if (is.null(Dx_Recent)) {
+  if (is.null(Dx_recent)) {
     return(NULL)
   } else {
     dt_final <- copy(Dx_recent)

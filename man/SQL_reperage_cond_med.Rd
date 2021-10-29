@@ -66,19 +66,3 @@ Repérage d'une condition médicale.
 \details{
 Détails à venir.
 }
-\examples{
-### Inscription des codes de diagnostics dans Dx_table
-# 1 code CIM9 ou CIM10
-liste1 = list(CIM9 = "413")
-liste2 = list(CIM10 = "I20")
-# 1 code de chaque
-liste3 = list(CIM9 = "413", CIM10 = "I20")
-# Plusieurs codes qui se suivent
-liste4 = list(CIM9 = 410:414, CIM10 = paste0("I", 21:25))
-# Codes qui ne se suivent pas
-liste5 = list(CIM9 = c(410, 412, 414), CIM10 = paste0("I", 21, 23, 25))
-# Codes qui se suivent et qui ne se suivent pas
-liste6 = list(CIM9 = c(405:410, 412:414),
-              CIM10 = c(paste0("I", c(18:21, 23:25)),
-                        paste0("K0", c(5:9)), paste0("K", 10:15)))
-}

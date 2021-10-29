@@ -67,13 +67,15 @@ SQL_comorbidity_diagn <- function(
     # Ajouter des pourcentages aux codes s'il n'y en a pas
     for (i in 1:length(Dx_table)) {
       for (j in 1:2) {
-        Dx_table[[i]][[j]] <- sapply(Dx_table[[i]][[j]], function(x) {
-          if (!str_detect(x, "%")) {
-            return(paste0(x, "%"))
-          } else {
-            return(x)
-          }
-        })
+        if (length(Dx_table[[i]][[j]])) {
+          Dx_table[[i]][[j]] <- sapply(Dx_table[[i]][[j]], function(x) {
+            if (!stringr::str_detect(x, "%")) {
+              return(paste0(x, "%"))
+            } else {
+              return(x)
+            }
+          })
+        }
       }
     }
     # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
