@@ -476,13 +476,17 @@ Charlson_Dx_UManitoba16 <- list(
   )
 )
 
+
+# Charlson_Dx_CCI_INSPQ_Manitoba --------------------------------------------------------------
+
+Charlson_Dx_CCI_INSPQ_Manitoba <- readRDS("inst/extdata/Charlson_Dx_CCI_INSPQ_Manitoba_2021-10-31.rds")
+
 # SQL regex ---------------------------------------------------------------
 
 ### Ajouter un '%' après chaque code pour pouvoir les utiliser dans du SQL regex
-for (k in c("Combine_Dx_CCI_INSPQ18",
-            "Charlson_Dx_CCI_INSPQ18",
-            "Elixhauser_Dx_CCI_INSPQ18",
-            "Charlson_Dx_UManitoba16")) {
+for (k in c("Combine_Dx_CCI_INSPQ18", "Charlson_Dx_CCI_INSPQ18", "Elixhauser_Dx_CCI_INSPQ18", "Charlson_Dx_UManitoba16"
+            # "Charlson_Dx_CCI_INSPQ_Manitoba"
+            )) {
   dt <- get(k)
   for (i in 1:length(dt)) {
     for (j in c("CIM9", "CIM10")) {
@@ -499,12 +503,15 @@ attr(Combine_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Charlson_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Elixhauser_Dx_CCI_INSPQ18, "MaJ") <- Sys.Date()
 attr(Charlson_Dx_UManitoba16, "MaJ") <- Sys.Date()
+attr(Charlson_Dx_CCI_INSPQ_Manitoba, "MaJ") <- Sys.Date()
 
 use_data(Combine_Dx_CCI_INSPQ18,
          Charlson_Dx_CCI_INSPQ18,
          Elixhauser_Dx_CCI_INSPQ18,
          Charlson_Dx_UManitoba16,
+         Charlson_Dx_CCI_INSPQ_Manitoba,
 
          overwrite = TRUE)
 
-rm(Combine_Dx_CCI_INSPQ18, Charlson_Dx_CCI_INSPQ18, Elixhauser_Dx_CCI_INSPQ18, Charlson_Dx_UManitoba16)
+rm(Combine_Dx_CCI_INSPQ18, Charlson_Dx_CCI_INSPQ18, Elixhauser_Dx_CCI_INSPQ18, Charlson_Dx_UManitoba16,
+   Charlson_Dx_CCI_INSPQ_Manitoba)

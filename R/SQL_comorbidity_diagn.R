@@ -172,6 +172,8 @@ SQL_comorbidity_diagn.select_Dx_table <- function(Dx_table) {
     return(inesss::Elixhauser_Dx_CCI_INSPQ18)
   } else if (Dx_table == "Charlson_Dx_UManitoba16") {
     return(inesss::Charlson_Dx_UManitoba16)
+  } else if (Dx_table == "Charlson_Dx_CCI_INSPQ_Manitoba") {
+    return(inesss::Charlson_Dx_CCI_INSPQ_Manitoba)
   } else {
     stop("SQL_comorbidity_diagn.select_Dx_table(): Dx_table ne contient pas une valeur permise.")
   }
