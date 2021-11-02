@@ -70,7 +70,7 @@ SQL_comorbidity <- function(
     }
 
     ### Cohorte d'étude
-    cohort <- dt$ID
+    cohort <- sort(dt$ID)
 
     ### Extraction des diagnostics dans les années désirées
     DIAGN <- SQL_comorbidity_diagn(

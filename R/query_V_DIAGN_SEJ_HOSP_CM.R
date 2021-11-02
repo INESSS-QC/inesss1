@@ -51,8 +51,10 @@ query_V_DIAGN_SEJ_HOSP_CM.date_dx_var <- function(date_dx_var) {
 #' @encoding UTF-8
 #' @keywords internal
 query_V_DIAGN_SEJ_HOSP_CM.where_diagn <- function(diagn) {
+
   cim9 <- diagn$CIM9
   cim10 <- diagn$CIM10
+
   if (length(cim9) && length(cim10)) {
     # CIM9 et CIM10
     return(paste0(

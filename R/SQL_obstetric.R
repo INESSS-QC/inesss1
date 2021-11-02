@@ -36,14 +36,10 @@ SQL_obstetric <- function(
     # CIM9 vs CIM10 -- Filtrer les types de codes si on veut seulement une version
     # de classification de code.
     diagn_codes <- inesss::Obstetrics_Dx
-    if (length(CIM) == 1) {
-      for (i in names(diagn_codes)) {
-        diagn_codes[[i]] <- diagn_codes[[i]][[CIM]]  # conserver seulement CIM9 ou CIM10
-      }
-    } else {
-      for (i in names(diagn_codes)) {
-        diagn_codes[[i]] <- unlist(diagn_codes[[i]], use.names = FALSE)  # grouper CIM9 et CIM10 en un seul vecteur
-      }
+    if (length(CIM) == 1 && CIM == "CIM9") {
+      diagn_codes$obstetric$CIM10 <- NULL
+    } else if (length(CIM) == 1 && CIM == "CIM10") {
+      diagn_codes$obstetric$CIM9 <- NULL
     }
 
     # Extraction des diagnostiques
