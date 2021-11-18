@@ -31,13 +31,7 @@ SQL_comorbidity_diagn(
 
 \item{fin}{Date de fin de la période d'étude au format \code{AAAA-MM-JJ}.}
 
-\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset (de la librairie \emph{inesss}) contenant la liste des codes de diagnostics à l'étude.
-\itemize{
-\item \code{'Combine_Dx_CCI_INSPQ18'}
-\item \code{'Charlson_Dx_CCI_INSPQ18'}
-\item \code{'Elixhauser_Dx_CCI_INSPQ18'}
-\item \code{'Charlson_Dx_UManitoba16'}
-}}
+\item{Dx_table}{\code{list} contenant les codes à analyser ou le nom d'une table qui est inclue dans la librairie.}
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 

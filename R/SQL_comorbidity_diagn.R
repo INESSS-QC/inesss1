@@ -14,6 +14,7 @@
 #' @param cohort Cohorte d'étude. Vecteur comprenant les numéros d'identification des individus à conserver.
 #' @param debut Date de début de la période d'étude au format `AAAA-MM-JJ`.
 #' @param fin Date de fin de la période d'étude au format `AAAA-MM-JJ`.
+#' @param Dx_table `list` contenant les codes à analyser ou le nom d'une table qui est inclue dans la librairie.
 #' @param CIM `'CIM9'`, `'CIM10'` ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la *Classification statistique internationale des maladies et des problèmes de santé connexes* (CIM).
 #' @param dt_source Vecteur comprenant la ou les bases de données où aller chercher l'information. Voir *Details*.
 #' @param dt_desc `list` décrivant les bases de données demandées dans `dt_source` au format `list(BD = 'MaDescription')`. Voir *Details*.
