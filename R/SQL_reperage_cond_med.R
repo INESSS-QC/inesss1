@@ -2,11 +2,12 @@
 #'
 #' Repérage d'une condition médicale.
 #'
-#' Détails à venir.
+#' **by_Dx :**\cr
+#' Supposons `Dx_table = list(Angoisse = [...], Trouble = [...], Deficience = [...])`. Si `TRUE`, il y aura la colonne `DIAGN` qui indiquera des dates pour chaque élément, soit *Angoisse*, *Trouble* et *Deficience*. Si `FALSE`, la colonne `DIAGN` est absente et l'algorithme est appliqué sur tous les codes de chaque élément. Cela reviendrait à écrire tous les codes sur une même ligne.
 #'
 #' @inheritParams SQL_diagn
 #' @inheritParams confirm_nDx
-#' @param by_Dx `TRUE` ou `FALSE`. Distinction entre les diagnostics (`TRUE`) ou pas (`FALSE`). La distinction des diagnostics implique une cohorte d'étude pour chaque élément de l'argument `Dx_table`, alors que `FALSE` tous les éléments sont réunis comme si c'était la même maladie.
+#' @param by_Dx `TRUE` ou `FALSE`. Distinction entre les diagnostics (`TRUE`) ou pas (`FALSE`). Si `TRUE`, on considère chaque élément de `Dx_table` où chaque élément peut contenir plusieurs codes. Le nombre d'éléments sera donc le nombre maximal d'observations (lignes résultats) par individu.\cr Si `FALSE`, on considère tous les éléments de `Dx_Table` comme un seul, on aura donc au maximum une ligne résultat par individu.\cr Voir Détails.
 #' @param keep_all `TRUE` ou `FALSE`. Par défaut `FALSE`.\cr`FALSE` supprime toutes les observations où `DI_Finale = NA`.\cr`TRUE` est utile si on cherche la date la plus récente pour chaque individu.
 #'
 #' @return `data.table` :
@@ -25,7 +26,7 @@ SQL_reperage_cond_med <- function(
   debut, fin,
   Dx_table,
   CIM = c("CIM9", "CIM10"),
-  by_Dx = FALSE,
+  by_Dx = TRUE,
   date_dx_var = "admis",
   n1 = 30, n2 = 730,
   keep_all = FALSE,
