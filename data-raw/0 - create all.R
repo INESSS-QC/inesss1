@@ -1,6 +1,7 @@
 library(inesss)
 
-load("C:/Users/ms045/Desktop/saveAuto/SQLconn_params.rda")  # Paramètres de connexion de MS045
+user <- "ms045"
+pwd <- "SQLpwd22/"
 if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
 if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
 
