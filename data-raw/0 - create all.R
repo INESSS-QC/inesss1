@@ -1,5 +1,7 @@
 library(inesss)
 
+user <- askpass::askpass("User")
+pwd <- askpass::askpass()
 if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
 if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
 
@@ -10,16 +12,16 @@ if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
 # )
 
 files <- c(
-  "CIM.R",
-  "Comorbidity_Dx.R",
-  "ComorbidityWeights.R",
-  "DBC_TablesV.R",
-  "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
-  "internal_datas.R",
-  "Obstetrics_Dx.R",
-  "Pop_QC.R",
-  "RLS_list.R",
-  "RLS_tab_convert.R",
+  # "CIM.R",
+  # "Comorbidity_Dx.R",
+  # "ComorbidityWeights.R",
+  # "DBC_TablesV.R",
+  # "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
+  # "internal_datas.R",
+  # "Obstetrics_Dx.R",
+  # "Pop_QC.R",
+  # "RLS_list.R",
+  # "RLS_tab_convert.R",
   "V_DEM_PAIMT_MED_CM.R",
   "V_DENOM_COMNE_MED.R",
   "V_DES_COD.R",
