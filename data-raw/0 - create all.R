@@ -1,7 +1,5 @@
 library(inesss)
 
-user <- "ms045"
-pwd <- "SQLpwd22/"
 if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
 if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
 
