@@ -1,9 +1,7 @@
 library(inesss)
 
 user <- askpass::askpass("User")
-pwd <- askpass::askpass()
-if (!exists("user")) stop("Créer argument 'user' : Identifiant Teradata.")
-if (!exists("pwd")) stop("Créer argument 'pwd' : Mot de passe Teradata.")
+pwd <- askpass::askpass("Mot de passe")
 
 # send_mail <- TRUE
 # mail_to <- c(
@@ -29,8 +27,14 @@ files <- c(
 )
 files <- paste0("data-raw/", files)
 
-t1 <- Sys.time()
-for (f in files) {
-  source(f, local = TRUE, encoding = "UTF-8")
+conn <- SQL_connexion(user, pwd)
+if (is.null(conn)) {
+  stop("User ou Mot de passe erroné.")
+} else if (class(conn)[1] == "Teradata") {
+  rm(conn)
+  t1 <- Sys.time()
+  for (f in files) {
+    source(f, local = TRUE, encoding = "UTF-8")
+  }
+  t2 <- Sys.time(); difftime(t2, t1)
 }
-t2 <- Sys.time(); difftime(t2, t1)
