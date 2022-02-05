@@ -11,12 +11,10 @@ SQL_reperage_cond_med(
   fin,
   Dx_table,
   CIM = c("CIM9", "CIM10"),
-  by_Dx = FALSE,
+  by_Dx = TRUE,
   date_dx_var = "admis",
   n1 = 30,
-  n2 = 730,
-  keep_all = FALSE,
-  verbose = TRUE
+  n2 = 730
 )
 }
 \arguments{
@@ -30,17 +28,13 @@ SQL_reperage_cond_med(
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
-\item{by_Dx}{\code{TRUE} ou \code{FALSE}. Distinction entre les diagnostics (\code{TRUE}) ou pas (\code{FALSE}). La distinction des diagnostics implique une cohorte d'étude pour chaque élément de l'argument \code{Dx_table}, alors que \code{FALSE} tous les éléments sont réunis comme si c'était la même maladie.}
+\item{by_Dx}{\code{TRUE} ou \code{FALSE}. Distinction entre les diagnostics (\code{TRUE}) ou pas (\code{FALSE}). Si \code{TRUE}, on considère chaque élément de \code{Dx_table} où chaque élément peut contenir plusieurs codes. Le nombre d'éléments sera donc le nombre maximal d'observations (lignes résultats) par individu.\cr Si \code{FALSE}, on considère tous les éléments de \code{Dx_Table} comme un seul, on aura donc au maximum une ligne résultat par individu.\cr Voir Détails.}
 
 \item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.}
 
 \item{n1}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
 
 \item{n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
-
-\item{keep_all}{\code{TRUE} ou \code{FALSE}. Par défaut \code{FALSE}.\cr\code{FALSE} supprime toutes les observations où \code{DI_Finale = NA}.\cr\code{TRUE} est utile si on cherche la date la plus récente pour chaque individu.}
-
-\item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 }
 \value{
 \code{data.table} :
@@ -58,5 +52,6 @@ SQL_reperage_cond_med(
 Repérage d'une condition médicale.
 }
 \details{
-Détails à venir.
+\strong{by_Dx :}\cr
+Supposons \verb{Dx_table = list(Angoisse = [...], Trouble = [...], Deficience = [...])}. Si \code{TRUE}, il y aura la colonne \code{DIAGN} qui indiquera des dates pour chaque élément, soit \emph{Angoisse}, \emph{Trouble} et \emph{Deficience}. Si \code{FALSE}, la colonne \code{DIAGN} est absente et l'algorithme est appliqué sur tous les codes de chaque élément. Cela reviendrait à écrire tous les codes sur une même ligne.
 }

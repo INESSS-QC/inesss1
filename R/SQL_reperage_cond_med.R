@@ -8,7 +8,6 @@
 #' @inheritParams SQL_diagn
 #' @inheritParams confirm_nDx
 #' @param by_Dx `TRUE` ou `FALSE`. Distinction entre les diagnostics (`TRUE`) ou pas (`FALSE`). Si `TRUE`, on considère chaque élément de `Dx_table` où chaque élément peut contenir plusieurs codes. Le nombre d'éléments sera donc le nombre maximal d'observations (lignes résultats) par individu.\cr Si `FALSE`, on considère tous les éléments de `Dx_Table` comme un seul, on aura donc au maximum une ligne résultat par individu.\cr Voir Détails.
-#' @param keep_all `TRUE` ou `FALSE`. Par défaut `FALSE`.\cr`FALSE` supprime toutes les observations où `DI_Finale = NA`.\cr`TRUE` est utile si on cherche la date la plus récente pour chaque individu.
 #'
 #' @return `data.table` :
 #' * `ID` : Identifiant de l'individu.
@@ -28,10 +27,16 @@ SQL_reperage_cond_med <- function(
   CIM = c("CIM9", "CIM10"),
   by_Dx = TRUE,
   date_dx_var = "admis",
-  n1 = 30, n2 = 730,
-  keep_all = FALSE,
-  verbose = TRUE
+  n1 = 30, n2 = 730
+  # keep_all = FALSE,
+  # verbose = TRUE
 ) {
+
+  ### Arguments qui ne sont plus dans la liste. Les mettres dans un {...}
+  keep_all <- FALSE
+  verbose <- TRUE
+  #################################################################### #
+
 
   ### Algorithme de repérage d'une condition médicale - étape 1 - MEDECHO
   # Extraction de tous les Dx selon les critères de l'étape 1
@@ -71,7 +76,7 @@ SQL_reperage_cond_med <- function(
   ### Algorithme de repérage d'une condition médicale - étape 2
   # Extraction de tous les Dx selon les critères de l'étape 2
   if (verbose) {
-    cat("Étape 2 :\n")  # indiquer que l'étape 1 commence
+    cat("Étape 2 :\n")  # indiquer que l'étape 2 commence
   }
   Dx_etape2 <- SQL_diagn(
     conn = conn, cohort = NULL,
@@ -108,7 +113,9 @@ SQL_reperage_cond_med <- function(
       n1 = n1, n2 = n2,
       keep_first = TRUE, reverse = FALSE
     )
-    setnames(Dx_etape2, c("DATE_REP", "DATE_CONF1"), c("DI_Acte", "DC_Acte"))
+    if (nrow(Dx_etape2)) {
+      setnames(Dx_etape2, c("DATE_REP", "DATE_CONF1"), c("DI_Acte", "DC_Acte"))
+    }
   }
 
   if (verbose) {
@@ -146,39 +153,38 @@ SQL_reperage_cond_med <- function(
       if (!is.null(Dx_etape2)) {
         dt_final <- Dx_etape2[dt_final, on = .(ID, DIAGN)]
       }
-    } else {
+    } else
       if (!is.null(Dx_etape1)) {
         dt_final <- Dx_etape1[dt_final, on = .(ID)]
       }
-      if (!is.null(Dx_etape2)) {
-        dt_final <- Dx_etape2[dt_final, on = .(ID)]
-      }
+    if (!is.null(Dx_etape2)) {
+      dt_final <- Dx_etape2[dt_final, on = .(ID)]
     }
-    # Ajouter les colonnes manquantes (si Dx_etape 1 ou 2 n'existe pas)
-    for (col in c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent")) {
-      if (!any(names(dt_final) == col)) {
-        dt_final[, (col) := NA]
-      }
-    }
-    dt_final[, DI_Finale := DI_Acte]
-    dt_final[is.na(DI_Acte), DI_Finale := DI_Hospit]
-    dt_final[DI_Hospit < DI_Acte, DI_Finale := DI_Hospit]
-
-    if (by_Dx) {
-      setcolorder(dt_final, c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent"))
-    } else {
-      dt_final <- dt_final[, .(ID, DI_Finale, DI_Hospit, DI_Acte, DC_Acte, D_Recent)]
-    }
-
-    if (verbose) {
-      cat("FIN.")
-    }
-
-    if (keep_all) {
-      return(dt_final)
-    } else {
-      return(dt_final[!is.na(DI_Finale)])
-    }
-
   }
+  # Ajouter les colonnes manquantes (si Dx_etape 1 ou 2 n'existe pas)
+  for (col in c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent")) {
+    if (!any(names(dt_final) == col)) {
+      dt_final[, (col) := NA]
+    }
+  }
+  dt_final[, DI_Finale := DI_Acte]
+  dt_final[is.na(DI_Acte), DI_Finale := DI_Hospit]
+  dt_final[DI_Hospit < DI_Acte, DI_Finale := DI_Hospit]
+
+  if (by_Dx) {
+    setcolorder(dt_final, c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent"))
+  } else {
+    dt_final <- dt_final[, .(ID, DI_Finale, DI_Hospit, DI_Acte, DC_Acte, D_Recent)]
+  }
+
+  if (verbose) {
+    cat("FIN.")
+  }
+
+  if (keep_all) {
+    return(dt_final)
+  } else {
+    return(dt_final[!is.na(DI_Finale)])
+  }
+
 }

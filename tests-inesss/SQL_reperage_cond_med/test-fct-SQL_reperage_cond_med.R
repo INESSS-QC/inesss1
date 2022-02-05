@@ -1,6 +1,6 @@
-test_reperage_cond_med <- SQL_reperage_cond_med(
+DT <- SQL_reperage_cond_med(
   conn = SQL_connexion("ms045"),
-  debut = "2020-06-01", fin = "2020-06-30",
+  debut = "2020-01-01", fin = "2020-12-31",
   Dx_table = list(
     diabete = list(
       CIM9 = c("2500%", "2501%", "2502%"),
@@ -15,6 +15,6 @@ test_reperage_cond_med <- SQL_reperage_cond_med(
   CIM = c("CIM9", "CIM10"),
   by_Dx = TRUE,
   date_dx_var = "admis",
-  n1 = 30, n2 = 730,
-  keep_all = FALSE, verbose = TRUE
+  n1 = 30, n2 = 730
+  # keep_all = FALSE, verbose = TRUE
 )
