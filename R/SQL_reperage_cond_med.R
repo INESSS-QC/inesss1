@@ -153,38 +153,40 @@ SQL_reperage_cond_med <- function(
       if (!is.null(Dx_etape2)) {
         dt_final <- Dx_etape2[dt_final, on = .(ID, DIAGN)]
       }
-    } else
+    } else {
       if (!is.null(Dx_etape1)) {
         dt_final <- Dx_etape1[dt_final, on = .(ID)]
       }
-    if (!is.null(Dx_etape2)) {
-      dt_final <- Dx_etape2[dt_final, on = .(ID)]
+      if (!is.null(Dx_etape2)) {
+        dt_final <- Dx_etape2[dt_final, on = .(ID)]
+      }
     }
-  }
-  # Ajouter les colonnes manquantes (si Dx_etape 1 ou 2 n'existe pas)
-  for (col in c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent")) {
-    if (!any(names(dt_final) == col)) {
-      dt_final[, (col) := NA]
+    # Ajouter les colonnes manquantes (si Dx_etape 1 ou 2 n'existe pas)
+    for (col in c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent")) {
+      if (!any(names(dt_final) == col)) {
+        dt_final[, (col) := NA]
+      }
     }
-  }
-  dt_final[, DI_Finale := DI_Acte]
-  dt_final[is.na(DI_Acte), DI_Finale := DI_Hospit]
-  dt_final[DI_Hospit < DI_Acte, DI_Finale := DI_Hospit]
+    dt_final[, DI_Finale := DI_Acte]
+    dt_final[is.na(DI_Acte), DI_Finale := DI_Hospit]
+    dt_final[DI_Hospit < DI_Acte, DI_Finale := DI_Hospit]
 
-  if (by_Dx) {
-    setcolorder(dt_final, c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent"))
-  } else {
-    dt_final <- dt_final[, .(ID, DI_Finale, DI_Hospit, DI_Acte, DC_Acte, D_Recent)]
-  }
+    if (by_Dx) {
+      setcolorder(dt_final, c("ID", "DIAGN", "DI_Finale", "DI_Hospit", "DI_Acte", "DC_Acte", "D_Recent"))
+    } else {
+      dt_final <- dt_final[, .(ID, DI_Finale, DI_Hospit, DI_Acte, DC_Acte, D_Recent)]
+    }
 
-  if (verbose) {
-    cat("FIN.")
-  }
+    if (verbose) {
+      cat("FIN.")
+    }
 
-  if (keep_all) {
-    return(dt_final)
-  } else {
-    return(dt_final[!is.na(DI_Finale)])
+    if (keep_all) {
+      return(dt_final)
+    } else {
+      return(dt_final[!is.na(DI_Finale)])
+    }
+
   }
 
 }
