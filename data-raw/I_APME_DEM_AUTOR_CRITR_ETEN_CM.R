@@ -12,24 +12,8 @@ conn <- SQL_connexion(user, pwd)
 
 des_court_indcn_recnu <- function() {
 
-  ### Vérifier si la variable d'itération contient une valeur nulle
-  verif_iterateur <- dbGetQuery(conn, statement = paste0(
-    "select APME_DAT_STA_DEM_PME as DAT_STA_DEM_PME\n",
-    "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-    "where APME_DAT_STA_DEM_PME is null;"
-  ))
-  if (nrow(verif_iterateur)) {
-    stop("I_APME_DEM_AUTOR_CRITR_ETEN_CM.des_court_indcn_recnu(): itérateur nulle.")
-  } else {
-    ### Années à utiliser pour les itérations
-    iter_vars <- dbGetQuery(conn, statement = paste0(
-      "select min(APME_DAT_STA_DEM_PME) as MIN_DAT,\n",
-      "       max(APME_DAT_STA_DEM_PME) as MAX_DAT\n",
-      "from I_APME_DEM_AUTOR_CRITR_ETEN_CM;"
-    ))
-
     ### Extraction
-    years <- (year(iter_vars$MIN_DAT)):(year(iter_vars$MAX_DAT))
+    years <- 1996:data.table::year(Sys.Date())
     DT <- vector("list", length(years) * 12)
     i <- 1L
     for (yr in years) {
@@ -53,7 +37,6 @@ des_court_indcn_recnu <- function() {
     setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
 
     return(DT)
-  }
 
 }
 no_seq_indcn_recnu <- function() {
