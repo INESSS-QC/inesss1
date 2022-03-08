@@ -1961,6 +1961,39 @@ formulaire <- function() {
           ),
           div(style = "margin-top:20px")
         ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DENOM", "DENOM")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DIN", "DIN")),
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__TENEUR", "TENEUR")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_TENEUR", "NOM_TENEUR"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__FORME", "FORME")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_FORME", "NOM_FORME"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__reset", "Réinitialiser",
+                                   style = reset_button_style()))
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
+          ),
+          div(style = "margin-top:20px")
+        ))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
         return(tagList(
           fluidRow(
@@ -2105,6 +2138,27 @@ formulaire <- function() {
             FIN <= input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[2]]
         ]
         return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        DT <- inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME
+        for (col in c("DENOM", "DIN", "TENEUR", "NOM_TENEUR", "FORME", "NOM_FORME")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN[[2]]
+        ]
+        return(DT)
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
         DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_SERV)
         for (col in c("COD_SERV", "COD_SERV_DESC")) {
@@ -2183,6 +2237,15 @@ formulaire <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DIN", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__MARQ_COMRC", value = "")
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DIN", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__TENEUR", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_TENEUR", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__FORME", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_FORME", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN", value = c(1996, year(Sys.Date())))
     })
     observeEvent(input$V_DEM_PAIMT_MED_CM__COD_SERV__reset, {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV", value = "")

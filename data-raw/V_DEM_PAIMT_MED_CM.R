@@ -262,7 +262,6 @@ cod_din <- function() {
 denom_din_teneur_forme <- function() {
 
   years <- 1996:year(Sys.Date())
-  years <- 2019:2020
 
   # Nom des formats
   nom_forme <- as.data.table(dbGetQuery(conn, statement = paste0(
