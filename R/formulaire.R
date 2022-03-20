@@ -124,6 +124,22 @@ formulaire <- function() {
     }
     return(code_serv)
   }
+  code_list_choices <- function(dt_code_list) {
+    ### Valeurs utilisées pour le choix des codes de liste de médicaments
+
+    dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
+  }
+  code_serv_choices <- function(dt_code_serv) {
+    ### Valeurs utilisées pour le choix des codes de service
+
+    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
+  }
   cols_select_from_method <- function(dt, method) {
     ### Puisque l'onglet Excel peut contenir des colonnes facultatives pour le
     ### formulaire, on doit les supprimer après l'avoir importé.
@@ -163,6 +179,48 @@ formulaire <- function() {
     dt <- setkey(dt, code)
     dt <- dt[dt[, .I[.N], .(code)]$V1]  # description la plus récente des codes de service
     return(dt)
+
+  }
+  find_date <- function(input, prefix, method = "deb") {
+    ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
+    ### (method = "fin") qui se retrouvent dans input.
+
+    if (method == "deb") {
+      type_date <- 1L
+    } else if (method == "fin") {
+      type_date <- 2L
+    } else {
+      stop("formulaire.find_date(): valeurs permises de method = {'deb', 'fin'}.")
+    }
+
+    if (is.null(input[[paste0(prefix,"_date1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements. Pourrait être géré autrement avec
+      # des ordres de priorité.
+      return(as.character(Sys.Date()))
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_per")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_date",i)]][type_date]))
+      }
+      return(vec)
+    }
+  }
+  find_code <- function(input, prefix) {
+    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
+    ### input. Si aucune valeur inscrite, retourne ""
+
+    if (is.null(input[[paste0(prefix, "_code1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements
+      return("")
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_codes")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_code",i)]]))
+      }
+      return(vec)
+    }
 
   }
   format_xl_err_nl <- function(l = 60) {
@@ -430,65 +488,7 @@ formulaire <- function() {
     ))
 
   }
-  sg1_find_date <- function(input, method = "deb") {
-    ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
-    ### (method = "fin") qui se retrouvent dans input.
-
-    if (method == "deb") {
-      type_date <- 1L
-    } else if (method == "fin") {
-      type_date <- 2L
-    } else {
-      stop("formulaire.sg1_find_date(): valeurs permises de method = {'deb', 'fin'}.")
-    }
-
-    if (is.null(input$sg1_date1)) {
-      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
-      # éviter des messages d'avertissements. Pourrait être géré autrement avec
-      # des ordres de priorité.
-      return(as.character(Sys.Date()))
-    } else {
-      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
-      for (i in 1:input$sg1_nb_per) {
-        vec <- c(vec, as.character(input[[paste0("sg1_date",i)]][type_date]))
-      }
-      return(vec)
-    }
-  }
-  sg1_find_code <- function(input) {
-    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
-    ### input. Si aucune valeur inscrite, retourne ""
-
-    if (is.null(input$sg1_code1)) {
-      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
-      # éviter des messages d'avertissements
-      return("")
-    } else {
-      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
-      for (i in 1:input$sg1_nb_codes) {
-        vec <- c(vec, as.character(input[[paste0("sg1_code",i)]]))
-      }
-      return(vec)
-    }
-
-  }
-  sg1_code_list_choices <- function(dt_code_list) {
-    ### Valeurs utilisées pour le choix des codes de liste de médicaments
-
-    dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
-    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
-    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
-
-  }
-  sg1_code_serv_choices <- function(dt_code_serv) {
-    ### Valeurs utilisées pour le choix des codes de service
-
-    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
-    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
-    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
-
-  }
-  sg1_dbGetQuery <- function(input, conn) {
+  sg1_dbGetQuery <- function(input, conn) {☻
     ### Effectue la ou les requêtes de statistiques générales selon les arguments
     ### @param input : Équivalent à une liste. Les éléments doivent avoir les
     ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
@@ -496,8 +496,8 @@ formulaire <- function() {
 
     DT <- SQL_stat_gen1(
       conn = conn,
-      debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
-      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
+      debut = find_date(input, "sg1", "deb"), fin = find_date(input, "sg1", "fin"),
+      type_Rx = input$sg1_type_Rx, codes = find_code(input, "sg1"), group_by = input$sg1_group_by,
       code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
       code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
       age_date = input$sg1_age_date
@@ -1026,6 +1026,7 @@ formulaire <- function() {
 
         ### Méthodes
         menuItem("Requêtes via Excel", tabName = "tabExcel"),
+        menuItem("Naïfs / Switch", tabName = "tabNaifsSwitch"),
         menuItem("Statistiques générales", tabName = "tabStatGen1"),
 
         div(style = "margin-top:30px"),
@@ -1081,6 +1082,95 @@ formulaire <- function() {
         ),
 
 
+
+        # UI - naif_switch1 -------------------------------------------------------
+
+        tabItem(
+          tabName = "tabNaifsSwitch",
+
+          # ARGUMENTS SECTION
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Arguments"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px"),
+          fluidRow(
+            column(  # Période d'analyse
+              width = 3,
+              # Nombre de périodes à afficher
+              numericInput("ns1_nb_per", "Nombre de périodes", value = 1),
+              uiOutput("ns1_nb_per")
+            ),
+            column(  # Codes d'analyse
+              width = 3,
+              # Nombre de codes à afficher pour l'analyse
+              numericInput("ns1_nb_codes", "Nombre de Codes Rx", value = 1),
+              # Sélection du type de code Rx
+              selectInput("ns1_type_Rx", "Type de Code Rx",
+                          choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+              # Text inputs où indiquer les codes d'analyse
+              uiOutput("ns1_nb_codes")
+            ),
+            column(  # Codes rétrospectif
+              width = 3,
+              numericInput("ns1_nb_codes_retro", "Nombre de Codes Rx Rétrospectifs", value = 1),
+              # Sélection du type de code Rx
+              selectInput("ns1_type_Rx_retro", "Type de Code Rx Rétrospectifs",
+                          choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+              # Text inputs où indiquer les codes d'analyse
+              uiOutput("ns1_nb_codes_retro")
+            ),
+            column(
+              width = 3,
+              # Grouper par
+              checkboxGroupInput(
+                "ns1_group_by", "Grouper par",
+                choices = c("AHFS", "DENOM", "DIN", "CodeServ", "CodeList", "Teneur", "Format", "Age"),
+                selected = "DENOM"
+              ),
+              div(style = "margin-top:-10px"),
+              uiOutput("ns1_age_date"),
+              # Codes de services
+              selectInput("ns1_code_serv_filter", "Codes de Services",
+                          choices = c("Exclusion", "Inclusion"),
+                          selected = "Exclusion", multiple = FALSE),
+              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+              checkboxGroupInput(
+                "ns1_code_serv", "",
+                choiceNames = code_serv_choices(dt_code_serv)$ch_name,
+                choiceValues = code_serv_choices(dt_code_serv)$value,
+                selected = c("1", "AD")
+              ),
+              # Codes liste médicaments
+              selectInput("ns1_code_list_filter", "Codes Liste Médicament",
+                          choices = c("Exclusion", "Inclusion"),
+                          selected = "Inclusion", multiple = FALSE),
+              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+              checkboxGroupInput(
+                "ns1_code_list", "",
+                choiceNames = code_list_choices(dt_code_list)$ch_name,
+                choiceValues = code_list_choices(dt_code_list)$value
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 3,
+              actionButton(  # Exécution de la requête SQL
+                "ns1_go_extract", "Exécuter Requête",
+                style = paste0("color: #ffffff;",
+                               "background-color: #006600;",
+                               "border-color: #000000;")
+              )
+            ),
+            column(
+              width = 3,
+              actionButton("ns1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
+            )
+          )
+        ),
+
+
         # UI - stat_gen1 ------------------------------------------------------------------------------
 
         tabItem(
@@ -1129,8 +1219,8 @@ formulaire <- function() {
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               checkboxGroupInput(
                 "sg1_code_serv", "",
-                choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
-                choiceValues = sg1_code_serv_choices(dt_code_serv)$value,
+                choiceNames = code_serv_choices(dt_code_serv)$ch_name,
+                choiceValues = code_serv_choices(dt_code_serv)$value,
                 selected = c("1", "AD")
               ),
               # Codes liste médicaments
@@ -1140,8 +1230,8 @@ formulaire <- function() {
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               checkboxGroupInput(
                 "sg1_code_list", "",
-                choiceNames = sg1_code_list_choices(dt_code_list)$ch_name,
-                choiceValues = sg1_code_list_choices(dt_code_list)$value
+                choiceNames = code_list_choices(dt_code_list)$ch_name,
+                choiceValues = code_list_choices(dt_code_list)$value
               )
             )
           ),
@@ -1362,6 +1452,112 @@ formulaire <- function() {
 
 
 
+    # naif_switch1 ------------------------------------------------------------
+
+    ns1_val <- reactiveValues(
+      show_query = FALSE,  # afficher la requête ou pas
+      query = NULL,  # message à afficher. NULL = même pas une case où afficher du texte
+      show_tab = FALSE  # contient le tableau de la requête/résultats
+    )
+
+    # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
+    # de input$ns1_nb_per
+    output$ns1_nb_per <- renderUI({
+      n <- input$ns1_nb_per  # nb périodes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "ns1_nb_per", value = 1)
+      }
+      isolate({  # voir commentaire 'output$sg1_nb_codes'
+        dates_input <- vector("list", length = n)
+        # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
+        # si input$ns1_nb_per diminue
+        for (i in 1:n) {
+          if (is.null(input[[paste0("ns1_date",i)]])) {
+            dates_input[[i]] <- dateRangeInput(
+              inputId = paste0("ns1_date",i), label = paste("Période", i),
+              separator = " au ",
+              autoclose = FALSE  # permet d'écrire manuellement la date sans erreur
+            )
+          } else {
+            dates_input[[i]] <- dateRangeInput(
+              inputId = paste0("ns1_date",i), label = paste("Période", i),
+              start = input[[paste0("ns1_date",i)]][1],
+              end = input[[paste0("ns1_date",i)]][2],
+              separator = " au ",
+              autoclose = FALSE
+            )
+          }
+        }
+        return(tagList(dates_input))
+      })
+    })
+
+    # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
+    # de input$ns1_nb_codes
+    ns1_nb_codes <- reactive({
+      n <- input$ns1_nb_codes  # nb codes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "ns1_nb_codes", value = 1)
+      }
+      isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+        # dans le textInput sans qu'il y ait de réactivité
+        codes_input <- vector("list", length = n)
+        # Créer des textInput. Possible de conserver les valeurs précédentes
+        # si input$ns1_nb_codes diminue
+        for (i in 1:n) {
+          if (is.null(input[[paste0("ns1_code",i)]])) {
+            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+                                          label = paste("Code Rx", i),
+                                          value = "")
+          } else {
+            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+                                          label = paste("Code Rx", i),
+                                          value = input[[paste0("ns1_code",i)]])
+          }
+        }
+        return(tagList(codes_input))
+      })
+    })
+    output$ns1_nb_codes <- renderUI({ ns1_nb_codes() })
+    ns1_nb_codes_retro <- reactive({
+      n <- input$ns1_nb_codes_retro  # nb codes & déclenche réactivité
+      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+        updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+      }
+      isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+        # dans le textInput sans qu'il y ait de réactivité
+        codes_input <- vector("list", length = n)
+        # Créer des textInput. Possible de conserver les valeurs précédentes
+        # si input$ns1_nb_codes diminue
+        for (i in 1:n) {
+          if (is.null(input[[paste0("ns1_code_retro",i)]])) {
+            codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
+                                          label = paste("Code Rx Rétrospectif", i),
+                                          value = "")
+          } else {
+            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+                                          label = paste("Code Rx Rétrospectif", i),
+                                          value = input[[paste0("ns1_code_retro",i)]])
+          }
+        }
+        return(tagList(codes_input))
+      })
+    })
+    output$ns1_nb_codes_retro <- renderUI({ ns1_nb_codes_retro() })
+
+    # Afficher une date pour le calcul de l'âge
+    output$ns1_age_date <- renderUI({
+      if (any(input$ns1_group_by == "Age")) {
+        return(tagList(
+          dateInput("ns1_age_date", label = "Date pour calcul Âge", value = input$ns1_date1[1])
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+
+
+
     # stat_gen1 -----------------------------------------------------------------------------------
 
     # Variables réactives pour sg1
@@ -1459,7 +1655,7 @@ formulaire <- function() {
     })
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      if (any("" %in% str_remove_all(sg1_find_code(input), " "))) {
+      if (any("" %in% str_remove_all(find_code(input, "sg1"), " "))) {
         sg1_val$show_tab <- FALSE
         showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
         return(NULL)
@@ -1516,9 +1712,9 @@ formulaire <- function() {
             dt = sg1_requete_sql(),
             args_list = list(
               METHODE = "stat_gen1",
-              DATE_DEBUT = sg1_find_date(input, "deb"),
-              DATE_FIN = sg1_find_date(input, "fin"),
-              TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
+              DATE_DEBUT = find_date(input, "sg1", "deb"),
+              DATE_FIN = find_date(input, "sg1", "fin"),
+              TYPE_RX = input$sg1_type_Rx, CODE_RX = find_code(input, "sg1"),
               GROUPER_PAR = input$sg1_group_by,
               CODE_SERV_FILTRE = input$sg1_code_serv_filter,
               CODE_SERV = adapt_code_serv(input$sg1_code_serv),
@@ -1527,8 +1723,8 @@ formulaire <- function() {
               AGE_DATE = input$sg1_age_date
             ),
             query = query_stat_gen1(
-              debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-              type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
+              debut = find_date(input, "sg1", "deb")[1], fin = find_date(input, "sg1", "fin")[1],
+              type_Rx = input$sg1_type_Rx, codes = find_code(input, "sg1"), group_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
               code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
               age_date = input$sg1_age_date
@@ -1560,9 +1756,9 @@ formulaire <- function() {
     sg1_code_SQL <- eventReactive(input$sg1_go_extract, {
       # Code SQL associé à la requête demandée
       query_stat_gen1(
-        debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
+        debut = find_date(input, "sg1", "deb")[1], fin = find_date(input, "sg1", "fin")[1],
         type_Rx = input$sg1_type_Rx,
-        codes = ifelse(input$sg1_type_Rx == "AHFS", sort(sg1_find_code(input))[1], sort(sg1_find_code(input))),
+        codes = ifelse(input$sg1_type_Rx == "AHFS", sort(find_code(input, "sg1"))[1], sort(find_code(input, "sg1"))),
         group_by = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter,
