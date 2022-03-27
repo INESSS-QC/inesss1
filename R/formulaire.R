@@ -223,6 +223,25 @@ formulaire <- function() {
     }
 
   }
+  find_code_retro <- function(input, prefix) {
+    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
+    ### input. Si aucune valeur inscrite, retourne ""
+
+    if (is.null(input[[paste0(prefix, "_code_retro1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements
+      return("")
+    } else if (input[[paste0(prefix,"_nb_codes_retro")]] == 1 && input[[paste0(prefix,"_code_retro1")]] == "") {
+      return(NULL)
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_codes_retro")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_code_retro",i)]]))
+      }
+      return(vec)
+    }
+
+  }
   format_xl_err_nl <- function(l = 60) {
     ### Répétition de '=' collé 'l' fois. Souvent utilisé pour une nouvelle
     ### section
@@ -314,6 +333,31 @@ formulaire <- function() {
     } else {
       return(msg_error)
     }
+  }
+  ns1_dbGetQuery <- function(input, conn) {
+    ### Effectue la ou les requêtes de naifs switch selon les arguments
+    ### @param input : Équivalent à une liste. Les éléments doivent avoir les
+    ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
+    ### @param conn_values : Variable de connexion créé dans la section SERVER
+
+    DT <- SQL_naif_switch1(
+      conn = conn,
+      debut = find_date(input, "ns1", "deb"),
+      fin = find_date(input, "sg1", "fin"),
+      type_Rx = input$ns1_type_Rx,
+      codes = find_code(input, "ns1"),
+      group_by = input$ns1_group_by,
+      type_Rx_retro = input$ns1_type_Rx_retro,
+      rx_retrospect_a_exclure = find_code_retro(input, "ns1"),
+      njours_sans_conso = input$ns1_njours_sans_conso,
+      code_serv = adapt_code_serv(input$ns1_code_serv),
+      code_serv_filtre = input$ns1_code_serv_filter,
+      code_list = input$ns1_code_list,
+      code_list_filtre = input$ns1_code_list_filter,
+      age_date = input$ns1_age_date
+    )
+    return(DT)
+
   }
   save_Excel <- function(dt, save_path) {
     ### Enregistrer au format Excel
@@ -488,7 +532,7 @@ formulaire <- function() {
     ))
 
   }
-  sg1_dbGetQuery <- function(input, conn) {☻
+  sg1_dbGetQuery <- function(input, conn) {
     ### Effectue la ou les requêtes de statistiques générales selon les arguments
     ### @param input : Équivalent à une liste. Les éléments doivent avoir les
     ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
@@ -505,7 +549,21 @@ formulaire <- function() {
     return(DT)
 
   }
-  sg1_table_format <- function(dt) {
+  shinyFiles_directories <- function(input_name, method) {
+    ### Créer le répertoire à partir d'un shinyFileButton
+
+    if (is.integer(input_name)) {
+      return(NULL)
+    } else if (method == "save") {
+      return(parseSavePath(Volumes_path(), input_name))
+    } else if (method == "file") {
+      return(parseFilePaths(Volumes_path(), input_name))
+    } else {
+      stop("formulaire.shinyFiles_directories() method valeur non permise.")
+    }
+
+  }
+  table_format <- function(dt) {
     ### Format visuel des colonnes pour meilleure présentation du data créé par
     ### la requête
 
@@ -524,20 +582,6 @@ formulaire <- function() {
                 DUREE_TX = formatC(DUREE_TX, big.mark = " "))
       ]
       return(dt)
-    }
-
-  }
-  shinyFiles_directories <- function(input_name, method) {
-    ### Créer le répertoire à partir d'un shinyFileButton
-
-    if (is.integer(input_name)) {
-      return(NULL)
-    } else if (method == "save") {
-      return(parseSavePath(Volumes_path(), input_name))
-    } else if (method == "file") {
-      return(parseFilePaths(Volumes_path(), input_name))
-    } else {
-      stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
 
   }
@@ -1129,7 +1173,10 @@ formulaire <- function() {
                 selected = "DENOM"
               ),
               div(style = "margin-top:-10px"),
+              # Date pour calcul de l'âge
               uiOutput("ns1_age_date"),
+              # Nombre de jours sans traitement
+              numericInput("ns1_njours_sans_conso", "Jours sans Consommation", value = 365),
               # Codes de services
               selectInput("ns1_code_serv_filter", "Codes de Services",
                           choices = c("Exclusion", "Inclusion"),
@@ -1167,7 +1214,21 @@ formulaire <- function() {
               width = 3,
               actionButton("ns1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
             )
-          )
+          ),
+
+          # RESULTATS SECTION
+          uiOutput("ns1_html_result_section"),  # En-tête
+          fluidRow(
+            p(),
+            dataTableOutput("ns1_table_req"),  # tableau des résultats
+            p()
+          ),
+          fluidRow(
+            # column(
+            #   width = 3,
+            #   uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
+            # )
+          ),
         ),
 
 
@@ -1535,7 +1596,7 @@ formulaire <- function() {
                                           label = paste("Code Rx Rétrospectif", i),
                                           value = "")
           } else {
-            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+            codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
                                           label = paste("Code Rx Rétrospectif", i),
                                           value = input[[paste0("ns1_code_retro",i)]])
           }
@@ -1555,6 +1616,89 @@ formulaire <- function() {
         return(NULL)
       }
     })
+
+    # En-tête Résultats - Apparaît seulement s'il y a eu une requête
+    output$ns1_html_result_section <- renderUI({
+      if (ns1_val$show_tab) {
+        return(tagList(
+          div(style = "margin-top:15px"),
+          fluidRow(
+            h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+            style = "color: #ffffff; background-color: #0086b3;"
+          ),
+          div(style = "margin-top:10px")
+        ))
+      } else {
+        return(NULL)
+      }
+    })
+    # Requete SQL
+    ns1_requete_sql <- eventReactive(input$ns1_go_extract, {
+      if (any("" %in% str_remove_all(find_code(input, "ns1"), " "))) {
+        ns1_val$show_tab <- FALSE
+        showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
+        return(NULL)
+      } else if (!is.null(conn_values$conn)) {
+        if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
+          ns1_val$show_tab <- FALSE
+          showNotification("Exécution impossible. Connexion requise.", type = "error")
+          return(NULL)
+        }
+        showNotification("Exécution en cours...", id = "ns1_go_extract", type = "message", duration = NULL)
+        ns1_val$show_tab <- TRUE
+        DT <- ns1_dbGetQuery(input, conn_values$conn)
+        removeNotification("ns1_go_extract")
+        return(DT)
+      } else {
+        ns1_val$show_tab <- FALSE
+        showNotification("Exécution impossible. Connexion requise.", type = "error")
+        return(NULL)
+      }
+    })
+    # Afficher le tableau demandé
+    output$ns1_table_req <- renderDataTable(
+      {
+        DT <- table_format(ns1_requete_sql())
+        if (ns1_val$show_tab) {
+          return(DT)
+        } else {
+          return(NULL)
+        }
+      }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
+    )
+
+    # Réinitialiser les arguments comme initialement
+    observeEvent(input$ns1_reset_args, {
+      # Effacer périodes sauf la 1ere
+      updateNumericInput(session, "ns1_nb_per", value = 1)
+
+      # Effacer code et remettre à 1 - Codes Rx + Codes Retro
+      n <- input$ns1_nb_codes
+      for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
+        updateTextInput(session, inputId = paste0("ns1_code",i),
+                        label = paste("Code Rx", i), value = "")
+      }
+      updateNumericInput(session, "ns1_nb_codes", value = 1)
+      n_retro <- input$ns1_nb_codes_retro
+      for (i in 1:n_retro) {  # Créer des textInput vide -> efface les valeurs précédentes
+        updateTextInput(session, inputId = paste0("ns1_code_retro_",i),
+                        label = paste("Code Rx Rétrospectif", i), value = "")
+      }
+      updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+
+      # Mettre à jour les checkboxGroup
+      # Mettre à jour les checkboxGroup
+      updateCheckboxGroupInput(session, inputId = "ns1_group_by", selected = "DENOM")
+      updateNumericInput(session, inputId = "ns1_njours_sans_conso", value = 365)
+      updateSelectInput(session, inputId = "ns1_code_serv_filter", selected = "Exclusion")
+      updateCheckboxGroupInput(session, inputId = "ns1_code_serv", selected = c("1", "AD"))
+      updateSelectInput(session, inputId = "ns1_code_list_filter", selected = "Inclusion")
+      updateCheckboxGroupInput(session, inputId = "ns1_code_list", selected = character())
+
+      # Effacer section Résultats et Requête SQL
+      ns1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
+    })
+
 
 
 
@@ -1677,15 +1821,15 @@ formulaire <- function() {
       }
     })
     # Afficher le tableau demandé
-    output$sg1_table_req <- renderDataTable({
-      DT <- sg1_table_format(sg1_requete_sql())
-      if (sg1_val$show_tab) {
-        return(DT)
-      } else {
-        return(NULL)
-      }
-    },
-    options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
+    output$sg1_table_req <- renderDataTable(
+      {
+        DT <- table_format(sg1_requete_sql())
+        if (sg1_val$show_tab) {
+          return(DT)
+        } else {
+          return(NULL)
+        }
+      }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
     )
 
     # Enregistrer le fichier au format Excel
@@ -1788,16 +1932,11 @@ formulaire <- function() {
       updateNumericInput(session, "sg1_nb_codes", value = 1)
 
       # Mettre à jour les checkboxGroup
-      updateCheckboxGroupInput(session, inputId = "sg1_group_by",
-                               selected = "Codes")
-      updateSelectInput(session, inputId = "sg1_code_serv_filter",
-                        selected = "Exclusion")
-      updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
-                               selected = c("1", "AD"))
-      updateSelectInput(session, inputId = "sg1_code_list_filter",
-                        selected = "Inclusion")
-      updateCheckboxGroupInput(session, inputId = "sg1_code_list",
-                               selected = character(0))
+      updateCheckboxGroupInput(session, inputId = "sg1_group_by", selected = "DENOM")
+      updateSelectInput(session, inputId = "sg1_code_serv_filter", selected = "Exclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_serv", selected = c("1", "AD"))
+      updateSelectInput(session, inputId = "sg1_code_list_filter", selected = "Inclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_list", selected = character())
 
       # Effacer section Résultats et Requête SQL
       sg1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
