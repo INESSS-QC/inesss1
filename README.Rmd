@@ -35,8 +35,6 @@ newpage <- function(space = "3cm") {
 }
 ```
 
-inesss `r as.character(packageVersion("inesss"))`
-
 # Support
 Pour des questions, des commentaires ou pour désigner tout défaut de conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et indiquer l'objet `librairie inesss`.  
 

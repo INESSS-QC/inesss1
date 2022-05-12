@@ -1070,7 +1070,7 @@ formulaire <- function() {
 
         ### Méthodes
         menuItem("Requêtes via Excel", tabName = "tabExcel"),
-        menuItem("Naïfs / Switch", tabName = "tabNaifsSwitch"),
+        # menuItem("Naïfs / Switch", tabName = "tabNaifsSwitch"),
         menuItem("Statistiques générales", tabName = "tabStatGen1"),
 
         div(style = "margin-top:30px"),
@@ -1129,107 +1129,107 @@ formulaire <- function() {
 
         # UI - naif_switch1 -------------------------------------------------------
 
-        tabItem(
-          tabName = "tabNaifsSwitch",
-
-          # ARGUMENTS SECTION
-          fluidRow(
-            h4(HTML("&nbsp;&nbsp;"), "Arguments"),
-            style = "color: #ffffff; background-color: #0086b3;"
-          ),
-          div(style = "margin-top:10px"),
-          fluidRow(
-            column(  # Période d'analyse
-              width = 3,
-              # Nombre de périodes à afficher
-              numericInput("ns1_nb_per", "Nombre de périodes", value = 1),
-              uiOutput("ns1_nb_per")
-            ),
-            column(  # Codes d'analyse
-              width = 3,
-              # Nombre de codes à afficher pour l'analyse
-              numericInput("ns1_nb_codes", "Nombre de Codes Rx", value = 1),
-              # Sélection du type de code Rx
-              selectInput("ns1_type_Rx", "Type de Code Rx",
-                          choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
-              # Text inputs où indiquer les codes d'analyse
-              uiOutput("ns1_nb_codes")
-            ),
-            column(  # Codes rétrospectif
-              width = 3,
-              numericInput("ns1_nb_codes_retro", "Nombre de Codes Rx Rétrospectifs", value = 1),
-              # Sélection du type de code Rx
-              selectInput("ns1_type_Rx_retro", "Type de Code Rx Rétrospectifs",
-                          choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
-              # Text inputs où indiquer les codes d'analyse
-              uiOutput("ns1_nb_codes_retro")
-            ),
-            column(
-              width = 3,
-              # Grouper par
-              checkboxGroupInput(
-                "ns1_group_by", "Grouper par",
-                choices = c("AHFS", "DENOM", "DIN", "CodeServ", "CodeList", "Teneur", "Format", "Age"),
-                selected = "DENOM"
-              ),
-              div(style = "margin-top:-10px"),
-              # Date pour calcul de l'âge
-              uiOutput("ns1_age_date"),
-              # Nombre de jours sans traitement
-              numericInput("ns1_njours_sans_conso", "Jours sans Consommation", value = 365),
-              # Codes de services
-              selectInput("ns1_code_serv_filter", "Codes de Services",
-                          choices = c("Exclusion", "Inclusion"),
-                          selected = "Exclusion", multiple = FALSE),
-              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
-              checkboxGroupInput(
-                "ns1_code_serv", "",
-                choiceNames = code_serv_choices(dt_code_serv)$ch_name,
-                choiceValues = code_serv_choices(dt_code_serv)$value,
-                selected = c("1", "AD")
-              ),
-              # Codes liste médicaments
-              selectInput("ns1_code_list_filter", "Codes Liste Médicament",
-                          choices = c("Exclusion", "Inclusion"),
-                          selected = "Inclusion", multiple = FALSE),
-              div(style = "margin-top:-30px"),  # coller le checkBox qui suit
-              checkboxGroupInput(
-                "ns1_code_list", "",
-                choiceNames = code_list_choices(dt_code_list)$ch_name,
-                choiceValues = code_list_choices(dt_code_list)$value
-              )
-            )
-          ),
-          fluidRow(
-            column(
-              width = 3,
-              actionButton(  # Exécution de la requête SQL
-                "ns1_go_extract", "Exécuter Requête",
-                style = paste0("color: #ffffff;",
-                               "background-color: #006600;",
-                               "border-color: #000000;")
-              )
-            ),
-            column(
-              width = 3,
-              actionButton("ns1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
-            )
-          ),
-
-          # RESULTATS SECTION
-          uiOutput("ns1_html_result_section"),  # En-tête
-          fluidRow(
-            p(),
-            dataTableOutput("ns1_table_req"),  # tableau des résultats
-            p()
-          ),
-          fluidRow(
-            # column(
-            #   width = 3,
-            #   uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
-            # )
-          ),
-        ),
+        # tabItem(
+        #   tabName = "tabNaifsSwitch",
+        #
+        #   # ARGUMENTS SECTION
+        #   fluidRow(
+        #     h4(HTML("&nbsp;&nbsp;"), "Arguments"),
+        #     style = "color: #ffffff; background-color: #0086b3;"
+        #   ),
+        #   div(style = "margin-top:10px"),
+        #   fluidRow(
+        #     column(  # Période d'analyse
+        #       width = 3,
+        #       # Nombre de périodes à afficher
+        #       numericInput("ns1_nb_per", "Nombre de périodes", value = 1),
+        #       uiOutput("ns1_nb_per")
+        #     ),
+        #     column(  # Codes d'analyse
+        #       width = 3,
+        #       # Nombre de codes à afficher pour l'analyse
+        #       numericInput("ns1_nb_codes", "Nombre de Codes Rx", value = 1),
+        #       # Sélection du type de code Rx
+        #       selectInput("ns1_type_Rx", "Type de Code Rx",
+        #                   choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+        #       # Text inputs où indiquer les codes d'analyse
+        #       uiOutput("ns1_nb_codes")
+        #     ),
+        #     column(  # Codes rétrospectif
+        #       width = 3,
+        #       numericInput("ns1_nb_codes_retro", "Nombre de Codes Rx Rétrospectifs", value = 1),
+        #       # Sélection du type de code Rx
+        #       selectInput("ns1_type_Rx_retro", "Type de Code Rx Rétrospectifs",
+        #                   choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+        #       # Text inputs où indiquer les codes d'analyse
+        #       uiOutput("ns1_nb_codes_retro")
+        #     ),
+        #     column(
+        #       width = 3,
+        #       # Grouper par
+        #       checkboxGroupInput(
+        #         "ns1_group_by", "Grouper par",
+        #         choices = c("AHFS", "DENOM", "DIN", "CodeServ", "CodeList", "Teneur", "Format", "Age"),
+        #         selected = "DENOM"
+        #       ),
+        #       div(style = "margin-top:-10px"),
+        #       # Date pour calcul de l'âge
+        #       uiOutput("ns1_age_date"),
+        #       # Nombre de jours sans traitement
+        #       numericInput("ns1_njours_sans_conso", "Jours sans Consommation", value = 365),
+        #       # Codes de services
+        #       selectInput("ns1_code_serv_filter", "Codes de Services",
+        #                   choices = c("Exclusion", "Inclusion"),
+        #                   selected = "Exclusion", multiple = FALSE),
+        #       div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+        #       checkboxGroupInput(
+        #         "ns1_code_serv", "",
+        #         choiceNames = code_serv_choices(dt_code_serv)$ch_name,
+        #         choiceValues = code_serv_choices(dt_code_serv)$value,
+        #         selected = c("1", "AD")
+        #       ),
+        #       # Codes liste médicaments
+        #       selectInput("ns1_code_list_filter", "Codes Liste Médicament",
+        #                   choices = c("Exclusion", "Inclusion"),
+        #                   selected = "Inclusion", multiple = FALSE),
+        #       div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+        #       checkboxGroupInput(
+        #         "ns1_code_list", "",
+        #         choiceNames = code_list_choices(dt_code_list)$ch_name,
+        #         choiceValues = code_list_choices(dt_code_list)$value
+        #       )
+        #     )
+        #   ),
+        #   fluidRow(
+        #     column(
+        #       width = 3,
+        #       actionButton(  # Exécution de la requête SQL
+        #         "ns1_go_extract", "Exécuter Requête",
+        #         style = paste0("color: #ffffff;",
+        #                        "background-color: #006600;",
+        #                        "border-color: #000000;")
+        #       )
+        #     ),
+        #     column(
+        #       width = 3,
+        #       actionButton("ns1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
+        #     )
+        #   ),
+        #
+        #   # RESULTATS SECTION
+        #   uiOutput("ns1_html_result_section"),  # En-tête
+        #   fluidRow(
+        #     p(),
+        #     dataTableOutput("ns1_table_req"),  # tableau des résultats
+        #     p()
+        #   ),
+        #   fluidRow(
+        #     # column(
+        #     #   width = 3,
+        #     #   uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
+        #     # )
+        #   ),
+        # ),
 
 
         # UI - stat_gen1 ------------------------------------------------------------------------------
@@ -1513,194 +1513,194 @@ formulaire <- function() {
 
 
 
-    # naif_switch1 ------------------------------------------------------------
-
-    ns1_val <- reactiveValues(
-      show_query = FALSE,  # afficher la requête ou pas
-      query = NULL,  # message à afficher. NULL = même pas une case où afficher du texte
-      show_tab = FALSE  # contient le tableau de la requête/résultats
-    )
-
-    # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
-    # de input$ns1_nb_per
-    output$ns1_nb_per <- renderUI({
-      n <- input$ns1_nb_per  # nb périodes & déclenche réactivité
-      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
-        updateNumericInput(session, "ns1_nb_per", value = 1)
-      }
-      isolate({  # voir commentaire 'output$sg1_nb_codes'
-        dates_input <- vector("list", length = n)
-        # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
-        # si input$ns1_nb_per diminue
-        for (i in 1:n) {
-          if (is.null(input[[paste0("ns1_date",i)]])) {
-            dates_input[[i]] <- dateRangeInput(
-              inputId = paste0("ns1_date",i), label = paste("Période", i),
-              separator = " au ",
-              autoclose = FALSE  # permet d'écrire manuellement la date sans erreur
-            )
-          } else {
-            dates_input[[i]] <- dateRangeInput(
-              inputId = paste0("ns1_date",i), label = paste("Période", i),
-              start = input[[paste0("ns1_date",i)]][1],
-              end = input[[paste0("ns1_date",i)]][2],
-              separator = " au ",
-              autoclose = FALSE
-            )
-          }
-        }
-        return(tagList(dates_input))
-      })
-    })
-
-    # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
-    # de input$ns1_nb_codes
-    ns1_nb_codes <- reactive({
-      n <- input$ns1_nb_codes  # nb codes & déclenche réactivité
-      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
-        updateNumericInput(session, "ns1_nb_codes", value = 1)
-      }
-      isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-        # dans le textInput sans qu'il y ait de réactivité
-        codes_input <- vector("list", length = n)
-        # Créer des textInput. Possible de conserver les valeurs précédentes
-        # si input$ns1_nb_codes diminue
-        for (i in 1:n) {
-          if (is.null(input[[paste0("ns1_code",i)]])) {
-            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
-                                          label = paste("Code Rx", i),
-                                          value = "")
-          } else {
-            codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
-                                          label = paste("Code Rx", i),
-                                          value = input[[paste0("ns1_code",i)]])
-          }
-        }
-        return(tagList(codes_input))
-      })
-    })
-    output$ns1_nb_codes <- renderUI({ ns1_nb_codes() })
-    ns1_nb_codes_retro <- reactive({
-      n <- input$ns1_nb_codes_retro  # nb codes & déclenche réactivité
-      if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
-        updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
-      }
-      isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
-        # dans le textInput sans qu'il y ait de réactivité
-        codes_input <- vector("list", length = n)
-        # Créer des textInput. Possible de conserver les valeurs précédentes
-        # si input$ns1_nb_codes diminue
-        for (i in 1:n) {
-          if (is.null(input[[paste0("ns1_code_retro",i)]])) {
-            codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
-                                          label = paste("Code Rx Rétrospectif", i),
-                                          value = "")
-          } else {
-            codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
-                                          label = paste("Code Rx Rétrospectif", i),
-                                          value = input[[paste0("ns1_code_retro",i)]])
-          }
-        }
-        return(tagList(codes_input))
-      })
-    })
-    output$ns1_nb_codes_retro <- renderUI({ ns1_nb_codes_retro() })
-
-    # Afficher une date pour le calcul de l'âge
-    output$ns1_age_date <- renderUI({
-      if (any(input$ns1_group_by == "Age")) {
-        return(tagList(
-          dateInput("ns1_age_date", label = "Date pour calcul Âge", value = input$ns1_date1[1])
-        ))
-      } else {
-        return(NULL)
-      }
-    })
-
-    # En-tête Résultats - Apparaît seulement s'il y a eu une requête
-    output$ns1_html_result_section <- renderUI({
-      if (ns1_val$show_tab) {
-        return(tagList(
-          div(style = "margin-top:15px"),
-          fluidRow(
-            h4(HTML("&nbsp;&nbsp;"), "Résultats"),
-            style = "color: #ffffff; background-color: #0086b3;"
-          ),
-          div(style = "margin-top:10px")
-        ))
-      } else {
-        return(NULL)
-      }
-    })
-    # Requete SQL
-    ns1_requete_sql <- eventReactive(input$ns1_go_extract, {
-      if (any("" %in% str_remove_all(find_code(input, "ns1"), " "))) {
-        ns1_val$show_tab <- FALSE
-        showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
-        return(NULL)
-      } else if (!is.null(conn_values$conn)) {
-        if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
-          ns1_val$show_tab <- FALSE
-          showNotification("Exécution impossible. Connexion requise.", type = "error")
-          return(NULL)
-        }
-        showNotification("Exécution en cours...", id = "ns1_go_extract", type = "message", duration = NULL)
-        ns1_val$show_tab <- TRUE
-        DT <- ns1_dbGetQuery(input, conn_values$conn)
-        removeNotification("ns1_go_extract")
-        return(DT)
-      } else {
-        ns1_val$show_tab <- FALSE
-        showNotification("Exécution impossible. Connexion requise.", type = "error")
-        return(NULL)
-      }
-    })
-    # Afficher le tableau demandé
-    output$ns1_table_req <- renderDataTable(
-      {
-        DT <- table_format(ns1_requete_sql())
-        if (ns1_val$show_tab) {
-          return(DT)
-        } else {
-          return(NULL)
-        }
-      }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
-    )
-
-    # Réinitialiser les arguments comme initialement
-    observeEvent(input$ns1_reset_args, {
-      # Effacer périodes sauf la 1ere
-      updateNumericInput(session, "ns1_nb_per", value = 1)
-
-      # Effacer code et remettre à 1 - Codes Rx + Codes Retro
-      n <- input$ns1_nb_codes
-      for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
-        updateTextInput(session, inputId = paste0("ns1_code",i),
-                        label = paste("Code Rx", i), value = "")
-      }
-      updateNumericInput(session, "ns1_nb_codes", value = 1)
-      n_retro <- input$ns1_nb_codes_retro
-      for (i in 1:n_retro) {  # Créer des textInput vide -> efface les valeurs précédentes
-        updateTextInput(session, inputId = paste0("ns1_code_retro_",i),
-                        label = paste("Code Rx Rétrospectif", i), value = "")
-      }
-      updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
-
-      # Mettre à jour les checkboxGroup
-      # Mettre à jour les checkboxGroup
-      updateCheckboxGroupInput(session, inputId = "ns1_group_by", selected = "DENOM")
-      updateNumericInput(session, inputId = "ns1_njours_sans_conso", value = 365)
-      updateSelectInput(session, inputId = "ns1_code_serv_filter", selected = "Exclusion")
-      updateCheckboxGroupInput(session, inputId = "ns1_code_serv", selected = c("1", "AD"))
-      updateSelectInput(session, inputId = "ns1_code_list_filter", selected = "Inclusion")
-      updateCheckboxGroupInput(session, inputId = "ns1_code_list", selected = character())
-
-      # Effacer section Résultats et Requête SQL
-      ns1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
-    })
-
-
-
+    # # naif_switch1 ------------------------------------------------------------
+    #
+    # ns1_val <- reactiveValues(
+    #   show_query = FALSE,  # afficher la requête ou pas
+    #   query = NULL,  # message à afficher. NULL = même pas une case où afficher du texte
+    #   show_tab = FALSE  # contient le tableau de la requête/résultats
+    # )
+    #
+    # # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
+    # # de input$ns1_nb_per
+    # output$ns1_nb_per <- renderUI({
+    #   n <- input$ns1_nb_per  # nb périodes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_per", value = 1)
+    #   }
+    #   isolate({  # voir commentaire 'output$sg1_nb_codes'
+    #     dates_input <- vector("list", length = n)
+    #     # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_per diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_date",i)]])) {
+    #         dates_input[[i]] <- dateRangeInput(
+    #           inputId = paste0("ns1_date",i), label = paste("Période", i),
+    #           separator = " au ",
+    #           autoclose = FALSE  # permet d'écrire manuellement la date sans erreur
+    #         )
+    #       } else {
+    #         dates_input[[i]] <- dateRangeInput(
+    #           inputId = paste0("ns1_date",i), label = paste("Période", i),
+    #           start = input[[paste0("ns1_date",i)]][1],
+    #           end = input[[paste0("ns1_date",i)]][2],
+    #           separator = " au ",
+    #           autoclose = FALSE
+    #         )
+    #       }
+    #     }
+    #     return(tagList(dates_input))
+    #   })
+    # })
+    #
+    # # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
+    # # de input$ns1_nb_codes
+    # ns1_nb_codes <- reactive({
+    #   n <- input$ns1_nb_codes  # nb codes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_codes", value = 1)
+    #   }
+    #   isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+    #     # dans le textInput sans qu'il y ait de réactivité
+    #     codes_input <- vector("list", length = n)
+    #     # Créer des textInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_codes diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_code",i)]])) {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+    #                                       label = paste("Code Rx", i),
+    #                                       value = "")
+    #       } else {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+    #                                       label = paste("Code Rx", i),
+    #                                       value = input[[paste0("ns1_code",i)]])
+    #       }
+    #     }
+    #     return(tagList(codes_input))
+    #   })
+    # })
+    # output$ns1_nb_codes <- renderUI({ ns1_nb_codes() })
+    # ns1_nb_codes_retro <- reactive({
+    #   n <- input$ns1_nb_codes_retro  # nb codes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+    #   }
+    #   isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+    #     # dans le textInput sans qu'il y ait de réactivité
+    #     codes_input <- vector("list", length = n)
+    #     # Créer des textInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_codes diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_code_retro",i)]])) {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
+    #                                       label = paste("Code Rx Rétrospectif", i),
+    #                                       value = "")
+    #       } else {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
+    #                                       label = paste("Code Rx Rétrospectif", i),
+    #                                       value = input[[paste0("ns1_code_retro",i)]])
+    #       }
+    #     }
+    #     return(tagList(codes_input))
+    #   })
+    # })
+    # output$ns1_nb_codes_retro <- renderUI({ ns1_nb_codes_retro() })
+    #
+    # # Afficher une date pour le calcul de l'âge
+    # output$ns1_age_date <- renderUI({
+    #   if (any(input$ns1_group_by == "Age")) {
+    #     return(tagList(
+    #       dateInput("ns1_age_date", label = "Date pour calcul Âge", value = input$ns1_date1[1])
+    #     ))
+    #   } else {
+    #     return(NULL)
+    #   }
+    # })
+    #
+    # # En-tête Résultats - Apparaît seulement s'il y a eu une requête
+    # output$ns1_html_result_section <- renderUI({
+    #   if (ns1_val$show_tab) {
+    #     return(tagList(
+    #       div(style = "margin-top:15px"),
+    #       fluidRow(
+    #         h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+    #         style = "color: #ffffff; background-color: #0086b3;"
+    #       ),
+    #       div(style = "margin-top:10px")
+    #     ))
+    #   } else {
+    #     return(NULL)
+    #   }
+    # })
+    # # Requete SQL
+    # ns1_requete_sql <- eventReactive(input$ns1_go_extract, {
+    #   if (any("" %in% str_remove_all(find_code(input, "ns1"), " "))) {
+    #     ns1_val$show_tab <- FALSE
+    #     showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
+    #     return(NULL)
+    #   } else if (!is.null(conn_values$conn)) {
+    #     if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
+    #       ns1_val$show_tab <- FALSE
+    #       showNotification("Exécution impossible. Connexion requise.", type = "error")
+    #       return(NULL)
+    #     }
+    #     showNotification("Exécution en cours...", id = "ns1_go_extract", type = "message", duration = NULL)
+    #     ns1_val$show_tab <- TRUE
+    #     DT <- ns1_dbGetQuery(input, conn_values$conn)
+    #     removeNotification("ns1_go_extract")
+    #     return(DT)
+    #   } else {
+    #     ns1_val$show_tab <- FALSE
+    #     showNotification("Exécution impossible. Connexion requise.", type = "error")
+    #     return(NULL)
+    #   }
+    # })
+    # # Afficher le tableau demandé
+    # output$ns1_table_req <- renderDataTable(
+    #   {
+    #     DT <- table_format(ns1_requete_sql())
+    #     if (ns1_val$show_tab) {
+    #       return(DT)
+    #     } else {
+    #       return(NULL)
+    #     }
+    #   }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
+    # )
+    #
+    # # Réinitialiser les arguments comme initialement
+    # observeEvent(input$ns1_reset_args, {
+    #   # Effacer périodes sauf la 1ere
+    #   updateNumericInput(session, "ns1_nb_per", value = 1)
+    #
+    #   # Effacer code et remettre à 1 - Codes Rx + Codes Retro
+    #   n <- input$ns1_nb_codes
+    #   for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
+    #     updateTextInput(session, inputId = paste0("ns1_code",i),
+    #                     label = paste("Code Rx", i), value = "")
+    #   }
+    #   updateNumericInput(session, "ns1_nb_codes", value = 1)
+    #   n_retro <- input$ns1_nb_codes_retro
+    #   for (i in 1:n_retro) {  # Créer des textInput vide -> efface les valeurs précédentes
+    #     updateTextInput(session, inputId = paste0("ns1_code_retro_",i),
+    #                     label = paste("Code Rx Rétrospectif", i), value = "")
+    #   }
+    #   updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+    #
+    #   # Mettre à jour les checkboxGroup
+    #   # Mettre à jour les checkboxGroup
+    #   updateCheckboxGroupInput(session, inputId = "ns1_group_by", selected = "DENOM")
+    #   updateNumericInput(session, inputId = "ns1_njours_sans_conso", value = 365)
+    #   updateSelectInput(session, inputId = "ns1_code_serv_filter", selected = "Exclusion")
+    #   updateCheckboxGroupInput(session, inputId = "ns1_code_serv", selected = c("1", "AD"))
+    #   updateSelectInput(session, inputId = "ns1_code_list_filter", selected = "Inclusion")
+    #   updateCheckboxGroupInput(session, inputId = "ns1_code_list", selected = character())
+    #
+    #   # Effacer section Résultats et Requête SQL
+    #   ns1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
+    # })
+    #
+    #
+    #
 
     # stat_gen1 -----------------------------------------------------------------------------------
 

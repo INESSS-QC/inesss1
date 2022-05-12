@@ -25,14 +25,6 @@ knitr::opts_chunk$set(
   + Mise à jour des tables (2021-06-14)
 * Fonctions
   + Nouvelle fonction `SQL_reperage_cond_med`.
-  + Nouvelle fonction `install_RDCOMClient`.
-  + Nouvelle fonction `outlook_mail`.
-  + Amélioration des fonctions `confirm_nDx` ([Issue#30](https://github.com/INESSS-QC/inesss1/issues/30){target="_blank"}).
-  + `SQL_comorbidty` affiche les attributs comme supposé ([Issue#21](https://github.com/INESSS-QC/inesss1/issues/21){target="_blank"}).
-* Documentation
-  + AIDE_FORMULAIRE : Description supplémentaire des *Naïfs* et *Switch* ([Issue#25](https://github.com/INESSS-QC/inesss1/issues/25){target="_blank"}).
-  + Vignette `SQL_diagn`.
-  + Vignette `confirm_2Dx`.
 
 ### Version 1.0.0
 #### 2021-05-23
