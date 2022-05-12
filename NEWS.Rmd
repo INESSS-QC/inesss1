@@ -20,9 +20,7 @@ knitr::opts_chunk$set(
 
 ## Librairie [`inesss` `r paste0('v.',as.character(packageVersion('inesss')))`](https://github.com/INESSS-QC/inesss1){target="_blank"}
 
-### Version 1.0.0.9000
-* Tables
-  + Mise à jour des tables (2021-06-14)
+### Version 1.1.0
 * Fonctions
   + Nouvelle fonction `SQL_reperage_cond_med`.
 
