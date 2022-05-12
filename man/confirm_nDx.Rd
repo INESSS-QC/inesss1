@@ -5,7 +5,7 @@
 \alias{confirm_nDx}
 \alias{confirm_2Dx}
 \alias{confirm_3Dx}
-\title{Confirmation Diagnostics}
+\title{Astuce}
 \usage{
 confirm_2Dx(
   dt,
@@ -16,6 +16,7 @@ confirm_2Dx(
   study_end = NULL,
   n1 = 30,
   n2 = 730,
+  keep_first = FALSE,
   reverse = FALSE
 )
 
@@ -28,6 +29,7 @@ confirm_3Dx(
   study_end = NULL,
   n1 = 30,
   n2 = 730,
+  keep_first = FALSE,
   reverse = FALSE
 )
 }
@@ -45,6 +47,8 @@ confirm_3Dx(
 \item{study_end}{Date de fin de la période d'étude \strong{contenant les dates de repérage}. Si \code{NULL}, aura pour valeur la dernière date de \code{dt}, la plus récente.}
 
 \item{n1, n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
+
+\item{keep_first}{\code{TRUE} ou \code{FALSE}. Permet d'arrêter le processus si on veut conserver la première date qui est confirmée par une autre dans l'intervalle [n1; n2]. Accélère le processus en évitant de confirmer d'autres dates inutilement.}
 
 \item{reverse}{\code{TRUE} ou \code{FALSE}. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.}
 }
@@ -66,7 +70,7 @@ ex_3dx <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates',
 ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
                               n1 = 10, n2 = 20, reverse = TRUE)
 
-### With DIAGN column
+### Avec argument DIAGN
 dt_ex_dx <- data.frame(
   id = 1L,
   dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',

@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{comorbidity}
 \alias{comorbidity}
-\title{Comorbidity}
+\title{Astuce}
 \usage{
 comorbidity(
   dt,
@@ -33,7 +33,7 @@ comorbidity(
 
 \item{n1, n2}{Nombre de jours dans le but de construire l'intervalle \verb{[n1,n2]}. Pour qu'un code de diagnostic soit confirmé, il faut que \emph{DIAGN{i}} soit suivi de \emph{DIAGN{j}} (où i < j) et que le nombre de jours entre les deux soit dans l'intervalle \verb{[n1,n2]}.}
 
-\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset (de la librairie \emph{inesss}) contenant la liste des codes de diagnostics à l'étude.
 \itemize{
 \item \code{'Combine_Dx_CCI_INSPQ18'}
 \item \code{'Charlson_Dx_CCI_INSPQ18'}
@@ -52,7 +52,7 @@ comorbidity(
 
 \item{exclu_diagn}{Vecteur contenant le nom du ou des diagnostics à exclure de l'analyse. Voir la liste de \code{Dx_table} pour connaître les valeurs permises.}
 
-\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut (voir fonction \code{base::attributes}) le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table}
@@ -61,5 +61,6 @@ comorbidity(
 Calcul des indicateurs de \emph{Charlson}, \emph{Elixhauser} et la combinaison des deux.
 }
 \details{
-\strong{\code{confirm_sourc} :} Dans l'exemple \code{confirm_sourc = list(source1=1, source2=2, source3=2, ...)}, la \code{source3} pourrait confirmer la \code{source2} et vice-versa.
+\strong{\code{confirm_sourc} :} Dans l'exemple \code{confirm_sourc = list(source1=1, source2=2, source3=2, ...)}, la \code{source3} pourrait confirmer la \code{source2} et vice-versa.\cr\cr
+\strong{\code{Dx_table} :} Il n'est pas nécessaire d'inclure un pourcentage à la fin de chaque code. Le programme le fait automatiquement s'il n'y en a pas. Par exemple inscrire le code \code{I25} et \verb{I25\%} revient au même.
 }

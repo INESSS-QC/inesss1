@@ -1,4 +1,4 @@
-#' Comorbidity
+#' Requête Complexe
 #'
 #' Extraction des codes de diagnostics CIM pour ensuite calculer les indicateurs de Charlson et Elixhauser.
 #'
@@ -30,7 +30,7 @@
 #' @encoding UTF-8
 #' @export
 SQL_comorbidity <- function(
-  conn,
+  conn = SQL_connexion(),
   dt, ID, DATE_INDEX,
   Dx_table = 'Combine_Dx_CCI_INSPQ18', CIM = c('CIM9', 'CIM10'), scores = 'CCI_INSPQ_2018_CIM10',
   lookup = 2, n1 = 30, n2 = 730,
@@ -70,7 +70,7 @@ SQL_comorbidity <- function(
     }
 
     ### Cohorte d'étude
-    cohort <- dt$ID
+    cohort <- sort(dt$ID)
 
     ### Extraction des diagnostics dans les années désirées
     DIAGN <- SQL_comorbidity_diagn(
@@ -84,7 +84,7 @@ SQL_comorbidity <- function(
       fin = max(dt$DATE_INDEX),
       Dx_table = Dx_table, CIM = CIM,
       dt_source = dt_source, dt_desc = dt_desc,
-      date_dx_var = date_dx_var,
+      date_dx_var = date_dx_var, typ_diagn = c("A", "P", "S"),
       exclu_diagn = exclu_diagn, verbose = verbose
     )
 
@@ -137,6 +137,9 @@ SQL_comorbidity <- function(
       Dx_table, scores, confirm_sourc,
       exclu_diagn, keep_confirm_data
     )
+    # Conserver les attributs pour plus tard
+    attr_infos <- attr(dt, "infos")
+    attr_confirm_data <- attr(dt, "confirm_data")
 
     ### Ajouter les ID manquants
     ids_2_add <- cohort[!cohort %in% dt$ID]
@@ -148,6 +151,12 @@ SQL_comorbidity <- function(
       }
     }
     setkey(dt, ID)
+
+    ### Insérer les attributs dans le data final
+    attr(dt, "infos") <- attr_infos
+    if (keep_confirm_data) {
+      attr(dt, "confirm_data") <- attr_confirm_data
+    }
 
     return(dt)
 

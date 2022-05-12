@@ -2,7 +2,6 @@ library(usethis)
 library(data.table)
 library(readxl)
 
-
 # CIM9 --------------------------------------------------------------------
 
 CIM9 <- as.data.table(read_xlsx(
@@ -40,3 +39,4 @@ use_data(CIM9,
          CIM_correspond,
 
          overwrite = TRUE)
+rm(CIM9, CIM10, CIM_correspond)

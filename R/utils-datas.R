@@ -1,7 +1,7 @@
 
 # CIM_correspond ----------------------------------------------------------
 
-#' Data - Correspondance entre CIM9 et CIM10
+#' Table ou Liste
 #'
 #' Tableau de correspondance entre la CIM-9 et la CIM-10
 #'
@@ -20,7 +20,7 @@
 
 # CIM9 ------------------------------------------------------------------
 
-#' Data - Diagnostics CIM-9
+#' Table ou Liste
 #'
 #' Version légèrement modifiée par la RAMQ pour la facturation.
 #'
@@ -37,7 +37,7 @@
 
 # CIM10 -----------------------------------------------------------------
 
-#' Data - Diagnostics CIM-10
+#' Table ou Liste
 #'
 #' Version légèrement modifiée par la RAMQ pour la facturation.
 #'
@@ -54,9 +54,9 @@
 
 # Combine_Dx_CCI_INSPQ18 --------------------------------------------------
 
-#' Data - Codes diagnostics
+#' Table ou Liste
 #'
-#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#' Codes SQL à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
 #' Contient les codes des datas `Charlson_Dx_CCI_INSPQ18` et `Elixhauser_Dx_CCI_INSPQ18`.\cr\cr
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
@@ -103,9 +103,9 @@
 
 # Charlson_Dx_CCI_INSPQ18 -------------------------------------------------
 
-#' Data - Codes diagnostics
+#' Table ou Liste
 #'
-#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#' Codes SQL à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
 #' `aids` : AIDS/HIV\cr
@@ -135,7 +135,7 @@
 
 # Elixhauser_Dx_CCI_INSPQ18 --------------------------------------------------
 
-#' Data - Codes diagnostics
+#' Table ou Liste
 #'
 #' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
@@ -180,9 +180,9 @@
 
 # Charlson_Dx_UManitoba16 -------------------------------------------------
 
-#' Data - Codes diagnostics
+#' Table ou Liste
 #'
-#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+#' Codes SQL à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 #'
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.\cr\cr
 #' `aids` : HIV/AIDS\cr
@@ -213,11 +213,13 @@
 
 # ComorbidityWeights ------------------------------------------------------
 
-#' Data - Poids des codes de diagnostics
+#' Table ou Liste
+#'
+#' Liste contenant plusieurs tables. Chaque table indique les poids des codes de diagnostics à utiliser dans l'étude de la comorbidité.
 #'
 #' @details L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
-#' @format `list` contenant trois (3) tables indiquant la description, le code et le poids :
+#' @format `list` contenant des `data.table` :
 #' \describe{
 #'   \item{CCI_INSPQ_2018_CIM9}{}
 #'   \item{CCI_INSPQ_2018_CIM10}{}
@@ -233,7 +235,7 @@
 
 # I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
 
-#' Data - Demandes d'autorisation de Patient-Médicament d'exceptions.
+#' Domaine de valeur
 #'
 #' @format `list`
 #' \describe{
@@ -250,9 +252,9 @@
 
 # Obstetrics_Dx -----------------------------------------------------------
 
-#' Data - Codes diagnostics gestationnels
+#' Table ou Liste
 #'
-#' Codes SQL regex (se terminent par un '%') à utiliser lors de l'extraction des codes de diagnostics gestationnels pour l'étude de la comorbidité.
+#' Codes SQL à utiliser lors de l'extraction des codes de diagnostics gestationnels.
 #'
 #' L'attribut `MaJ` indique la dernière mise à jour ou la date de création du tableau.
 #'
@@ -265,7 +267,7 @@
 
 # DBC_TablesV -------------------------------------------------------------
 
-#' Data - Liste des tables de *EI* RAMQ
+#' Domaine de valeur
 #'
 #' @format `data.table` de 3 variables et 32708 observations
 #' \describe{
@@ -282,7 +284,7 @@
 
 # Pop_QC ------------------------------------------------------------------
 
-#' Data - Estimations et projections de population comparables (1996-2041)
+#' Table ou Liste
 #'
 #' Tableau de la population québécoise par niveau géographique.\cr\cr
 #' Ce fichier présente une série continue de données populationnelles comparables composée de la série des estimations (1996-2019) et de la série des projections (2020-2041) de population. Ces données tiennent compte de l'évolution de la population selon les plus récentes données observées de naissances, décès et mouvements migratoires.\cr\cr
@@ -317,7 +319,7 @@
 
 # RLS_list ----------------------------------------------------------------
 
-#' Data - Liste des RLS
+#' Table ou Liste
 #'
 #' Vecteur contenant la liste des 93 RLS plus 3 valeurs utiles lors d'analyse : 1001, 1701, 1801.
 #'
@@ -332,7 +334,7 @@
 
 # RLS_tab_convert -------------------------------------------------------------
 
-#' Data - Correspondance RLS Loi 10
+#' Table ou Liste
 #'
 #' Établir la correspondance des RLS avant et après l'adoption de la loi 10.
 #'
@@ -356,7 +358,7 @@
 
 # V_DEM_PAIMT_MED_CM ------------------------------------------------------
 
-#' Data
+#' Domaine de valeur
 #'
 #' Base de données sur les demandes de paiement de médicaments.
 #'
@@ -381,7 +383,7 @@
 
 # V_DENOM_COMNE_MED -------------------------------------------------------
 
-#' Data
+#' Domaine de valeur
 #'
 #' Description des codes de dénomination commune.
 #'
@@ -406,7 +408,7 @@
 
 # V_DES_COD ---------------------------------------------------------------
 
-#' Data
+#' Domaine de valeur
 #'
 #' Domaine de valeurs pour les différents codes de l'environnement informationnel.
 #'
@@ -430,7 +432,7 @@
 
 # V_PRODU_MED -------------------------------------------------------------
 
-#' Data
+#' Domaine de valeur
 #'
 #' Produit qui peut faire l'objet d'une facturation. Règle générale, c'est un médicament conçu par un fabricant.
 #'

@@ -1,7 +1,7 @@
-#' Tronquer un vecteur en plusieurs parties
+#' Astuce
 #'
-#' Divise le vecteur `x` en `n_chunks` parties ou le divise pour avoir au maximum `n_vals` valeurs dans chaque partie.
-#'
+#' En utilisant `n_chunks` : divise le vecteur `x` en `n_chunks` parties.\cr
+#' En utilisant `n_vals` : divise le vecteur `x` pour avoir au maximum `n_vals` valeurs dans chaque partie.\cr
 #' Utiliser l'argument `n_chunks` ou `n_vals`, pas les deux.
 #'
 #' @param x Vecteur à tronquer en plusieurs parties.

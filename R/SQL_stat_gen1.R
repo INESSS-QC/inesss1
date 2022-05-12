@@ -1,5 +1,6 @@
-#' Statistiques générales
+#' Astuce
 #'
+#' inesss v.`r as.character(packageVersion("inesss"))`\cr\cr
 #' Statistiques d'un ou de plusieurs codes de médicaments selon certains critères.\cr
 #' Vue utilisée : \code{\href{http://intranet/eci/ECI2/ASP/ECI2P04_DescVue.asp?Envir=PROD&NoVue=1823&NomVue=V%5FDEM%5FPAIMT%5FMED%5FCM+%28DEMANDES+DE+PAIEMENT+%2D+PROGRAMME+%ABMEDICAMENT%BB%29}{V_DEM_PAIMT_MED_CM}}.
 #'
@@ -42,8 +43,8 @@
 #' @import data.table
 #' @export
 #' @examples
-#' \dontrun{
-#' conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
+#' \donttest{
+#' conn <- SQL_connexion()
 #'
 #' ### group_by
 #' # Aucun

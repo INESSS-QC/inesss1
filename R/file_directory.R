@@ -1,4 +1,4 @@
-#' Utils
+#' Astuce
 #'
 #' Emplacement sur le disque dur où le script est sauvegardé.
 #'

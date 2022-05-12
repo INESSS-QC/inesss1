@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{DBC_TablesV}
 \alias{DBC_TablesV}
-\title{Data - Liste des tables de \emph{EI} RAMQ}
+\title{Domaine de valeur}
 \format{
 \code{data.table} de 3 variables et 32708 observations
 \describe{
@@ -17,6 +17,6 @@
 data('DBC_TablesV')
 }
 \description{
-Data - Liste des tables de \emph{EI} RAMQ
+Domaine de valeur
 }
 \keyword{internal}

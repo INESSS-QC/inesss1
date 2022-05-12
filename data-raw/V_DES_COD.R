@@ -4,7 +4,7 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(lubridate)
-# conn <- SQL_connexion(askpass("User"))
+conn <- SQL_connexion(user, pwd)
 
 fct <- function(need_conn = FALSE) {
 
@@ -33,8 +33,9 @@ fct <- function(need_conn = FALSE) {
 
 }
 
-
 V_DES_COD <- fct()
 use_data(V_DES_COD, overwrite = TRUE)
-
 rm(V_DES_COD)
+
+# Fermer la connexion
+conn <- odbc::dbDisconnect(conn)

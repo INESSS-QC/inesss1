@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Charlson_Dx_CCI_INSPQ18}
 \alias{Charlson_Dx_CCI_INSPQ18}
-\title{Data - Codes diagnostics}
+\title{Table ou Liste}
 \format{
 \code{list(Dx = list(CIM9, CIM10))}
 }
@@ -15,7 +15,7 @@
 data('Charlson_Dx_CCI_INSPQ18')
 }
 \description{
-Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
+Codes SQL à utiliser lors de l'extraction des codes de diagnostics pour l'étude de la comorbidité.
 }
 \details{
 L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.\cr\cr

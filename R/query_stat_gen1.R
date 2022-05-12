@@ -32,6 +32,7 @@
 #' @param age_date Date à laquelle on calcule l'âge si `group_by` contient `'Age'`. Si `NULL`, aura pour valeur `debut`.
 #'
 #' @return Chaîne de caractères à utiliser dans une requête SQL.
+#' @keywords internal
 #' @encoding UTF-8
 #' @export
 #' @examples

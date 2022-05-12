@@ -1,4 +1,4 @@
-#' Utils
+#' Astuce
 #'
 #' Combinaison de `sort()` et `unique()`.
 #'

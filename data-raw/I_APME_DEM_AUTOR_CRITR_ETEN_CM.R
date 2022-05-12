@@ -4,49 +4,39 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(stringr)
-# conn <- SQL_connexion(askpass("User"))
+library(writexl)
+conn <- SQL_connexion(user, pwd)
+
+
+# Fonctions ---------------------------------------------------------------
 
 des_court_indcn_recnu <- function() {
 
-  ### Vérifier si la variable d'itération contient une valeur nulle
-  verif_iterateur <- dbGetQuery(conn, statement = paste0(
-    "select APME_DAT_STA_DEM_PME as DAT_STA_DEM_PME\n",
-    "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-    "where APME_DAT_STA_DEM_PME is null;"
-  ))
-  if (nrow(verif_iterateur)) {
-    stop("I_APME_DEM_AUTOR_CRITR_ETEN_CM.des_court_indcn_recnu(): itérateur nulle.")
-  } else {
-    ### Années à utiliser pour les itérations
-    iter_vars <- dbGetQuery(conn, statement = paste0(
-      "select min(APME_DAT_STA_DEM_PME) as MIN_DAT,\n",
-      "       max(APME_DAT_STA_DEM_PME) as MAX_DAT\n",
-      "from I_APME_DEM_AUTOR_CRITR_ETEN_CM;"
-    ))
-
     ### Extraction
-    years <- (year(iter_vars$MIN_DAT)):(year(iter_vars$MAX_DAT))
-    DT <- vector("list", length(years))
+    years <- 1996:data.table::year(Sys.Date())
+    DT <- vector("list", length(years) * 12)
     i <- 1L
     for (yr in years) {
-      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select distinct(NPME_DES_COURT_INDCN_RECNU) as DES_COURT_INDCN_RECNU\n",
-        "from I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-        "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, 1, 1),"' and '",date_ymd(yr, 12, 31),"';"
-      )))
-      DT[[i]][, ANNEE := yr]
-      i <- i + 1L
+      for (mth in 1:12) {
+        DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+          "select distinct\n",
+          "    APME_COD_DENOM_COMNE_DEM as DENOM_DEM,\n",
+          "    APME_COD_DIN_DEM as DIN_DEM,\n",
+          "    extract(year from APME_DAT_STA_DEM_PME) as ANNEE,\n",
+          "    extract(month from APME_DAT_STA_DEM_PME) as MOIS,\n",
+          "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
+          "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+          "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
+          "    and NPME_DES_COURT_INDCN_RECNU is not null\n",
+          "    and APME_COD_DENOM_COMNE_DEM is not null;"
+        )))
+        i <- i + 1L
+      }
     }
     DT <- rbindlist(DT)
-    setorder(DT, DES_COURT_INDCN_RECNU, ANNEE)
-    DT <- DT[
-      , .(DEBUT = min(ANNEE),
-          FIN = max(ANNEE)),
-      .(DES_COURT_INDCN_RECNU)
-    ]
+    setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
 
     return(DT)
-  }
 
 }
 no_seq_indcn_recnu <- function() {
@@ -91,12 +81,20 @@ no_seq_indcn_recnu <- function() {
 
 }
 
+
+# Créer dataset ----------------------------------------------------------
+
 I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
   DES_COURT_INDCN_RECNU = des_court_indcn_recnu(),
   NO_SEQ_INDCN_RECNU_PME = no_seq_indcn_recnu()
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
-use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
 
+# Fermer la connexion
+conn <- odbc::dbDisconnect(conn)
+
+# Save data pour package --------------------------------------------------
+
+use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
 rm(I_APME_DEM_AUTOR_CRITR_ETEN_CM)

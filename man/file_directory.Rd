@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{file_directory}
 \alias{file_directory}
-\title{Utils}
+\title{Astuce}
 \usage{
 file_directory()
 }

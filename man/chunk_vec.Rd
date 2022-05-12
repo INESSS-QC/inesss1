@@ -2,7 +2,7 @@
 % Please edit documentation in R/chunk_vec.R
 \name{chunk_vec}
 \alias{chunk_vec}
-\title{Tronquer un vecteur en plusieurs parties}
+\title{Astuce}
 \usage{
 chunk_vec(x, n_chunks = NULL, n_vals = NULL)
 }
@@ -17,9 +17,8 @@ chunk_vec(x, n_chunks = NULL, n_vals = NULL)
 \code{list} ayant \code{n_chunks} éléments (ou \code{as.integer(length(x) / n_vals + 1L)}).
 }
 \description{
-Divise le vecteur \code{x} en \code{n_chunks} parties ou le divise pour avoir au maximum \code{n_vals} valeurs dans chaque partie.
-}
-\details{
+En utilisant \code{n_chunks} : divise le vecteur \code{x} en \code{n_chunks} parties.\cr
+En utilisant \code{n_vals} : divise le vecteur \code{x} pour avoir au maximum \code{n_vals} valeurs dans chaque partie.\cr
 Utiliser l'argument \code{n_chunks} ou \code{n_vals}, pas les deux.
 }
 \examples{

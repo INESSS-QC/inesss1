@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{RLS_list}
 \alias{RLS_list}
-\title{Data - Liste des RLS}
+\title{Table ou Liste}
 \format{
 Vecteur \code{integer} de 96 nombres.
 }

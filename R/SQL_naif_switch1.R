@@ -1,4 +1,4 @@
-#' Naïfs et Switchs
+#' Astuce
 #'
 #' Statistiques générales pour un ou des médicaments à partir d'une cohorte consommant ce(s) médicament(s) pour la première fois.\cr
 #' Un individu est considéré *naïf* lorsqu'il a un traitement pour la première fois et qu'il n'a jamais eu d'autres traitements *de la même famille*.\cr
@@ -39,72 +39,8 @@
 #' @encoding UTF-8
 #' @import data.table
 #' @export
-#' @examples
-#' \dontrun{
-#' conn <- SQL_connexion(askpass::askpass('Utilisateur :'), askpass::askpass('Mot de passe :'))
-#'
-#' ### group_by
-#' # Aucun
-#' ex01 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = NULL
-#' )
-#' # Tous les group_by
-#' ex02 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135),
-#'   group_by = c('AHFS', 'DENOM', 'DIN', 'CodeList', 'CodeServ', 'Teneur', 'Format', 'Age')
-#' )
-#'
-#' ### DENOM
-#' ex03 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM'
-#' )
-#'
-#' ### DIN
-#' ex04 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = 'DIN'
-#' )
-#'
-#' ### Exclusions Rx retrospectif
-#' # AHFS
-#' ex05 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
-#'   type_Rx_retro = 'AHFS', rx_retrospect_a_exclure = c('04----', '08--16', '122436')
-#' )
-#'
-#' # DENOM
-#' ex06 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(47092, 47135), group_by = 'DENOM',
-#'   type_Rx_retro = 'DENOM', rx_retrospect_a_exclure = c(47092, 47135, 47136)
-#' )
-#' # DIN
-#' ex07 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = 47092, group_by = c('DENOM', 'DIN'),
-#'   type_Rx_retro = 'DIN', rx_retrospect_a_exclure = c(2083523, 2084082, 2240331, 2453312)
-#' )
-#'
-#' ### Age
-#' ex08 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DIN', codes = c(30848, 585092), group_by = c('DIN', 'Age'), age_date = '2018-06-05'
-#' )
-#'
-#' ### Exclusion VS Inclusion
-#' ex09 <- SQL_naif_switch1(
-#'   conn, debut = c('2018-01-01', '2019-01-01'), fin = c('2018-12-31', '2019-12-31'),
-#'   type_Rx = 'DENOM', codes = c(39, 47092, 47135), group_by = 'DENOM',
-#'   code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-#'   code_list = c('40', '41'), code_list_filtre = 'Inclusion'
-#' )
-#' }
 SQL_naif_switch1 <- function(
-  conn = NULL, debut, fin,
+  conn = SQL_connexion(), debut, fin,
   type_Rx = 'DENOM', codes, group_by = 'DENOM',
   type_Rx_retro = NULL, rx_retrospect_a_exclure = NULL,
   njours_sans_conso = 365,

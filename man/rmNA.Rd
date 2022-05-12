@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{rmNA}
 \alias{rmNA}
-\title{Utils}
+\title{Astuce}
 \usage{
 rmNA(x)
 }

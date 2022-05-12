@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{I_APME_DEM_AUTOR_CRITR_ETEN_CM}
 \alias{I_APME_DEM_AUTOR_CRITR_ETEN_CM}
-\title{Data - Demandes d'autorisation de Patient-Médicament d'exceptions.}
+\title{Domaine de valeur}
 \format{
 \code{list}
 \describe{
@@ -19,6 +19,6 @@
 data('I_APME_DEM_AUTOR_CRITR_ETEN_CM')
 }
 \description{
-Data - Demandes d'autorisation de Patient-Médicament d'exceptions.
+Domaine de valeur
 }
 \keyword{datasets}

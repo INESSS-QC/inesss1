@@ -72,7 +72,7 @@ formulaire <- function() {
   }
   renderDataTable_options <- function() {
     return(list(
-      lengthMenu = list(c(25, 100, -1), c("25", "100", "All")),
+      lengthMenu = list(c(25, 100, -1), c("25", "100", "Tout")),
       pageLength = 100,
       scrollX = TRUE,
       searching = FALSE
@@ -124,6 +124,22 @@ formulaire <- function() {
     }
     return(code_serv)
   }
+  code_list_choices <- function(dt_code_list) {
+    ### Valeurs utilisées pour le choix des codes de liste de médicaments
+
+    dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
+  }
+  code_serv_choices <- function(dt_code_serv) {
+    ### Valeurs utilisées pour le choix des codes de service
+
+    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
+    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
+    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
+
+  }
   cols_select_from_method <- function(dt, method) {
     ### Puisque l'onglet Excel peut contenir des colonnes facultatives pour le
     ### formulaire, on doit les supprimer après l'avoir importé.
@@ -163,6 +179,67 @@ formulaire <- function() {
     dt <- setkey(dt, code)
     dt <- dt[dt[, .I[.N], .(code)]$V1]  # description la plus récente des codes de service
     return(dt)
+
+  }
+  find_date <- function(input, prefix, method = "deb") {
+    ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
+    ### (method = "fin") qui se retrouvent dans input.
+
+    if (method == "deb") {
+      type_date <- 1L
+    } else if (method == "fin") {
+      type_date <- 2L
+    } else {
+      stop("formulaire.find_date(): valeurs permises de method = {'deb', 'fin'}.")
+    }
+
+    if (is.null(input[[paste0(prefix,"_date1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements. Pourrait être géré autrement avec
+      # des ordres de priorité.
+      return(as.character(Sys.Date()))
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_per")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_date",i)]][type_date]))
+      }
+      return(vec)
+    }
+  }
+  find_code <- function(input, prefix) {
+    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
+    ### input. Si aucune valeur inscrite, retourne ""
+
+    if (is.null(input[[paste0(prefix, "_code1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements
+      return("")
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_codes")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_code",i)]]))
+      }
+      return(vec)
+    }
+
+  }
+  find_code_retro <- function(input, prefix) {
+    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
+    ### input. Si aucune valeur inscrite, retourne ""
+
+    if (is.null(input[[paste0(prefix, "_code_retro1")]])) {
+      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
+      # éviter des messages d'avertissements
+      return("")
+    } else if (input[[paste0(prefix,"_nb_codes_retro")]] == 1 && input[[paste0(prefix,"_code_retro1")]] == "") {
+      return(NULL)
+    } else {
+      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
+      for (i in 1:input[[paste0(prefix,"_nb_codes_retro")]]) {
+        vec <- c(vec, as.character(input[[paste0(prefix,"_code_retro",i)]]))
+      }
+      return(vec)
+    }
 
   }
   format_xl_err_nl <- function(l = 60) {
@@ -256,6 +333,31 @@ formulaire <- function() {
     } else {
       return(msg_error)
     }
+  }
+  ns1_dbGetQuery <- function(input, conn) {
+    ### Effectue la ou les requêtes de naifs switch selon les arguments
+    ### @param input : Équivalent à une liste. Les éléments doivent avoir les
+    ###                mêmes noms que les input de l'onglet sg1 = Statistiques générales
+    ### @param conn_values : Variable de connexion créé dans la section SERVER
+
+    DT <- SQL_naif_switch1(
+      conn = conn,
+      debut = find_date(input, "ns1", "deb"),
+      fin = find_date(input, "sg1", "fin"),
+      type_Rx = input$ns1_type_Rx,
+      codes = find_code(input, "ns1"),
+      group_by = input$ns1_group_by,
+      type_Rx_retro = input$ns1_type_Rx_retro,
+      rx_retrospect_a_exclure = find_code_retro(input, "ns1"),
+      njours_sans_conso = input$ns1_njours_sans_conso,
+      code_serv = adapt_code_serv(input$ns1_code_serv),
+      code_serv_filtre = input$ns1_code_serv_filter,
+      code_list = input$ns1_code_list,
+      code_list_filtre = input$ns1_code_list_filter,
+      age_date = input$ns1_age_date
+    )
+    return(DT)
+
   }
   save_Excel <- function(dt, save_path) {
     ### Enregistrer au format Excel
@@ -430,64 +532,6 @@ formulaire <- function() {
     ))
 
   }
-  sg1_find_date <- function(input, method = "deb") {
-    ### Trouver toutes les valeurs des dates de début, method="deb", ou de fin
-    ### (method = "fin") qui se retrouvent dans input.
-
-    if (method == "deb") {
-      type_date <- 1L
-    } else if (method == "fin") {
-      type_date <- 2L
-    } else {
-      stop("formulaire.sg1_find_date(): valeurs permises de method = {'deb', 'fin'}.")
-    }
-
-    if (is.null(input$sg1_date1)) {
-      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
-      # éviter des messages d'avertissements. Pourrait être géré autrement avec
-      # des ordres de priorité.
-      return(as.character(Sys.Date()))
-    } else {
-      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
-      for (i in 1:input$sg1_nb_per) {
-        vec <- c(vec, as.character(input[[paste0("sg1_date",i)]][type_date]))
-      }
-      return(vec)
-    }
-  }
-  sg1_find_code <- function(input) {
-    ### Trouver toutes les valeurs de codes d'analyse qui se retrouvent dans
-    ### input. Si aucune valeur inscrite, retourne ""
-
-    if (is.null(input$sg1_code1)) {
-      # Cette condition est utilisée seulement au lancement du shiny, c'est pour
-      # éviter des messages d'avertissements
-      return("")
-    } else {
-      vec <- c()  # pas possible d'utiliser vector(mode, length), à voir...
-      for (i in 1:input$sg1_nb_codes) {
-        vec <- c(vec, as.character(input[[paste0("sg1_code",i)]]))
-      }
-      return(vec)
-    }
-
-  }
-  sg1_code_list_choices <- function(dt_code_list) {
-    ### Valeurs utilisées pour le choix des codes de liste de médicaments
-
-    dt <- dt_code_list[code %in% c("03", "40", "41")]  # codes utilisés
-    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
-    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
-
-  }
-  sg1_code_serv_choices <- function(dt_code_serv) {
-    ### Valeurs utilisées pour le choix des codes de service
-
-    dt <- dt_code_serv[code %in% c("1", "AD", "L, M, M1 à M3")]  # codes utilisés
-    dt[, ch_name := paste0(code," : ",desc), .(code)]  # indiquer la description
-    return(list(ch_name = as.list(dt$ch_name), value = as.list(dt$code)))
-
-  }
   sg1_dbGetQuery <- function(input, conn) {
     ### Effectue la ou les requêtes de statistiques générales selon les arguments
     ### @param input : Équivalent à une liste. Les éléments doivent avoir les
@@ -496,8 +540,8 @@ formulaire <- function() {
 
     DT <- SQL_stat_gen1(
       conn = conn,
-      debut = sg1_find_date(input, "deb"), fin = sg1_find_date(input, "fin"),
-      type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
+      debut = find_date(input, "sg1", "deb"), fin = find_date(input, "sg1", "fin"),
+      type_Rx = input$sg1_type_Rx, codes = find_code(input, "sg1"), group_by = input$sg1_group_by,
       code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
       code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
       age_date = input$sg1_age_date
@@ -505,7 +549,21 @@ formulaire <- function() {
     return(DT)
 
   }
-  sg1_table_format <- function(dt) {
+  shinyFiles_directories <- function(input_name, method) {
+    ### Créer le répertoire à partir d'un shinyFileButton
+
+    if (is.integer(input_name)) {
+      return(NULL)
+    } else if (method == "save") {
+      return(parseSavePath(Volumes_path(), input_name))
+    } else if (method == "file") {
+      return(parseFilePaths(Volumes_path(), input_name))
+    } else {
+      stop("formulaire.shinyFiles_directories() method valeur non permise.")
+    }
+
+  }
+  table_format <- function(dt) {
     ### Format visuel des colonnes pour meilleure présentation du data créé par
     ### la requête
 
@@ -524,20 +582,6 @@ formulaire <- function() {
                 DUREE_TX = formatC(DUREE_TX, big.mark = " "))
       ]
       return(dt)
-    }
-
-  }
-  shinyFiles_directories <- function(input_name, method) {
-    ### Créer le répertoire à partir d'un shinyFileButton
-
-    if (is.integer(input_name)) {
-      return(NULL)
-    } else if (method == "save") {
-      return(parseSavePath(Volumes_path(), input_name))
-    } else if (method == "file") {
-      return(parseFilePaths(Volumes_path(), input_name))
-    } else {
-      stop("formulaire.shinyFiles_directories() method valeur non permise.")
     }
 
   }
@@ -590,8 +634,9 @@ formulaire <- function() {
       }
     }
 
-    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs & debut <= fin
     if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
+      # Même nombre de valeurs
       lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
       lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
       if (lng_deb != lng_fin) {  # si le nbre de valeurs est différent
@@ -601,6 +646,16 @@ formulaire <- function() {
         }
         msg_error <- paste0(msg_error,
                             " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
+        )
+      }
+      # Debut <= Fin
+      if (any(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " ") > stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  DATE_DEBUT doit être plus petit ou égal à DATE_FIN.\n"
         )
       }
     }
@@ -815,7 +870,7 @@ formulaire <- function() {
       }
     }
 
-    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs
+    # DATE_DEBUT & DATE_FIN doivent avoir le même nombre de valeurs & Debut <= Fin
     if ("DATE_DEBUT" %in% names(dt) && "DATE_FIN" %in% names(dt)) {
       lng_deb <- length(str_remove_all(rmNA(dt$DATE_DEBUT), " "))  # nombre de valeurs
       lng_fin <- length(str_remove_all(rmNA(dt$DATE_FIN), " "))
@@ -828,6 +883,17 @@ formulaire <- function() {
                             " -  DATE_DEBUT et DATE_FIN n'ont pas le même nombre de valeurs.\n"
         )
       }
+      # Debut <= Fin
+      if (any(stringr::str_remove_all(rmNA(dt$DATE_DEBUT), " ") > stringr::str_remove_all(rmNA(dt$DATE_FIN), " "))) {
+        if (new_error) {
+          msg_error <- paste0(msg_error, format_xl_err_sh(sh))  # indiquer nom d'onglet
+          new_error <- FALSE
+        }
+        msg_error <- paste0(msg_error,
+                            " -  DATE_DEBUT doit être plus petit ou égal à DATE_FIN.\n"
+        )
+      }
+
     }
 
     # TYPE_RX, CODE_SERV_FILTRE, CODE_LIST_FILTRE
@@ -1004,6 +1070,7 @@ formulaire <- function() {
 
         ### Méthodes
         menuItem("Requêtes via Excel", tabName = "tabExcel"),
+        # menuItem("Naïfs / Switch", tabName = "tabNaifsSwitch"),
         menuItem("Statistiques générales", tabName = "tabStatGen1"),
 
         div(style = "margin-top:30px"),
@@ -1059,6 +1126,112 @@ formulaire <- function() {
         ),
 
 
+
+        # UI - naif_switch1 -------------------------------------------------------
+
+        # tabItem(
+        #   tabName = "tabNaifsSwitch",
+        #
+        #   # ARGUMENTS SECTION
+        #   fluidRow(
+        #     h4(HTML("&nbsp;&nbsp;"), "Arguments"),
+        #     style = "color: #ffffff; background-color: #0086b3;"
+        #   ),
+        #   div(style = "margin-top:10px"),
+        #   fluidRow(
+        #     column(  # Période d'analyse
+        #       width = 3,
+        #       # Nombre de périodes à afficher
+        #       numericInput("ns1_nb_per", "Nombre de périodes", value = 1),
+        #       uiOutput("ns1_nb_per")
+        #     ),
+        #     column(  # Codes d'analyse
+        #       width = 3,
+        #       # Nombre de codes à afficher pour l'analyse
+        #       numericInput("ns1_nb_codes", "Nombre de Codes Rx", value = 1),
+        #       # Sélection du type de code Rx
+        #       selectInput("ns1_type_Rx", "Type de Code Rx",
+        #                   choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+        #       # Text inputs où indiquer les codes d'analyse
+        #       uiOutput("ns1_nb_codes")
+        #     ),
+        #     column(  # Codes rétrospectif
+        #       width = 3,
+        #       numericInput("ns1_nb_codes_retro", "Nombre de Codes Rx Rétrospectifs", value = 1),
+        #       # Sélection du type de code Rx
+        #       selectInput("ns1_type_Rx_retro", "Type de Code Rx Rétrospectifs",
+        #                   choices = c("AHFS", "DENOM", "DIN"), selected = "DENOM"),
+        #       # Text inputs où indiquer les codes d'analyse
+        #       uiOutput("ns1_nb_codes_retro")
+        #     ),
+        #     column(
+        #       width = 3,
+        #       # Grouper par
+        #       checkboxGroupInput(
+        #         "ns1_group_by", "Grouper par",
+        #         choices = c("AHFS", "DENOM", "DIN", "CodeServ", "CodeList", "Teneur", "Format", "Age"),
+        #         selected = "DENOM"
+        #       ),
+        #       div(style = "margin-top:-10px"),
+        #       # Date pour calcul de l'âge
+        #       uiOutput("ns1_age_date"),
+        #       # Nombre de jours sans traitement
+        #       numericInput("ns1_njours_sans_conso", "Jours sans Consommation", value = 365),
+        #       # Codes de services
+        #       selectInput("ns1_code_serv_filter", "Codes de Services",
+        #                   choices = c("Exclusion", "Inclusion"),
+        #                   selected = "Exclusion", multiple = FALSE),
+        #       div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+        #       checkboxGroupInput(
+        #         "ns1_code_serv", "",
+        #         choiceNames = code_serv_choices(dt_code_serv)$ch_name,
+        #         choiceValues = code_serv_choices(dt_code_serv)$value,
+        #         selected = c("1", "AD")
+        #       ),
+        #       # Codes liste médicaments
+        #       selectInput("ns1_code_list_filter", "Codes Liste Médicament",
+        #                   choices = c("Exclusion", "Inclusion"),
+        #                   selected = "Inclusion", multiple = FALSE),
+        #       div(style = "margin-top:-30px"),  # coller le checkBox qui suit
+        #       checkboxGroupInput(
+        #         "ns1_code_list", "",
+        #         choiceNames = code_list_choices(dt_code_list)$ch_name,
+        #         choiceValues = code_list_choices(dt_code_list)$value
+        #       )
+        #     )
+        #   ),
+        #   fluidRow(
+        #     column(
+        #       width = 3,
+        #       actionButton(  # Exécution de la requête SQL
+        #         "ns1_go_extract", "Exécuter Requête",
+        #         style = paste0("color: #ffffff;",
+        #                        "background-color: #006600;",
+        #                        "border-color: #000000;")
+        #       )
+        #     ),
+        #     column(
+        #       width = 3,
+        #       actionButton("ns1_reset_args", "Réinitialiser Arguments", style = reset_button_style())
+        #     )
+        #   ),
+        #
+        #   # RESULTATS SECTION
+        #   uiOutput("ns1_html_result_section"),  # En-tête
+        #   fluidRow(
+        #     p(),
+        #     dataTableOutput("ns1_table_req"),  # tableau des résultats
+        #     p()
+        #   ),
+        #   fluidRow(
+        #     # column(
+        #     #   width = 3,
+        #     #   uiOutput("sg1_save") # bouton sauvegarder les résultats de la requête
+        #     # )
+        #   ),
+        # ),
+
+
         # UI - stat_gen1 ------------------------------------------------------------------------------
 
         tabItem(
@@ -1107,8 +1280,8 @@ formulaire <- function() {
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               checkboxGroupInput(
                 "sg1_code_serv", "",
-                choiceNames = sg1_code_serv_choices(dt_code_serv)$ch_name,
-                choiceValues = sg1_code_serv_choices(dt_code_serv)$value,
+                choiceNames = code_serv_choices(dt_code_serv)$ch_name,
+                choiceValues = code_serv_choices(dt_code_serv)$value,
                 selected = c("1", "AD")
               ),
               # Codes liste médicaments
@@ -1118,8 +1291,8 @@ formulaire <- function() {
               div(style = "margin-top:-30px"),  # coller le checkBox qui suit
               checkboxGroupInput(
                 "sg1_code_list", "",
-                choiceNames = sg1_code_list_choices(dt_code_list)$ch_name,
-                choiceValues = sg1_code_list_choices(dt_code_list)$value
+                choiceNames = code_list_choices(dt_code_list)$ch_name,
+                choiceValues = code_list_choices(dt_code_list)$value
               )
             )
           ),
@@ -1340,6 +1513,195 @@ formulaire <- function() {
 
 
 
+    # # naif_switch1 ------------------------------------------------------------
+    #
+    # ns1_val <- reactiveValues(
+    #   show_query = FALSE,  # afficher la requête ou pas
+    #   query = NULL,  # message à afficher. NULL = même pas une case où afficher du texte
+    #   show_tab = FALSE  # contient le tableau de la requête/résultats
+    # )
+    #
+    # # Périodes d'analyse : afficher le bon nombre de dateRangeInput selon valeur
+    # # de input$ns1_nb_per
+    # output$ns1_nb_per <- renderUI({
+    #   n <- input$ns1_nb_per  # nb périodes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_per", value = 1)
+    #   }
+    #   isolate({  # voir commentaire 'output$sg1_nb_codes'
+    #     dates_input <- vector("list", length = n)
+    #     # Créer des dateRangeInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_per diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_date",i)]])) {
+    #         dates_input[[i]] <- dateRangeInput(
+    #           inputId = paste0("ns1_date",i), label = paste("Période", i),
+    #           separator = " au ",
+    #           autoclose = FALSE  # permet d'écrire manuellement la date sans erreur
+    #         )
+    #       } else {
+    #         dates_input[[i]] <- dateRangeInput(
+    #           inputId = paste0("ns1_date",i), label = paste("Période", i),
+    #           start = input[[paste0("ns1_date",i)]][1],
+    #           end = input[[paste0("ns1_date",i)]][2],
+    #           separator = " au ",
+    #           autoclose = FALSE
+    #         )
+    #       }
+    #     }
+    #     return(tagList(dates_input))
+    #   })
+    # })
+    #
+    # # Codes Rx d'analyse : afficher le bon nombre de textInput selon la valeur
+    # # de input$ns1_nb_codes
+    # ns1_nb_codes <- reactive({
+    #   n <- input$ns1_nb_codes  # nb codes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_codes", value = 1)
+    #   }
+    #   isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+    #     # dans le textInput sans qu'il y ait de réactivité
+    #     codes_input <- vector("list", length = n)
+    #     # Créer des textInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_codes diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_code",i)]])) {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+    #                                       label = paste("Code Rx", i),
+    #                                       value = "")
+    #       } else {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code",i),
+    #                                       label = paste("Code Rx", i),
+    #                                       value = input[[paste0("ns1_code",i)]])
+    #       }
+    #     }
+    #     return(tagList(codes_input))
+    #   })
+    # })
+    # output$ns1_nb_codes <- renderUI({ ns1_nb_codes() })
+    # ns1_nb_codes_retro <- reactive({
+    #   n <- input$ns1_nb_codes_retro  # nb codes & déclenche réactivité
+    #   if (is.na(n) || n < 1) {  # forcer valeur 1 si < 1
+    #     updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+    #   }
+    #   isolate({  # enlève la réactivité de chaque input créé, permet d'écrire
+    #     # dans le textInput sans qu'il y ait de réactivité
+    #     codes_input <- vector("list", length = n)
+    #     # Créer des textInput. Possible de conserver les valeurs précédentes
+    #     # si input$ns1_nb_codes diminue
+    #     for (i in 1:n) {
+    #       if (is.null(input[[paste0("ns1_code_retro",i)]])) {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
+    #                                       label = paste("Code Rx Rétrospectif", i),
+    #                                       value = "")
+    #       } else {
+    #         codes_input[[i]] <- textInput(inputId = paste0("ns1_code_retro",i),
+    #                                       label = paste("Code Rx Rétrospectif", i),
+    #                                       value = input[[paste0("ns1_code_retro",i)]])
+    #       }
+    #     }
+    #     return(tagList(codes_input))
+    #   })
+    # })
+    # output$ns1_nb_codes_retro <- renderUI({ ns1_nb_codes_retro() })
+    #
+    # # Afficher une date pour le calcul de l'âge
+    # output$ns1_age_date <- renderUI({
+    #   if (any(input$ns1_group_by == "Age")) {
+    #     return(tagList(
+    #       dateInput("ns1_age_date", label = "Date pour calcul Âge", value = input$ns1_date1[1])
+    #     ))
+    #   } else {
+    #     return(NULL)
+    #   }
+    # })
+    #
+    # # En-tête Résultats - Apparaît seulement s'il y a eu une requête
+    # output$ns1_html_result_section <- renderUI({
+    #   if (ns1_val$show_tab) {
+    #     return(tagList(
+    #       div(style = "margin-top:15px"),
+    #       fluidRow(
+    #         h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+    #         style = "color: #ffffff; background-color: #0086b3;"
+    #       ),
+    #       div(style = "margin-top:10px")
+    #     ))
+    #   } else {
+    #     return(NULL)
+    #   }
+    # })
+    # # Requete SQL
+    # ns1_requete_sql <- eventReactive(input$ns1_go_extract, {
+    #   if (any("" %in% str_remove_all(find_code(input, "ns1"), " "))) {
+    #     ns1_val$show_tab <- FALSE
+    #     showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
+    #     return(NULL)
+    #   } else if (!is.null(conn_values$conn)) {
+    #     if (is.logical(conn_values$conn) && conn_values$conn == FALSE) {
+    #       ns1_val$show_tab <- FALSE
+    #       showNotification("Exécution impossible. Connexion requise.", type = "error")
+    #       return(NULL)
+    #     }
+    #     showNotification("Exécution en cours...", id = "ns1_go_extract", type = "message", duration = NULL)
+    #     ns1_val$show_tab <- TRUE
+    #     DT <- ns1_dbGetQuery(input, conn_values$conn)
+    #     removeNotification("ns1_go_extract")
+    #     return(DT)
+    #   } else {
+    #     ns1_val$show_tab <- FALSE
+    #     showNotification("Exécution impossible. Connexion requise.", type = "error")
+    #     return(NULL)
+    #   }
+    # })
+    # # Afficher le tableau demandé
+    # output$ns1_table_req <- renderDataTable(
+    #   {
+    #     DT <- table_format(ns1_requete_sql())
+    #     if (ns1_val$show_tab) {
+    #       return(DT)
+    #     } else {
+    #       return(NULL)
+    #     }
+    #   }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
+    # )
+    #
+    # # Réinitialiser les arguments comme initialement
+    # observeEvent(input$ns1_reset_args, {
+    #   # Effacer périodes sauf la 1ere
+    #   updateNumericInput(session, "ns1_nb_per", value = 1)
+    #
+    #   # Effacer code et remettre à 1 - Codes Rx + Codes Retro
+    #   n <- input$ns1_nb_codes
+    #   for (i in 1:n) {  # Créer des textInput vide -> efface les valeurs précédentes
+    #     updateTextInput(session, inputId = paste0("ns1_code",i),
+    #                     label = paste("Code Rx", i), value = "")
+    #   }
+    #   updateNumericInput(session, "ns1_nb_codes", value = 1)
+    #   n_retro <- input$ns1_nb_codes_retro
+    #   for (i in 1:n_retro) {  # Créer des textInput vide -> efface les valeurs précédentes
+    #     updateTextInput(session, inputId = paste0("ns1_code_retro_",i),
+    #                     label = paste("Code Rx Rétrospectif", i), value = "")
+    #   }
+    #   updateNumericInput(session, "ns1_nb_codes_retro", value = 1)
+    #
+    #   # Mettre à jour les checkboxGroup
+    #   # Mettre à jour les checkboxGroup
+    #   updateCheckboxGroupInput(session, inputId = "ns1_group_by", selected = "DENOM")
+    #   updateNumericInput(session, inputId = "ns1_njours_sans_conso", value = 365)
+    #   updateSelectInput(session, inputId = "ns1_code_serv_filter", selected = "Exclusion")
+    #   updateCheckboxGroupInput(session, inputId = "ns1_code_serv", selected = c("1", "AD"))
+    #   updateSelectInput(session, inputId = "ns1_code_list_filter", selected = "Inclusion")
+    #   updateCheckboxGroupInput(session, inputId = "ns1_code_list", selected = character())
+    #
+    #   # Effacer section Résultats et Requête SQL
+    #   ns1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
+    # })
+    #
+    #
+    #
+
     # stat_gen1 -----------------------------------------------------------------------------------
 
     # Variables réactives pour sg1
@@ -1437,7 +1799,7 @@ formulaire <- function() {
     })
     # Requête SQL
     sg1_requete_sql <- eventReactive(input$sg1_go_extract, {
-      if (any("" %in% str_remove_all(sg1_find_code(input), " "))) {
+      if (any("" %in% str_remove_all(find_code(input, "sg1"), " "))) {
         sg1_val$show_tab <- FALSE
         showNotification("Inscrire un Code Rx dans chaque zone prévu à cet effet.", type = "error")
         return(NULL)
@@ -1459,15 +1821,15 @@ formulaire <- function() {
       }
     })
     # Afficher le tableau demandé
-    output$sg1_table_req <- renderDataTable({
-      DT <- sg1_table_format(sg1_requete_sql())
-      if (sg1_val$show_tab) {
-        return(DT)
-      } else {
-        return(NULL)
-      }
-    },
-    options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
+    output$sg1_table_req <- renderDataTable(
+      {
+        DT <- table_format(sg1_requete_sql())
+        if (sg1_val$show_tab) {
+          return(DT)
+        } else {
+          return(NULL)
+        }
+      }, options = renderDataTable_options()  # scrolling si le tableau est plus large que la fenêtre
     )
 
     # Enregistrer le fichier au format Excel
@@ -1494,9 +1856,9 @@ formulaire <- function() {
             dt = sg1_requete_sql(),
             args_list = list(
               METHODE = "stat_gen1",
-              DATE_DEBUT = sg1_find_date(input, "deb"),
-              DATE_FIN = sg1_find_date(input, "fin"),
-              TYPE_RX = input$sg1_type_Rx, CODE_RX = sg1_find_code(input),
+              DATE_DEBUT = find_date(input, "sg1", "deb"),
+              DATE_FIN = find_date(input, "sg1", "fin"),
+              TYPE_RX = input$sg1_type_Rx, CODE_RX = find_code(input, "sg1"),
               GROUPER_PAR = input$sg1_group_by,
               CODE_SERV_FILTRE = input$sg1_code_serv_filter,
               CODE_SERV = adapt_code_serv(input$sg1_code_serv),
@@ -1505,8 +1867,8 @@ formulaire <- function() {
               AGE_DATE = input$sg1_age_date
             ),
             query = query_stat_gen1(
-              debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
-              type_Rx = input$sg1_type_Rx, codes = sg1_find_code(input), group_by = input$sg1_group_by,
+              debut = find_date(input, "sg1", "deb")[1], fin = find_date(input, "sg1", "fin")[1],
+              type_Rx = input$sg1_type_Rx, codes = find_code(input, "sg1"), group_by = input$sg1_group_by,
               code_serv = input$sg1_code_serv, code_serv_filtre = input$sg1_code_serv_filter,
               code_list = input$sg1_code_list, code_list_filtre = input$sg1_code_list_filter,
               age_date = input$sg1_age_date
@@ -1538,9 +1900,9 @@ formulaire <- function() {
     sg1_code_SQL <- eventReactive(input$sg1_go_extract, {
       # Code SQL associé à la requête demandée
       query_stat_gen1(
-        debut = sg1_find_date(input, "deb")[1], fin = sg1_find_date(input, "fin")[1],
+        debut = find_date(input, "sg1", "deb")[1], fin = find_date(input, "sg1", "fin")[1],
         type_Rx = input$sg1_type_Rx,
-        codes = ifelse(input$sg1_type_Rx == "AHFS", sort(sg1_find_code(input))[1], sort(sg1_find_code(input))),
+        codes = ifelse(input$sg1_type_Rx == "AHFS", sort(find_code(input, "sg1"))[1], sort(find_code(input, "sg1"))),
         group_by = input$sg1_group_by,
         code_serv = adapt_code_serv(input$sg1_code_serv), code_serv_filtre = input$sg1_code_serv_filter,
         code_list = sort(input$sg1_code_list), code_list_filtre = input$sg1_code_list_filter,
@@ -1570,16 +1932,11 @@ formulaire <- function() {
       updateNumericInput(session, "sg1_nb_codes", value = 1)
 
       # Mettre à jour les checkboxGroup
-      updateCheckboxGroupInput(session, inputId = "sg1_group_by",
-                               selected = "Codes")
-      updateSelectInput(session, inputId = "sg1_code_serv_filter",
-                        selected = "Exclusion")
-      updateCheckboxGroupInput(session, inputId = "sg1_code_serv",
-                               selected = c("1", "AD"))
-      updateSelectInput(session, inputId = "sg1_code_list_filter",
-                        selected = "Inclusion")
-      updateCheckboxGroupInput(session, inputId = "sg1_code_list",
-                               selected = character(0))
+      updateCheckboxGroupInput(session, inputId = "sg1_group_by", selected = "DENOM")
+      updateSelectInput(session, inputId = "sg1_code_serv_filter", selected = "Exclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_serv", selected = c("1", "AD"))
+      updateSelectInput(session, inputId = "sg1_code_list_filter", selected = "Inclusion")
+      updateCheckboxGroupInput(session, inputId = "sg1_code_list", selected = character())
 
       # Effacer section Résultats et Requête SQL
       sg1_val$show_tab <- FALSE  # variable qui détermine si on affiche les sections
@@ -1596,7 +1953,50 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", "Chaîne de caractères")
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom",
+                        "DENOM_DEM")
+            ),
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din",
+                        "DIN_DEM")
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
+                          "Début période - Année",
+                          choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
+                          selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+            ),
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
+                          "Début période - Mois",
+                          choices = 1:12, selected = 1)
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
+                          "Fin période - Année",
+                          choices = max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
+                          selected = data.table::year(Sys.Date()))
+            ),
+            column(
+              width = 4,
+              selectInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
+                          "Fin période - Mois",
+                          choices = 1:12, selected = data.table::month(Sys.Date()))
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search",
+                        "DES_COURT_INDCN_RECNU")
             )
           ),
           fluidRow(
@@ -1605,7 +2005,8 @@ formulaire <- function() {
           ),
           div(style = "margin-top:15px"),
           fluidRow(
-            column(4, shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+            column(4, shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save",
+                                      "Sauvegarder Résultats en Excel",
                                       "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
                                       filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
                                       viewtype = "list",
@@ -1618,14 +2019,20 @@ formulaire <- function() {
           fluidRow(
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU", "NO_SEQ_INDCN_RECNU"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM", "DD_TRAIT_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR", "DD_AUTOR"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR", "DD_APLIC_AUTOR"),
-              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset", "Réinitialiser",
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__NO_SEQ_INDCN_RECNU",
+                        "NO_SEQ_INDCN_RECNU"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_TRAIT_DEM",
+                        "DD_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_AUTOR",
+                        "DD_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DD_APLIC_AUTOR",
+                        "DD_APLIC_AUTOR"),
+              actionButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset",
+                           "Réinitialiser",
                            style = reset_button_style()),
               div(style = "margin-top:15px"),
-              shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save", "Sauvegarder Résultats en Excel",
+              shinySaveButton("I_APME_DEM_AUTOR_CRITR_ETEN_CM_save",
+                              "Sauvegarder Résultats en Excel",
                               "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
                               filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
                               viewtype = "list",
@@ -1633,10 +2040,14 @@ formulaire <- function() {
             ),
             column(
               width = 4,
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM", "DAT_STA_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM", "DF_TRAIT_DEM"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR", "DF_AUTOR"),
-              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR", "DF_APLIC_AUTOR")
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DAT_STA_DEM",
+                        "DAT_STA_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_TRAIT_DEM",
+                        "DF_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_AUTOR",
+                        "DF_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__DF_APLIC_AUTOR",
+                        "DF_APLIC_AUTOR")
             )
           ),
           div(style = "margin-top:20px")
@@ -1651,6 +2062,8 @@ formulaire <- function() {
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- reactive({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU)
+        setkey(DT, DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU, ANNEE, MOIS)
+        # Rechercher les mots-clés de DES_COURT_INDCN_RECNU
         search_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search,
                                                   "\\+"))
         if (length(search_words) == 1 && search_words == "") {
@@ -1662,6 +2075,42 @@ formulaire <- function() {
             DT[, paste(i) := NULL]
           }
         }
+        # Rechercher les DENOM_DEM
+        denom_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom,
+                                                  "\\+"))
+        if (length(denom_words) == 1 && denom_words == "") {
+          # rien pour le moment...
+        } else {
+          for (i in 1:length(denom_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(DENOM_DEM), tolower(denom_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        # Rechercher les DIN_DEM
+        din_words <- unlist(stringr::str_split(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din,
+                                                 "\\+"))
+        if (length(din_words) == 1 && din_words == "") {
+          # rien pour le moment...
+        } else {
+          for (i in 1:length(din_words)) {
+            DT[, paste(i) := stringr::str_detect(tolower(DIN_DEM), tolower(din_words[i]))]
+            DT <- DT[get(paste(i)) == TRUE]
+            DT[, paste(i) := NULL]
+          }
+        }
+        # Période d'étude à analyser
+        DT <- DT[ANNEE >= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut) &
+                   MOIS >= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut) &
+                   ANNEE <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin) &
+                   MOIS <= as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin)]
+        # Regrouper ensemble les dates continues dans le temps
+        DT[, DATE := paste0(ANNEE,"-",stringr::str_pad(MOIS, 2, "left", "0")), .(DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU)]
+        DT <- DT[
+          , .(DEBUT = first(DATE),
+              FIN = last(DATE)),
+          .(DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU)
+        ]
         return(DT)
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         DT <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$NO_SEQ_INDCN_RECNU_PME)
@@ -1688,6 +2137,16 @@ formulaire <- function() {
                                                                 options = renderDataTable_options())
     # Réinitialisation
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom", selected = "")
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din", selected = "")
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
+                        selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
+                        selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MOIS))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
+                        selected = max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
+                        selected = data.table::month(Sys.Date()))
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", value = "")
     })
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__NO_SEQ_INDCN_RECNU_PME__reset, {
@@ -1824,8 +2283,41 @@ formulaire <- function() {
           ),
           fluidRow(
             column(4, actionButton("V_DEM_PAIMT_MED_CM__COD_DIN__reset", "Réinitialiser",
-                         style = reset_button_style()))
+                                   style = reset_button_style()))
 
+          ),
+          div(style = "margin-top:15px"),
+          fluidRow(
+            column(4, shinySaveButton("V_DEM_PAIMT_MED_CM_save", "Sauvegarder Résultats en Excel",
+                                      "Enregistrer sous...",  # message du haut une fois la fenêtre ouverte
+                                      filetype = list(`Classeur Excel` = "xlsx"),  # type de fichier permis
+                                      viewtype = "list",
+                                      style = saveExcel_button_style()))
+          ),
+          div(style = "margin-top:20px")
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        return(tagList(
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DENOM", "DENOM")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DIN", "DIN")),
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__TENEUR", "TENEUR")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_TENEUR", "NOM_TENEUR"))
+          ),
+          fluidRow(
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__FORME", "FORME")),
+            column(4, textInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_FORME", "NOM_FORME"))
+          ),
+          fluidRow(
+            column(4, sliderInput("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN", "DEBUT - FIN",
+                                  min = 1996, max = year(Sys.Date()), value = c(1996, year(Sys.Date())),
+                                  sep = "", step = 1))
+          ),
+          fluidRow(
+            column(4, actionButton("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__reset", "Réinitialiser",
+                                   style = reset_button_style()))
           ),
           div(style = "margin-top:15px"),
           fluidRow(
@@ -1981,6 +2473,27 @@ formulaire <- function() {
             FIN <= input$V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN[[2]]
         ]
         return(DT)
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        DT <- inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME
+        for (col in c("DENOM", "DIN", "TENEUR", "NOM_TENEUR", "FORME", "NOM_FORME")) {
+          search_words <- unlist(stringr::str_split(
+            input[[paste0("V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__",col)]], "\\+"
+          ))
+          if (length(search_words) == 1 && search_words == "") {
+            next
+          } else {
+            for (i in 1:length(search_words)) {
+              DT[, paste(i) := stringr::str_detect(tolower(get(col)), tolower(search_words[i]))]
+              DT <- DT[get(paste(i)) == TRUE]
+              DT[, paste(i) := NULL]
+            }
+          }
+        }
+        DT <- DT[
+          input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN[[1]] <= DEBUT &
+            FIN <= input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN[[2]]
+        ]
+        return(DT)
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
         DT <- copy(inesss::V_DEM_PAIMT_MED_CM$COD_SERV)
         for (col in c("COD_SERV", "COD_SERV_DESC")) {
@@ -2059,6 +2572,15 @@ formulaire <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DIN", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__MARQ_COMRC", value = "")
       updateSliderInput(session, "V_DEM_PAIMT_MED_CM__COD_DIN__DEBUT_FIN", value = c(1996, year(Sys.Date())))
+    })
+    observeEvent(input$V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__reset, {
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DENOM", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DIN", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__TENEUR", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_TENEUR", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__FORME", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__NOM_FORME", value = "")
+      updateSliderInput(session, "V_DEM_PAIMT_MED_CM__DENOM_DIN_TENEUR_FORME__DEBUT_FIN", value = c(1996, year(Sys.Date())))
     })
     observeEvent(input$V_DEM_PAIMT_MED_CM__COD_SERV__reset, {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__COD_SERV__COD_SERV", value = "")

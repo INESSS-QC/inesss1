@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{V_DEM_PAIMT_MED_CM}
 \alias{V_DEM_PAIMT_MED_CM}
-\title{Data}
+\title{Domaine de valeur}
 \format{
 \code{list} :
 \describe{

@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{sunique}
 \alias{sunique}
-\title{Utils}
+\title{Astuce}
 \usage{
 sunique(x, decreasing = FALSE, na.last = FALSE)
 }

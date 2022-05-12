@@ -1,4 +1,4 @@
-#' Date
+#' Astuce
 #'
 #' Retourne une date au format `AAAA-MM-JJ`. Utile dans des `for loop`, car `dd` peut prendre la valeur `'last'` (au lieu d'un nombre), donc pas besoin de savoir si le dernier jour du mois est le 28 ou le 29 en février, ou un 30 ou un 31 pour les autres mois.
 #'

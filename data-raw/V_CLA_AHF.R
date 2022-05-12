@@ -3,7 +3,7 @@ library(data.table)
 library(odbc)
 library(inesss)
 library(askpass)
-# conn <- SQL_connexion(askpass("User"))
+conn <- SQL_connexion(user, pwd)
 
 fct <- function() {
 
@@ -23,3 +23,8 @@ fct <- function() {
 
 V_CLA_AHF <- fct()
 use_data(V_CLA_AHF, overwrite = TRUE)
+rm(V_CLA_AHF)
+
+# Fermer la connexion
+odbc <- odbc::dbDisconnect(conn)
+

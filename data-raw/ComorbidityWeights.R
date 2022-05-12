@@ -27,6 +27,14 @@ ComorbidityWeights$UManitoba_2016[, POIDS := as.integer(POIDS)]
 setkey(ComorbidityWeights$UManitoba_2016, DIAGN_CODE)
 
 
+# CCI_INSPQ_Manitoba --------------------------------------------------------------------------
+
+ComorbidityWeights$CCI_INSPQ_Manitoba <-
+  as.data.table(read_excel("inst/extdata/Comorbidity_weights.xlsx", "CCI_INSPQ_Manitoba"))
+ComorbidityWeights$CCI_INSPQ_Manitoba[, POIDS := as.integer(POIDS)]
+setkey(ComorbidityWeights$CCI_INSPQ_Manitoba, DIAGN_CODE)
+
+
 
 attr(ComorbidityWeights, "MaJ") <- Sys.Date()
 use_data(ComorbidityWeights, overwrite = TRUE)

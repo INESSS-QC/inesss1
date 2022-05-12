@@ -1,4 +1,4 @@
-#' Confirmation Diagnostics
+#' Astuce
 #'
 #' Confirmation d'un diagnostic par d'autres diagnostics lorsque ceux-ci se retrouvent dans un intervalle précis.
 #'
@@ -9,6 +9,7 @@
 #' @param study_start Date de début de la période d'étude **contenant les dates de repérage**. Si `NULL`, aura pour valeur la première date de `dt`, la plus ancienne.
 #' @param study_end Date de fin de la période d'étude **contenant les dates de repérage**. Si `NULL`, aura pour valeur la dernière date de `dt`, la plus récente.
 #' @param n1,n2 Nombre de jours permettant de construire l'intervalle \[n1; n2\] où un code de diagnostic peut en confirmer un autre.
+#' @param keep_first `TRUE` ou `FALSE`. Permet d'arrêter le processus si on veut conserver la première date qui est confirmée par une autre dans l'intervalle \[n1; n2\]. Accélère le processus en évitant de confirmer d'autres dates inutilement.
 #' @param reverse `TRUE` ou `FALSE`. Si on doit faire la vérification en prenant la date la plus récente et en reculant dans le temps.
 #'
 #' @name confirm_nDx
@@ -28,7 +29,7 @@
 #' ex_3dx_reverse <- confirm_3Dx(dt = dt_ex, ID = 'id', DATE = 'dates', DIAGN = NULL,
 #'                               n1 = 10, n2 = 20, reverse = TRUE)
 #'
-#' ### With DIAGN column
+#' ### Avec argument DIAGN
 #' dt_ex_dx <- data.frame(
 #'   id = 1L,
 #'   dates = c('2020-01-01', '2020-01-09', '2020-01-10', '2020-01-15', '2020-01-16',
@@ -50,9 +51,13 @@
 #' @rdname confirm_nDx
 #' @import data.table
 #' @export
-confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
-                        study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
-                        reverse = FALSE) {
+confirm_2Dx <- function(
+  dt, ID, DATE, DIAGN = NULL,
+  study_start = NULL, study_end = NULL,
+  n1 = 30, n2 = 730,
+  keep_first = FALSE,
+  reverse = FALSE
+) {
 
   ### Arranger data
   # Convertir data.table au besoin
@@ -92,7 +97,7 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
     study_end <- lubridate::as_date(study_end)
   }
 
-  ### Nombre d'itérations nécessaires
+  ### Nombre d'itérations nécessaires au maximum
   dt[, n_iter := 1:.N, .(ID, DIAGN)]
   n_iter <- max(dt$n_iter)
   dt[, n_iter := NULL]
@@ -105,7 +110,7 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
     setkey(dt, ID, DIAGN, DATE)
   }
   for (i in 1:n_iter) {
-    idx <- dt[, .I[.N >= 2], .(ID, DIAGN)]$V1  # lignes où les ID ont 3 obs ou plus
+    idx <- dt[, .I[.N >= 2], .(ID, DIAGN)]$V1  # lignes où les ID ont 2 obs ou plus
     if (length(idx)) {
       sd <- dt[idx]  # subset data
       # Trouver 1ère date où la différence = [n1, n2]
@@ -115,8 +120,11 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
       }
       sd[, diff := cumsum(diff), .(ID, DIAGN)]  # nombre de jours cumulés
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
-      sd[, keep := fcase(any(diff %in% n1:n2), TRUE,
-                         default = FALSE)]
+      sd[
+        , keep := fcase(any(diff %in% n1:n2), TRUE,
+                        default = FALSE),
+        .(ID, DIAGN)
+      ]
       # sd[, keep := FALSE]
       # sd[any(diff %in% n1:n2), keep := TRUE, .(ID, DIAGN)]
       sd <- sd[keep == TRUE]
@@ -135,11 +143,19 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
           .(ID, DIAGN)
         ]
         confirm_tab[[i]] <- sd
+        if (keep_first) {
+          # Supprimer les ID qui ont déjà une date confirmée
+          dt <- dt[!ID %in% sunique(sd$ID)]
+        }
       }
     } else {
       break
     }
-    dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne
+    if (nrow(dt)) {
+      dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne
+    } else {
+      break
+    }
   }
 
   ### Arrangement data final
@@ -182,9 +198,13 @@ confirm_2Dx <- function(dt, ID, DATE, DIAGN = NULL,
 #' @rdname confirm_nDx
 #' @import data.table
 #' @export
-confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
-                        study_start = NULL, study_end = NULL, n1 = 30, n2 = 730,
-                        reverse = FALSE) {
+confirm_3Dx <- function(
+  dt, ID, DATE, DIAGN = NULL,
+  study_start = NULL, study_end = NULL,
+  n1 = 30, n2 = 730,
+  keep_first = FALSE,
+  reverse = FALSE
+) {
 
   ### Arranger data
   # Convertir data.table au besoin
@@ -217,11 +237,19 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
     study_start <- min(dt$DATE)
   } else if (!lubridate::is.Date(study_start)) {
     study_start <- lubridate::as_date(study_start)
+    # Supprimer les dates qui ne concordent pas avec study_start
+    if (!reverse) {
+      dt <- dt[DATE >= study_start]
+    }
   }
   if (is.null(study_end)) {
     study_end <- max(dt$DATE)
   } else if (!lubridate::is.Date(study_end)) {
     study_end <- lubridate::as_date(study_end)
+    # Supprimer les dates qui ne concordent pas avec study_end
+    if (reverse) {
+      dt <- dt[DATE <= study_end]
+    }
   }
 
   ### Nombre d'itérations nécessaires
@@ -258,8 +286,8 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
       # Conserver les ID où la 1ere ligne est confirmé par deux dates
       sd[, keep := FALSE]
       sd[
-        any(diff %in% n1:n2) & any(diff2 %in% n1:n2),
-        keep := TRUE,
+        , keep := fcase(any(diff %in% n1:n2) & any(diff2 %in% n1:n2), TRUE,
+                        default = FALSE),
         .(ID, DIAGN)
       ]
       sd <- sd[keep == TRUE]
@@ -281,11 +309,19 @@ confirm_3Dx <- function(dt, ID, DATE, DIAGN = NULL,
           .(ID, DIAGN)
         ]
         confirm_tab[[i]] <- sd
+        if (keep_first) {
+          # Supprimer les ID qui ont déjà une date confirmée
+          dt <- dt[!ID %in% sunique(sd$ID)]
+        }
       }
     } else {
       break
     }
-    dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne
+    if (nrow(dt)) {
+      dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1ere ligne
+    } else {
+      break
+    }
   }
 
   ### Arrangement data final

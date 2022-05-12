@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{replace_NA_in_dt}
 \alias{replace_NA_in_dt}
-\title{Utils}
+\title{Astuce}
 \usage{
 replace_NA_in_dt(dt, by)
 }

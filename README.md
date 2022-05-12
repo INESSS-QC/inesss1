@@ -1,17 +1,19 @@
-inesss 1.0.0
-
-# Support
+Support
+=======
 
 Pour des questions, des commentaires ou pour désigner tout défaut de
 conception, écrire un courriel à `guillaume.boucher@inesss.qc.ca` et
 indiquer l’objet `librairie inesss`.
 
-# Installation de la librairie *inesss*
+Installation de la librairie *inesss*
+=====================================
 
--   Télécharger le fichier *inesss_x.y.z.tar.gz* sur votre poste où
+-   Télécharger le fichier *inesss\_x.y.z.tar.gz* sur votre poste où
     *x.y.z* est le numéro de version.
 -   Copier le code suivant dans la console de RStudio en prenant bien
-    soin d’y inscrire le répertoire complet et le nom du fichier.
+    soin d’y inscrire le répertoire complet et le nom du fichier (**ne
+    pas copier l’exemple**).
+    -   Remplacer les `\` par `/` ou `\\`
 
 ``` r
 if (!"remotes" %in% installed.packages()[,1]) install.packages("remotes")
@@ -24,7 +26,8 @@ remotes::install_local("Mon/repertoire/de/telechargement/inesss_x.y.z.tar.gz", u
 library(inesss)
 ```
 
-# Documentation
+Documentation
+=============
 
 -   **Gabarits et Outils EXCEL :** Fichiers à utiliser pour *Requêtes
     via Excel* et macros VBA pratiques pour Excel.
@@ -38,41 +41,47 @@ library(inesss)
     Excel*.
 -   **AIDE-FORMULAIRE-EXEMPLES-RESULTATS.xlsx** : Résultats générés à
     partir du fichier *AIDE-FORMULAIRE-EXEMPLES-ARGUMENTS.xlsx*.
--   **inesss_x.y.z :** Documentation complète de la librairie *inesss*
+-   **inesss\_x.y.z :** Documentation complète de la librairie *inesss*
     où *x.y.z* indique le numéro de version.
 -   **inesss-REGISTRE-VERSION.html :** Registre des versions. Tous les
     ajouts et les modifications apportées à la librairie y sont
     inscrits.
 
-# Démarrer le formulaire
+Démarrer le formulaire
+======================
 
 <img src="Documentation/source/images/formulaire-addin.png" style="width:90.0%" />
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 
-# Notes de création
+Notes de création
+=================
 
-## R
+R
+-
 
 R version 4.0.5 (2021-03-31)
 
-## Librairies
+Librairies
+----------
 
 `askpass` v.1.1<br> `data.table` v.1.14.0<br> `DBI` v.1.1.1<br> `fs`
-v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.32<br> `lubridate`
+v.1.5.0<br> `kableExtra` v.1.3.4<br> `knitr` v.1.31<br> `lubridate`
 v.1.7.10<br> `miniUI` v.0.1.1.1<br> `parallel` v.4.0.5<br> `odbc`
-v.1.3.2<br> `readxl` v.1.3.1<br> `rmarkdown` v.2.7<br> `rstudioapi`
-v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard` v.0.7.1<br> `shinyFiles`
-v.0.9.0<br> `stringr` v.1.4.0<br> `testthat` v.3.0.2<br> `writexl`
-v.1.4.0
+v.1.3.1<br> `Rd2md` v.0.0.5<br> `readxl` v.1.3.1<br> `rmarkdown`
+v.2.11<br> `rstudioapi` v.0.13<br> `shiny` v.1.6.0<br> `shinydashboard`
+v.0.7.1<br> `shinyFiles` v.0.9.0<br> `stringr` v.1.4.0<br> `testthat`
+v.3.0.2<br> `writexl` v.1.3.1
 
 <p style="page-break-before: always">
 <p style="margin-bottom:3cm">
 
-# Autres installations/désinstallations
+Autres installations/désinstallations
+=====================================
 
-## Installation de R
+Installation de R
+-----------------
 
 -   Télécharger la version R 4.0.5 en cliquant
     [ici](https://cloud.r-project.org/bin/windows/base/old/4.0.5/R-4.0.5-win.exe)
@@ -117,7 +126,8 @@ v.1.4.0
     *msXXX* est votre numéro d’identifiant. Répéter les étapes à partir
     de *Cliquer sur Tools*.
 
-## Désinstallation de R
+Désinstallation de R
+--------------------
 
 Suivre les étapes suivantes pour supprimer une ancienne version de R
 installée à partir de la [section 1 *Installation de R*](#inst).
@@ -138,7 +148,8 @@ installée à partir de la [section 1 *Installation de R*](#inst).
     installées. Pour sauver de l’espace disque, il est conseillé de
     supprimer ce dossier (clic droit de la souris, puis supprimer).
 
-## Rtools40
+Rtools40
+--------
 
 -   Télécharger *Rtools40* en cliquant
     [ici](https://cran.r-project.org/bin/windows/Rtools/rtools40-x86_64.exe).

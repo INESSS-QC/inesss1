@@ -12,8 +12,12 @@ SQL_comorbidity_diagn.V_DIAGN_SEJ_HOSP_CM(
   fin,
   diag_desc,
   sourc_desc,
-  date_dx_var
+  date_dx_var,
+  typ_diagn
 )
+}
+\arguments{
+\item{diagn}{Comparativement aux autres fonctions d'extraction, celle-ci conserve la liste des diagnostics par CIM9 et CIM10 parce qu'il est possible de les séparer. La variable \code{SHOP_NO_SEQ_SYS_CLA} indique si c'est un CIM9 ou un CIM10, car la vue \code{V_DIAGN_SEJ_HOSP_CM} peut contenir deux fois le même code de diagnostic appartenant à des CIM différents.}
 }
 \description{
 Requête SQL pour extraire les diagnostics de la vue V_DIAGN_SEJ_HOSP_CM

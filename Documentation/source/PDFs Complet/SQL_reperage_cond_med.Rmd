@@ -1,0 +1,502 @@
+---
+title: "SQL_reperage_cond_med"
+output:
+  pdf_document:
+    number_sections: yes
+    extra_dependencies: ["xcolor", "caption"]
+    
+geometry: "left=1.15cm,right=1.15cm,top=1.5cm,bottom=1.5cm"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, eval = FALSE)
+library(inesss)
+library(kableExtra)
+library(data.table)
+```
+\captionsetup[table]{labelformat=empty}
+
+# Description
+
+Repérage d'une condition médicale
+
+
+\vspace{1.5cm}
+
+
+# Usage
+
+```{r}
+NomTable <- SQL_reperage_cond_med(
+  conn = SQL_connexion(),
+  debut, fin,
+  Dx_table,
+  CIM = c("CIM9", "CIM10"),
+  by_Dx = FALSE,
+  date_dx_var = "admis",
+  n1 = 30, n2 = 730
+)
+```
+
+
+\pagebreak
+
+
+# Arguments
+
+## conn
+Variable contenant la connexion entre R et Teradata. Voir la documentation de la fonction `SQL_connexion()`.
+```{r}
+conn = SQL_connexion("msXXX")
+```
+
+## debut & fin
+Date de début et de fin de la période d'étude au format `AAAA-MM-JJ`.
+```{r}
+debut = "2021-01-01", fin = "2021-12-31"
+```
+
+## Dx_table
+`list` contenant les codes de diagnostics à l'étude.
+```{r}
+Dx_table = list(
+  diabete = list(CIM9 = c("2504%", "2505%", "2506%", "2507%"),
+                 CIM10 = c("E102%", "E103%", "E104%", "E105%", "E107%")),
+  diabete_complique = list(CIM9 = c("250%"),
+                           CIM10 = c("E100%", "E101%", "E106%", "E108%", "E109%"))
+)
+```
+
+## CIM
+Sélection entre `CIM9`, `CIM10` ou les deux.
+```{r}
+CIM = "CIM9"  # CIM9 seulement
+CIM = "CIM10"  # CIM10 seulement
+CIM = c("CIM9", "CIM10")  # CIM9 et CIM10
+```
+
+## by_Dx
+Permet des études de sensibilité sans avoir besoin de réécrire la liste des codes. Voir ci-dessous en exemple les équivalences en utilisant `by_Dx` au lieu de tout réécrire le code.
+```{r}
+Dx_table = list(
+  diabete = list(CIM9 = c("2504%", "2505%", "2506%", "2507%"),
+                 CIM10 = c("E102%", "E103%", "E104%", "E105%", "E107%")),
+  diabete_complique = list(CIM9 = c("250%"),
+                           CIM10 = c("E100%", "E101%", "E106%", "E108%", "E109%"))
+),
+by_Dx = FALSE
+
+# Revient à écrire :
+Dx_table = list(
+  diabete_tout = list(
+    CIM9 = c("2504%", "2505%", "2506%", "2507%",
+             "250%"),
+    CIM10 = c("E102%", "E103%", "E104%", "E105%", "E107%",
+              "E100%", "E101%", "E106%", "E108%", "E109%"))
+),
+by_Dx = TRUE  # ou FALSE, pas d'importance, car un seul type de condition médicale
+```
+
+## date_dx_var
+Indique si on utilise la date d'admission (`admis`) ou la date de départ (`depar`) comme date de diagnostic lors de l'extraction des données. Voir la section *Processus*, *Étape 1* et *Étape 2* pour voir l'impact sur le code SQL généré.
+```{r}
+date_dx_var = "admis"  # date d'amission
+date_dx_var = "depar"  # date de départ
+```
+
+## n1 & n2
+Nombre entier. Permet de construire l'intervalle `[n1, n2]`. Pour qu'un code de diagnostic soit confirmé, il faut que *DIAGN{i}* soit suivi de *DIAGN{j}* (où `i` < `j`) et que le nombre de jours entre `DIAGN{j} - DIAGN{i}` soit dans cet intervalle.
+```{r}
+n1 = 30, n2 = 730
+```
+
+
+\pagebreak
+
+
+# Résultat
+
+\vspace{1cm}
+
+```{r, echo=FALSE, eval=TRUE, results="asis"}
+dt_result <- data.table(
+  Variable = c(
+    "ID",
+    "DIAGN",
+    "DI\\_Finale",
+    "DI\\_Hospit",
+    "DI\\_Acte",
+    "DC\\_Acte",
+    "D\\_Recent"
+  ),
+  Descriptif = c(
+    "Numéro d'identification de l'individu.",
+    "Nom du diagnostic inscrit dans l'argument \\textsf{Dx\\_table}. Selon l'exemple de la section \\textit{Arguments}, on y verrait les valeurs \\textsf{diabete} et \\textsf{diabete\\_complique}. \\textbf{Présente seulement si \\textsf{by\\_Dx=TRUE}}.",
+    "Date d'incidence retenue.",
+    "Date d'incidence des hospitalisations",
+    "Date d'incidence des actes",
+    "Date qui confirme la date d'incidence de l'acte \\texttt{DI\\_Acte} selon l'intervalle \\textsf{[n1, n2]}.",
+    "Date du diagnostic le plus récent dans l'intervalle \\texttt{[debut, fin]} dans les trois banques (BDCU, MED-ÉCHO et SMOD) sans tenir compte de l'algorithme."
+  )
+)
+
+kable(dt_result, "latex", booktabs = TRUE, escape = FALSE, longtable = TRUE, linesep = "") %>%
+  kable_styling(latex_options = "hold_position", position = "center") %>%
+  column_spec(1, "2.5cm") %>%
+  column_spec(2, "14cm")
+```
+
+
+
+\pagebreak
+
+
+# Processus
+Supposons les arguments suivants :
+```{r}
+debut = "2021-01-01"
+fin = "2021-12-31"
+Dx_table = list(
+  code1 = list(CIM9 = c("2504%", "2505%", "2506%"),
+               CIM10 = c("E102%", "E103%", "E104%"))
+)
+n1 = 30
+n2 = 730
+```
+
+\vspace{1cm}
+
+## Étape 1 --- MED-ÉCHO
+Pour chaque personne, repérer la 1$^{re}$ admission parmi toutes ses hospitalisations qui contient un diagnostic de la condition médicale. Rechercher dans les diagnostics hsopitaliers suivants : Principal (P), Secondaires (S) et Services et décès (D).
+
+### V_DIAGN_SEJ_HOSP_CM
+\textcolor{white}{.}
+
+#### `date_dx_var = "admis"` & `CIM = c("CIM9", "CIM10")`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = Dx_table[[1]], date_dx_var = "admis",
+  typ_diagn = c("P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and  (
+            (SHOP_COD_DIAGN_MDCAL_CLINQ like any ('E102%', 'E103%', 'E104%')
+              and SHOP_NO_SEQ_SYS_CLA = 1)
+          or
+            (SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%')
+              and SHOP_NO_SEQ_SYS_CLA = 4)
+          )
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('P', 'S', 'D');
+```
+
+#### `date_dx_var = "depar"` & `CIM = "CIM9"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = list(CIM9 = c("2504%", "2505%", "2506%")),
+date_dx_var = "depar",
+  typ_diagn = c("P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_DEPAR_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%')
+    and SHOP_NO_SEQ_SYS_CLA = 4
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('P', 'S', 'D');
+```
+
+#### `date_dx_var = "admis"` & `CIM = "CIM10"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = list(CIM10 = c("E102%", "E103%", "E104%")),
+date_dx_var = "admis",
+  typ_diagn = c("P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('E102%', 'E103%', 'E104%')
+    and SHOP_NO_SEQ_SYS_CLA = 1
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('P', 'S', 'D');
+```
+
+\vspace{1cm}
+
+### V_SEJ_SERV_HOSP_CM
+
+#### `date_dx_var = "admis"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_SEJ_SERV_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = unlist(Dx_table[[1]]),
+  date_dx_var = "admis")
+)
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+#### `date_dx_var = "depar"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_SEJ_SERV_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = unlist(Dx_table[[1]]),
+  date_dx_var = "depar")
+)
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_DAT_DEPAR_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+\pagebreak
+
+## Étape 2 --- BDCU, SMOD et MED-ÉCHO
+Pour chaque personne, repérer le 1$^{er}$ diagnostic de la condition médicale inscrit à un des trois fichiers si celui-ci est suivi d'un autre diagnostic de la condition médicale inscrit à un de ces mêmes trois fichiers dans un intervalle d'au moins `n1` jours et de moins de `n2` jours.\newline
+Pour MED-ÉCHO, rechercher dans tous les diagnostics hospitaliers : Admission (A), Principal (P), Secondaires (S) et Services et décès (D).
+
+\vspace{1cm}
+
+### V_DIAGN_SEJ_HOSP_CM --- MED-ÉCHO
+#### `date_dx_var = "admis"` & `CIM = c("CIM9", "CIM10")`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = Dx_table[[1]], date_dx_var = "admis",
+  typ_diagn = c("A", "P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and  (
+            (SHOP_COD_DIAGN_MDCAL_CLINQ like any ('E102%', 'E103%', 'E104%')
+              and SHOP_NO_SEQ_SYS_CLA = 1)
+          or
+            (SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%')
+              and SHOP_NO_SEQ_SYS_CLA = 4)
+          )
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S', 'D');
+```
+
+#### `date_dx_var = "depar"` & `CIM = "CIM9"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = list(CIM9 = c("2504%", "2505%", "2506%")),
+date_dx_var = "depar",
+  typ_diagn = c("A", "P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_DEPAR_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%')
+    and SHOP_NO_SEQ_SYS_CLA = 4
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S', 'D');
+```
+
+#### `date_dx_var = "admis"` & `CIM = "CIM10"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_DIAGN_SEJ_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = list(CIM10 = c("E102%", "E103%", "E104%")),
+date_dx_var = "admis",
+  typ_diagn = c("A", "P", "S", "D")
+))
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_DIAGN_SEJ_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('E102%', 'E103%', 'E104%')
+    and SHOP_NO_SEQ_SYS_CLA = 1
+    and SHOP_TYP_DIAGN_SEJ_HOSP in ('A', 'P', 'S', 'D');
+```
+
+\vspace{1cm}
+
+### V_SEJ_SERV_HOSP_CM --- MED-ÉCHO
+
+#### `date_dx_var = "admis"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_SEJ_SERV_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = unlist(Dx_table[[1]]),
+  date_dx_var = "admis")
+)
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_ADMIS_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_DAT_ADMIS_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+#### `date_dx_var = "depar"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_SEJ_SERV_HOSP_CM(
+  debut = debut, fin = fin,
+  diagn = unlist(Dx_table[[1]]),
+  date_dx_var = "depar")
+)
+```
+```{sql}
+select SHOP_NO_INDIV_BEN_BANLS as ID,
+       SHOP_DAT_DEPAR_SEJ_HOSP as DATE_DX
+from RES_SSS.V_SEJ_SERV_HOSP_CM
+where SHOP_DAT_DEPAR_SEJ_HOSP between '2021-01-01' and '2021-12-31'
+    and SHOP_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+\vspace{1cm}
+
+### V_EPISO_SOIN_DURG_CM --- BDCU
+
+#### `date_dx_var = "admis"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_EPISO_SOIN_DURG_CM(debut, fin, diagn = unlist(Dx_table[[1]]), date_dx_var = "admis"))
+```
+```{sql}
+select SURG_NO_INDIV_BEN_BANLS as ID,
+       SURG_DHD_EPISO_SOIN_DURG as DATE_DX
+from RES_SSS.V_EPISO_SOIN_DURG_CM
+where SURG_DHD_EPISO_SOIN_DURG between to_date('2021-01-01') and to_date('2021-12-31')
+    and SURG_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+#### `date_dx_var = "depar"`
+\textcolor{white}{.}
+```{r, echo=FALSE}
+cat(query_V_EPISO_SOIN_DURG_CM(debut, fin, diagn = unlist(Dx_table[[1]]), date_dx_var = "depar"))
+```
+```{sql}
+select SURG_NO_INDIV_BEN_BANLS as ID,
+       SURG_DH_DEPAR_USAG_DURG as DATE_DX
+from RES_SSS.V_EPISO_SOIN_DURG_CM
+where SURG_DH_DEPAR_USAG_DURG between to_date('2021-01-01') and to_date('2021-12-31')
+    and SURG_COD_DIAGN_MDCAL_CLINQ like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%');
+```
+
+\vspace{1cm}
+
+### I_SMOD_SERV_MD_CM --- SMOD
+
+```{r, echo=FALSE}
+cat(query_I_SMOD_SERV_MD_CM(debut, fin, unlist(Dx_table[[1]])))
+```
+```{sql}
+select SMOD_NO_INDIV_BEN_BANLS as ID,
+       SMOD_DAT_SERV as DATE_DX
+from PROD.I_SMOD_SERV_MD_CM
+where SMOD_DAT_SERV between '2021-01-01' and '2021-12-31'
+    and SMOD_COD_DIAGN_PRIMR like any ('2504%', '2505%', '2506%', 'E102%', 'E103%', 'E104%')
+    and SMOD_COD_STA_DECIS = 'PAY';
+```
+
+\pagebreak
+
+### Confirmation des diagnostics
+Exemples où `n1=30` et `n2=730`.
+
+#### Exemple 1
+\textcolor{white}{.}\newline
+```{r, echo=FALSE, eval=TRUE, results="asis"}
+ex1 <- data.table(ID = 1, DATE_DX = c("2020-01-01", "2020-01-20", "2020-02-05"))
+kable(ex1, "latex", booktabs = TRUE, caption = "Avant") %>%
+  kable_styling(latex_options = "hold_position", position = "center")
+```
+```{r, echo=FALSE, eval=TRUE, results="asis"}
+ex1_1 <- confirm_2Dx(ex1, "ID", "DATE_DX")
+kable(ex1_1, "latex", booktabs = TRUE, caption = "Après") %>%
+  kable_styling(latex_options = "hold_position", position = "center")
+```
+
+#### Exemple 2
+\textcolor{white}{.}\newline
+```{r, echo=FALSE, eval=TRUE, results="asis"}
+ex2 <- data.table(ID = 1, DATE_DX = c("2018-01-01", "2018-01-20", "2020-06-15", "2020-07-25", "2020-09-05"))
+kable(ex2, "latex", booktabs = TRUE, caption = "Avant") %>%
+  kable_styling(latex_options = "hold_position", position = "center")
+```
+```{r, echo=FALSE, eval=TRUE, results="asis"}
+ex2_1 <- confirm_2Dx(ex2, "ID", "DATE_DX")
+kable(ex2_1, "latex", booktabs = TRUE, caption = "Après") %>%
+  kable_styling(latex_options = "hold_position", position = "center")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

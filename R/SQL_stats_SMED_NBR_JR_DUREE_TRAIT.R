@@ -1,4 +1,4 @@
-#' Statistiques
+#' Astuces
 #'
 #' Statistiques descriptives de la variable `SMED_NBR_JR_DUREE_TRAIT` de la vue `V_DEM_PAIMT_MED_CM`.
 #'
@@ -12,7 +12,11 @@
 #' @import data.table
 #' @encoding UTF-8
 #' @export
-SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(conn, debut, fin, by_code_serv = TRUE, include_dureeTx_0 = FALSE) {
+SQL_stats_SMED_NBR_JR_DUREE_TRAIT <- function(
+  conn = SQL_connexion(),
+  debut, fin,
+  by_code_serv = TRUE, include_dureeTx_0 = FALSE
+) {
 
   # Vérification des arguments ----------------------------------------------
 

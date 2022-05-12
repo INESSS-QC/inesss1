@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{V_DENOM_COMNE_MED}
 \alias{V_DENOM_COMNE_MED}
-\title{Data}
+\title{Domaine de valeur}
 \format{
 Tableau de 7 variables :
 \describe{

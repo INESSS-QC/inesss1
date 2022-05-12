@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{SQL_connexion}
 \alias{SQL_connexion}
-\title{Connexion Teradata}
+\title{Astuce}
 \usage{
 SQL_connexion(uid = NULL, pwd = NULL, dsn = "PEI_PRD", encoding = "latin1")
 }

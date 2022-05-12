@@ -3,10 +3,10 @@
 \encoding{UTF-8}
 \name{SQL_comorbidity}
 \alias{SQL_comorbidity}
-\title{Comorbidity}
+\title{Requête Complexe}
 \usage{
 SQL_comorbidity(
-  conn,
+  conn = SQL_connexion(),
   dt,
   ID,
   DATE_INDEX,
@@ -37,7 +37,7 @@ SQL_comorbidity(
 
 \item{DATE_INDEX}{Nom de la colonne contenant la date index de chaque usager.}
 
-\item{Dx_table}{Nom du dataset contenant la liste des codes de diagnostics à l'étude.
+\item{Dx_table}{\code{list} personnelle contenant les codes de diagnostics ou nom du dataset (de la librairie \emph{inesss}) contenant la liste des codes de diagnostics à l'étude.
 \itemize{
 \item \code{'Combine_Dx_CCI_INSPQ18'}
 \item \code{'Charlson_Dx_CCI_INSPQ18'}
@@ -66,7 +66,7 @@ SQL_comorbidity(
 
 \item{confirm_sourc}{\code{list} indiquant la \emph{confiance} des \code{SOURCE}. Si une \code{SOURCE} doit être confirmée par une autre dans l'intervalle \verb{[n1,n2]}, inscrire \code{2}, sinon \code{1}. Inscrire les sources sous le format : \code{confirm_sourc = list(source1 = 1, source2 = 2, source3 = 2, ...)}. \code{confirm_sourc} doit contenir toutes les valeurs uniques de la colonne \code{SOURCE}.}
 
-\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM. Voir la vignette \emph{SQL_comorbidity} section 4 \emph{Sources SQL (dt_source)} pour voir le code SQL généré.}
+\item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.}
 
 \item{obstetric_exclu}{\code{TRUE} ou \code{FALSE}. Si l'on doit exclure (\code{TRUE}) les diabètes et les hypertensions de type gestationnel. Voir Détails.}
 
@@ -74,7 +74,7 @@ SQL_comorbidity(
 
 \item{verbose}{\code{TRUE} ou \code{FALSE}. Affiche le temps qui a été nécessaire pour extraire les diagnostics d'une source (\code{dt_source}). Utile pour suivre le déroulement de l'extraction.}
 
-\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
+\item{keep_confirm_data}{\code{TRUE} ou \code{FALSE}. Place en attribut (voir fonction \code{base::attributes}) le data \code{confirm_data} qui indique la date de repérage et la date de confirmation d'un diagnostic.}
 }
 \value{
 \code{data.table} :

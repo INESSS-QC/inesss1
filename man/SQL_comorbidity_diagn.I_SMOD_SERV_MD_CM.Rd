@@ -18,4 +18,7 @@ SQL_comorbidity_diagn.I_SMOD_SERV_MD_CM(
 \description{
 Requête SQL pour extraire les diagnostics de la vue I_SMOD_SERV_MD_CM
 }
+\details{
+L'argument \code{date_dx_var} n'est pas utilisé dans cette fonction. Il est là pour permettre une boucle avec les autres fonctions de requêtes.
+}
 \keyword{internal}

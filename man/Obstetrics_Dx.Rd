@@ -4,7 +4,7 @@
 \encoding{UTF-8}
 \name{Obstetrics_Dx}
 \alias{Obstetrics_Dx}
-\title{Data - Codes diagnostics gestationnels}
+\title{Table ou Liste}
 \format{
 \code{list(Dx = list(CIM9, CIM10))}
 }
@@ -12,7 +12,7 @@
 data('Obstetrics_Dx')
 }
 \description{
-Codes SQL regex (se terminent par un '\%') à utiliser lors de l'extraction des codes de diagnostics gestationnels pour l'étude de la comorbidité.
+Codes SQL à utiliser lors de l'extraction des codes de diagnostics gestationnels.
 }
 \details{
 L'attribut \code{MaJ} indique la dernière mise à jour ou la date de création du tableau.
