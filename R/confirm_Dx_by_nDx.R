@@ -1,6 +1,6 @@
 #' Confirmation Diagnostic
-#' 
-#' Indique la liste des diagnostics qui sont confirmés par `nDx` dans un intervalle de [`n1`, `n2`] jours.
+#'
+#' Indique la liste des diagnostics qui sont confirmés par `nDx` dans un intervalle de \[`n1`, `n2`\] jours.
 #'
 #' @param dt Table d'analyse.
 #' @param ID Nom de la colonne indiquant le numéro de l'usager, de l'individu.
@@ -8,8 +8,8 @@
 #' @param DATE_DX Nom de la colonne indiquant la date du diagnostic.
 #' @param nDx Nombre de diagnostics qui doivent confirmer une date précédente.
 #' @param n1,n2 Nombre de jours requis pour confirmer le diagnostic
-#' @param keep_all Afficher toutes les dates qui sont suivies de `nDx` date(s) dans un intervalle de [`n1`, `n2`] jours (`TRUE`), ou conserver seulement la première date (`FALSE`).
-#' 
+#' @param keep_all Afficher toutes les dates qui sont suivies de `nDx` date(s) dans un intervalle de \[`n1`, `n2`\] jours (`TRUE`), ou conserver seulement la première date (`FALSE`).
+#'
 #' @import data.table
 #' @importFrom lubridate as_date
 #'
@@ -23,7 +23,7 @@ confirm_Dx_par_nDx <- function(
   n1 = 30, n2 = 730,
   keep_all = FALSE
 ) {
-  
+
   # Arranger dataset
   if (!is.data.table(dt)) {
     dt <- as.data.table(dt)  # convertir data.table au besoin
@@ -39,7 +39,7 @@ confirm_Dx_par_nDx <- function(
   }
   nloop <- max(dt[, .N, .(ID, DIAGN)]$N) - nDx  # nombre de loop nécessaire au maximum
   DT_final <- vector("list", nloop)  # table résultante
-  
+
   for (i in 1:nloop) {
     dt_confirm <- copy(dt)
     dt_confirm[, diff := DATE_DX - shift(DATE_DX), .(ID, DIAGN)][is.na(diff), diff := 0L]  # nbre jours entre la date et celle précédente
@@ -67,7 +67,7 @@ confirm_Dx_par_nDx <- function(
       stop("Erreur dans le nombre d'itérations de la boucle FOR.")  # back up au cas où l'algorithme aurait une erreur
     }
   }
-  
+
   # Arranger la table finale
   DT_final <- rbindlist(DT_final)
   setkey(DT_final)
@@ -77,30 +77,30 @@ confirm_Dx_par_nDx <- function(
     DT_final[, (col) := as_date(get(col))]
     setnames(DT_final, col, paste0("DATE_CONF", col))
   }
-  
+
   return(DT_final)
-  
+
 }
 
-library(data.table)
-library(lubridate)
-
-### Verifs
-# 0 < n1 < n2
-# DATE_DX doit être une date au format "AAAA-MM-JJ"
-
-t1 <- confirm_Dx_par_nDx(
-  dt = sample_Rx_processed,
-  ID = "id", DIAGN = "code", DATE_DX = "tx_start",
-  nDx = 2,
-  n1 = 30, n2 = 730,
-  keep_all = TRUE
-)
-
-t2 <- confirm_Dx_par_nDx(
-  dt = sample_Rx_processed,
-  ID = "id", DIAGN = "code", DATE_DX = "tx_start",
-  nDx = 2,
-  n1 = 30, n2 = 730,
-  keep_all = FALSE
-)
+# library(data.table)
+# library(lubridate)
+#
+# ### Verifs
+# # 0 < n1 < n2
+# # DATE_DX doit être une date au format "AAAA-MM-JJ"
+#
+# t1 <- confirm_Dx_par_nDx(
+#   dt = sample_Rx_processed,
+#   ID = "id", DIAGN = "code", DATE_DX = "tx_start",
+#   nDx = 2,
+#   n1 = 30, n2 = 730,
+#   keep_all = TRUE
+# )
+#
+# t2 <- confirm_Dx_par_nDx(
+#   dt = sample_Rx_processed,
+#   ID = "id", DIAGN = "code", DATE_DX = "tx_start",
+#   nDx = 2,
+#   n1 = 30, n2 = 730,
+#   keep_all = FALSE
+# )
