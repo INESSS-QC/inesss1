@@ -11,10 +11,12 @@ SQL_reperage_cond_med(
   fin,
   Dx_table,
   CIM = c("CIM9", "CIM10"),
+  nDx = 1,
   by_Dx = TRUE,
   date_dx_var = "admis",
   n1 = 30,
-  n2 = 730
+  n2 = 730,
+  ...
 )
 }
 \arguments{
@@ -28,13 +30,15 @@ SQL_reperage_cond_med(
 
 \item{CIM}{\code{'CIM9'}, \code{'CIM10'} ou les deux. Permet de filtrer les codes de diagnostics selon le numéro de révision de la \emph{Classification statistique internationale des maladies et des problèmes de santé connexes} (CIM).}
 
+\item{nDx}{Nombre de diagnostics qui doivent confirmer la 1re date. Par défaut 1.}
+
 \item{by_Dx}{\code{TRUE} ou \code{FALSE}. Distinction entre les diagnostics (\code{TRUE}) ou pas (\code{FALSE}). Si \code{TRUE}, on considère chaque élément de \code{Dx_table} où chaque élément peut contenir plusieurs codes. Le nombre d'éléments sera donc le nombre maximal d'observations (lignes résultats) par individu.\cr Si \code{FALSE}, on considère tous les éléments de \code{Dx_Table} comme un seul, on aura donc au maximum une ligne résultat par individu.\cr Voir Détails.}
 
 \item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.}
 
-\item{n1}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
+\item{n1}{Nombre de jours requis pour confirmer le diagnostic}
 
-\item{n2}{Nombre de jours permettant de construire l'intervalle [n1; n2] où un code de diagnostic peut en confirmer un autre.}
+\item{n2}{Nombre de jours requis pour confirmer le diagnostic}
 }
 \value{
 \code{data.table} :
@@ -54,4 +58,83 @@ Repérage d'une condition médicale.
 \details{
 \strong{by_Dx :}\cr
 Supposons \verb{Dx_table = list(Angoisse = [...], Trouble = [...], Deficience = [...])}. Si \code{TRUE}, il y aura la colonne \code{DIAGN} qui indiquera des dates pour chaque élément, soit \emph{Angoisse}, \emph{Trouble} et \emph{Deficience}. Si \code{FALSE}, la colonne \code{DIAGN} est absente et l'algorithme est appliqué sur tous les codes de chaque élément. Cela reviendrait à écrire tous les codes sur une même ligne.
+}
+\examples{
+EX1_default <- SQL_reperage_cond_med(
+  conn = conn, debut = "2020-01-01", fin = "2020-12-31",
+  Dx_table = list(
+    diabete = list(
+      CIM9 = c("2500\%", "2501\%", "2502\%"),
+      CIM10 = c("E100\%", "E101\%", "E109\%", "E110\%", "E111\%", "E119\%", "E130\%",
+                "E131\%", "E139\%", "E140\%", "E141\%", "E149\%")
+    ),
+    diabete_complication = list(
+      CIM9 = paste0(2503:2509, "\%"),
+      CIM10 = paste0("E", c(102:108, 112:118, 132:138, 142:148), "\%")
+    )
+  ),
+  CIM = c("CIM9", "CIM10"), by_Dx = TRUE, date_dx_var = "admis",
+  n1 = 30, n2 = 730,
+  nDx = 1
+)
+EX2_nDx0 <- SQL_reperage_cond_med(
+  conn = conn, debut = "2020-01-01", fin = "2020-12-31",
+  Dx_table = list(
+    diabete = list(
+      CIM9 = c("2500\%", "2501\%", "2502\%"),
+      CIM10 = c("E100\%", "E101\%", "E109\%", "E110\%", "E111\%", "E119\%", "E130\%",
+                "E131\%", "E139\%", "E140\%", "E141\%", "E149\%")
+    ),
+    diabete_complication = list(
+      CIM9 = paste0(2503:2509, "\%"),
+      CIM10 = paste0("E", c(102:108, 112:118, 132:138, 142:148), "\%")
+    )
+  ),
+  nDx = 0
+)
+EX3_nDx2 <- SQL_reperage_cond_med(
+  conn = conn, debut = "2020-01-01", fin = "2020-12-31",
+  Dx_table = list(
+    diabete = list(
+      CIM9 = c("2500\%", "2501\%", "2502\%"),
+      CIM10 = c("E100\%", "E101\%", "E109\%", "E110\%", "E111\%", "E119\%", "E130\%",
+                "E131\%", "E139\%", "E140\%", "E141\%", "E149\%")
+    ),
+    diabete_complication = list(
+      CIM9 = paste0(2503:2509, "\%"),
+      CIM10 = paste0("E", c(102:108, 112:118, 132:138, 142:148), "\%")
+    )
+  ),
+  nDx = 2
+)
+EX4_byDxFALSE_nDx0 <- SQL_reperage_cond_med(
+  conn = conn, debut = "2020-01-01", fin = "2020-12-31",
+  Dx_table = list(
+    diabete = list(
+      CIM9 = c("2500\%", "2501\%", "2502\%"),
+      CIM10 = c("E100\%", "E101\%", "E109\%", "E110\%", "E111\%", "E119\%", "E130\%",
+                "E131\%", "E139\%", "E140\%", "E141\%", "E149\%")
+    ),
+    diabete_complication = list(
+      CIM9 = paste0(2503:2509, "\%"),
+      CIM10 = paste0("E", c(102:108, 112:118, 132:138, 142:148), "\%")
+    )
+  ),
+  by_Dx = FALSE, nDx = 0
+)
+EX5_byDxFALSE_nDx2 <- SQL_reperage_cond_med(
+  conn = conn, debut = "2020-01-01", fin = "2020-12-31",
+  Dx_table = list(
+    diabete = list(
+      CIM9 = c("2500\%", "2501\%", "2502\%"),
+      CIM10 = c("E100\%", "E101\%", "E109\%", "E110\%", "E111\%", "E119\%", "E130\%",
+                "E131\%", "E139\%", "E140\%", "E141\%", "E149\%")
+    ),
+    diabete_complication = list(
+      CIM9 = paste0(2503:2509, "\%"),
+      CIM10 = paste0("E", c(102:108, 112:118, 132:138, 142:148), "\%")
+    )
+  ),
+  by_Dx = FALSE, nDx = 2
+)
 }
