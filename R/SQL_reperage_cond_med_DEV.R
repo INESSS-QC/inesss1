@@ -6,7 +6,7 @@
 #' Supposons `Dx_table = list(Angoisse = [...], Trouble = [...], Deficience = [...])`. Si `TRUE`, il y aura la colonne `DIAGN` qui indiquera des dates pour chaque élément, soit *Angoisse*, *Trouble* et *Deficience*. Si `FALSE`, la colonne `DIAGN` est absente et l'algorithme est appliqué sur tous les codes de chaque élément. Cela reviendrait à écrire tous les codes sur une même ligne.
 #'
 #' @inheritParams SQL_diagn
-#' @inheritParams confirm_nDx
+#' @inheritParams confirm_Dx_par_nDx
 #' @param by_Dx `TRUE` ou `FALSE`. Distinction entre les diagnostics (`TRUE`) ou pas (`FALSE`). Si `TRUE`, on considère chaque élément de `Dx_table` où chaque élément peut contenir plusieurs codes. Le nombre d'éléments sera donc le nombre maximal d'observations (lignes résultats) par individu.\cr Si `FALSE`, on considère tous les éléments de `Dx_Table` comme un seul, on aura donc au maximum une ligne résultat par individu.\cr Voir Détails.
 #'
 #' @return `data.table` :
@@ -20,17 +20,16 @@
 #' @encoding UTF-8
 #' @import data.table
 #' @export
-SQL_reperage_cond_med <- function(
+SQL_reperage_cond_med_DEV <- function(
   conn = SQL_connexion(),
   debut, fin,
   Dx_table,
   CIM = c("CIM9", "CIM10"),
+  nDx = 1,
   by_Dx = TRUE,
   date_dx_var = "admis",
   n1 = 30, n2 = 730,
   ...
-  # keep_all = FALSE,
-  # verbose = TRUE
 ) {
 
   ### Arguments qui sont peut-etre dans <...> : les creer si ce n'est pas le cas
@@ -109,13 +108,22 @@ SQL_reperage_cond_med <- function(
     if (verbose) {
       cat("Confirmation des diagnostics...\n")
     }
-    Dx_etape2 <- confirm_2Dx(
-      dt = Dx_etape2, ID = "ID", DATE = "DATE_DX",
-      DIAGN = {if (by_Dx) "DIAGN" else NULL},
-      study_start = NULL, study_end = NULL,
-      n1 = n1, n2 = n2,
-      keep_first = TRUE, reverse = FALSE
+
+    # Ajouter une colonne substitut si by_Dx = FALSE
+    if (!by_Dx) {
+      Dx_etape2[, DIAGN2 := 1L]
+    }
+    Dx_etape2 <- confirm_Dx_par_nDx(
+      dt = Dx_etape2,
+      ID = "ID",
+      DIAGN = {if (by_Dx) "DIAGN" else "DIAGN2"},
+      DATE_DX = "DATE_DX",
+      nDx = nDx, n1 = n1, n2 = n2,
+      keep_all = FALSE
     )
+    if (!by_Dx) {
+      Dx_etape2[]
+    }
     if (nrow(Dx_etape2)) {
       setnames(Dx_etape2, c("DATE_REP", "DATE_CONF1"), c("DI_Acte", "DC_Acte"))
     }

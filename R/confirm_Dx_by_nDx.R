@@ -61,7 +61,7 @@ confirm_Dx_par_nDx <- function(
     dt <- dt[!dt[, .I[1], .(ID, DIAGN)]$V1]  # supprimer la 1re ligne de chaque groupe -> on passe à la prochaine date à analyser
     dt <- dt[dt[, .I[.N > nDx], .(ID, DIAGN)]$V1]  # supprimer les Dx qui n'ont pas assez d'obs pour être confirmé par nDx Dx
     if (!nrow(dt)) {
-      break  # sortir de la loop s'il n'y a plus de données (devrait être si )
+      break  # sortir de la loop s'il n'y a plus de donnéess
     }
     if (i == nloop && nrow(dt)) {
       stop("Erreur dans le nombre d'itérations de la boucle FOR.")  # back up au cas où l'algorithme aurait une erreur
@@ -81,26 +81,3 @@ confirm_Dx_par_nDx <- function(
   return(DT_final)
 
 }
-
-# library(data.table)
-# library(lubridate)
-#
-# ### Verifs
-# # 0 < n1 < n2
-# # DATE_DX doit être une date au format "AAAA-MM-JJ"
-#
-# t1 <- confirm_Dx_par_nDx(
-#   dt = sample_Rx_processed,
-#   ID = "id", DIAGN = "code", DATE_DX = "tx_start",
-#   nDx = 2,
-#   n1 = 30, n2 = 730,
-#   keep_all = TRUE
-# )
-#
-# t2 <- confirm_Dx_par_nDx(
-#   dt = sample_Rx_processed,
-#   ID = "id", DIAGN = "code", DATE_DX = "tx_start",
-#   nDx = 2,
-#   n1 = 30, n2 = 730,
-#   keep_all = FALSE
-# )
