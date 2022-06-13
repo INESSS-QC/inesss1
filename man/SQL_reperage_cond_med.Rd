@@ -36,9 +36,7 @@ SQL_reperage_cond_med(
 
 \item{date_dx_var}{\verb{'admis} ou \code{'depar'}. Indique si on utilise la date d'admission ou la date de départ comme date de diagnostic pour l'étude dans les vues V_DIAGN_SEJ_HOSP_CM, V_SEJ_SERV_HOSP_CM et V_EPISO_SOIN_DURG_CM.}
 
-\item{n1}{Nombre de jours requis pour confirmer le diagnostic}
-
-\item{n2}{Nombre de jours requis pour confirmer le diagnostic}
+\item{n1, n2}{Nombre de jours requis pour confirmer le diagnostic}
 }
 \value{
 \code{data.table} :

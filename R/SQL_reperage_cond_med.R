@@ -113,10 +113,14 @@ SQL_reperage_cond_med <- function(
 
   ### Arguments qui sont peut-etre dans <...> : les creer si ce n'est pas le cas
   dotargs <- list(...)
-  if (!any(names(dotargs) == "keep_all")) {
+  if (any(names(dotargs) == "keep_all")) {
+    keep_all <- dotargs$keep_all
+  } else {
     keep_all <- FALSE
   }
-  if (!any(names(dotargs) == "verbose")) {
+  if (any(names(dotargs) == "verbose")) {
+    verbose <- dotargs$verbose
+  } else {
     verbose <- TRUE
   }
 
