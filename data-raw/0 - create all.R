@@ -14,7 +14,7 @@ files <- c(
   "Comorbidity_Dx.R",
   "ComorbidityWeights.R",
   "DBC_TablesV.R",
-  # "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
+  "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
   "internal_datas.R",
   "Obstetrics_Dx.R",
   "Pop_QC.R",
@@ -31,7 +31,7 @@ conn <- SQL_connexion(user, pwd)
 if (is.null(conn)) {
   stop("User ou Mot de passe erroné.")
 } else if (class(conn)[1] == "Teradata") {
-  rm(conn)
+  rm(conn)  # suppprimer conn parce qu'on le recrée dans les scripts
   t1 <- Sys.time()
   for (f in files) {
     source(f, local = TRUE, encoding = "UTF-8")
