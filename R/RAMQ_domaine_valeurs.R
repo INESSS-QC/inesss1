@@ -35,17 +35,18 @@ RAMQ_domaine_valeurs <- function() {
       tabItems(
         tabItem(
           tabName = "tab_I_APME_DEM_AUTOR_CRITR_ETEN_CM",
-          tabsetPanel(
-            type = "tabs",
-            tabPanel(
-              title = "Domaine de valeurs",
-              textInput("id1", "Test1")
-            ),
-            tabPanel(
-              title = "Documentation",
-              textInput("id2", "Test2")
-            )
-          )
+          # tabsetPanel(
+          #   type = "tabs",
+          #   tabPanel(
+          #     title = "Domaine de valeurs",
+          #     textInput("id1", "Test1")
+          #   ),
+          #   tabPanel(
+          #     title = "Documentation",
+          #     textInput("id2", "Test2")
+          #   )
+          # )
+          i_apme_dem_auto_critr_eten_cm.UI("I_APME_DEM_AUTOR_CRITR_ETEN_CM")
         )
       )
     )
@@ -64,4 +65,24 @@ RAMQ_domaine_valeurs <- function() {
 
   shinyApp(ui, server)
 
+}
+
+
+# I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
+
+i_apme_dem_auto_critr_eten_cm.UI <- function(id) {
+  ns <- NS(id)
+  tabsetPanel(
+    tabsetPanel(
+      type = "tabs",
+      tabPanel(
+        title = "Domaine de valeurs",
+        textInput(ns("id1"), "Test1")
+      ),
+      tabPanel(
+        title = "Documentation",
+        textInput(ns("id2"), "Test2")
+      )
+    )
+  )
 }
