@@ -8,7 +8,8 @@
 #' @import shinydashboard
 domaine_valeurs <- function() {
 
-# INTERNAL ------------------------------------------------------------------------------------
+
+# FONCTIONS INTERNES ------------------------------------------------------
 
   button_go_style <- function() {
     ### Couleur et format du bouton qui fait apparaître les tableaux
@@ -28,14 +29,32 @@ domaine_valeurs <- function() {
       "border-color: #000000;"
     ))
   }
-  button_save_style <- function() {
-    ### Couleur et format du bouton qui sauvegarde en Excel
+  download_data <- function(input, datasave, data, subdata = NULL) {
+    ### Télécharge sur l'ordinateur le data affiché à l'écran
+    ### @param datasave Tableau à enregistrer.
+    ### @param data Nom du dataset, par exemple I_APME_DEM_AUTOR_CRITR_ETEN_CM
+    ### @param subdata Nom du sous data qui est inclut, selon le cas, sous le data. Par exemple DES_COURT_INDCN_RECNU.
 
-    return(paste0(
-      "color: #ffffff;",
-      "background-color: #0073e6;",
-      "border-color: #000000;"
-    ))
+    if (is.null(subdata)) {
+
+    } else {
+      return(downloadHandler(
+        filename = function() {
+          paste0(
+            input[[paste0(data,"__",subdata,"__savename")]],
+            ".",
+            input[[paste0(data,"__",subdata,"__saveext")]]
+          )
+        },
+        content = function(file) {
+          if (input[[paste0(data,"__",subdata,"__saveext")]] == "xlsx") {
+            writexl::write_xlsx(datasave, file)
+          } else if (input[[paste0(data,"__",subdata,"__saveext")]] == "csv") {
+            write.csv2(datasave, file)
+          }
+        }
+      ))
+    }
   }
   header_MaJ_datas <- function(date_MaJ) {
     ### Indique la date à laquelle la table a été mise à jour : "Actualisé le JJ MM YYYY"
@@ -97,7 +116,24 @@ domaine_valeurs <- function() {
     return(list(
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU = I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU$MOIS
     ))
-  }; mois_debut <- mois_debut_fct()
+  }
+  search_value_chr <- function(dt, col, values) {
+    ### Filtre les valeurs CHR dans la table dt
+    ### @param dt Data à modifier
+    ### @param col Colonne à filtrer
+    ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
+    ###               aura plusieurs codes.
+
+    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    dt <- dt[get(col) %in% values]  # conserver les valeurs voulues
+    return(dt)
+  }
+
+
+# DATAS -------------------------------------------------------------------
+
+  mois_debut <- mois_debut_fct()  # valeur initiales pour le début
+
 
 # USER INTERFACE ----------------------------------------------------------
 
@@ -124,19 +160,23 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
+            header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
+            column(
+              width = 4,
+              selectInput(  # sélection de la base de données
+                inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
+                label = "Élément",
+                choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
+              )
+            )
           ),
           tabsetPanel(
             type = "tabs",
             tabPanel(
               title = "Base de données",
               div(style = "margin-top:10px"),
-              selectInput(  # sélection de la base de données
-                inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
-                label = "Élément",
-                choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
-              ),
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
+              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
             ),
@@ -166,7 +206,7 @@ domaine_valeurs <- function() {
 
     # * I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__val <- reactiveValues(
-      show_tab = FALSE
+      show_tab = FALSE  # afficher la table ou pas
     )
 
     # * * UI ####
@@ -252,43 +292,89 @@ domaine_valeurs <- function() {
                 width = 4,
                 actionButton(  # Remettre les arguments comme au départ
                   "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset",
-                  "Réinitialiser arguments",
+                  "Réinitialiser",
                   style = button_reset_style()
-                )
-              )
-            ),
-            div(style = "margin-top:10px"),
-            fluidRow(
-              column(
-                width = 4,
-                actionButton(  # Sauvegarder la table en Excel
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__save",
-                  "Sauvegarder Excel",
-                  style = button_save_style()
                 )
               )
             )
           ))
         }
     })
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
+      if (!is.null(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()) && nrow(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())) {
+        return(tagList(
+          div(style = "margin-top:10px"),
+          fluidRow(
+            column(
+              width = 4,
+              textInput(
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__savename",
+                "Nom du fichier à sauvegarder"
+              )
+            ),
+            column(
+              width = 4,
+              selectInput(  # déterminer l'extension du fichier
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__saveext",
+                "Extension du fichier",
+                choices = c("xlsx", "csv"),
+                selected = "xlsx"
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 4,
+              downloadButton(  # Sauvegarder la table en Excel
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__save",
+                "Sauvegarder"
+              ),
+            ),
+          )
+        ))
+      } else {
+        return(NULL)
+      }
+    })
 
     # * * Datatable ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN__DES_COURT_INDCN_RECNU__go, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE
     })
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab, {
-      if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
-        dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
-        return(dt)
-      } else {
-        return(NULL)
-      }
-    })
+    I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
+      c(input$I_APME_DEM_AUTOR_CRITR_ETEN__DES_COURT_INDCN_RECNU__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
+      {
+        if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
+          dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
+          if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM_DEM",
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom
+              )
+            }
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      },
+      ignoreInit = TRUE
+    )
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
+
+    # * * Export ####
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__save <- download_data(
+      input,
+      I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),  # data à enregistrer
+      data = "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
+      subdata = "DES_COURT_INDCN_RECNU"
+    )
 
     # * * Update buttons ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
+      # Remettre les valeurs initiales
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom", value = "")
       updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din", value = "")
       updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
