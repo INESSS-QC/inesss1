@@ -184,7 +184,7 @@ domaine_valeurs <- function() {
               title = "Fiche technique",
               h3("I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
               h4("Descriptif"),
-              p("Description de la table blah blah blah")
+              p("En développement")
             )
           )
         )
@@ -298,7 +298,11 @@ domaine_valeurs <- function() {
               )
             )
           ))
-        }
+      } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
+        return(tagList(
+
+        ))
+      }
     })
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
       if (!is.null(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()) && nrow(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())) {
