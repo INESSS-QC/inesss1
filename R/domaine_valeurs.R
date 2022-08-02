@@ -29,32 +29,27 @@ domaine_valeurs <- function() {
       "border-color: #000000;"
     ))
   }
-  download_data <- function(input, datasave, data, subdata = NULL) {
+  download_data <- function(input, datasave, dataname) {
     ### Télécharge sur l'ordinateur le data affiché à l'écran
     ### @param datasave Tableau à enregistrer.
-    ### @param data Nom du dataset, par exemple I_APME_DEM_AUTOR_CRITR_ETEN_CM
-    ### @param subdata Nom du sous data qui est inclut, selon le cas, sous le data. Par exemple DES_COURT_INDCN_RECNU.
+    ### @param dataname Nom du dataset, par exemple I_APME_DEM_AUTOR_CRITR_ETEN_CM
 
-    if (is.null(subdata)) {
-
-    } else {
-      return(downloadHandler(
-        filename = function() {
-          paste0(
-            input[[paste0(data,"__",subdata,"__savename")]],
-            ".",
-            input[[paste0(data,"__",subdata,"__saveext")]]
-          )
-        },
-        content = function(file) {
-          if (input[[paste0(data,"__",subdata,"__saveext")]] == "xlsx") {
-            writexl::write_xlsx(datasave, file)
-          } else if (input[[paste0(data,"__",subdata,"__saveext")]] == "csv") {
-            write.csv2(datasave, file)
-          }
+    return(downloadHandler(
+      filename = function() {
+        paste0(
+          input[[paste0(dataname, "__savename")]],
+          ".",
+          input[[paste0(dataname, "__saveext")]]
+        )
+      },
+      content = function(file) {
+        if (input[[paste0(dataname, "__saveext")]] == "xlsx") {
+          writexl::write_xlsx(datasave, file)
+        } else if (input[[paste0(dataname, "__saveext")]] == "csv") {
+          write.csv(datasave, file)
         }
-      ))
-    }
+      }
+    ))
   }
   header_MaJ_datas <- function(date_MaJ) {
     ### Indique la date à laquelle la table a été mise à jour : "Actualisé le JJ MM YYYY"
@@ -217,14 +212,14 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 textInput(  # Code de DENOM
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
                   "DENOM_DEM"
                 )
               ),
               column(
                 width = 4,
                 textInput(  # Code de DIN
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
                   "DIN_DEM"
                 )
               )
@@ -233,7 +228,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 selectInput(  # Année début
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
                   "Début période - Année",
                   choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
                                 min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
@@ -243,7 +238,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 selectInput(  # Mois début
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
                   "Début période - Mois",
                   choices = 1:12, selected = mois_debut$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU
                 )
@@ -253,7 +248,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 selectInput(  # Année fin
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin",
                   "Fin période - Année",
                   choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
                                 min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
@@ -263,7 +258,7 @@ domaine_valeurs <- function() {
               column(  # Mois fin
                 width = 4,
                 selectInput(
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
                   "Fin période - Mois",
                   choices = 1:12,
                   selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
@@ -274,7 +269,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 textInput(  # Recherche mot-clé
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search",
                   "DES_COURT_INDCN_RECNU"
                 )
               )
@@ -283,7 +278,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 actionButton(  # Faire apparaître table selon critère
-                  "I_APME_DEM_AUTOR_CRITR_ETEN__DES_COURT_INDCN_RECNU__go",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN__go",
                   "Exécuter",
                   style = button_go_style()
                 )
@@ -291,7 +286,7 @@ domaine_valeurs <- function() {
               column(
                 width = 4,
                 actionButton(  # Remettre les arguments comme au départ
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset",
+                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset",
                   "Réinitialiser",
                   style = button_reset_style()
                 )
@@ -312,14 +307,14 @@ domaine_valeurs <- function() {
             column(
               width = 4,
               textInput(
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__savename",
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__savename",
                 "Nom du fichier à sauvegarder"
               )
             ),
             column(
               width = 4,
               selectInput(  # déterminer l'extension du fichier
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__saveext",
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext",
                 "Extension du fichier",
                 choices = c("xlsx", "csv"),
                 selected = "xlsx"
@@ -330,7 +325,7 @@ domaine_valeurs <- function() {
             column(
               width = 4,
               downloadButton(  # Sauvegarder la table en Excel
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__save",
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__save",
                 "Sauvegarder"
               ),
             ),
@@ -342,19 +337,19 @@ domaine_valeurs <- function() {
     })
 
     # * * Datatable ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN__DES_COURT_INDCN_RECNU__go, {
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN__go, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE
     })
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
-      c(input$I_APME_DEM_AUTOR_CRITR_ETEN__DES_COURT_INDCN_RECNU__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
+      c(input$I_APME_DEM_AUTOR_CRITR_ETEN__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
       {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
           dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
           if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom != "") {
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {
               dt <- search_value_chr(
                 dt, col = "DENOM_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom
               )
             }
           }
@@ -368,28 +363,60 @@ domaine_valeurs <- function() {
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
 
     # * * Export ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__save <- download_data(
-      input,
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),  # data à enregistrer
-      data = "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
-      subdata = "DES_COURT_INDCN_RECNU"
-    )
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- download_data(input,
+                                                                 datasave = I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),
+                                                                 dataname = "I_APME_DEM_AUTOR_CRITR_ETEN_CM")
 
     # * * Update buttons ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__reset, {
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
       # Remettre les valeurs initiales
-      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__denom", value = "")
-      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__din", value = "")
-      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnDebut",
-                        selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
-      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisDebut",
-                        selected = mois_debut$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU)
-      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__AnFin",
-                        selected = lubridate::year(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
-      updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__MoisFin",
-                        selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
-      updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU__search", value = "")
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom", value = "")
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din", value = "")
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
+                          selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
+                          selected = mois_debut$I_APME_DEM_AUTOR_CRITR_ETEN_CM)
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin",
+                          selected = lubridate::year(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
+                          selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
+      }
+    })
+
+    # * * Erreurs possibles ####
+    # Début > Fin
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut, {
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut > input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin) {
+          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut", selected = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin)
+        }
+      }
+    })
+    # Début mois > fin mois
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut, {
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut == input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin && input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut > input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin) {
+          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut", selected = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
+        }
+      }
+    })
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin, {
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut > input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin) {
+          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin", selected = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut)
+        }
+      }
+    })
+    # Début mois > fin mois
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin, {
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut == input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin && input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut > input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin) {
+          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin", selected = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
+        }
+      }
     })
 
   }
