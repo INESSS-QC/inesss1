@@ -142,15 +142,21 @@ domaine_valeurs <- function() {
       searching = FALSE
     ))
   }
-  search_value_chr <- function(dt, col, values) {
+  search_value_chr <- function(dt, col, values, lower = TRUE) {
     ### Filtre les valeurs CHR dans la table dt
     ### @param dt Data à modifier
     ### @param col Colonne à filtrer
     ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
     ###               aura plusieurs codes.
+    ### @param lower Si on doit convertir en minuscule ou chercher la valeur exacte.
 
     values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
-    dt <- dt[get(col) %in% values]  # conserver les valeurs voulues
+    # Conserver les valeurs voulues
+    if (lower) {
+      dt <- dt[tolower(get(col)) %in% tolower(values)]  # convertir en minuscule au besoin
+    } else {
+      dt <- dt[get(col) %in% values]
+    }
     return(dt)
   }
   search_value_num <- function(dt, col, values, type = "int") {
@@ -299,25 +305,7 @@ domaine_valeurs <- function() {
                 selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
               )
             )
-          )# ,
-          # fluidRow(
-          #   column(
-          #     width = 4,
-          #     actionButton(  # Faire apparaître table selon critère
-          #       "I_APME_DEM_AUTOR_CRITR_ETEN_CM__go",
-          #       "Exécuter",
-          #       style = button_go_style()
-          #     )
-          #   ),
-          #   column(
-          #     width = 4,
-          #     actionButton(  # Remettre les arguments comme au départ
-          #       "I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset",
-          #       "Réinitialiser",
-          #       style = button_reset_style()
-          #     )
-          #   )
-          # )
+          )
         ))
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         return(tagList(
@@ -398,12 +386,29 @@ domaine_valeurs <- function() {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
           dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
           if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
               dt <- search_value_chr(
                 dt, col = "DENOM_DEM",
                 values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom
               )
             }
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
+              dt <- search_value_chr(
+                dt, col = "DIN_DEM",
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din
+              )
+            }
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
+              dt <- search_value_chr(
+                dt, col = "DES_COURT_INDCN_RECNU",
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
+              )
+            }
+            # Filtrer selon les années demandées
+            debut <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
+            fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
+            dt[, filtre_an := ANNEE * 100 + MOIS]
+            dt <- dt[filtre_an <= fin & filtre_an >= debut]
           }
           return(dt)
         } else {
