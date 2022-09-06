@@ -11,6 +11,28 @@ domaine_valeurs <- function() {
 
 # FONCTIONS INTERNES ------------------------------------------------------
 
+  button_go_reset <- function(dataname, goname = "Exécuter", resetname = "Réinitialiser") {
+    return(tagList(
+      fluidRow(
+        column(
+          width = 4,
+          actionButton(  # Faire apparaître table selon critère
+            paste0(dataname, "__go"),
+            goname,
+            style = button_go_style()
+          )
+        ),
+        column(
+          width = 4,
+          actionButton(  # Remettre les arguments comme au départ
+            paste0(dataname, "__reset"),
+            resetname,
+            style = button_reset_style()
+          )
+        )
+      )
+    ))
+  }
   button_go_style <- function() {
     ### Couleur et format du bouton qui fait apparaître les tableaux
 
@@ -112,6 +134,14 @@ domaine_valeurs <- function() {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU = I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU$MOIS
     ))
   }
+  renderDataTable_options <- function() {
+    return(list(
+      lengthMenu = list(c(25, 100, -1), c("25", "100", "Tout")),
+      pageLength = 100,
+      scrollX = TRUE,
+      searching = FALSE
+    ))
+  }
   search_value_chr <- function(dt, col, values) {
     ### Filtre les valeurs CHR dans la table dt
     ### @param dt Data à modifier
@@ -120,6 +150,25 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
 
     values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    dt <- dt[get(col) %in% values]  # conserver les valeurs voulues
+    return(dt)
+  }
+  search_value_num <- function(dt, col, values, type = "int") {
+    ### Filtre les valeurs NUM dans la table dt
+    ### @param dt Data à modifier
+    ### @param col Colonne à filtrer
+    ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
+    ###               aura plusieurs codes.
+    ### @param type "int" pour integer ou "num" pour "numeric"
+
+    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    if (type == "int") {
+      values <- as.integer(values)
+    } else if (type == "num") {
+      values <- as.numeric(values)
+    } else {
+      stop("search_value_num(): type a une valeur non permise.")
+    }
     dt <- dt[get(col) %in% values]  # conserver les valeurs voulues
     return(dt)
   }
@@ -171,15 +220,13 @@ domaine_valeurs <- function() {
               title = "Base de données",
               div(style = "margin-top:10px"),
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
+              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button"),
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
             ),
             tabPanel(
-              title = "Fiche technique",
-              h3("I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-              h4("Descriptif"),
-              p("En développement")
+              title = "Fiche technique"
             )
           )
         )
@@ -207,97 +254,102 @@ domaine_valeurs <- function() {
     # * * UI ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-          return(tagList(
-            fluidRow(
-              column(
-                width = 4,
-                textInput(  # Code de DENOM
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
-                  "DENOM_DEM"
-                )
+        return(tagList(
+          fluidRow(
+            column(
+              width = 4,
+              textInput(  # Code de DENOM
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
+                "DENOM_DEM"
               ),
-              column(
-                width = 4,
-                textInput(  # Code de DIN
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
-                  "DIN_DEM"
-                )
+              selectInput(  # Année début
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
+                "Début période - Année",
+                choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
+                              min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
+                selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)
+              ),
+              selectInput(  # Année fin
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin",
+                "Fin période - Année",
+                choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
+                              min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
+                selected = lubridate::year(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
+              ),
+              textInput(  # Recherche mot-clé
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search",
+                "DES_COURT_INDCN_RECNU"
               )
             ),
-            fluidRow(
-              column(
-                width = 4,
-                selectInput(  # Année début
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
-                  "Début période - Année",
-                  choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
-                                min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
-                  selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)
-                )
+            column(
+              width = 4,
+              textInput(  # Code de DIN
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
+                "DIN_DEM"
               ),
-              column(
-                width = 4,
-                selectInput(  # Mois début
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
-                  "Début période - Mois",
-                  choices = 1:12, selected = mois_debut$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU
-                )
-              )
-            ),
-            fluidRow(
-              column(
-                width = 4,
-                selectInput(  # Année fin
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin",
-                  "Fin période - Année",
-                  choices = c(max(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE):
-                                min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE)),
-                  selected = lubridate::year(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
-                )
+              selectInput(  # Mois début
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
+                "Début période - Mois",
+                choices = 1:12, selected = mois_debut$I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU
               ),
-              column(  # Mois fin
-                width = 4,
-                selectInput(
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
-                  "Fin période - Mois",
-                  choices = 1:12,
-                  selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
-                )
-              )
-            ),
-            fluidRow(
-              column(
-                width = 4,
-                textInput(  # Recherche mot-clé
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search",
-                  "DES_COURT_INDCN_RECNU"
-                )
-              )
-            ),
-            fluidRow(
-              column(
-                width = 4,
-                actionButton(  # Faire apparaître table selon critère
-                  "I_APME_DEM_AUTOR_CRITR_ETEN__go",
-                  "Exécuter",
-                  style = button_go_style()
-                )
-              ),
-              column(
-                width = 4,
-                actionButton(  # Remettre les arguments comme au départ
-                  "I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset",
-                  "Réinitialiser",
-                  style = button_reset_style()
-                )
+              selectInput(
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
+                "Fin période - Mois",
+                choices = 1:12,
+                selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
               )
             )
-          ))
+          )# ,
+          # fluidRow(
+          #   column(
+          #     width = 4,
+          #     actionButton(  # Faire apparaître table selon critère
+          #       "I_APME_DEM_AUTOR_CRITR_ETEN_CM__go",
+          #       "Exécuter",
+          #       style = button_go_style()
+          #     )
+          #   ),
+          #   column(
+          #     width = 4,
+          #     actionButton(  # Remettre les arguments comme au départ
+          #       "I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset",
+          #       "Réinitialiser",
+          #       style = button_reset_style()
+          #     )
+          #   )
+          # )
+        ))
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         return(tagList(
-
+          fluidRow(
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__noSeqIndcnRecnu",
+                        "NO_SEQ_INDCN_RECNU"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__debTraitDem",
+                        "DD_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__debAutor",
+                        "DD_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__debAplicAutor",
+                        "DD_APLIC_AUTOR")
+            ),
+            column(
+              width = 4,
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__datStaDem",
+                        "DAT_STA_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__finTraitDem",
+                        "DF_TRAIT_DEM"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__finAutor",
+                        "DF_AUTOR"),
+              textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__finAplicAutor",
+                        "DF_APLIC_AUTOR")
+            )
+          )
         ))
       }
+    })
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button <- renderUI({
+      button_go_reset("I_APME_DEM_AUTOR_CRITR_ETEN_CM")
     })
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
       if (!is.null(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()) && nrow(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())) {
@@ -337,11 +389,11 @@ domaine_valeurs <- function() {
     })
 
     # * * Datatable ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN__go, {
+    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE
     })
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
-      c(input$I_APME_DEM_AUTOR_CRITR_ETEN__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
+      c(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
       {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
           dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
@@ -360,12 +412,16 @@ domaine_valeurs <- function() {
       },
       ignoreInit = TRUE
     )
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable({
+      I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()
+    }, options = renderDataTable_options())
 
     # * * Export ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- download_data(input,
-                                                                 datasave = I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),
-                                                                 dataname = "I_APME_DEM_AUTOR_CRITR_ETEN_CM")
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- download_data(
+      input,
+      datasave = I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),
+      dataname = "I_APME_DEM_AUTOR_CRITR_ETEN_CM"
+    )
 
     # * * Update buttons ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset, {
@@ -387,6 +443,7 @@ domaine_valeurs <- function() {
     })
 
     # * * Erreurs possibles ####
+    ### DES_COURT_INDCN_RECNU
     # Début > Fin
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut, {
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
