@@ -7,11 +7,14 @@ conn <- SQL_connexion(user, pwd)
 
 fct <- function() {
 
+  cat("V_CLA_AHF en cours")
+
   DT <- as.data.table(dbGetQuery(conn, statement = paste0(
     "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
 	  "       NMED_COD_SCLA_AHF as AHFS_SCLA,\n",
 	  "       NMED_COD_SSCLA_AHF as AHFS_SSCLA,\n",
-    "       NMED_NOM_CLA_AHF as NOM_AHFS\n",
+    "       NMED_NOM_CLA_AHF as NOM_AHFS,\n",
+    "       NMED_NOM_ANGL_CLA_AHF as NOM_ANGLAIS_AHFS\n",
     "from V_CLA_AHF;"
   )))
 
@@ -22,6 +25,7 @@ fct <- function() {
 }
 
 V_CLA_AHF <- fct()
+attr(V_CLA_AHF, "MaJ") <- Sys.Date()
 use_data(V_CLA_AHF, overwrite = TRUE)
 rm(V_CLA_AHF)
 

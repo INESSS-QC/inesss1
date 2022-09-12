@@ -51,6 +51,42 @@ domaine_valeurs <- function() {
       "border-color: #000000;"
     ))
   }
+  button_save <- function(dataname, dataset) {
+    if (!is.null(dataset) && nrow(dataset)) {
+      return(tagList(
+        div(style = "margin-top:10px"),
+        fluidRow(
+          column(
+            width = 4,
+            textInput(
+              paste0(dataname, "__savename"),
+              "Nom du fichier à sauvegarder"
+            )
+          ),
+          column(
+            width = 4,
+            selectInput(  # déterminer l'extension du fichier
+              paste0(dataname, "__saveext"),
+              "Extension du fichier",
+              choices = c("xlsx", "csv"),
+              selected = "xlsx"
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = 4,
+            downloadButton(  # Sauvegarder la table en Excel
+              paste0(dataname, "__save"),
+              "Sauvegarder"
+            ),
+          ),
+        )
+      ))
+    } else {
+      return(NULL)
+    }
+  }
   download_data <- function(input, datasave, dataname) {
     ### Télécharge sur l'ordinateur le data affiché à l'écran
     ### @param datasave Tableau à enregistrer.
@@ -158,7 +194,7 @@ domaine_valeurs <- function() {
     }
     return(dt)
   }
-  search_value_chr <- function(dt, col, values, lower = TRUE) {
+  search_value_chr <- function(dt, col, values, lower = TRUE, pad = NULL) {
     ### Filtre les valeurs CHR dans la table dt
     ### @param dt Data à modifier
     ### @param col Colonne à filtrer
@@ -167,6 +203,9 @@ domaine_valeurs <- function() {
     ### @param lower Si on doit convertir en minuscule ou chercher la valeur exacte.
 
     values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    if (!is.null(pad)) {
+      values <- stringr::str_pad(values, width = pad, pad = "0")
+    }
     # Conserver les valeurs voulues
     if (lower) {
       dt <- dt[tolower(get(col)) %in% tolower(values)]  # convertir en minuscule au besoin
@@ -230,7 +269,8 @@ domaine_valeurs <- function() {
     dashboardSidebar(
       width = 266,  # ajuster l'espace nécessaire selon le nom de la base de données
       sidebarMenu(
-        menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM")
+        menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF")
       )
     ),
 
@@ -262,6 +302,29 @@ domaine_valeurs <- function() {
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
+            ),
+            tabPanel(
+              title = "Fiche technique"
+            )
+          )
+        ),
+
+        # * * V_CLA_AHF ---------------------------------------------------------------
+        tabItem(
+          tabName = "tabV_CLA_AHF",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_CLA_AHF)$MaJ)
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Base de données",
+              div(style = "margin-top:10px"),
+              uiOutput("V_CLA_AHF__params"),
+              uiOutput("V_CLA_AHF__go_reset_button"),
+              uiOutput("V_CLA_AHF__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_CLA_AHF__dt")
             ),
             tabPanel(
               title = "Fiche technique"
@@ -379,40 +442,7 @@ domaine_valeurs <- function() {
       button_go_reset("I_APME_DEM_AUTOR_CRITR_ETEN_CM")
     })
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
-      if (!is.null(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()) && nrow(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())) {
-        return(tagList(
-          div(style = "margin-top:10px"),
-          fluidRow(
-            column(
-              width = 4,
-              textInput(
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__savename",
-                "Nom du fichier à sauvegarder"
-              )
-            ),
-            column(
-              width = 4,
-              selectInput(  # déterminer l'extension du fichier
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext",
-                "Extension du fichier",
-                choices = c("xlsx", "csv"),
-                selected = "xlsx"
-              )
-            )
-          ),
-          fluidRow(
-            column(
-              width = 4,
-              downloadButton(  # Sauvegarder la table en Excel
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__save",
-                "Sauvegarder"
-              ),
-            ),
-          )
-        ))
-      } else {
-        return(NULL)
-      }
+      button_save("I_APME_DEM_AUTOR_CRITR_ETEN_CM", I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
     })
 
     # * * Datatable ####
@@ -423,17 +453,17 @@ domaine_valeurs <- function() {
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data, {
       # Faire disparaitre la table si on change le data
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE
-    })
+    }, ignoreInit = TRUE)
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
       c(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
       {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
-          dt <- copy(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]])
+          dt <- inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
           if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
             if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
               dt <- search_value_chr(
                 dt, col = "DENOM_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom, pad = 5
               )
             }
             if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
@@ -461,6 +491,7 @@ domaine_valeurs <- function() {
             fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
             dt[, filtre_an := ANNEE * 100 + MOIS]
             dt <- dt[filtre_an <= fin & filtre_an >= debut]
+            dt[, filtre_an := NULL]
           } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
             if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__noSeqIndcnRecnu != "") {
               dt <- search_value_num(
@@ -491,8 +522,7 @@ domaine_valeurs <- function() {
         } else {
           return(NULL)
         }
-      },
-      ignoreInit = TRUE
+      }, ignoreInit = TRUE
     )
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable({
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()
@@ -571,6 +601,140 @@ domaine_valeurs <- function() {
       },
       ignoreInit = TRUE
     )
+
+
+    # * V_CLA_AHF ------------------------------------------------------------
+    V_CLA_AHF__val <- reactiveValues(
+      show_tab = FALSE  # afficher la table ou pas
+    )
+
+    # * * UI ####
+    output$V_CLA_AHF__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = 4,
+            textInput("V_CLA_AHF__ahfsCla", "AHFS_CLA"),
+            textInput("V_CLA_AHF__nomAhfs", "NOM_AHFS"),
+            textInput("V_CLA_AHF__nomAnglaisAhfs", "NOM_ANGLAIS_AHFS")
+          ),
+          column(
+            width = 4,
+            textInput("V_CLA_AHF__ahfsScla", "AHFS_SCLA"),
+            selectInput(
+              "V_CLA_AHF__nomAhfs__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            ),
+            selectInput(
+              "V_CLA_AHF__nomAnglaisAhfs__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          ),
+          column(
+            width = 4,
+            textInput("V_CLA_AHF__ahfsSscla", "AHFS_SSCLA")
+          )
+        )
+      ))
+    })
+    output$V_CLA_AHF__go_reset_button <- renderUI({
+      button_go_reset("V_CLA_AHF")
+    })
+    output$V_CLA_AHF__save_button <- renderUI({
+      button_save("V_CLA_AHF", V_CLA_AHF__dt())
+    })
+
+    # * * Datatable ####
+    observeEvent(input$V_CLA_AHF__go, {
+      # Afficher la table si on clique sur Exécuter
+      V_CLA_AHF__val$show_tab <- TRUE
+    }, ignoreInit = TRUE)
+    V_CLA_AHF__dt <- eventReactive(
+      c(input$V_CLA_AHF__go, V_CLA_AHF__val$show_tab),
+      {
+        if (V_CLA_AHF__val$show_tab) {
+          dt <- inesss::V_CLA_AHF
+          # Classe AHFS
+          if (input$V_CLA_AHF__ahfsCla != "") {
+            dt <- search_value_chr(
+              dt, col = "AHFS_CLA",
+              values = input$V_CLA_AHF__ahfsCla, pad = 2
+            )
+          }
+          # Sous-Classe AHFS
+          if (input$V_CLA_AHF__ahfsScla != "") {
+            dt <- search_value_chr(
+              dt, col = "AHFS_SCLA",
+              values = input$V_CLA_AHF__ahfsScla, pad = 2
+            )
+          }
+          # Sous-Sous-Classe AHFS
+          if (input$V_CLA_AHF__ahfsSscla != "") {
+            dt <- search_value_chr(
+              dt, col = "AHFS_SSCLA",
+              values = input$V_CLA_AHF__ahfsSscla, pad = 2
+            )
+          }
+          # Nom Classe AHFS
+          if (input$V_CLA_AHF__nomAhfs != "") {
+            if (input$V_CLA_AHF__nomAhfs__typeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_AHFS",
+                values = input$V_CLA_AHF__nomAhfs
+              )
+            } else if (input$V_CLA_AHF__nomAhfs__typeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "NOM_AHFS",
+                values = input$V_CLA_AHF__nomAhfs
+              )
+            }
+          }
+          # Nom Anglais Classe AHFS
+          if (input$V_CLA_AHF__nomAnglaisAhfs != "") {
+            if (input$V_CLA_AHF__nomAnglaisAhfs__typeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_ANGLAIS_AHFS",
+                values = input$V_CLA_AHF__nomAnglaisAhfs
+              )
+            } else if (input$V_CLA_AHF__nomAnglaisAhfs__typeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "NOM_ANGLAIS_AHFS",
+                values = input$V_CLA_AHF__nomAnglaisAhfs
+              )
+            }
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }, ignoreInit = TRUE
+    )
+    output$V_CLA_AHF__dt <- renderDataTable({
+      V_CLA_AHF__dt()
+    }, options = renderDataTable_options())
+
+    # * * Export ####
+    output$V_CLA_AHF__save <- download_data(
+      input,
+      datasave = V_CLA_AHF__dt(),
+      dataname = "V_CLA_AHF"
+    )
+
+    # * * Update Buttons ####
+    observeEvent(input$V_CLA_AHF__reset, {
+      updateTextInput(session, "V_CLA_AHF__ahfsCla", value = "")
+      updateTextInput(session, "V_CLA_AHF__ahfsScla", value = "")
+      updateTextInput(session, "V_CLA_AHF__ahfsSscla", value = "")
+      updateTextInput(session, "V_CLA_AHF__nomAhfs", value = "")
+      updateTextInput(session, "V_CLA_AHF__nomAnglaisAhfs", value = "")
+    })
+
   }
 
 
