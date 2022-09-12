@@ -12,34 +12,52 @@ conn <- SQL_connexion(user, pwd)
 
 des_court_indcn_recnu <- function() {
 
-    ### Extraction
-    years <- 1996:data.table::year(Sys.Date())
-    DT <- vector("list", length(years) * 12)
-    i <- 1L
-    for (yr in years) {
-      for (mth in 1:12) {
-        DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-          "select distinct\n",
-          "    APME_COD_DENOM_COMNE_DEM as DENOM_DEM,\n",
-          "    APME_COD_DIN_DEM as DIN_DEM,\n",
-          "    extract(year from APME_DAT_STA_DEM_PME) as ANNEE,\n",
-          "    extract(month from APME_DAT_STA_DEM_PME) as MOIS,\n",
-          "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
-          "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
-          "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
-          "    and NPME_DES_COURT_INDCN_RECNU is not null\n",
-          ";"
-        )))
-        i <- i + 1L
-      }
-    }
-    DT <- rbindlist(DT)
-    setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
+  cat("I_APME_DEM_AUTOR_CRITR_ETEN_CM - DES_COURT_INDCN_RECNU en cours")
 
-    return(DT)
+  # Vérifier que la variable d'itération ne contient pas de valeurs vides
+  verif_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct APME_DAT_STA_DEM_PME\n",
+    "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+    "where APME_DAT_STA_DEM_PME is null;"
+  )))
+  # Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  if (nrow(verif_var)) {
+    verif_var <- FALSE
+  } else {
+    verif_var <- TRUE
+  }
+
+  ### Extraction
+  years <- 1996:data.table::year(Sys.Date())
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    APME_COD_DENOM_COMNE_DEM as DENOM_DEM,\n",
+        "    APME_COD_DIN_DEM as DIN_DEM,\n",
+        "    extract(year from APME_DAT_STA_DEM_PME) as ANNEE,\n",
+        "    extract(month from APME_DAT_STA_DEM_PME) as MOIS,\n",
+        "    NPME_DES_COURT_INDCN_RECNU as DES_COURT_INDCN_RECNU\n",
+        "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
+        "where APME_DAT_STA_DEM_PME between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"'\n",
+        "    and NPME_DES_COURT_INDCN_RECNU is not null\n",
+        ";"
+      )))
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)
+  setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
+  attr(DT, "verif") <- verif_var
+
+  return(DT)
 
 }
 no_seq_indcn_recnu <- function() {
+
+  cat("I_APME_DEM_AUTOR_CRITR_ETEN_CM - NO_SEQ_INDCN_RECNU_PME en cours")
 
   ### Extraction data
   DT <- dbGetQuery(
@@ -76,6 +94,8 @@ no_seq_indcn_recnu <- function() {
         DAT_STA_DEM = paste0(min(DAT_STA_DEM, na.rm = TRUE),"-",max(DAT_STA_DEM, na.rm = TRUE))),
     .(NO_SEQ_INDCN_RECNU)
   ]
+
+  attr(DT, "verif") <- TRUE  # pour l'instant pas de variable d'itération
 
   return(DT)
 

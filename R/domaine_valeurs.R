@@ -136,11 +136,27 @@ domaine_valeurs <- function() {
   }
   renderDataTable_options <- function() {
     return(list(
-      lengthMenu = list(c(25, 100, -1), c("25", "100", "Tout")),
-      pageLength = 100,
+      lengthMenu = list(c(25, 50, 100, -1), c("25", "50", "100", "Tout")),
+      pageLength = 50,
       scrollX = TRUE,
       searching = FALSE
     ))
+  }
+  search_keyword <- function(dt, col, values, lower = TRUE) {
+    ### Rechercher un ou des mots clés dans une colonne
+    ### @param dt Data à modifier
+    ### @param col Colonne à filtrer
+    ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
+    ###               aura plusieurs codes.
+
+    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    values <- paste(values, collapse = "|")  # rechercher tous les mots dans une même chaîne de caractères
+    if (lower) {
+      dt <- dt[stringr::str_detect(tolower(get(col)), tolower(values))]
+    } else {
+      dt <- dt[stringr::str_detect(get(col), values)]
+    }
+    return(dt)
   }
   search_value_chr <- function(dt, col, values, lower = TRUE) {
     ### Filtre les valeurs CHR dans la table dt
@@ -319,6 +335,13 @@ domaine_valeurs <- function() {
                 "Fin période - Mois",
                 choices = 1:12,
                 selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ)
+              ),
+              selectInput(
+                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
+                "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
               )
             )
           )
@@ -394,9 +417,11 @@ domaine_valeurs <- function() {
 
     # * * Datatable ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
+      # Afficher la table si on clique sur Exécuter
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE
     }, ignoreInit = TRUE)
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data, {
+      # Faire disparaitre la table si on change le data
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE
     })
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
@@ -418,10 +443,18 @@ domaine_valeurs <- function() {
               )
             }
             if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
-              dt <- search_value_chr(
-                dt, col = "DES_COURT_INDCN_RECNU",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-              )
+              if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "DES_COURT_INDCN_RECNU",
+                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
+                )
+              } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "DES_COURT_INDCN_RECNU",
+                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
+                )
+              }
+
             }
             # Filtrer selon les années demandées
             debut <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
@@ -488,6 +521,8 @@ domaine_valeurs <- function() {
         updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
                           selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
         updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
+                          selected = "keyword")
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         input_name <- paste0(
           "I_APME_DEM_AUTOR_CRITR_ETEN_CM__",
@@ -508,35 +543,34 @@ domaine_valeurs <- function() {
     ### DES_COURT_INDCN_RECNU
     observeEvent(
       eventExpr = {
-        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-          c(  # modifier un des 4 éléments déclenche la vérification
-            input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut,
-            input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin,
-            input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut,
-            input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin
-          )
-        }
+        # modifier un des éléments déclenche la vérification
+        c(
+          # DES_COURT_INDCN_RECNU
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut,
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin,
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut,
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin
+        )
       },
       handlerExpr = {
-        annee_deb <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut)
-        annee_fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin)
-        mois_deb <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
-        mois_fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
-        # La combinaison année+mois du début doit être <= à la fin
-        if (annee_deb >= annee_fin && mois_deb > mois_fin) {
-          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
-                            selected = mois_fin)
-        }
-        if (annee_deb > annee_fin) {
-          updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
-                            selected = annee_fin)
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+          annee_deb <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut)
+          annee_fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin)
+          mois_deb <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
+          mois_fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
+          # La combinaison année+mois du début doit être <= à la fin
+          if (annee_deb >= annee_fin && mois_deb > mois_fin) {
+            updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
+                              selected = mois_fin)
+          }
+          if (annee_deb > annee_fin) {
+            updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
+                              selected = annee_fin)
+          }
         }
       },
       ignoreInit = TRUE
     )
-    ### NO_SEQ_INDCN_RECNU_PME
-    # Afficher Avertissement si ce ne sont pas des années inscrites
-    observeEvent()
   }
 
 
