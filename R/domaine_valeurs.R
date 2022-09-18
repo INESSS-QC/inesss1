@@ -11,11 +11,11 @@ domaine_valeurs <- function() {
 
 # FONCTIONS INTERNES ------------------------------------------------------
 
-  button_go_reset <- function(dataname, goname = "Exécuter", resetname = "Réinitialiser") {
+  button_go_reset <- function(dataname, goname = "Exécuter", resetname = "Réinitialiser", colwidth = NULL) {
     return(tagList(
       fluidRow(
         column(
-          width = 4,
+          width = ui_col_width(colwidth),
           actionButton(  # Faire apparaître table selon critère
             paste0(dataname, "__go"),
             goname,
@@ -23,7 +23,7 @@ domaine_valeurs <- function() {
           )
         ),
         column(
-          width = 4,
+          width = ui_col_width(colwidth),
           actionButton(  # Remettre les arguments comme au départ
             paste0(dataname, "__reset"),
             resetname,
@@ -51,20 +51,20 @@ domaine_valeurs <- function() {
       "border-color: #000000;"
     ))
   }
-  button_save <- function(dataname, dataset) {
+  button_save <- function(dataname, dataset, colwidth = NULL) {
     if (!is.null(dataset) && nrow(dataset)) {
       return(tagList(
         div(style = "margin-top:10px"),
         fluidRow(
           column(
-            width = 4,
+            width = ui_col_width(colwidth),
             textInput(
               paste0(dataname, "__savename"),
               "Nom du fichier à sauvegarder"
             )
           ),
           column(
-            width = 4,
+            width = ui_col_width(colwidth),
             selectInput(  # déterminer l'extension du fichier
               paste0(dataname, "__saveext"),
               "Extension du fichier",
@@ -75,7 +75,7 @@ domaine_valeurs <- function() {
         ),
         fluidRow(
           column(
-            width = 4,
+            width = ui_col_width(colwidth),
             downloadButton(  # Sauvegarder la table en Excel
               paste0(dataname, "__save"),
               "Sauvegarder"
@@ -249,6 +249,19 @@ domaine_valeurs <- function() {
     }
     return(dt)
   }
+  ui_col_width <- function(width = NULL) {
+    ### Largeur par défaut des input. Permet de changer d'idée rapidement et ne pas
+    ### devoir le changer partout dans le programme
+    ### Par défaut = 3 (modifier cette valeur au besoin)
+
+    default <- 3
+
+    if (is.null(width)) {
+      return(default)
+    } else {
+      return(width)
+    }
+  }
 
 
 # DATAS -------------------------------------------------------------------
@@ -270,7 +283,8 @@ domaine_valeurs <- function() {
       width = 266,  # ajuster l'espace nécessaire selon le nom de la base de données
       sidebarMenu(
         menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF")
+        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
+        menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM")
       )
     ),
 
@@ -284,7 +298,7 @@ domaine_valeurs <- function() {
           fluidRow(
             header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
             column(
-              width = 4,
+              width = ui_col_width(),
               selectInput(  # sélection de la base de données
                 inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                 label = "Élément",
@@ -330,7 +344,39 @@ domaine_valeurs <- function() {
               title = "Fiche technique"
             )
           )
+        ),
+
+        # * * V_DEM_PAIMT_MED_CM --------------------------------------------------
+        tabItem(
+          tabName = "tabV_DEM_PAIMT_MED_CM",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            column(
+              width = ui_col_width(),
+              selectInput(  # sélection de la base de données
+                inputId = "V_DEM_PAIMT_MED_CM__data",
+                label = "Élément",
+                choices = names(inesss::V_DEM_PAIMT_MED_CM)
+              )
+            )
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Base de données",
+              div(style = "margin-top:10px"),
+              uiOutput("V_DEM_PAIMT_MED_CM__params"),
+              uiOutput("V_DEM_PAIMT_MED_CM__go_reset_button"),
+              uiOutput("V_DEM_PAIMT_MED_CM__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
+            ),
+            tabPanel(
+              title = "Fiche technique"
+            )
+          )
         )
+
       )
     )
   )
@@ -341,13 +387,13 @@ domaine_valeurs <- function() {
   server <- function(input, output, session) {
 
 
-    # * General -----------------------------------------------------------------
+    # General -----------------------------------------------------------------
 
     ### Fermer l'application lorsque la fenêtre se ferme
     session$onSessionEnded(function() {stopApp()})
 
 
-    # * I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
+    # I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__val <- reactiveValues(
       show_tab = FALSE  # afficher la table ou pas
     )
@@ -358,7 +404,7 @@ domaine_valeurs <- function() {
         return(tagList(
           fluidRow(
             column(
-              width = 4,
+              width = ui_col_width(),
               textInput(  # Code de DENOM
                 "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
                 "DENOM_DEM"
@@ -383,7 +429,7 @@ domaine_valeurs <- function() {
               )
             ),
             column(
-              width = 4,
+              width = ui_col_width(),
               textInput(  # Code de DIN
                 "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
                 "DIN_DEM"
@@ -413,7 +459,7 @@ domaine_valeurs <- function() {
         return(tagList(
           fluidRow(
             column(
-              width = 4,
+              width = ui_col_width(),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__noSeqIndcnRecnu",
                         "NO_SEQ_INDCN_RECNU"),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__debTraitDem",
@@ -424,7 +470,7 @@ domaine_valeurs <- function() {
                         "DD_APLIC_AUTOR")
             ),
             column(
-              width = 4,
+              width = ui_col_width(),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__datStaDem",
                         "DAT_STA_DEM"),
               textInput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__finTraitDem",
@@ -603,7 +649,7 @@ domaine_valeurs <- function() {
     )
 
 
-    # * V_CLA_AHF ------------------------------------------------------------
+    # V_CLA_AHF ------------------------------------------------------------
     V_CLA_AHF__val <- reactiveValues(
       show_tab = FALSE  # afficher la table ou pas
     )
@@ -613,13 +659,13 @@ domaine_valeurs <- function() {
       return(tagList(
         fluidRow(
           column(
-            width = 4,
+            width = ui_col_width(),
             textInput("V_CLA_AHF__ahfsCla", "AHFS_CLA"),
             textInput("V_CLA_AHF__nomAhfs", "NOM_AHFS"),
             textInput("V_CLA_AHF__nomAnglaisAhfs", "NOM_ANGLAIS_AHFS")
           ),
           column(
-            width = 4,
+            width = ui_col_width(),
             textInput("V_CLA_AHF__ahfsScla", "AHFS_SCLA"),
             selectInput(
               "V_CLA_AHF__nomAhfs__typeRecherche",
@@ -637,7 +683,7 @@ domaine_valeurs <- function() {
             )
           ),
           column(
-            width = 4,
+            width = ui_col_width(),
             textInput("V_CLA_AHF__ahfsSscla", "AHFS_SSCLA")
           )
         )
@@ -735,6 +781,268 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_CLA_AHF__nomAnglaisAhfs", value = "")
     })
 
+
+    # V_DEM_PAIMT_MED_CM ----------------------------------------------------
+    V_DEM_PAIMT_MED_CM__val <- reactiveValues(
+      show_tab = FALSE
+    )
+
+    # * * UI ####
+    output$V_DEM_PAIMT_MED_CM__params <- renderUI({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
+              textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
+              textInput("V_DEM_PAIMT_MED_CM__marqComrc", "MARQ_COMRC")
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__denomTypeRecherche",
+                "NOM_DENOM Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__marqTypeRecherche",
+                "MARQ_COMRC Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut",
+                "Début période - Année",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT)
+              )
+            ),
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA"),
+              selectInput(  # Année Fin
+                "V_DEM_PAIMT_MED_CM__AnFin",
+                "Fin période - Année",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN)
+              )
+            ),
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+            ),
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__ahfsTypeRecherche",
+                "AHFS_NOM_CLA Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Début période - Année",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
+              selectInput(  # Année fin
+                "V_DEM_PAIMT_MED_CM__AnFin", "Fin période - Année",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__typeRecherche", "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        ))
+      } else if (TRUE) {
+
+      }
+    })
+    output$V_DEM_PAIMT_MED_CM__go_reset_button <- renderUI({
+      button_go_reset("V_DEM_PAIMT_MED_CM")
+    })
+    output$V_DEM_PAIMT_MED_CM__save_button <- renderUI({
+      button_save("V_DEM_PAIMT_MED_CM", V_DEM_PAIMT_MED_CM__dt())
+    })
+
+    # * * Datatable ####
+    observeEvent(input$V_DEM_PAIMT_MED_CM__go, {
+      # Afficher la table si on clique sur Exécuter
+      V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE
+    }, ignoreInit = TRUE)
+    observeEvent(input$V_DEM_PAIMT_MED_CM__data, {
+      # Faire disparaitre la table si on change le data
+      V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
+    }, ignoreInit = TRUE)
+    V_DEM_PAIMT_MED_CM__dt <- eventReactive(
+      c(input$V_DEM_PAIMT_MED_CM__go, V_DEM_PAIMT_MED_CM__val$show_tab),
+      {
+        if (V_DEM_PAIMT_MED_CM__val$show_tab) {
+          dt <- inesss::V_DEM_PAIMT_MED_CM[[input$V_DEM_PAIMT_MED_CM__data]]
+          if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+            # DENOM
+            if (input$V_DEM_PAIMT_MED_CM__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_DEM_PAIMT_MED_CM__denom, pad = 5
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__nomDenom != "") {
+              if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              }
+            }
+            # DIN
+            if (input$V_DEM_PAIMT_MED_CM__din != "") {
+              dt <- search_value_chr(
+                dt, col = "DIN",
+                values = input$V_DEM_PAIMT_MED_CM__din
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__marqComrc != "") {
+              if (input$V_DEM_PAIMT_MED_CM__marqTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__marqTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              }
+            }
+            # AHFS
+            if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_CLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsCla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsScla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsScla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsSscla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SSCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsSscla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsNomCla != "") {
+              if (input$V_DEM_PAIMT_MED_CM__ahfsTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__ahfsTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              }
+            }
+            # Période d'étude
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+            ]
+          }
+          return(dt)
+        }
+      }, ignoreInit = TRUE
+    )
+    output$V_DEM_PAIMT_MED_CM__dt <- renderDataTable({
+      V_DEM_PAIMT_MED_CM__dt()
+    }, options = renderDataTable_options())
+
+    # * * Export ####
+    output$V_DEM_PAIMT_MED_CM__save <- download_data(
+      input,
+      datasave = V_DEM_PAIMT_MED_CM__dt(),
+      dataname = "V_DEM_PAIMT_MED_CM"
+    )
+
+    # * * Update Buttons ####
+    observeEvent(input$V_DEM_PAIMT_MED_CM__reset, {
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomDenom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__marqComrc", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN))
+      }
+    })
+
+    # * * Erreurs possibles ####
+    observeEvent(
+      eventExpr = {
+        # modifier un des éléments déclenche la vérification
+        c(input$V_DEM_PAIMT_MED_CM__AnDebut, input$V_DEM_PAIMT_MED_CM__AnFin)
+      },
+      handlerExpr = {
+        annee_deb <- as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut)
+        annee_fin <- as.integer(input$V_DEM_PAIMT_MED_CM__AnFin)
+        if (annee_deb >= annee_fin) {
+          updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut", selected = annee_fin)
+        }
+      },
+      ignoreInit = TRUE
+    )
+
   }
 
 
@@ -743,3 +1051,32 @@ domaine_valeurs <- function() {
   shinyApp(ui, server)
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
