@@ -9,86 +9,6 @@ library(lubridate)
 
 # Fonctions ---------------------------------------------------------------
 
-denom_din_ahfs <- function() {
-  ### Description
-  # DENOM
-  DENOM_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
-    "select NMED_COD_DENOM_COMNE as DENOM,\n",
-    "       NMED_DD_DENOM_COMNE as DATE_DEBUT,\n",
-    "       NMED_DF_DENOM_COMNE as DATE_FIN,\n",
-    "       NMED_NOM_DENOM_COMNE as NOM_DENOM\n",
-    "from PROD.V_DENOM_COMNE_MED\n",
-    "order by DENOM, DATE_DEBUT;"
-  )))
-  setkey(DENOM_desc, DENOM, DATE_DEBUT)
-  DENOM_desc <- DENOM_desc[  # conserver le dernier nom, le plus récent
-    DENOM_desc[, .I[.N], .(DENOM)]$V1,
-    .(DENOM, NOM_DENOM)
-  ]
-
-  # DIN
-  DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
-    "select NMED_COD_DIN as DIN,\n",
-    "       NMED_DD_PRODU_MED as DATE_DEBUT,\n",
-    "       NMED_DF_PRODU_MED as DATE_FIN,\n",
-    "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
-    "from V_PRODU_MED;"
-  )))
-  setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
-  DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
-    DIN_desc[, .I[.N], .(DIN)]$V1,
-    .(DIN, MARQ_COMRC)
-  ]
-
-  # AHFS
-  AHFS_desc <- as.data.table(dbGetQuery(conn, paste0(
-    "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
-    "       NMED_COD_SCLA_AHF as AHFS_SCLA,\n",
-    "       NMED_COD_SSCLA_AHF as AHFS_SSCLA,\n",
-    "       NMED_NOM_CLA_AHF as AHFS_NOM_CLA\n",
-    "from V_CLA_AHF;"
-  )))
-  setkey(AHFS_desc)
-
-  ### Extraction
-  to_year <- 1996:year(Sys.Date())
-  DT <- vector("list", length(to_year) * 12)
-  i <- 1L
-  for (yr in to_year) {
-    for (mth in 1:12) {
-      dt <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select	 distinct(SMED_COD_DENOM_COMNE) as DENOM,\n",
-        "        SMED_COD_DIN as DIN,\n",
-        "        SMED_COD_CLA_AHF as AHFS_CLA,\n",
-        "        SMED_COD_SCLA_AHF as AHFS_SCLA,\n",
-        "        SMED_COD_SSCLA_AHF as AHFS_SSCLA\n",
-        "from	   V_DEM_PAIMT_MED_CM\n",
-        "where 	 SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
-      )))
-      dt[, ANNEE := yr]
-      DT[[i]] <- dt
-      i <- i + 1L
-    }
-  }
-  DT <- rbindlist(DT)
-  DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
-    .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
-  ]
-  setorder(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
-           na.last = TRUE)
-
-  ### Ajouter les noms (les plus récents)
-  colorder <- names(DT)
-  DT <- DENOM_desc[DT, on = .(DENOM)]
-  DT <- DIN_desc[DT, on = .(DIN)]
-  DT <- AHFS_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
-  setcolorder(DT, c(colorder, "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA"))
-
-  return(DT)
-
-}
 cod_ahfs <- function() {
   ### Descriptif des codes AHFS
   ahfs_desc <- as.data.table(dbGetQuery(conn, paste0(
@@ -259,103 +179,6 @@ cod_din <- function() {
   }
 
 }
-denom_din_teneur_forme <- function() {
-
-  years <- 1996:year(Sys.Date())
-
-  # Nom des formats
-  nom_forme <- as.data.table(dbGetQuery(conn, statement = paste0(
-    "select NMED_COD_FORME_MED as FORME,\n",
-    "   	  NMED_NOM_FORME as NOM_FORME\n",
-    "from V_FORME_MED\n",
-    "order by FORME;"
-  )))
-  nom_forme[, FORME := as.integer(FORME)]
-  setkey(nom_forme, FORME)
-
-  # Forme des médicaments
-  DT <- vector("list", length(years) * 12)
-  i <- 1L
-  for (yr in years) {
-    for (mth in 1:12) {
-      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select distinct\n",
-        "    SMED_COD_DENOM_COMNE as DENOM,\n",
-        "    SMED_COD_DIN as DIN,\n",
-        "    SMED_COD_FORME_MED as FORME\n",
-        "from PROD.V_DEM_PAIMT_MED_CM\n",
-        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
-      )))
-      if (nrow(DT[[i]])) {
-        DT[[i]][, ANNEE := yr]
-      } else {
-        DT[[i]] <- NULL
-      }
-      i <- i + 1L
-    }
-  }
-  forme <- rbindlist(DT)
-  setkey(forme, DENOM, DIN, FORME, ANNEE)
-  forme <- unique(forme)
-  forme[, FORME := as.integer(FORME)]
-
-  # Ajouter le nom des formes
-  forme <- nom_forme[forme, on = .(FORME)]
-
-  # Teneur du médicament
-  nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
-    "select NMED_COD_TENR_MED as TENEUR,\n",
-    "       NMED_NOM_TENR as NOM_TENEUR\n",
-    "from PROD.V_TENR_MED;"
-  )))
-  nom_teneur[, TENEUR := as.integer(TENEUR)]
-  setkey(nom_teneur, TENEUR)
-
-  DT <- vector("list", length(years) * 12)
-  i <- 1L
-  for (yr in years) {
-    for (mth in 1:12) {
-      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
-        "select distinct\n",
-        "    SMED_COD_DENOM_COMNE as DENOM,\n",
-        "    SMED_COD_DIN as DIN,\n",
-        "    SMED_COD_TENR_MED as TENEUR\n",
-        "from PROD.V_DEM_PAIMT_MED_CM\n",
-        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
-      )))
-      if (nrow(DT[[i]])) {
-        DT[[i]][, ANNEE := yr]
-      } else {
-        DT[[i]] <- NULL
-      }
-      i <- i + 1L
-    }
-  }
-  teneur <- rbindlist(DT)
-  teneur[, TENEUR := as.integer(TENEUR)]
-  teneur <- unique(teneur)
-  setkey(teneur, DENOM, DIN, TENEUR, ANNEE)
-
-  # Ajouter le nom des teneur
-  teneur <- nom_teneur[teneur, on = .(TENEUR)]
-
-  ### Merge des formats et des teneur
-  DT <- merge(
-    forme, teneur,
-    by = c("DENOM", "DIN", "ANNEE"),
-    all = TRUE
-  )
-  DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
-    .(DENOM, DIN, TENEUR, NOM_TENEUR, FORME, NOM_FORME)
-  ]
-  setorder(DT, DENOM, DIN, TENEUR, FORME,
-           na.last = TRUE)
-
-  return(DT)
-
-}
 cod_serv <- function() {
 
   ### Description des codes de service
@@ -461,6 +284,183 @@ cod_sta_decis <- function() {
   return(DT)
 
 }
+denom_din_ahfs <- function() {
+  ### Description
+  # DENOM
+  DENOM_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_DENOM_COMNE as DENOM,\n",
+    "       NMED_DD_DENOM_COMNE as DATE_DEBUT,\n",
+    "       NMED_DF_DENOM_COMNE as DATE_FIN,\n",
+    "       NMED_NOM_DENOM_COMNE as NOM_DENOM\n",
+    "from PROD.V_DENOM_COMNE_MED\n",
+    "order by DENOM, DATE_DEBUT;"
+  )))
+  setkey(DENOM_desc, DENOM, DATE_DEBUT)
+  DENOM_desc <- DENOM_desc[  # conserver le dernier nom, le plus récent
+    DENOM_desc[, .I[.N], .(DENOM)]$V1,
+    .(DENOM, NOM_DENOM)
+  ]
+
+  # DIN
+  DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_DIN as DIN,\n",
+    "       NMED_DD_PRODU_MED as DATE_DEBUT,\n",
+    "       NMED_DF_PRODU_MED as DATE_FIN,\n",
+    "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
+    "from V_PRODU_MED;"
+  )))
+  setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
+  DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
+    DIN_desc[, .I[.N], .(DIN)]$V1,
+    .(DIN, MARQ_COMRC)
+  ]
+
+  # AHFS
+  AHFS_desc <- as.data.table(dbGetQuery(conn, paste0(
+    "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
+    "       NMED_COD_SCLA_AHF as AHFS_SCLA,\n",
+    "       NMED_COD_SSCLA_AHF as AHFS_SSCLA,\n",
+    "       NMED_NOM_CLA_AHF as AHFS_NOM_CLA\n",
+    "from V_CLA_AHF;"
+  )))
+  setkey(AHFS_desc)
+
+  ### Extraction
+  to_year <- 1996:year(Sys.Date())
+  DT <- vector("list", length(to_year) * 12)
+  i <- 1L
+  for (yr in to_year) {
+    for (mth in 1:12) {
+      dt <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select	 distinct(SMED_COD_DENOM_COMNE) as DENOM,\n",
+        "        SMED_COD_DIN as DIN,\n",
+        "        SMED_COD_CLA_AHF as AHFS_CLA,\n",
+        "        SMED_COD_SCLA_AHF as AHFS_SCLA,\n",
+        "        SMED_COD_SSCLA_AHF as AHFS_SSCLA\n",
+        "from	   V_DEM_PAIMT_MED_CM\n",
+        "where 	 SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+      )))
+      dt[, ANNEE := yr]
+      DT[[i]] <- dt
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)
+  DT <- DT[
+    , .(DEBUT = min(ANNEE),
+        FIN = max(ANNEE)),
+    .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
+  ]
+  setorder(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
+           na.last = TRUE)
+
+  ### Ajouter les noms (les plus récents)
+  colorder <- names(DT)
+  DT <- DENOM_desc[DT, on = .(DENOM)]
+  DT <- DIN_desc[DT, on = .(DIN)]
+  DT <- AHFS_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
+  setcolorder(DT, c(colorder, "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA"))
+
+  return(DT)
+
+}
+denom_din_teneur_forme <- function() {
+
+  years <- 1996:year(Sys.Date())
+
+  # Nom des formats
+  nom_forme <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_FORME_MED as FORME,\n",
+    "   	  NMED_NOM_FORME as NOM_FORME\n",
+    "from V_FORME_MED\n",
+    "order by FORME;"
+  )))
+  nom_forme[, FORME := as.integer(FORME)]
+  setkey(nom_forme, FORME)
+
+  # Forme des médicaments
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    SMED_COD_DENOM_COMNE as DENOM,\n",
+        "    SMED_COD_DIN as DIN,\n",
+        "    SMED_COD_FORME_MED as FORME\n",
+        "from PROD.V_DEM_PAIMT_MED_CM\n",
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+      )))
+      if (nrow(DT[[i]])) {
+        DT[[i]][, ANNEE := yr]
+      } else {
+        DT[[i]] <- NULL
+      }
+      i <- i + 1L
+    }
+  }
+  forme <- rbindlist(DT)
+  setkey(forme, DENOM, DIN, FORME, ANNEE)
+  forme <- unique(forme)
+  forme[, FORME := as.integer(FORME)]
+
+  # Ajouter le nom des formes
+  forme <- nom_forme[forme, on = .(FORME)]
+
+  # Teneur du médicament
+  nom_teneur <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_TENR_MED as TENEUR,\n",
+    "       NMED_NOM_TENR as NOM_TENEUR\n",
+    "from PROD.V_TENR_MED;"
+  )))
+  nom_teneur[, TENEUR := as.integer(TENEUR)]
+  setkey(nom_teneur, TENEUR)
+
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      DT[[i]] <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct\n",
+        "    SMED_COD_DENOM_COMNE as DENOM,\n",
+        "    SMED_COD_DIN as DIN,\n",
+        "    SMED_COD_TENR_MED as TENEUR\n",
+        "from PROD.V_DEM_PAIMT_MED_CM\n",
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+      )))
+      if (nrow(DT[[i]])) {
+        DT[[i]][, ANNEE := yr]
+      } else {
+        DT[[i]] <- NULL
+      }
+      i <- i + 1L
+    }
+  }
+  teneur <- rbindlist(DT)
+  teneur[, TENEUR := as.integer(TENEUR)]
+  teneur <- unique(teneur)
+  setkey(teneur, DENOM, DIN, TENEUR, ANNEE)
+
+  # Ajouter le nom des teneur
+  teneur <- nom_teneur[teneur, on = .(TENEUR)]
+
+  ### Merge des formats et des teneur
+  DT <- merge(
+    forme, teneur,
+    by = c("DENOM", "DIN", "ANNEE"),
+    all = TRUE
+  )
+  DT <- DT[
+    , .(DEBUT = min(ANNEE),
+        FIN = max(ANNEE)),
+    .(DENOM, DIN, TENEUR, NOM_TENEUR, FORME, NOM_FORME)
+  ]
+  setorder(DT, DENOM, DIN, TENEUR, FORME,
+           na.last = TRUE)
+
+  return(DT)
+
+}
 
 
 # Créer dataset -----------------------------------------------------------
@@ -470,10 +470,6 @@ V_DEM_PAIMT_MED_CM <- list()
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
 conn <- odbc::dbDisconnect(conn)
-# COD_AHFS
-conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
-conn <- odbc::dbDisconnect(conn)
 # COD_DENOM_COMNE
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
@@ -481,6 +477,10 @@ conn <- odbc::dbDisconnect(conn)
 # COD_DIN
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
+conn <- odbc::dbDisconnect(conn)
+# COD_AHFS
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
 conn <- odbc::dbDisconnect(conn)
 # DENOM_DIN_TENEUR_FORME
 conn <- SQL_connexion(user, pwd)
