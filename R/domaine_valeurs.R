@@ -285,7 +285,8 @@ domaine_valeurs <- function() {
       sidebarMenu(
         menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
         menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
-        menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM")
+        menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED")
       )
     ),
 
@@ -317,9 +318,6 @@ domaine_valeurs <- function() {
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
-            ),
-            tabPanel(
-              title = "Fiche technique"
             )
           )
         ),
@@ -340,9 +338,6 @@ domaine_valeurs <- function() {
               uiOutput("V_CLA_AHF__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_CLA_AHF__dt")
-            ),
-            tabPanel(
-              title = "Fiche technique"
             )
           )
         ),
@@ -371,9 +366,26 @@ domaine_valeurs <- function() {
               uiOutput("V_DEM_PAIMT_MED_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
-            ),
+            )
+          )
+        ),
+
+        # * * V_DENOM_COMNE_MED --------------------------------------------------
+        tabItem(
+          tabName = "tabV_DENOM_COMNE_MED",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ)
+          ),
+          tabsetPanel(
+            type = "tabs",
             tabPanel(
-              title = "Fiche technique"
+              title = "Base de données",
+              div(style = "margin-top:10px"),
+              uiOutput("V_DENOM_COMNE_MED__params"),
+              uiOutput("V_DENOM_COMNE_MED__go_reset_button"),
+              uiOutput("V_DENOM_COMNE_MED__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_DENOM_COMNE_MED__dt")
             )
           )
         )
@@ -1431,6 +1443,213 @@ domaine_valeurs <- function() {
         }
       },
       ignoreInit = TRUE
+    )
+
+
+    # V_DENOM_COMNE_MED ---------------------------------------------------------------------------
+    V_DENOM_COMNE_MED__val <- reactiveValues(
+      show_tab = FALSE
+    )
+
+    # * * UI ####
+    output$V_DENOM_COMNE_MED__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = 3,
+            textInput("V_DENOM_COMNE_MED__denom", "DENOM")
+          )
+        ),
+        fluidRow(
+          column(
+            width = 3,
+            textInput("V_DENOM_COMNE_MED__nomDenom", "NOM_DENOM"),
+            textInput("V_DENOM_COMNE_MED__nomAnglais", "NOM_DENOM_ANGLAIS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DENOM_COMNE_MED__denomTypeRecherche",
+              "NOM_DENOM Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            ),
+            selectInput(
+              "V_DENOM_COMNE_MED__anglaisTypeRecherche",
+              "NOM_DENOM_ANGLAIS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          ),
+          column(
+            width = 3,
+            textInput("V_DENOM_COMNE_MED__synDenom", "NOM_DENOM_SYNON"),
+            textInput("V_DENOM_COMNE_MED__synAnglais", "NOM_DENOM_SYNON_ANGLAIS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DENOM_COMNE_MED__synTypeRecherche",
+              "NOM_DENOM_SYNON Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            ),
+            selectInput(
+              "V_DENOM_COMNE_MED__synAnglaisTypeRecherche",
+              "NOM_DENOM_SYNON_ANGLAIS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = 3,
+            textInput("V_DENOM_COMNE_MED__debut", "Début - Année")
+          ),
+          column(
+            width = 3,
+            textInput("V_DENOM_COMNE_MED__fin", "Fin - Année")
+          )
+        )
+      ))
+    })
+    output$V_DENOM_COMNE_MED__go_reset_button <- renderUI({
+      button_go_reset("V_DENOM_COMNE_MED")
+    })
+    output$V_DENOM_COMNE_MED__save_button <- renderUI({
+      button_save("V_DENOM_COMNE_MED", V_DENOM_COMNE_MED__dt())
+    })
+
+    # * * Datatable ####
+    observeEvent(input$V_DENOM_COMNE_MED__go, {
+      # Afficher la table si on clique sur Exécuter
+      V_DENOM_COMNE_MED__val$show_tab <- TRUE
+    }, ignoreInit = TRUE)
+    V_DENOM_COMNE_MED__dt <- eventReactive(
+      c(input$V_DENOM_COMNE_MED__go, V_DENOM_COMNE_MED__val$show_tab),
+      {
+        if (V_DENOM_COMNE_MED__val$show_tab) {
+          dt <- inesss::V_DENOM_COMNE_MED
+          # DENOM
+          if (input$V_DENOM_COMNE_MED__denom != "") {
+            dt <- search_value_chr(
+              dt, col = "DENOM",
+              values = input$V_DENOM_COMNE_MED__denom, pad = 5
+            )
+          }
+          # NOM_DENOM
+          if (input$V_DENOM_COMNE_MED__nomDenom != "") {
+            if (input$V_DENOM_COMNE_MED__denomTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_DENOM",
+                values = input$V_DENOM_COMNE_MED__nomDenom
+              )
+            } else if (input$V_DENOM_COMNE_MED__denomTypeRecherche == "keyword") {
+              dt <- search_value_chr(
+                dt, col = "NOM_DENOM",
+                values = input$V_DENOM_COMNE_MED__nomDenom
+              )
+            }
+          }
+          # NOM_DENOM_SYNON
+          if (input$V_DENOM_COMNE_MED__synDenom != "") {
+            if (input$V_DENOM_COMNE_MED__synTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_DENOM_SYNON",
+                values = input$V_DENOM_COMNE_MED__synDenom
+              )
+            } else if (input$V_DENOM_COMNE_MED__synTypeRecherche == "keyword") {
+              dt <- search_value_chr(
+                dt, col = "NOM_DENOM_SYNON",
+                values = input$V_DENOM_COMNE_MED__synDenom
+              )
+            }
+          }
+          # NOM_DENOM_ANGLAIS
+          if (input$V_DENOM_COMNE_MED__nomAnglais != "") {
+            if (input$V_DENOM_COMNE_MED__anglaisTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_DENOM_ANGLAIS",
+                values = input$V_DENOM_COMNE_MED__nomAnglais
+              )
+            } else if (input$V_DENOM_COMNE_MED__anglaisTypeRecherche == "keyword") {
+              dt <- search_value_chr(
+                dt, col = "NOM_DENOM_ANGLAIS",
+                values = input$V_DENOM_COMNE_MED__nomAnglais
+              )
+            }
+          }
+          # NOM_DENOM_SYNON_ANGLAIS
+          if (input$V_DENOM_COMNE_MED__synAnglais != "") {
+            if (input$V_DENOM_COMNE_MED__synAnglaisTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_DENOM_SYNON_ANGLAIS",
+                values = input$V_DENOM_COMNE_MED__synAnglais
+              )
+            } else if (input$V_DENOM_COMNE_MED__synAnglaisTypeRecherche == "keyword") {
+              dt <- search_value_chr(
+                dt, col = "NOM_DENOM_SYNON_ANGLAIS",
+                values = input$V_DENOM_COMNE_MED__synAnglais
+              )
+            }
+          }
+          # Période d'étude
+          if (input$V_DENOM_COMNE_MED__debut != "" && input$V_DENOM_COMNE_MED__fin != "") {
+            deb <- as.integer(input$V_DENOM_COMNE_MED__debut)
+            fin <- as.integer(input$V_DENOM_COMNE_MED__fin)
+            dt <- dt[deb <= year(DATE_FIN) & fin >= year(DATE_DEBUT)]
+          } else if (input$V_DENOM_COMNE_MED__debut != "" || input$V_DENOM_COMNE_MED__fin != "") {
+            deb <- as.integer(input$V_DENOM_COMNE_MED__debut)
+            dt <- dt[year(DATE_DEBUT) <= deb & deb <= year(DATE_FIN)]
+          } else if (input$V_DENOM_COMNE_MED__fin != "") {
+            fin <- as.integer(input$V_DENOM_COMNE_MED__fin)
+            dt <- dt[year(DATE_DEBUT) <= fin & fin <= year(DATE_FIN)]
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }
+    )
+    output$V_DENOM_COMNE_MED__dt <- renderDataTable({
+      V_DENOM_COMNE_MED__dt()
+    }, options = renderDataTable_options())
+
+    # * * Export ####
+    output$V_DENOM_COMNE_MED__save <- download_data(
+      input,
+      datasave = V_DENOM_COMNE_MED__dt(),
+      dataname = "V_DENOM_COMNE_MED"
+    )
+
+    # * * Update buttons ####
+    observeEvent(input$V_DENOM_COMNE_MED__reset, {
+      updateTextInput(session, "V_DENOM_COMNE_MED__denom", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__nomDenom", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__nomAnglais", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__synDenom", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__synAnglais", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__debut", value = "")
+      updateTextInput(session, "V_DENOM_COMNE_MED__fin", value = "")
+    })
+
+    # * * Erreurs possibles ####
+    observeEvent(
+      eventExpr = c(input$V_DENOM_COMNE_MED__debut, input$V_DENOM_COMNE_MED__fin),
+      handlerExpr = {
+        if (input$V_DENOM_COMNE_MED__debut != "" && input$V_DENOM_COMNE_MED__fin != "") {
+          debut <- as.integer(input$V_DENOM_COMNE_MED__debut)
+          fin <- as.integer(input$V_DENOM_COMNE_MED__fin)
+          if (debut > fin) {
+            updateTextInput(session, "V_DENOM_COMNE_MED__debut", value = input$V_DENOM_COMNE_MED__fin)
+          }
+        }
+      }
     )
 
   }
