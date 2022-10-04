@@ -4,7 +4,7 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(stringr)
-library(writexl)
+color_text <- crayon::green
 conn <- SQL_connexion(user, pwd)
 
 
@@ -12,7 +12,7 @@ conn <- SQL_connexion(user, pwd)
 
 des_court_indcn_recnu <- function() {
 
-  cat("I_APME_DEM_AUTOR_CRITR_ETEN_CM - DES_COURT_INDCN_RECNU en cours")
+  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - DES_COURT_INDCN_RECNU en cours\n"))
 
   # Vérifier que la variable d'itération ne contient pas de valeurs vides
   verif_var <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -57,7 +57,7 @@ des_court_indcn_recnu <- function() {
 }
 no_seq_indcn_recnu <- function() {
 
-  cat("I_APME_DEM_AUTOR_CRITR_ETEN_CM - NO_SEQ_INDCN_RECNU_PME en cours")
+  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - NO_SEQ_INDCN_RECNU_PME en cours\n"))
 
   ### Extraction data
   DT <- dbGetQuery(

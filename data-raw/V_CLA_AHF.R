@@ -3,11 +3,12 @@ library(data.table)
 library(odbc)
 library(inesss)
 library(askpass)
+color_text <- crayon::green
 conn <- SQL_connexion(user, pwd)
 
 fct <- function() {
 
-  cat("V_CLA_AHF en cours")
+  cat(color_text("V_CLA_AHF en cours\n"))
 
   DT <- as.data.table(dbGetQuery(conn, statement = paste0(
     "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
