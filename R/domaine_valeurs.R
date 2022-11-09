@@ -276,7 +276,7 @@ domaine_valeurs <- function() {
 
 
     # * Header section ----------------------------------------------------------------------------
-    dashboardHeader(title = "Domaine de valeurs"),
+    dashboardHeader(title = "Domaine de valeur"),
 
 
     # * Sidebar section ---------------------------------------------------------------------------
@@ -286,7 +286,9 @@ domaine_valeurs <- function() {
         menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
         menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
         menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED")
+        menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
+        menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
+        menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
       )
     ),
 
@@ -301,7 +303,7 @@ domaine_valeurs <- function() {
             header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
             column(
               width = ui_col_width(),
-              selectInput(  # sélection de la base de données
+              selectInput(  # sélection du domaine de valeur
                 inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                 label = "Élément",
                 choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
@@ -311,7 +313,7 @@ domaine_valeurs <- function() {
           tabsetPanel(
             type = "tabs",
             tabPanel(
-              title = "Base de données",
+              title = "Domaine de valeur",
               div(style = "margin-top:10px"),
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
               uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button"),
@@ -331,7 +333,7 @@ domaine_valeurs <- function() {
           tabsetPanel(
             type = "tabs",
             tabPanel(
-              title = "Base de données",
+              title = "Domaine de valeur",
               div(style = "margin-top:10px"),
               uiOutput("V_CLA_AHF__params"),
               uiOutput("V_CLA_AHF__go_reset_button"),
@@ -349,7 +351,7 @@ domaine_valeurs <- function() {
             header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
             column(
               width = ui_col_width(),
-              selectInput(  # sélection de la base de données
+              selectInput(  # sélection du domaine de valeur
                 inputId = "V_DEM_PAIMT_MED_CM__data",
                 label = "Élément",
                 choices = names(inesss::V_DEM_PAIMT_MED_CM)
@@ -359,7 +361,7 @@ domaine_valeurs <- function() {
           tabsetPanel(
             type = "tabs",
             tabPanel(
-              title = "Base de données",
+              title = "Domaine de valeur",
               div(style = "margin-top:10px"),
               uiOutput("V_DEM_PAIMT_MED_CM__params"),
               uiOutput("V_DEM_PAIMT_MED_CM__go_reset_button"),
@@ -379,13 +381,63 @@ domaine_valeurs <- function() {
           tabsetPanel(
             type = "tabs",
             tabPanel(
-              title = "Base de données",
+              title = "Domaine de valeur",
               div(style = "margin-top:10px"),
               uiOutput("V_DENOM_COMNE_MED__params"),
               uiOutput("V_DENOM_COMNE_MED__go_reset_button"),
               uiOutput("V_DENOM_COMNE_MED__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_DENOM_COMNE_MED__dt")
+            )
+          )
+        ),
+
+
+        # * * V_DES_COD ---------------------------------------------------------
+        tabItem(
+          tabName = "tabV_DES_COD",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_DES_COD)$MaJ)
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              uiOutput("V_DES_COD__params"),
+              uiOutput("V_DES_COD__go_reset_button"),
+              uiOutput("V_DES_COD__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_DES_COD__dt")
+            )
+          )
+        ),
+
+
+        # * * V_PRODU_MED ----------------------------------------------------------
+        tabItem(
+          tabName = "tabV_PRODU_MED",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_PRODU_MED)$MaJ),
+            column(
+              width = ui_col_width(),
+              selectInput(  # sélection du domaine de valeur
+                inputId = "V_PRODU_MED__data",
+                label = "Élément",
+                choices = names(inesss::V_PRODU_MED)
+              )
+            )
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              uiOutput("V_PRODU_MED__params"),
+              uiOutput("V_PRODU_MED__go_reset_button"),
+              uiOutput("V_PRODU_MED__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_PRODU_MED__dt")
             )
           )
         )
@@ -506,8 +558,7 @@ domaine_valeurs <- function() {
 
     # * * Datatable ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
-      # Afficher la table si on clique sur Exécuter
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE
+      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data, {
       # Faire disparaitre la table si on change le data
@@ -711,8 +762,7 @@ domaine_valeurs <- function() {
 
     # * * Datatable ####
     observeEvent(input$V_CLA_AHF__go, {
-      # Afficher la table si on clique sur Exécuter
-      V_CLA_AHF__val$show_tab <- TRUE
+      V_CLA_AHF__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
     V_CLA_AHF__dt <- eventReactive(
       c(input$V_CLA_AHF__go, V_CLA_AHF__val$show_tab),
@@ -1062,16 +1112,13 @@ domaine_valeurs <- function() {
 
     # * * Datatable ####
     observeEvent(input$V_DEM_PAIMT_MED_CM__go, {
-      # Afficher la table si on clique sur Exécuter
-      V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE
+      V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
     observeEvent(input$V_DEM_PAIMT_MED_CM__data, {
       if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
-        # On veut faire apparaître le data, car petite table qui n'a pas d'input
-        V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE
+        V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE  # On veut faire apparaître le data, car petite table qui n'a pas d'input
       } else {
-        # Faire disparaitre la table si on change le data
-        V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
+        V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE  # Faire disparaitre la table si on change le data
       }
     }, ignoreInit = TRUE)
     V_DEM_PAIMT_MED_CM__dt <- eventReactive(
@@ -1509,11 +1556,11 @@ domaine_valeurs <- function() {
         fluidRow(
           column(
             width = 3,
-            textInput("V_DENOM_COMNE_MED__debut", "Début - Année")
+            textInput("V_DENOM_COMNE_MED__debut", "Début période - Année")
           ),
           column(
             width = 3,
-            textInput("V_DENOM_COMNE_MED__fin", "Fin - Année")
+            textInput("V_DENOM_COMNE_MED__fin", "Fin période - Année")
           )
         )
       ))
@@ -1527,8 +1574,7 @@ domaine_valeurs <- function() {
 
     # * * Datatable ####
     observeEvent(input$V_DENOM_COMNE_MED__go, {
-      # Afficher la table si on clique sur Exécuter
-      V_DENOM_COMNE_MED__val$show_tab <- TRUE
+      V_DENOM_COMNE_MED__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
     V_DENOM_COMNE_MED__dt <- eventReactive(
       c(input$V_DENOM_COMNE_MED__go, V_DENOM_COMNE_MED__val$show_tab),
@@ -1629,6 +1675,7 @@ domaine_valeurs <- function() {
 
     # * * Update buttons ####
     observeEvent(input$V_DENOM_COMNE_MED__reset, {
+      V_DENOM_COMNE_MED__val$show_tab <- FALSE
       updateTextInput(session, "V_DENOM_COMNE_MED__denom", value = "")
       updateTextInput(session, "V_DENOM_COMNE_MED__nomDenom", value = "")
       updateTextInput(session, "V_DENOM_COMNE_MED__nomAnglais", value = "")
@@ -1652,6 +1699,232 @@ domaine_valeurs <- function() {
       }
     )
 
+
+    # V_DES_COD ####
+    V_DES_COD__val <- reactiveValues(
+      show_tab = FALSE
+    )
+
+    # * * UI ####
+    output$V_DES_COD__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_DES_COD__code", "CODE")
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_DES_COD__typeCode", "TYPE_CODE"),
+            textInput("V_DES_COD__codeDesc", "CODE_DESC")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_DES_COD__typeCodeTypeRecherche",
+              "TYPE_CODE Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            ),
+            selectInput(
+              "V_DES_COD__codeDescTypeRecherche",
+              "CODE_DESC Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      ))
+    })
+    output$V_DES_COD__go_reset_button <- renderUI({
+      button_go_reset("V_DES_COD")
+    })
+    output$V_DES_COD__save_button <- renderUI({
+      button_save("V_DES_COD", V_DES_COD__dt())
+    })
+
+    # * * Datatable ####
+    observeEvent(input$V_DES_COD__go, {
+      V_DES_COD__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
+    }, ignoreInit = TRUE)
+    V_DES_COD__dt <- eventReactive(
+      c(input$V_DES_COD__go, V_DES_COD__val$show_tab),
+      {
+        if (V_DES_COD__val$show_tab) {
+          dt <- inesss::V_DES_COD
+          # CODE
+          if (input$V_DES_COD__code != "") {
+            dt <- search_value_chr(
+              dt, col = "CODE",
+              values = input$V_DES_COD__code
+            )
+          }
+          # TYPE_CODE
+          if (input$V_DES_COD__typeCode != "") {
+            if (input$V_DES_COD__typeCodeTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "TYPE_CODE",
+                values = input$V_DES_COD__typeCode
+              )
+            } else if (input$V_DES_COD__typeCodeTypeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "TYPE_CODE",
+                values = input$V_DES_COD__typeCode
+              )
+            }
+          }
+          # CODE_DESC
+          if (input$V_DES_COD__codeDesc != "") {
+            if (input$V_DES_COD__codeDescTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "CODE_DESC",
+                values = input$V_DES_COD__codeDesc
+              )
+            } else if (input$V_DES_COD__codeDescTypeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "CODE_DESC",
+                values = input$V_DES_COD__codeDesc
+              )
+            }
+          }
+
+          return(dt)
+        }
+      }
+    )
+    output$V_DES_COD__dt <- renderDataTable({
+      V_DES_COD__dt()
+    }, options = renderDataTable_options())
+
+    # * * Export ####
+    output$V_DES_COD__save <- download_data(
+      input,
+      datasave = V_DES_COD__dt(),
+      dataname = "V_DES_COD"
+    )
+
+    # * * Update buttons ####
+    observeEvent(input$V_DES_COD__reset, {
+      V_DES_COD__val$show_tab <- FALSE
+      updateTextInput(session, "V_DES_COD__code", value = "")
+      updateTextInput(session, "V_DES_COD__typeCode", value = "")
+      updateTextInput(session, "V_DES_COD__codeDesc", value = "")
+    })
+
+
+    # V_PRODU_MED ####
+    V_PRODU_MED__val <- reactiveValues(
+      show_tab = FALSE
+    )
+
+    # * * UI ####
+    output$V_PRODU_MED__params <- renderUI({
+      if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_PRODU_MED__denom", "DENOM")
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_PRODU_MED__din", "DIN")
+            )
+          ),
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_PRODU_MED__nomMarqComrc", "NOM_MARC_COMRC")
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_PRODU_MED__nomMarqComrcTypeRecherche",
+                "NOM_MARQ_COMRC Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-Clé"
+              )
+            )
+          )
+        ))
+      }
+    })
+    output$V_PRODU_MED__go_reset_button <- renderUI({
+      button_go_reset("V_PRODU_MED")
+    })
+    output$V_PRODU_MED__save_button <- renderUI({
+      button_save("V_PRODU_MED", V_PRODU_MED__dt())
+    })
+
+    # * * Datatable ####
+    observeEvent(input$V_PRODU_MED__go, {
+      V_PRODU_MED__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
+    }, ignoreInit = TRUE)
+    observeEvent(input$V_PRODU_MED__data, {
+      V_PRODU_MED__val$show_tab <- FALSE  # Faire disparaitre la table si on change le data
+    }, ignoreInit = TRUE)
+    V_PRODU_MED__dt <- eventReactive(
+      c(input$V_PRODU_MED__go, V_PRODU_MED__val$show_tab),
+      {
+        if (V_PRODU_MED__val$show_tab) {
+          dt <- inesss::V_PRODU_MED[[input$V_PRODU_MED__data]]
+          if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
+            # DENOM
+            if (input$V_PRODU_MED__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_PRODU_MED__denom
+              )
+            }
+            # DIN
+            if (input$V_PRODU_MED__din != "") {
+              dt <- search_value_chr(
+                dt, col = "DIN",
+                values = input$V_PRODU_MED__din
+              )
+            }
+            # NOM_MARQ_COMRC
+            if (input$V_PRODU_MED__nomMarqComrc != "") {
+              if (input$V_PRODU_MED__nomMarqComrcTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_MARQ_COMRC",
+                  values = input$V_PRODU_MED__nomMarqComrc
+                )
+              } else if (input$V_PRODU_MED__nomMarqComrcTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_MARQ_COMRC",
+                  values = input$V_PRODU_MED__nomMarqComrc
+                )
+              }
+            }
+          }
+          return(dt)
+        }
+      }
+    )
+    output$V_PRODU_MED__dt <- renderDataTable({
+      V_PRODU_MED__dt()
+    }, options = renderDataTable_options())
+
+    # * * Export ####
+    output$V_PRODU_MED__save <- download_data(
+      input,
+      datasave = V_PRODU_MED__dt(),
+      dataname = "V_PRODU_MED"
+    )
+
+    # * * Update buttons ####
+    observeEvent(input$V_PRODU_MED__reset, {
+      V_PRODU_MED__val$show_tab <- FALSE
+      updateTextInput(session, "V_PRODU_MED__denom", value = "")
+      updateTextInput(session, "V_PRODU_MED__din", value = "")
+      updateTextInput(session, "V_PRODU_MED__nomMarqComrc", value = "")
+    })
   }
 
 
