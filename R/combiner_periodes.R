@@ -1,4 +1,19 @@
-combiner_periodes <- function(dt, id, debut, fin, par_cols = NULL, njours = 1) {
+#' Combinaisons périodes d'études
+#'
+#' Combine, fusionne des périodes qui se chevauchent dans le temps.
+#'
+#' @param dt Data d'analyse.
+#' @param id Nom de la colonne indiquant l'identifiant de l'individu.
+#' @param debut Nom de la colonne indiquant le début de la période.
+#' @param fin Nom de la colonne indiquant la fin de la période.
+#' @param par_cols Nom des autres colonnes qui doivent être incluses dans l'analyse. Par exemple des codes de médicaments. Par défaut `NULL`.
+#' @param njours Nombre de jours max entre le début et la fin précédente pour effectuer une combinaison.
+#'
+#' @import data.table
+#' @importFrom lubridate as_date
+#' @encoding UTF-8
+#' @export
+combiner _periodes <- function(dt, id, debut, fin, par_cols = NULL, njours = 1) {
   ############################# #
   # Serait inclut dans le package inesss
   rmNA <- function(x) {
@@ -76,19 +91,19 @@ combiner_periodes <- function(dt, id, debut, fin, par_cols = NULL, njours = 1) {
 }
 
 
-DT <- data.table(
-  ID = c(rep(1, 3), rep(2, 2)),
-  DIN = c(rep(555, 3), rep(999, 2)),
-  DENOM = c(rep(159, 3), rep(357, 2)),
-  DatAdm = as.Date(c("2022-03-01","2022-03-15","2022-03-19",
-                     "2022-06-01", "2022-06-15")),
-  DatDep = as.Date(c("2022-03-25","2022-03-17","2022-03-30",
-                     "2022-06-15", "2022-06-19"))
-)
-dt <- copy(DT)
-id = "ID"
-debut = "DatAdm"
-fin = "DatDep"
-njours = 1
-par_cols = c("DIN", "DENOM")
-par_cols = NULL
+# DT <- data.table(
+#   ID = c(rep(1, 3), rep(2, 2)),
+#   DIN = c(rep(555, 3), rep(999, 2)),
+#   DENOM = c(rep(159, 3), rep(357, 2)),
+#   DatAdm = as.Date(c("2022-03-01","2022-03-15","2022-03-19",
+#                      "2022-06-01", "2022-06-15")),
+#   DatDep = as.Date(c("2022-03-25","2022-03-17","2022-03-30",
+#                      "2022-06-15", "2022-06-19"))
+# )
+# dt <- copy(DT)
+# id = "ID"
+# debut = "DatAdm"
+# fin = "DatDep"
+# njours = 1
+# par_cols = c("DIN", "DENOM")
+# par_cols = NULL
