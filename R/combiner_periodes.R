@@ -13,7 +13,7 @@
 #' @importFrom lubridate as_date
 #' @encoding UTF-8
 #' @export
-combiner _periodes <- function(dt, id, debut, fin, par_cols = NULL, njours = 1) {
+combiner_periodes <- function(dt, id, debut, fin, par_cols = NULL, njours = 1) {
   ############################# #
   # Serait inclut dans le package inesss
   rmNA <- function(x) {
