@@ -4,9 +4,14 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(lubridate)
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
 conn <- SQL_connexion(user, pwd)
 
 fct <- function(need_conn = FALSE) {
+
+  cat(color_text("V_DES_COD\n"))
 
   ### Effectuer la connexion à Teradata
   if (need_conn) {
@@ -28,12 +33,14 @@ fct <- function(need_conn = FALSE) {
              DATE_FIN = as_date(DATE_FIN))]
   setkey(DT, TYPE_CODE, CODE, DATE_DEBUT)  # tri
 
-  attr(DT, "MaJ") <- Sys.Date()  # date de création
+  attr(DT, "verif_loop_var") <- NULL
+  attr(DT, "name_loop_var") <- NULL
   return(DT)
 
 }
 
 V_DES_COD <- fct()
+attr(V_DES_COD, "MaJ") <- Sys.Date()  # date de création
 use_data(V_DES_COD, overwrite = TRUE)
 rm(V_DES_COD)
 

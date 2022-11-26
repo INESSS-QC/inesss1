@@ -5,11 +5,18 @@ library(inesss)
 library(askpass)
 library(stringr)
 library(lubridate)
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
+conn <- SQL_connexion(user, pwd)
 
 
 # Fonctions ---------------------------------------------------------------
 
 cod_ahfs <- function() {
+
+  cat(color_text("V_DEM_PAIMT_MED_CM - COD_AHFS\n"))
+
   ### Descriptif des codes AHFS
   ahfs_desc <- as.data.table(dbGetQuery(conn, paste0(
     "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
@@ -20,11 +27,30 @@ cod_ahfs <- function() {
   )))
   setkey(ahfs_desc)
 
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_DAT_SERV is null;"
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:year(Sys.Date())
+  } else {
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
+  }
+
   ### Extraction des codes AHFS
-  to_year <- 1996:year(Sys.Date())
-  DT <- vector("list", length(to_year) * 12)
+  DT <- vector("list", length(years) * 12)
   i <- 1L
-  for (yr in to_year) {
+  for (yr in years) {
     for (mth in 1:12) {
       dt <- as.data.table(dbGetQuery(conn, statement = paste0(
         "select distinct(SMED_COD_CLA_AHF) as AHFS_CLA,\n",
@@ -41,8 +67,8 @@ cod_ahfs <- function() {
   DT <- rbindlist(DT)
   setkey(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
     .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
 
@@ -51,135 +77,185 @@ cod_ahfs <- function() {
 
   setorder(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
            na.last = TRUE)
-
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
 cod_denom <- function() {
 
-  ### Vérifier si la variable d'itération contient une valeur nulle
-  verif_iter <- dbGetQuery(conn, statement = paste0(
-    "select distinct(smed_dat_serv) as DATE_SERV\n",
-    "from V_DEM_PAIMT_MED_CM\n",
+  cat(color_text("V_DEM_PAIMT_MED_CM - COD_DENOM\n"))
+
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
     "where SMED_DAT_SERV is null;"
-  ))
-  if (nrow(verif_iter)) {
-    stop("V_DEM_PAIMT_MED_CM.cod_denom(): iter nulle.")
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:year(Sys.Date())
   } else {
-    ### Descriptions des Denom à ajouter
-    query <- paste0(
-      "select NMED_COD_DENOM_COMNE as DENOM,\n",
-      "       NMED_DD_DENOM_COMNE as DATE_DEBUT,\n",
-      "       NMED_DF_DENOM_COMNE as DATE_FIN,\n",
-      "       NMED_NOM_DENOM_COMNE as NOM_DENOM\n",
-      "from PROD.V_DENOM_COMNE_MED\n",
-      "order by DENOM, DATE_DEBUT;"
-    )
-    DT_desc <- as.data.table(dbGetQuery(conn, query))
-    DT_desc[, `:=` (DATE_DEBUT = year(DATE_DEBUT), DATE_FIN = year(DATE_FIN))]
-    # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
-    # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
-    # en utilisant la seule description possible
-    idx <- DT_desc[, .I[.N == 1], .(DENOM)]$V1
-    if (length(idx)) {
-      DT_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
-    }
-    DT_desc <- DT_desc[, .(ANNEE = DATE_DEBUT:DATE_FIN), .(DENOM, NOM_DENOM)]
-
-    to_year <- 1996:year(Sys.Date())
-    DT <- vector("list", length(to_year) * 12)
-    i <- 1L
-    for (yr in to_year) {
-      for (mth in 1:12) {
-        dt <- as.data.table(dbGetQuery(conn, statement = paste0(
-          "select distinct(SMED_COD_DENOM_COMNE) as DENOM\n",
-          "from V_DEM_PAIMT_MED_CM\n",
-          "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
-        )))
-        dt[, ANNEE := yr]
-        dt <- DT_desc[, .(DENOM, NOM_DENOM, ANNEE)][dt, on = .(DENOM, ANNEE)]
-        DT[[i]] <- dt
-        i <- i + 1L
-      }
-    }
-    DT <- rbindlist(DT)
-    setkey(DT, DENOM, ANNEE)
-    DT <- DT[
-      , .(DEBUT = min(ANNEE),
-          FIN = max(ANNEE)),
-      .(DENOM, NOM_DENOM)
-    ]
-
-    setorder(DT, DENOM, DEBUT, na.last = TRUE)
-    return(DT)
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
   }
+
+  ### Descriptions des Denom à ajouter
+  denom_desc_query <- paste0(
+    "select NMED_COD_DENOM_COMNE as DENOM,\n",
+    "       NMED_DD_DENOM_COMNE as DATE_DEBUT,\n",
+    "       NMED_DF_DENOM_COMNE as DATE_FIN,\n",
+    "       NMED_NOM_DENOM_COMNE as NOM_DENOM\n",
+    "from PROD.V_DENOM_COMNE_MED\n",
+    "order by DENOM, DATE_DEBUT;"
+  )
+  DT_desc <- as.data.table(dbGetQuery(conn, denom_desc_query))
+  DT_desc[
+    , `:=` (DATE_DEBUT = year(DATE_DEBUT),
+            DATE_FIN = year(DATE_FIN))
+  ]
+  # Ceux qui ont juste une ligne : mettre de 1996 à aujourd'hui
+  # Permet d'avoir une description pour des codes où les dates ne seraient pas valides
+  # en utilisant la seule description possible
+  idx <- DT_desc[, .I[.N == 1], .(DENOM)]$V1
+  if (length(idx)) {
+    DT_desc[idx, `:=` (DATE_DEBUT = 1996, DATE_FIN = year(Sys.Date()))]
+  }
+  DT_desc <- DT_desc[, .(ANNEE = DATE_DEBUT:DATE_FIN), .(DENOM, NOM_DENOM)]
+
+  DT <- vector("list", length(years) * 12)
+  i <- 1L
+  for (yr in years) {
+    for (mth in 1:12) {
+      dt <- as.data.table(dbGetQuery(conn, statement = paste0(
+        "select distinct(SMED_COD_DENOM_COMNE) as DENOM\n",
+        "from V_DEM_PAIMT_MED_CM\n",
+        "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+      )))
+      dt[, ANNEE := yr]
+      dt <- DT_desc[, .(DENOM, NOM_DENOM, ANNEE)][dt, on = .(DENOM, ANNEE)]
+      DT[[i]] <- dt
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)
+  setkey(DT, DENOM, ANNEE)
+  DT <- DT[
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    .(DENOM, NOM_DENOM)
+  ]
+
+  setorder(DT, DENOM, Premier_SMED_DAT_SERV, na.last = TRUE)
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
+  return(DT)
 
 }
 cod_din <- function() {
 
-  ### Vérifier si la variable d'itération contient une valeur nulle
-  verif_iter <- dbGetQuery(conn, statement = paste0(
-    "select distinct(smed_dat_serv) as DATE_SERV\n",
-    "from V_DEM_PAIMT_MED_CM\n",
+  cat(color_text("V_DEM_PAIMT_MED_CM - COD_DIN\n"))
+
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
     "where SMED_DAT_SERV is null;"
-  ))
-  if (nrow(verif_iter)) {
-    stop("V_DEM_PAIMT_MED_CM.cod_denom(): iter nulle.")
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:year(Sys.Date())
   } else {
-
-    ### Description des DIN
-    DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
-      "select NMED_COD_DIN as DIN,\n",
-      "       NMED_DD_PRODU_MED as DATE_DEBUT,\n",
-      "       NMED_DF_PRODU_MED as DATE_FIN,\n",
-      "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
-      "from V_PRODU_MED;"
-    )))
-    setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
-    DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
-      DIN_desc[, .I[.N], .(DIN)]$V1,
-      .(DIN, MARQ_COMRC)
-    ]
-
-    ### Trouver la liste des codes pour chaque année
-    to_year <- 1996:year(Sys.Date())  # année à analyser
-    DT <- vector("list", length(to_year) * 12)  # contiendra les tableaux des requêtes
-    i <- 1L
-    for (yr in to_year) {  # pour chaque année
-      for (mth in 1:12) {  # pour chaque mois
-        dt <- as.data.table(dbGetQuery(  # liste unique des codes de service pour le mois
-          conn, paste0(
-            "select distinct SMED_COD_DIN as DIN\n",
-            "from V_DEM_PAIMT_MED_CM\n",
-            "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
-          )
-        ))
-        if (nrow(dt)) {
-          dt[, ANNEE := yr]  # indiquer l'année
-          DT[[i]] <- dt
-        } else {
-          DT[[i]] <- NULL
-        }
-        i <- i + 1L
-      }
-    }
-    DT <- rbindlist(DT)  # un seul tableau
-
-    ### Indiquer les années où le code est présent
-    DT <- DT[
-      , .(DEBUT = min(ANNEE), FIN = max(ANNEE)),
-      .(DIN)
-    ]
-
-    ### Ajouter marque commerciale
-    DT <- DIN_desc[DT, on = .(DIN)]
-    setkey(DT, DIN)
-
-    return(DT)
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
   }
+
+  ### Description des DIN
+  DIN_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select NMED_COD_DIN as DIN,\n",
+    "       NMED_DD_PRODU_MED as DATE_DEBUT,\n",
+    "       NMED_DF_PRODU_MED as DATE_FIN,\n",
+    "       NMED_NOM_MARQ_COMRC as MARQ_COMRC\n",
+    "from V_PRODU_MED;"
+  )))
+  setkey(DIN_desc, DIN, DATE_DEBUT, DATE_FIN)
+  DIN_desc <- DIN_desc[  # conserver le dernier nom, le plus récent
+    DIN_desc[, .I[.N], .(DIN)]$V1,
+    .(DIN, MARQ_COMRC)
+  ]
+
+  ### Trouver la liste des codes pour chaque année
+  DT <- vector("list", length(years) * 12)  # contiendra les tableaux des requêtes
+  i <- 1L
+  for (yr in years) {  # pour chaque année
+    for (mth in 1:12) {  # pour chaque mois
+      dt <- as.data.table(dbGetQuery(  # liste unique des codes de service pour le mois
+        conn, paste0(
+          "select distinct SMED_COD_DIN as DIN\n",
+          "from V_DEM_PAIMT_MED_CM\n",
+          "where SMED_DAT_SERV between '",date_ymd(yr, mth, 1),"' and '",date_ymd(yr, mth, "last"),"';"
+        )
+      ))
+      if (nrow(dt)) {
+        dt[, ANNEE := yr]  # indiquer l'année
+        DT[[i]] <- dt
+      } else {
+        DT[[i]] <- NULL
+      }
+      i <- i + 1L
+    }
+  }
+  DT <- rbindlist(DT)  # un seul tableau
+
+  ### Indiquer les années où le code est présent
+  DT <- DT[
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    .(DIN)
+  ]
+
+  ### Ajouter marque commerciale
+  DT <- DIN_desc[DT, on = .(DIN)]
+  setkey(DT, DIN)
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
+  return(DT)
 
 }
 cod_serv <- function() {
+
+  cat(color_text("V_DEM_PAIMT_MED_CM - COD_SERV\n"))
+
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_DAT_SERV is null;"
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    min_year <- 1996L
+  } else {
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+  }
 
   ### Description des codes de service
   DT_desc <- as.data.table(dbGetQuery(
@@ -200,15 +276,31 @@ cod_serv <- function() {
     , .(DEBUT = min(DEBUT), FIN = max(FIN)),
     .(COD_SERV, COD_SERV_DESC, per)
   ][, per := NULL]
-  # Modifier les valeurs pour avoir des descriptions avant 2003
-  DT_desc[DT_desc[, .I[1], .(COD_SERV)]$V1, DEBUT := 1996L]
+  DT_desc[, diff := DEBUT - shift(FIN), .(COD_SERV, COD_SERV_DESC)]
+  idx <- DT_desc[, .I[diff <= 1], .(COD_SERV, COD_SERV_DESC)][["V1"]]
+  idx <- idx[!is.na(idx)]
+  while (length(idx)) {
+    DT_desc[is.na(diff), diff := 0L]
+    DT_desc[, per := 0L][diff > 1, per := 1L][, per := cumsum(per) + 1L]
+    DT_desc <- DT_desc[
+      , .(DEBUT = min(DEBUT), FIN = max(FIN)),
+      .(COD_SERV, COD_SERV_DESC, per)
+    ][, per := NULL]
+    DT_desc[, diff := DEBUT - shift(FIN), .(COD_SERV, COD_SERV_DESC)]
+    idx <- DT_desc[, .I[diff <= 1], .(COD_SERV, COD_SERV_DESC)]$V1
+    idx <- idx[!is.na(idx)]
+  }
+  DT_desc[, diff := NULL]
+
+  # Modifier les valeurs uniques pour avoir des descriptions avant 2003
+  DT_desc[DT_desc[, .I[1], .(COD_SERV)]$V1, DEBUT := min_year]
 
   ### Liste des codes de service dans chaque colonne (1 à 3) de SMED_COD_SERV_
-  to_year <- 1996:year(Sys.Date())  # années à analyser
-  DT <- vector("list", length(to_year) * 3)  # contiendra les tableaux des requêtes
+  years <- min_year:data.table::year(Sys.Date())
+  DT <- vector("list", length(years) * 3)  # contiendra les tableaux des requêtes
   i <- 1L
   for (c_serv in 1:3) {  # codes de service 1 à 3
-    for (yr in to_year) {  # mininum DAT_SERV de V_DEM_PAIMT_MED_CM = 1996-01-01
+    for (yr in years) {  # mininum DAT_SERV de V_DEM_PAIMT_MED_CM = 1996-01-01
       dt <- as.data.table(dbGetQuery(  # liste unique des codes de service
         conn, paste0(
           "select distinct SMED_COD_SERV_",c_serv," as COD_SERV\n",
@@ -241,18 +333,41 @@ cod_serv <- function() {
   }
 
   ### Arrangements finaux
-  setnames(DT, paste(1:3), paste0("SERV_",1:3))  # nom des colonnes
+  setnames(DT, paste(1:3), paste0("COD_SERV_",1:3))  # nom des colonnes
   DT[, COD_SERV := str_remove_all(COD_SERV, " ")]  # supprimer espaces
 
-  setorder(DT, COD_SERV, SERV_1, na.last = TRUE)
-
+  setorder(DT, COD_SERV, COD_SERV_1, na.last = TRUE)
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
 cod_sta_decis <- function() {
-  ### Valeurs uniques
 
-  years <- 1996:year(Sys.Date())
+  cat(color_text("V_DEM_PAIMT_MED_CM - COD_STA_DECIS\n"))
+
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_DAT_SERV is null;"
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    min_year <- 1996L
+  } else {
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+  }
+
+
+  ### Valeurs uniques
+  years <- min_year:year(Sys.Date())
   DT <- vector("list", length(years) * 12)
   i <- 1L
   for (yr in years) {
@@ -275,16 +390,41 @@ cod_sta_decis <- function() {
   setkey(DT, COD_STA_DECIS, ANNEE)
 
   DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
     .(COD_STA_DECIS, COD_STA_DESC)
   ]
-  setkey(DT, COD_STA_DECIS)
 
+  setkey(DT, COD_STA_DECIS)
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
 denom_din_ahfs <- function() {
+
+  cat(color_text("V_DEM_PAIMT_MED_CM - DENOM_DIN_AHFS\n"))
+
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_DAT_SERV is null;"
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:year(Sys.Date())
+  } else {
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
+  }
+
   ### Description
   # DENOM
   DENOM_desc <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -326,8 +466,8 @@ denom_din_ahfs <- function() {
   setkey(AHFS_desc)
 
   ### Extraction
-  to_year <- 1996:year(Sys.Date())
-  DT <- vector("list", length(to_year) * 12)
+  years <- min_year:year(Sys.Date())
+  DT <- vector("list", length(years) * 12)
   i <- 1L
   for (yr in to_year) {
     for (mth in 1:12) {
@@ -347,8 +487,8 @@ denom_din_ahfs <- function() {
   }
   DT <- rbindlist(DT)
   DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
     .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
   setorder(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
@@ -361,14 +501,36 @@ denom_din_ahfs <- function() {
   DT <- AHFS_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
   setcolorder(DT, c(colorder, "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA"))
 
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
 denom_din_teneur_forme <- function() {
 
-  years <- 1996:year(Sys.Date())
+  cat(color_text("V_DEM_PAIMT_MED_CM - DENOM_DIN_TENEUR_FORME\n"))
 
-  # Nom des formats
+  ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "SMED_DAT_SERV"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+    "select distinct SMED_DAT_SERV\n",
+    "from PROD.V_DEM_PAIMT_MED_CM\n",
+    "where SMED_DAT_SERV is null;"
+  )))
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:year(Sys.Date())
+  } else {
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
+      "from PROD.V_DEM_PAIMT_MED_CM\n",
+      "where SMED_DAT_SERV < '1997-12-31';"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
+  }
+
+  # Nom des forme
   nom_forme <- as.data.table(dbGetQuery(conn, statement = paste0(
     "select NMED_COD_FORME_MED as FORME,\n",
     "   	  NMED_NOM_FORME as NOM_FORME\n",
@@ -451,13 +613,14 @@ denom_din_teneur_forme <- function() {
     all = TRUE
   )
   DT <- DT[
-    , .(DEBUT = min(ANNEE),
-        FIN = max(ANNEE)),
+    , .(Premier_SMED_DAT_SERV = min(ANNEE),
+        Dernier_SMED_DAT_SERV = max(ANNEE)),
     .(DENOM, DIN, TENEUR, NOM_TENEUR, FORME, NOM_FORME)
   ]
   setorder(DT, DENOM, DIN, TENEUR, FORME,
            na.last = TRUE)
-
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
@@ -466,6 +629,10 @@ denom_din_teneur_forme <- function() {
 # Créer dataset -----------------------------------------------------------
 
 V_DEM_PAIMT_MED_CM <- list()
+# DENOM_DIN_TENEUR_FORME
+conn <- SQL_connexion(user, pwd)
+V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME <- denom_din_teneur_forme()
+conn <- odbc::dbDisconnect(conn)
 # DENOM_DIN_AHFS
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
@@ -481,10 +648,6 @@ conn <- odbc::dbDisconnect(conn)
 # COD_AHFS
 conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
-conn <- odbc::dbDisconnect(conn)
-# DENOM_DIN_TENEUR_FORME
-conn <- SQL_connexion(user, pwd)
-V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME <- denom_din_teneur_forme()
 conn <- odbc::dbDisconnect(conn)
 # COD_SERV
 conn <- SQL_connexion(user, pwd)

@@ -3,12 +3,14 @@ library(data.table)
 library(odbc)
 library(inesss)
 library(askpass)
-color_text <- crayon::green
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
 conn <- SQL_connexion(user, pwd)
 
 fct <- function() {
 
-  cat(color_text("V_CLA_AHF en cours\n"))
+  cat(color_text("V_CLA_AHF\n"))
 
   DT <- as.data.table(dbGetQuery(conn, statement = paste0(
     "select NMED_COD_CLA_AHF as AHFS_CLA,\n",
@@ -20,7 +22,8 @@ fct <- function() {
   )))
 
   setkey(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
-
+  attr(DT, "verif_loop_var") <- NULL
+  attr(DT, "name_loop_var") <- NULL
   return(DT)
 
 }

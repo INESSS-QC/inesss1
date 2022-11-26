@@ -4,7 +4,9 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(stringr)
-color_text <- crayon::green
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
 conn <- SQL_connexion(user, pwd)
 
 
@@ -12,23 +14,29 @@ conn <- SQL_connexion(user, pwd)
 
 des_court_indcn_recnu <- function() {
 
-  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - DES_COURT_INDCN_RECNU en cours\n"))
+  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - DES_COURT_INDCN_RECNU\n"))
 
-  # Vérifier que la variable d'itération ne contient pas de valeurs vides
-  verif_var <- as.data.table(dbGetQuery(conn, statement = paste0(
+  # Indiquer si la variable d'itération donne accès à la table complète ou partielle
+  name_loop_var <- "APME_DAT_STA_DEM_PME"
+  verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
     "select distinct APME_DAT_STA_DEM_PME\n",
     "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM\n",
     "where APME_DAT_STA_DEM_PME is null;"
   )))
-  # Indiquer si la variable d'itération donne accès à la table complète ou partielle
-  if (nrow(verif_var)) {
-    verif_var <- FALSE
+  if (nrow(verif_loop_var)) {
+    verif_loop_var <- FALSE
+    years <- 1996:data.table::year(Sys.Date())
   } else {
-    verif_var <- TRUE
+    verif_loop_var <- TRUE
+    min_year <- dbGetQuery(conn, statement = paste0(
+      "select min(extract(year from APME_DAT_STA_DEM_PME)) as min_date\n",
+      "from PROD.I_APME_DEM_AUTOR_CRITR_ETEN_CM;"
+    ))$min_date
+    years <- min_year:data.table::year(Sys.Date())
   }
 
   ### Extraction
-  years <- 1996:data.table::year(Sys.Date())
+
   DT <- vector("list", length(years) * 12)
   i <- 1L
   for (yr in years) {
@@ -49,15 +57,16 @@ des_court_indcn_recnu <- function() {
     }
   }
   DT <- rbindlist(DT)
-  setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
-  attr(DT, "verif") <- verif_var
 
+  setkey(DT, DENOM_DEM, DIN_DEM, ANNEE, MOIS)
+  attr(DT, "verif_loop_var") <- verif_loop_var
+  attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
 
 }
 no_seq_indcn_recnu <- function() {
 
-  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - NO_SEQ_INDCN_RECNU_PME en cours\n"))
+  cat(color_text("I_APME_DEM_AUTOR_CRITR_ETEN_CM - NO_SEQ_INDCN_RECNU_PME\n"))
 
   ### Extraction data
   DT <- dbGetQuery(
@@ -95,8 +104,8 @@ no_seq_indcn_recnu <- function() {
     .(NO_SEQ_INDCN_RECNU)
   ]
 
-  attr(DT, "verif") <- TRUE  # pour l'instant pas de variable d'itération
-
+  attr(DT, "verif_loop_var") <- NULL
+  attr(DT, "name_loop_var") <- NULL
   return(DT)
 
 }

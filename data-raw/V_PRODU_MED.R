@@ -4,6 +4,9 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(lubridate)
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
 conn <- SQL_connexion(user, pwd)
 
 nom_marq_comrc <- function() {
@@ -36,9 +39,33 @@ nom_marq_comrc <- function() {
         DATE_FIN = max(DATE_FIN)),
     .(DENOM, DIN, NOM_MARQ_COMRC, per)
   ][, per := NULL]
+  DT[
+    rmNA(DT[, .I[.N > 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1),
+    diff := as.integer(DATE_DEBUT - shift(DATE_FIN)),
+    .(DENOM, DIN, NOM_MARQ_COMRC)
+  ]
+  idx <- rmNA(DT[, .I[diff <= 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1)
+  while (length(idx)) {
+    DT[is.na(diff), diff := 0L]
+    DT[, per := 0L][diff > 1, per := 1L]
+    DT[, per := cumsum(per) + 1L, .(DENOM, DIN, NOM_MARQ_COMRC)]
+    DT <- DT[
+      , .(DATE_DEBUT = min(DATE_DEBUT),
+          DATE_FIN = max(DATE_FIN)),
+      .(DENOM, DIN, NOM_MARQ_COMRC, per)
+    ][, per := NULL]
+
+    DT[
+      rmNA(DT[, .I[.N > 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1),
+      diff := as.integer(DATE_DEBUT - shift(DATE_FIN)),
+      .(DENOM, DIN, NOM_MARQ_COMRC)
+    ]
+    idx <- rmNA(DT[, .I[diff <= 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1)
+  }
 
   setkey(DT, DENOM, DIN)
-
+  attr(DT, "verif_loop_var") <- NULL
+  attr(DT, "name_loop_var") <- NULL
   return(DT)
 
 }

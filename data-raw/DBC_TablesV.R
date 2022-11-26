@@ -6,10 +6,14 @@ library(inesss)
 conn <- SQL_connexion(user, pwd)
 
 DBC_TablesV <- as.data.table(dbGetQuery(conn, statement = paste0(
-  "select	DataBaseName as NOM_BD,\n",
-  "		    TableName as NOM_TABLE,\n",
-  "       TableKind as TYPE_TABLE\n",
-  "from   DBC.TablesV;"
+  "select\n",
+  "  DataBaseName as NOM_BD,\n",
+  "  TableName as NOM_TABLE,\n",
+  "  TableKind as TYPE_TABL,\n",
+  "  CreateTimeStamp as CREATION,\n",
+  "  LastAlterTimeStamp as DERNIERE_MODIF\n",
+  "from DBC.TablesV\n",
+  "order by nom_bd, nom_table;"
 )))
 setkey(DBC_TablesV)
 
