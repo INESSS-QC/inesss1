@@ -4,9 +4,7 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(stringr)
-color_text <- function(x) {
-  return(crayon::italic(crayon::green(x)))
-}
+color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
 conn <- SQL_connexion(user, pwd)
 
 
