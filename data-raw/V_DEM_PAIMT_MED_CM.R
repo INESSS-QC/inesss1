@@ -5,9 +5,7 @@ library(inesss)
 library(askpass)
 library(stringr)
 library(lubridate)
-color_text <- function(x) {
-  return(crayon::italic(crayon::green(x)))
-}
+color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
 conn <- SQL_connexion(user, pwd)
 
 
@@ -67,8 +65,8 @@ cod_ahfs <- function() {
   DT <- rbindlist(DT)
   setkey(DT, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
 
@@ -147,12 +145,12 @@ cod_denom <- function() {
   DT <- rbindlist(DT)
   setkey(DT, DENOM, ANNEE)
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(DENOM, NOM_DENOM)
   ]
 
-  setorder(DT, DENOM, Premier_SMED_DAT_SERV, na.last = TRUE)
+  setorder(DT, DENOM, PremierePrescription, na.last = TRUE)
   attr(DT, "verif_loop_var") <- verif_loop_var
   attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
@@ -221,8 +219,8 @@ cod_din <- function() {
 
   ### Indiquer les années où le code est présent
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(DIN)
   ]
 
@@ -390,8 +388,8 @@ cod_sta_decis <- function() {
   setkey(DT, COD_STA_DECIS, ANNEE)
 
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(COD_STA_DECIS, COD_STA_DESC)
   ]
 
@@ -487,20 +485,21 @@ denom_din_ahfs <- function() {
   }
   DT <- rbindlist(DT)
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)
   ]
   setorder(DT, DENOM, DIN, AHFS_CLA, AHFS_SCLA, AHFS_SSCLA,
            na.last = TRUE)
 
   ### Ajouter les noms (les plus récents)
-  colorder <- names(DT)
   DT <- DENOM_desc[DT, on = .(DENOM)]
   DT <- DIN_desc[DT, on = .(DIN)]
   DT <- AHFS_desc[DT, on = .(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
-  setcolorder(DT, c(colorder, "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA"))
 
+  setcolorder(DT, c("DENOM", "DIN", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
+                    "NOM_DENOM", "MARQ_COMRC", "AHFS_NOM_CLA",
+                    "PremierePrescription", "DernierePrescription"))
   attr(DT, "verif_loop_var") <- verif_loop_var
   attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
@@ -613,12 +612,11 @@ denom_din_teneur_forme <- function() {
     all = TRUE
   )
   DT <- DT[
-    , .(Premier_SMED_DAT_SERV = min(ANNEE),
-        Dernier_SMED_DAT_SERV = max(ANNEE)),
+    , .(PremierePrescription = min(ANNEE),
+        DernierePrescription = max(ANNEE)),
     .(DENOM, DIN, TENEUR, NOM_TENEUR, FORME, NOM_FORME)
   ]
-  setorder(DT, DENOM, DIN, TENEUR, FORME,
-           na.last = TRUE)
+  setorder(DT, DENOM, DIN, TENEUR, FORME, na.last = TRUE)
   attr(DT, "verif_loop_var") <- verif_loop_var
   attr(DT, "name_loop_var") <- name_loop_var
   return(DT)
