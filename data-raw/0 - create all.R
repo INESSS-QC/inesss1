@@ -13,14 +13,14 @@ files <- c(
   # "CIM.R",
   # "Comorbidity_Dx.R",
   # "ComorbidityWeights.R",
-  # "DBC_TablesV.R",
-  # "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
-  # "internal_datas.R",
+  "DBC_TablesV.R",
+  "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
+  "internal_datas.R",
   # "Obstetrics_Dx.R",
   # "Pop_QC.R",
   # "RLS_list.R",
   # "RLS_tab_convert.R",
-  # "V_CLA_AHF.R",
+  "V_CLA_AHF.R",
   "V_DEM_PAIMT_MED_CM.R",
   "V_DENOM_COMNE_MED.R",
   "V_DES_COD.R",
@@ -37,5 +37,6 @@ if (is.null(conn)) {
   for (f in files) {
     source(f, local = TRUE, encoding = "UTF-8")
   }
-  t2 <- Sys.time(); difftime(t2, t1)
+  t2 <- Sys.time()
+  difftime(t2, t1)
 }
