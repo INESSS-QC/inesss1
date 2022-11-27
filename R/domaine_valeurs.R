@@ -890,9 +890,9 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut",
-                "Début période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT)
+                "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription)
               )
             ),
             column(
@@ -900,9 +900,9 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA"),
               selectInput(  # Année Fin
                 "V_DEM_PAIMT_MED_CM__AnFin",
-                "Fin période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN)
+                "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription)
               )
             ),
             column(
@@ -929,18 +929,18 @@ domaine_valeurs <- function() {
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
               selectInput(  # Année début
-                "V_DEM_PAIMT_MED_CM__AnDebut", "Début période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT)
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription)
               )
             ),
             column(
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
               selectInput(  # Année fin
-                "V_DEM_PAIMT_MED_CM__AnFin", "Fin période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN)
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription)
               )
             ),
             column(
@@ -961,18 +961,18 @@ domaine_valeurs <- function() {
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__din", "DIN"),
               selectInput(  # Année début
-                "V_DEM_PAIMT_MED_CM__AnDebut", "Début période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT)
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription)
               )
             ),
             column(
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__marqComrc", "MARQ_COMRC"),
               selectInput(  # Année fin
-                "V_DEM_PAIMT_MED_CM__AnFin", "Fin période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN)
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription)
               )
             ),
             column(
@@ -994,9 +994,9 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
               textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_COM_CLA"),
               selectInput(  # Année début
-                "V_DEM_PAIMT_MED_CM__AnDebut", "Début période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT)
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription)
               )
             ),
             column(
@@ -1009,9 +1009,9 @@ domaine_valeurs <- function() {
                 selected = "Mot-clé"
               ),
               selectInput(  # Année fin
-                "V_DEM_PAIMT_MED_CM__AnFin", "Fin période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN)
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription)
               )
             ),
             column(
@@ -1038,9 +1038,9 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR"),
               textInput("V_DEM_PAIMT_MED_CM__forme", "FORME"),
               selectInput(  # Année début
-                "V_DEM_PAIMT_MED_CM__AnDebut", "Début période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT)
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription)
               )
             ),
             column(
@@ -1048,9 +1048,9 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__nomTeneur", "NOM_TENEUR"),
               textInput("V_DEM_PAIMT_MED_CM__nomForme", "NOM_FORME"),
               selectInput(  # Année fin
-                "V_DEM_PAIMT_MED_CM__AnFin", "Fin période - Année",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN)
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription)
               )
             ),
             column(
@@ -1076,12 +1076,12 @@ domaine_valeurs <- function() {
             column(
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__codServ", "COD_SERV"),
-              textInput("V_DEM_PAIMT_MED_CM__serv1", "SERV_1")
+              textInput("V_DEM_PAIMT_MED_CM__serv1", "COD_SERV_1")
             ),
             column(
               width = ui_col_width(),
               textInput("V_DEM_PAIMT_MED_CM__codServDesc", "COD_SERV_DESC"),
-              textInput("V_DEM_PAIMT_MED_CM__serv2", "SERV_2")
+              textInput("V_DEM_PAIMT_MED_CM__serv2", "COD_SERV_2")
             ),
             column(
               width = ui_col_width(),
@@ -1091,7 +1091,7 @@ domaine_valeurs <- function() {
                             "Valeur exacte" = "exactWord"),
                 selected = "Mot-clé"
               ),
-              textInput("V_DEM_PAIMT_MED_CM__serv3", "SERV_3")
+              textInput("V_DEM_PAIMT_MED_CM__serv3", "COD_SERV_3")
             )
           )
         ))
@@ -1101,6 +1101,7 @@ domaine_valeurs <- function() {
     })
     output$V_DEM_PAIMT_MED_CM__go_reset_button <- renderUI({
       if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        # Seulement une table à 3 obs, pas besoin de mettre un reset
         return(NULL)
       } else {
         return(button_go_reset("V_DEM_PAIMT_MED_CM"))
@@ -1126,7 +1127,9 @@ domaine_valeurs <- function() {
       {
         if (V_DEM_PAIMT_MED_CM__val$show_tab) {
           dt <- inesss::V_DEM_PAIMT_MED_CM[[input$V_DEM_PAIMT_MED_CM__data]]
+
           if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+
             # DENOM
             if (input$V_DEM_PAIMT_MED_CM__denom != "") {
               dt <- search_value_chr(
@@ -1199,12 +1202,19 @@ domaine_valeurs <- function() {
                 )
               }
             }
-            # Période d'étude
+            # Période d'étude demandée
             dt <- dt[
-              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
-                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
             ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
           } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+
             # DENOM
             if (input$V_DEM_PAIMT_MED_CM__denom != "") {
               dt <- search_value_chr(
@@ -1226,12 +1236,19 @@ domaine_valeurs <- function() {
                 )
               }
             }
-            # Période d'étude
+            # Période d'étude demandée
             dt <- dt[
-              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
-                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
             ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
           } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+
             # DIN
             if (input$V_DEM_PAIMT_MED_CM__din != "") {
               dt <- search_value_num(
@@ -1253,12 +1270,19 @@ domaine_valeurs <- function() {
                 )
               }
             }
-            # Période d'étude
+            # Période d'étude demandée
             dt <- dt[
-              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
-                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
             ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
           } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+
             # AHFS_CLA
             if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
               dt <- search_value_chr(
@@ -1294,12 +1318,19 @@ domaine_valeurs <- function() {
                 )
               }
             }
-            # Période d'étude
+            # Période d'étude demandée
             dt <- dt[
-              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
-                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
             ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
           } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+
             # DENOM
             if (input$V_DEM_PAIMT_MED_CM__denom != "") {
               dt <- search_value_chr(
@@ -1356,12 +1387,19 @@ domaine_valeurs <- function() {
                 )
               }
             }
-            # Période d'étude
+            # Période d'étude demandée
             dt <- dt[
-              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= FIN &
-                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= DEBUT
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
             ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
           } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+
             # COD_SERV
             if (input$V_DEM_PAIMT_MED_CM__codServ != "") {
               dt <- search_value_chr(
@@ -1385,9 +1423,9 @@ domaine_valeurs <- function() {
             }
             # SERV_X
             cols <- c(  # noms input = nom colonne
-              V_DEM_PAIMT_MED_CM__serv1 = "SERV_1",
-              V_DEM_PAIMT_MED_CM__serv2 = "SERV_2",
-              V_DEM_PAIMT_MED_CM__serv3 = "SERV_3"
+              V_DEM_PAIMT_MED_CM__serv1 = "COD_SERV_1",
+              V_DEM_PAIMT_MED_CM__serv2 = "COD_SERV_2",
+              V_DEM_PAIMT_MED_CM__serv3 = "COD_SERV_3"
             )
             for (c in 1:length(cols)) {  # boucle pour filtrer toutes les colonnes
               if (input[[names(cols)[c]]] != "") {
