@@ -469,7 +469,7 @@ denom_din_ahfs <- function() {
   years <- min_year:year(Sys.Date())
   DT <- vector("list", length(years) * 12)
   i <- 1L
-  for (yr in to_year) {
+  for (yr in years) {
     for (mth in 1:12) {
       dt <- as.data.table(dbGetQuery(conn, statement = paste0(
         "select	 distinct(SMED_COD_DENOM_COMNE) as DENOM,\n",

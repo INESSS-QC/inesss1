@@ -2,9 +2,12 @@ library(data.table)
 library(usethis)
 library(odbc)
 library(inesss)
-
+color_text <- function(x) {
+  return(crayon::italic(crayon::green(x)))
+}
 conn <- SQL_connexion(user, pwd)
 
+cat(color_text("DBC_TablesV\n"))
 DBC_TablesV <- as.data.table(dbGetQuery(conn, statement = paste0(
   "select\n",
   "  DataBaseName as NOM_BD,\n",
