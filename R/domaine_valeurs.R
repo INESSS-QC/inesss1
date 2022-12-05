@@ -2,10 +2,13 @@
 #'
 #' Domaine de valeurs de différentes bases de données disponibles dans le domaine de la santé, principalement à la RAMQ.
 #'
-#' @encoding UTF-8
 #' @import data.table
 #' @import shiny
 #' @import shinydashboard
+#'
+#' @encoding UTF-8
+#' @keywords internal
+#' @export
 domaine_valeurs <- function() {
 
 
@@ -888,6 +891,7 @@ domaine_valeurs <- function() {
             column(
               width = 3,
               textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut",
                 "Période Prescription (Début)",
@@ -898,6 +902,13 @@ domaine_valeurs <- function() {
             column(
               width = 3,
               textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA"),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__ahfsTypeRecherche",
+                "AHFS_NOM_CLA Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
               selectInput(  # Année Fin
                 "V_DEM_PAIMT_MED_CM__AnFin",
                 "Période Prescription (Fin)",
@@ -908,17 +919,6 @@ domaine_valeurs <- function() {
             column(
               width = 3,
               textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
-            ),
-            column(
-              width = 3,
-              textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
-              selectInput(
-                "V_DEM_PAIMT_MED_CM__ahfsTypeRecherche",
-                "AHFS_NOM_CLA Type Recherche",
-                choices = c("Mot-clé" = "keyword",
-                            "Valeur exacte" = "exactWord"),
-                selected = "Mot-clé"
-              )
             )
           )
         ))
