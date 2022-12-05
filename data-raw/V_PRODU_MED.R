@@ -62,6 +62,7 @@ nom_marq_comrc <- function() {
     ]
     idx <- rmNA(DT[, .I[diff <= 1], .(DENOM, DIN, NOM_MARQ_COMRC)]$V1)
   }
+  DT[, diff := NULL]
 
   setkey(DT, DENOM, DIN)
   attr(DT, "verif_loop_var") <- NULL
