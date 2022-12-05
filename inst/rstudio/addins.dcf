@@ -6,5 +6,5 @@ Interactive: true
 
 Name: Domaine_Valeurs
 Description: Démarrage du domaine de valeurs.
-Binding: domaine
+Binding: domaine_valeurs
 Interactive: true
