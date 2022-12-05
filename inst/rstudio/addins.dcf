@@ -2,3 +2,9 @@ Name: Formulaire
 Description: Démarrage du formulaire avec Shiny.
 Binding: formulaire_addin
 Interactive: true
+
+
+Name: Domaine_Valeurs
+Description: Démarrage du domaine de valeurs.
+Binding: domaine
+Interactive: true
