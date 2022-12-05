@@ -15,7 +15,7 @@ files <- c(
   # "ComorbidityWeights.R",
   "DBC_TablesV.R",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
-  "internal_datas.R",
+  # "internal_datas.R",
   # "Obstetrics_Dx.R",
   # "Pop_QC.R",
   # "RLS_list.R",
