@@ -286,11 +286,17 @@ domaine_valeurs <- function() {
     dashboardSidebar(
       width = 266,  # ajuster l'espace nécessaire selon le nom de la base de données
       sidebarMenu(
+
+        div(style = "margin-top:10px"),
+
         menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
         menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
+
+        div(style = "margin-top:30px"),
+
+        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
         menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
-        menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
+        # menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
         menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
       )
     ),
