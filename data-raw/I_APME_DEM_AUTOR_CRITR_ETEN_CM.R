@@ -89,6 +89,10 @@ des_court_indcn_recnu <- function() {
       "01"
     ))
   ][, FinPeriodeDesc := FinPeriodeDesc %m+% months(1, FALSE) - 1L]
+  DT[
+    , `:=` (DebPeriodeDesc = format(DebPeriodeDesc, "%Y-%m"),
+            FinPeriodeDesc = format(FinPeriodeDesc, "%Y-%m"))
+  ]
 
   setkey(DT, DENOM_DEM, DIN_DEM, DES_COURT_INDCN_RECNU)
   attr(DT, "verif_loop_var") <- verif_loop_var
