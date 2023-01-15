@@ -4,7 +4,7 @@ Binding: formulaire_addin
 Interactive: true
 
 
-Name: Domaine_valeurs
+Name: Domaine Valeurs
 Description: Démarrage du domaine de valeurs.
 Binding: domaine_valeurs
 Interactive: true
