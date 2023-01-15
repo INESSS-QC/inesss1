@@ -1,10 +1,14 @@
-Name: Formulaire
-Description: Démarrage du formulaire avec Shiny.
-Binding: formulaire_addin
+Name: DER - Mise à jour
+Description: Mettre à jour la librairie inesss.
+Binding: DER_update_package
 Interactive: true
-
 
 Name: Domaine Valeurs
 Description: Démarrage du domaine de valeurs.
 Binding: domaine_valeurs
+Interactive: true
+
+Name: Formulaire
+Description: Démarrage du formulaire avec Shiny.
+Binding: formulaire_addin
 Interactive: true

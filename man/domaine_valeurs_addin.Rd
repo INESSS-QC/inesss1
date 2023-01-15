@@ -3,7 +3,7 @@
 \encoding{UTF-8}
 \name{domaine_valeurs_addin}
 \alias{domaine_valeurs_addin}
-\title{Addin}
+\title{Démarrer domaine de valeur}
 \usage{
 domaine_valeurs_addin()
 }
@@ -11,6 +11,6 @@ domaine_valeurs_addin()
 \link{domaine_valeurs}
 }
 \description{
-Addin
+Démarrer domaine de valeur
 }
 \keyword{internal}

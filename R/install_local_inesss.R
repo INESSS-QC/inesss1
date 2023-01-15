@@ -7,11 +7,18 @@
 #' @export
 install_local_inesss <- function(direction) {
 
-  ### À modifier quand
+  ### Unload package s'il est en function
+  if (any("inesss" == .packages())) {
+    detach("package:inesss", unload = TRUE)
+  }
 
-  if (team == "DER") {
-    if (length(list.files("C:/Users/ms045/Desktop/Github/"))) {
+  ### Installer le package selon l'équipe
+  if (direction == "DER") {
+    if (file.exists("C:/Users/ms045/Desktop/Github/inesss_1.1.0.9000.tar.gz")) {
       remotes::install_local("C:/Users/ms045/Desktop/Github/inesss_1.1.0.9000.tar.gz",
+                             upgrade = "never")
+    } else if (file.exists("C:/Users/bogu5550/Documents/GitHub/inesss_1.1.0.9000.tar.gz")) {
+      remotes::install_local("C:/Users/bogu5550/Documents/GitHub/inesss_1.1.0.9000.tar.gz",
                              upgrade = "never")
     }
   }
