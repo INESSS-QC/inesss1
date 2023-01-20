@@ -289,15 +289,30 @@ domaine_valeurs <- function() {
 
         div(style = "margin-top:10px"),
 
-        menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-        menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("Médicaments d'exception", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
 
         div(style = "margin-top:30px"),
 
-        menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
-        menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
-        # menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
-        menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
+        menuItem("Classes AHFS", tabName = "tabV_CLA_AHF"),
+        menuItem("Dénomination commune", tabName = "tabV_DENOM_COMNE_MED"),
+        menuItem("Produit médicament", tabName = "tabV_PRODU_MED")
+
+        ### ************************************************************************************** #
+        ### 2023-01-20  Version initiale où on indiquait le nom de la table plutôt que son contenu
+        # div(style = "margin-top:10px"),
+        #
+        # menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        # menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        #
+        # div(style = "margin-top:30px"),
+        #
+        # menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
+        # menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
+        # # menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
+        # menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
+        ### ************************************************************************************** #
+
       )
     ),
 
@@ -311,12 +326,25 @@ domaine_valeurs <- function() {
           fluidRow(
             header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
             column(
+              width = 12,
+              strong("Vue : I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+              p("Demandes d'autorisation de Patient-Médicament d'exceptions.")
+            ),
+            column(
               width = ui_col_width(),
               selectInput(  # sélection du domaine de valeur
                 inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                 label = "Élément",
                 choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
               )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              div(style = "margin-top:-10px"),
+              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc"),
+              div(style = "margin-top:20px")
             )
           ),
           tabsetPanel(
@@ -333,31 +361,16 @@ domaine_valeurs <- function() {
           )
         ),
 
-        # * * V_CLA_AHF ---------------------------------------------------------------
-        tabItem(
-          tabName = "tabV_CLA_AHF",
-          fluidRow(
-            header_MaJ_datas(attributes(inesss::V_CLA_AHF)$MaJ)
-          ),
-          tabsetPanel(
-            type = "tabs",
-            tabPanel(
-              title = "Domaine de valeur",
-              div(style = "margin-top:10px"),
-              uiOutput("V_CLA_AHF__params"),
-              uiOutput("V_CLA_AHF__go_reset_button"),
-              uiOutput("V_CLA_AHF__save_button"),
-              div(style = "margin-top:10px"),
-              dataTableOutput("V_CLA_AHF__dt")
-            )
-          )
-        ),
-
         # * * V_DEM_PAIMT_MED_CM --------------------------------------------------
         tabItem(
           tabName = "tabV_DEM_PAIMT_MED_CM",
           fluidRow(
             header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_DEM_PAIMT_MED_CM"),
+              p("Demandes de paiement de médicaments.")
+            ),
             column(
               width = ui_col_width(),
               selectInput(  # sélection du domaine de valeur
@@ -365,6 +378,14 @@ domaine_valeurs <- function() {
                 label = "Élément",
                 choices = names(inesss::V_DEM_PAIMT_MED_CM)
               )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              div(style = "margin-top:-10px"),
+              uiOutput("V_DEM_PAIMT_MED_CM__dataDesc"),
+              div(style = "margin-top:20px")
             )
           ),
           tabsetPanel(
@@ -381,11 +402,41 @@ domaine_valeurs <- function() {
           )
         ),
 
+        # * * V_CLA_AHF ---------------------------------------------------------------
+        tabItem(
+          tabName = "tabV_CLA_AHF",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_CLA_AHF)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_CLA_AHF"),
+              p("Système de classification américain élaboré par l'American Hospital Formulary Service (AHFS).")
+            ),
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              uiOutput("V_CLA_AHF__params"),
+              uiOutput("V_CLA_AHF__go_reset_button"),
+              uiOutput("V_CLA_AHF__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_CLA_AHF__dt")
+            )
+          )
+        ),
+
         # * * V_DENOM_COMNE_MED --------------------------------------------------
         tabItem(
           tabName = "tabV_DENOM_COMNE_MED",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ)
+            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_DENOM_COMNE_MED"),
+              p("Cette structure contient l'information qui décrit un code de dénomination commune de médicament.")
+            ),
           ),
           tabsetPanel(
             type = "tabs",
@@ -403,24 +454,24 @@ domaine_valeurs <- function() {
 
 
         # * * V_DES_COD ---------------------------------------------------------
-        tabItem(
-          tabName = "tabV_DES_COD",
-          fluidRow(
-            header_MaJ_datas(attributes(inesss::V_DES_COD)$MaJ)
-          ),
-          tabsetPanel(
-            type = "tabs",
-            tabPanel(
-              title = "Domaine de valeur",
-              div(style = "margin-top:10px"),
-              uiOutput("V_DES_COD__params"),
-              uiOutput("V_DES_COD__go_reset_button"),
-              uiOutput("V_DES_COD__save_button"),
-              div(style = "margin-top:10px"),
-              dataTableOutput("V_DES_COD__dt")
-            )
-          )
-        ),
+        # tabItem(
+        #   tabName = "tabV_DES_COD",
+        #   fluidRow(
+        #     header_MaJ_datas(attributes(inesss::V_DES_COD)$MaJ)
+        #   ),
+        #   tabsetPanel(
+        #     type = "tabs",
+        #     tabPanel(
+        #       title = "Domaine de valeur",
+        #       div(style = "margin-top:10px"),
+        #       uiOutput("V_DES_COD__params"),
+        #       uiOutput("V_DES_COD__go_reset_button"),
+        #       uiOutput("V_DES_COD__save_button"),
+        #       div(style = "margin-top:10px"),
+        #       dataTableOutput("V_DES_COD__dt")
+        #     )
+        #   )
+        # ),
 
 
         # * * V_PRODU_MED ----------------------------------------------------------
@@ -429,12 +480,25 @@ domaine_valeurs <- function() {
           fluidRow(
             header_MaJ_datas(attributes(inesss::V_PRODU_MED)$MaJ),
             column(
+              width = 12,
+              strong("Vue : V_PRODU_MED"),
+              p("Cet élément représente le nom sous lequel est commercialisé un produit pharmaceutique. Il sert à désigner, plus précisément, un code DIN.")
+            ),
+            column(
               width = ui_col_width(),
               selectInput(  # sélection du domaine de valeur
                 inputId = "V_PRODU_MED__data",
                 label = "Élément",
                 choices = names(inesss::V_PRODU_MED)
               )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              div(style = "margin-top:-10px"),
+              uiOutput("V_PRODU_MED__dataDesc"),
+              div(style = "margin-top:20px")
             )
           ),
           tabsetPanel(
@@ -471,6 +535,29 @@ domaine_valeurs <- function() {
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__val <- reactiveValues(
       show_tab = FALSE  # afficher la table ou pas
     )
+
+    # * * Descriptif Data ####
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc <- renderUI({
+      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons des descriptions courtes complètes des indications reconnues de Patient-Médicament d'exceptions.")
+            )
+          )
+        ))
+      } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons des numéros séquentiels permettant d'identifier de façon unique chacune des indications reconnues.")
+            )
+          )
+        ))
+      }
+    })
 
     # * * UI ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({
@@ -554,31 +641,31 @@ domaine_valeurs <- function() {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
           dt <- inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
           if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-            # if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
-            #   dt <- search_value_chr(
-            #     dt, col = "DENOM_DEM",
-            #     values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom, pad = 5
-            #   )
-            # }
-            # if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
-            #   dt <- search_value_num(
-            #     dt, col = "DIN_DEM",
-            #     values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din
-            #   )
-            # }
-            # if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
-            #   if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "keyword") {
-            #     dt <- search_keyword(
-            #       dt, col = "DES_COURT_INDCN_RECNU",
-            #       values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-            #     )
-            #   } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "exactWord") {
-            #     dt <- search_value_chr(
-            #       dt, col = "DES_COURT_INDCN_RECNU",
-            #       values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-            #     )
-            #   }
-            # }
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
+              dt <- search_value_chr(
+                dt, col = "DENOM_DEM",
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom, pad = 5
+              )
+            }
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
+              dt <- search_value_num(
+                dt, col = "DIN_DEM",
+                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din
+              )
+            }
+            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
+              if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "DES_COURT_INDCN_RECNU",
+                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
+                )
+              } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "DES_COURT_INDCN_RECNU",
+                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
+                )
+              }
+            }
             # # Filtrer selon les années demandées
             # debut <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut)
             # fin <- as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnFin) * 100 + as.integer(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin)
@@ -635,8 +722,8 @@ domaine_valeurs <- function() {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
       # Remettre les valeurs initiales
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        # updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom", value = "")
-        # updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din", value = "")
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom", value = "")
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din", value = "")
         # updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__AnDebut",
         #                   selected = min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE))
         # updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisDebut",
@@ -645,9 +732,9 @@ domaine_valeurs <- function() {
         #                   selected = lubridate::year(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
         # updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__MoisFin",
         #                   selected = lubridate::month(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ))
-        # updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
-        # updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
-        #                   selected = "keyword")
+        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
+        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
+                          selected = "keyword")
       } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "NO_SEQ_INDCN_RECNU_PME") {
         input_name <- paste0(
           "I_APME_DEM_AUTOR_CRITR_ETEN_CM__",
@@ -697,53 +784,6 @@ domaine_valeurs <- function() {
     #   ignoreInit = TRUE
     # )
 
-
-    # V_CLA_AHF ------------------------------------------------------------
-    V_CLA_AHF__val <- reactiveValues(
-      show_tab = FALSE  # afficher la table ou pas
-    )
-
-    # * * UI ####
-    output$V_CLA_AHF__params <- renderUI({
-      return(tagList(
-        fluidRow(
-          column(
-            width = ui_col_width(),
-            textInput("V_CLA_AHF__ahfsCla", "AHFS_CLA"),
-            textInput("V_CLA_AHF__nomAhfs", "NOM_AHFS"),
-            textInput("V_CLA_AHF__nomAnglaisAhfs", "NOM_ANGLAIS_AHFS")
-          ),
-          column(
-            width = ui_col_width(),
-            textInput("V_CLA_AHF__ahfsScla", "AHFS_SCLA"),
-            selectInput(
-              "V_CLA_AHF__nomAhfs__typeRecherche",
-              "Type Recherche",
-              choices = c("Mot-clé" = "keyword",
-                          "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
-            ),
-            selectInput(
-              "V_CLA_AHF__nomAnglaisAhfs__typeRecherche",
-              "Type Recherche",
-              choices = c("Mot-clé" = "keyword",
-                          "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
-            )
-          ),
-          column(
-            width = ui_col_width(),
-            textInput("V_CLA_AHF__ahfsSscla", "AHFS_SSCLA")
-          )
-        )
-      ))
-    })
-    output$V_CLA_AHF__go_reset_button <- renderUI({
-      button_go_reset("V_CLA_AHF")
-    })
-    output$V_CLA_AHF__save_button <- renderUI({
-      button_save("V_CLA_AHF", V_CLA_AHF__dt())
-    })
 
     # * * Datatable ####
     observeEvent(input$V_CLA_AHF__go, {
@@ -835,6 +875,74 @@ domaine_valeurs <- function() {
     V_DEM_PAIMT_MED_CM__val <- reactiveValues(
       show_tab = FALSE
     )
+
+    # * * Descriptif Data ####
+    output$V_DEM_PAIMT_MED_CM__dataDesc <- renderUI({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM), identification du médicament (DIN), teneur et forme.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM), identification du médicament (DIN), et classe AHFS.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM).")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par identification du médicament (DIN).")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par classe AHFS.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par code de service.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par code de statut de décision.")
+            )
+          )
+        ))
+      }
+    })
 
     # * * UI ####
     output$V_DEM_PAIMT_MED_CM__params <- renderUI({
@@ -1513,6 +1621,58 @@ domaine_valeurs <- function() {
     )
 
 
+
+
+
+
+    # V_CLA_AHF ------------------------------------------------------------
+    V_CLA_AHF__val <- reactiveValues(
+      show_tab = FALSE  # afficher la table ou pas
+    )
+
+    # * * UI ####
+    output$V_CLA_AHF__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_CLA_AHF__ahfsCla", "AHFS_CLA"),
+            textInput("V_CLA_AHF__nomAhfs", "NOM_AHFS"),
+            textInput("V_CLA_AHF__nomAnglaisAhfs", "NOM_ANGLAIS_AHFS")
+          ),
+          column(
+            width = ui_col_width(),
+            textInput("V_CLA_AHF__ahfsScla", "AHFS_SCLA"),
+            selectInput(
+              "V_CLA_AHF__nomAhfs__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            ),
+            selectInput(
+              "V_CLA_AHF__nomAnglaisAhfs__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          ),
+          column(
+            width = ui_col_width(),
+            textInput("V_CLA_AHF__ahfsSscla", "AHFS_SSCLA")
+          )
+        )
+      ))
+    })
+    output$V_CLA_AHF__go_reset_button <- renderUI({
+      button_go_reset("V_CLA_AHF")
+    })
+    output$V_CLA_AHF__save_button <- renderUI({
+      button_save("V_CLA_AHF", V_CLA_AHF__dt())
+    })
+
+
     # V_DENOM_COMNE_MED ---------------------------------------------------------------------------
     V_DENOM_COMNE_MED__val <- reactiveValues(
       show_tab = FALSE
@@ -1840,6 +2000,20 @@ domaine_valeurs <- function() {
     V_PRODU_MED__val <- reactiveValues(
       show_tab = FALSE
     )
+
+    # * * Descriptif Data ####
+    output$V_PRODU_MED__dataDesc <- renderUI({
+      if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Description courte complète de l'indication reconnue de Patient-Médicament d'exceptions.")
+            )
+          )
+        ))
+      }
+    })
 
     # * * UI ####
     output$V_PRODU_MED__params <- renderUI({
