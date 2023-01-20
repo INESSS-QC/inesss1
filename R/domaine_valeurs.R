@@ -398,6 +398,9 @@ domaine_valeurs <- function() {
               uiOutput("V_DEM_PAIMT_MED_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
+            ),
+            tabPanel(
+              title = "Fiche technique"
             )
           )
         ),
@@ -423,6 +426,10 @@ domaine_valeurs <- function() {
               uiOutput("V_CLA_AHF__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_CLA_AHF__dt")
+            ),
+            tabPanel(
+              title = "Fiche technique",
+              dataTableOutput("V_CLA_AHF_varDesc")
             )
           )
         ),
@@ -1630,6 +1637,24 @@ domaine_valeurs <- function() {
       show_tab = FALSE  # afficher la table ou pas
     )
 
+    # * * Fiche Technique ####
+    output$V_CLA_AHF_varDesc <- renderDataTable({
+      return(data.table(
+        VARIABLE = c(
+          "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
+          "NOM_AHFS", "NOM_ANGLAIS_AHFS"
+        ),
+        `VARIABLE RAMQ` = c(
+          "NMED_COD_CLA_AHF", "NMED_COD_SCLA_AHF", "NMED_COD_SSCLA_AHF",
+          "NMED_NOM_CLA_AHF", "NMED_NOM_ANGL_CLA_AHF"
+        ),
+        `NOM FONCTIONNEL` = c(
+          "CODE DE CLASSE AHFS", "CODE DE SOUS-CLASSE AHFS", "CODE DE SOUS-SOUS-CLASSE AHFS",
+          "NOM D'UNE CLASSE AHFS", "NOM ANGLAIS D'UNE CLASSE AHFS"
+        )
+      ))
+    })
+
     # * * UI ####
     output$V_CLA_AHF__params <- renderUI({
       return(tagList(
@@ -2127,32 +2152,3 @@ domaine_valeurs <- function() {
   shinyApp(ui, server)
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
