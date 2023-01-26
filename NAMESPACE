@@ -3,6 +3,7 @@
 export(.SQL_adr_internal)
 export(RLS_convert)
 export(SQL_adr)
+export(SQL_code_generateur)
 export(SQL_comorbidity)
 export(SQL_comorbidity_diagn)
 export(SQL_connexion)
