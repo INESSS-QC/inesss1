@@ -11,6 +11,7 @@ writeLines(desc_file, "DER.inesss/DESCRIPTION")
 
 #* Fonction ####
 DER.inesss.fcts <- paste0(c(
+  "date_ymd",
   "SQL_connexion"
 ),".R")
 for (fct in DER.inesss.fcts) {
