@@ -1,4 +1,4 @@
-Package: inesss
+Package: DER.inesss
 Title: Institut National Excellence Sante Services Sociaux
 Version: 2.0.0.9000
 Authors@R: 
@@ -6,7 +6,7 @@ Authors@R:
            family = "Boucher",
            role = c("aut", "cre"),
            email = "guillaume.boucher@inesss.qc.ca")
-Description: Outils pour la BDCA de l'INESSS
+Description: Outils pour la DER de l'INESSS
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
