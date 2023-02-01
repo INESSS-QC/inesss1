@@ -1,0 +1,4 @@
+Name: Domaine Valeurs
+Description: Démarrage du domaine de valeurs.
+Binding: domaine_valeurs.addins
+Interactive: true

@@ -2,3 +2,7 @@
 
 export(SQL_connexion)
 export(date_ymd)
+export(domaine_valeurs)
+import(data.table)
+import(shiny)
+import(shinydashboard)

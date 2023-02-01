@@ -21,7 +21,8 @@ Imports:
     shiny,
     shinydashboard,
     stringr,
-    usethis
+    usethis,
+    writexl
 VignetteBuilder: knitr
 Depends: 
     R (>= 4.0.3)
