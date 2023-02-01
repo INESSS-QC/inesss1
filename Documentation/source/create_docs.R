@@ -8,6 +8,18 @@ library(writexl)
 # Build Manual ------------------------------------------------------------
 devtools::build_manual(path = "Documentation")
 
+
+# Installation - Docu -------------------------------------------------------------------------
+
+# DER - Installation librairie R
+render(
+  input = "Documentation/source/Install_lib_DER.Rmd",
+  output_file = "DER - Installation librairie R.pdf",
+  output_dir = "Documentation/Installations",
+  encoding = "UTF-8", envir = new.env()
+)
+
+
 # Vignettes ---------------------------------------------------------
 files <- list.files("vignettes")
 files <- files[tolower(stringr::str_sub(files, nchar(files) - 3, nchar(files))) == ".rmd"]

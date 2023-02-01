@@ -14,11 +14,8 @@ install_local_inesss <- function(direction) {
 
   ### Installer le package selon l'équipe
   if (direction == "DER") {
-    if (file.exists("C:/Users/ms045/Desktop/Github/inesss_1.1.0.9000.tar.gz")) {
-      remotes::install_local("C:/Users/ms045/Desktop/Github/inesss_1.1.0.9000.tar.gz",
-                             upgrade = "never")
-    } else if (file.exists("C:/Users/bogu5550/Documents/GitHub/inesss_1.1.0.9000.tar.gz")) {
-      remotes::install_local("C:/Users/bogu5550/Documents/GitHub/inesss_1.1.0.9000.tar.gz",
+    if (file.exists("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/inesss_DER.tar.gz")) {
+      remotes::install_local("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/inesss_DER.tar.gz",
                              upgrade = "never")
     }
   }
