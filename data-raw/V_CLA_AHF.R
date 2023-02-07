@@ -31,6 +31,7 @@ fct <- function() {
 }
 
 V_CLA_AHF <- fct()
+attr(V_CLA_AHF, "MaJ") <- Sys.Date()
 use_data(V_CLA_AHF, overwrite = TRUE)
 rm(V_CLA_AHF)
 
