@@ -115,6 +115,5 @@ I_APME_DEM_AUTOR_CRITR_ETEN_CM <- list(
 )
 attr(I_APME_DEM_AUTOR_CRITR_ETEN_CM, "MaJ") <- Sys.Date()
 
-conn <- odbc::dbDisconnect()
 use_data(I_APME_DEM_AUTOR_CRITR_ETEN_CM, overwrite = TRUE)
 rm(I_APME_DEM_AUTOR_CRITR_ETEN_CM)

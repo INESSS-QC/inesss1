@@ -18,7 +18,6 @@ conn <- SQL_connexion(user, pwd)
 if (is.null(conn)) {
   stop("User ou Mot de passe erroné.")
 } else if (class(conn)[1] == "Teradata") {
-  rm(conn)  # suppprimer conn parce qu'on le recrée dans les scripts
   t1 <- Sys.time()
   for (f in files) {
     source(f, local = TRUE, encoding = "UTF-8")

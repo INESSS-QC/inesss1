@@ -633,33 +633,19 @@ denom_din_teneur_forme <- function() {
 
 V_DEM_PAIMT_MED_CM <- list()
 # DENOM_DIN_TENEUR_FORME
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME <- denom_din_teneur_forme()
-conn <- odbc::dbDisconnect(conn)
 # DENOM_DIN_AHFS
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS <- denom_din_ahfs()
-conn <- odbc::dbDisconnect(conn)
 # COD_DENOM_COMNE
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE <- cod_denom()
-conn <- odbc::dbDisconnect(conn)
 # COD_DIN
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_DIN <- cod_din()
-conn <- odbc::dbDisconnect(conn)
 # COD_AHFS
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_AHFS <- cod_ahfs()
-conn <- odbc::dbDisconnect(conn)
 # COD_SERV
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_SERV <- cod_serv()
-conn <- odbc::dbDisconnect(conn)
 # COD_STA_DECIS
-conn <- SQL_connexion(user, pwd)
 V_DEM_PAIMT_MED_CM$COD_STA_DECIS <- cod_sta_decis()
-conn <- odbc::dbDisconnect(conn)
 
 attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()  # date de création
 

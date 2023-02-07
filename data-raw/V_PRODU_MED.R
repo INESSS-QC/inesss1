@@ -62,7 +62,5 @@ V_PRODU_MED <- list(
   NOM_MARQ_COMRC = nom_marq_comrc()
 )
 attr(V_PRODU_MED, "MaJ") <- Sys.Date()
-
-conn <- odbc::dbDisconnect()
 use_data(V_PRODU_MED, overwrite = TRUE)
 rm(V_PRODU_MED)

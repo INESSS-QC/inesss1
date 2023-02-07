@@ -36,5 +36,3 @@ V_TENR_MED <- fct()
 attr(V_TENR_MED, "MaJ") <- Sys.Date()
 use_data(V_TENR_MED, overwrite = TRUE)
 rm(V_TENR_MED)
-
-odbc <- odbc::dbDisconnect(conn)
