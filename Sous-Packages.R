@@ -11,7 +11,7 @@ writeLines(desc_file, "DER.inesss/DESCRIPTION")
 
 #* Fonction ####
 DER.inesss.fcts <- paste0(c(
-  "date_ymd", "domaine_valeurs",
+  "date_ymd", "DER_inesss_update", "domaine_valeurs",
   "SQL_connexion"
 ),".R")
 for (fct in DER.inesss.fcts) {
@@ -23,7 +23,9 @@ DER.inesss.datas <- paste0(c(
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
   "V_CLA_AHF",
   "V_DEM_PAIMT_MED_CM", "V_DENOM_COMNE_MED",
-  "V_PRODU_MED"
+  "V_FORME_MED",
+  "V_PRODU_MED",
+  "V_TENR_MED"
 ), ".rda")
 for (tab in DER.inesss.datas) {
   file.copy(paste0("data/",tab), paste0("DER.inesss/data/",tab), overwrite = TRUE)
@@ -32,6 +34,11 @@ for (tab in DER.inesss.datas) {
 #* Addins ####
 DER.inesss.addins <- readLines("inst/rstudio/addins.dcf")
 DER.inesss.addins <- DER.inesss.addins[c(
-  1:4  # domaine_valeurs
+  1:4,  # DER_inesss_update.addins
+  5,
+  6:9  # domaine_valeurs
 )]
 writeLines(DER.inesss.addins, "DER.inesss/inst/rstudio/addins.dcf")
+
+#* Documentation ####
+file.copy("Documentation/Installations/DER - Installation librairie R.pdf", "DER.inesss/Documentation")
