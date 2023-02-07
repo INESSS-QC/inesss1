@@ -41,4 +41,5 @@ DER.inesss.addins <- DER.inesss.addins[c(
 writeLines(DER.inesss.addins, "DER.inesss/inst/rstudio/addins.dcf")
 
 #* Documentation ####
-file.copy("Documentation/Installations/DER - Installation librairie R.pdf", "DER.inesss/Documentation")
+file.copy("Documentation/Installations/DER - Installation librairie R.pdf", "DER.inesss/Documentation",
+          overwrite = TRUE)
