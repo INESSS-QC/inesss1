@@ -17,6 +17,17 @@ DER.inesss.fcts <- paste0(c(
 for (fct in DER.inesss.fcts) {
   file.copy(paste0("R/",fct), paste0("DER.inesss/R/",fct), overwrite = TRUE)
 }
+# domaine_valeurs
+domaine_valeurs_script <- readLines("DER.inesss/R/domaine_valeurs.R")
+for (i in 1:length(domaine_valeurs_script)) {
+  domaine_valeurs_script[[i]] <- str_replace_all(
+    domaine_valeurs_script[[i]],
+    "inesss\\:\\:",
+    "DER.inesss\\:\\:"
+  )
+}
+writeLines(domaine_valeurs_script, "DER.inesss/R/domaine_valeurs.R")
+
 
 #* Datas ####
 DER.inesss.datas <- paste0(c(
@@ -30,15 +41,6 @@ DER.inesss.datas <- paste0(c(
 for (tab in DER.inesss.datas) {
   file.copy(paste0("data/",tab), paste0("DER.inesss/data/",tab), overwrite = TRUE)
 }
-
-#* Addins ####
-DER.inesss.addins <- readLines("inst/rstudio/addins.dcf")
-DER.inesss.addins <- DER.inesss.addins[c(
-  1:4,  # DER_inesss_update.addins
-  5,
-  6:9  # domaine_valeurs
-)]
-writeLines(DER.inesss.addins, "DER.inesss/inst/rstudio/addins.dcf")
 
 #* Documentation ####
 file.copy("Documentation/Installations/DER - Installation librairie R.pdf", "DER.inesss/Documentation",
