@@ -17,6 +17,7 @@ Imports:
     crayon,
     data.table,
     lubridate,
+    miniUI,
     odbc,
     shiny,
     shinydashboard,
