@@ -35,7 +35,8 @@ DER_inesss_update <- function() {
   if (file.exists("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar.gz")) {
     cat("Installation - J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar.gz")
     remotes::install_local("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar.gz",
-                           upgrade = "never")
+                           upgrade = "never",
+                           force = TRUE)
   }
 
 }
