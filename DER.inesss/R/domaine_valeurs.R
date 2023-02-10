@@ -2,7 +2,7 @@
 #' @keywords internal
 #' @encoding UTF-8
 domaine_valeurs.addins <- function() {
-  inesss::domaine_valeurs()
+  DER.inesss::domaine_valeurs()
 }
 
 
@@ -165,8 +165,8 @@ domaine_valeurs <- function() {
 
     # I_APME_DEM_AUTOR_CRITR_ETEN_CM
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU <- unique(
-      inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU[
-        ANNEE == min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
+      DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU[
+        ANNEE == min(DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
         .(ANNEE, MOIS)
       ]
     )
@@ -506,7 +506,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
             column(
               width = 12,
               strong("Vue : I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
@@ -517,7 +517,7 @@ domaine_valeurs <- function() {
               selectInput(  # sélection du domaine de valeur
                 inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
                 label = "Élément",
-                choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
+                choices = names(DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
               )
             )
           ),
@@ -556,7 +556,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabV_DEM_PAIMT_MED_CM",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::V_DEM_PAIMT_MED_CM)$MaJ),
             column(
               width = 12,
               strong("Vue : V_DEM_PAIMT_MED_CM"),
@@ -567,7 +567,7 @@ domaine_valeurs <- function() {
               selectInput(  # sélection du domaine de valeur
                 inputId = "V_DEM_PAIMT_MED_CM__data",
                 label = "Élément",
-                choices = names(inesss::V_DEM_PAIMT_MED_CM)
+                choices = names(DER.inesss::V_DEM_PAIMT_MED_CM)
               )
             )
           ),
@@ -606,7 +606,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabV_CLA_AHF",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_CLA_AHF)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::V_CLA_AHF)$MaJ),
             column(
               width = 12,
               strong("Vue : V_CLA_AHF"),
@@ -640,7 +640,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabV_DENOM_COMNE_MED",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::V_DEM_PAIMT_MED_CM)$MaJ),
             column(
               width = 12,
               strong("Vue : V_DENOM_COMNE_MED"),
@@ -675,7 +675,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabV_PRODU_MED",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_PRODU_MED)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::V_PRODU_MED)$MaJ),
             column(
               width = 12,
               strong("Vue : V_PRODU_MED"),
@@ -686,7 +686,7 @@ domaine_valeurs <- function() {
               selectInput(  # sélection du domaine de valeur
                 inputId = "V_PRODU_MED__data",
                 label = "Élément",
-                choices = names(inesss::V_PRODU_MED)
+                choices = names(DER.inesss::V_PRODU_MED)
               )
             )
           ),
@@ -822,7 +822,7 @@ domaine_valeurs <- function() {
       c(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
       {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
-          dt <- inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
+          dt <- DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
           if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
             if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
               dt <- search_value_chr(
@@ -1002,8 +1002,8 @@ domaine_valeurs <- function() {
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut",
                 "Période Prescription (Début)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription),
+                selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription)
               )
             ),
             column(
@@ -1019,8 +1019,8 @@ domaine_valeurs <- function() {
               selectInput(  # Année Fin
                 "V_DEM_PAIMT_MED_CM__AnFin",
                 "Période Prescription (Fin)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription),
+                selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription)
               )
             ),
             column(
@@ -1037,8 +1037,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription),
+                selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription)
               )
             ),
             column(
@@ -1046,8 +1046,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
               selectInput(  # Année fin
                 "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription),
+                selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription)
               )
             ),
             column(
@@ -1069,8 +1069,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__din", "DIN"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription),
+                selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription)
               )
             ),
             column(
@@ -1078,8 +1078,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__marqComrc", "MARQ_COMRC"),
               selectInput(  # Année fin
                 "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription),
+                selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription)
               )
             ),
             column(
@@ -1102,8 +1102,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription),
+                selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription)
               )
             ),
             column(
@@ -1117,8 +1117,8 @@ domaine_valeurs <- function() {
               ),
               selectInput(  # Année fin
                 "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription),
+                selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription)
               )
             ),
             column(
@@ -1146,8 +1146,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__forme", "FORME"),
               selectInput(  # Année début
                 "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription),
-                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription),
+                selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription)
               )
             ),
             column(
@@ -1156,8 +1156,8 @@ domaine_valeurs <- function() {
               textInput("V_DEM_PAIMT_MED_CM__nomForme", "NOM_FORME"),
               selectInput(  # Année fin
                 "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
-                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription),
-                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription)
+                choices = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription):min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription),
+                selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription)
               )
             ),
             column(
@@ -1233,7 +1233,7 @@ domaine_valeurs <- function() {
       c(input$V_DEM_PAIMT_MED_CM__go, V_DEM_PAIMT_MED_CM__val$show_tab),
       {
         if (V_DEM_PAIMT_MED_CM__val$show_tab) {
-          dt <- inesss::V_DEM_PAIMT_MED_CM[[input$V_DEM_PAIMT_MED_CM__data]]
+          dt <- DER.inesss::V_DEM_PAIMT_MED_CM[[input$V_DEM_PAIMT_MED_CM__data]]
 
           if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
 
@@ -1575,32 +1575,32 @@ domaine_valeurs <- function() {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT))
+                          selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN))
+                          selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomDenom", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT))
+                          selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN))
+                          selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__marqComrc", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT))
+                          selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN))
+                          selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT))
+                          selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN))
+                          selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
@@ -1609,9 +1609,9 @@ domaine_valeurs <- function() {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__forme", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomForme", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT))
+                          selected = min(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN))
+                          selected = max(DER.inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc", value = "")
@@ -1702,7 +1702,7 @@ domaine_valeurs <- function() {
       c(input$V_CLA_AHF__go, V_CLA_AHF__val$show_tab),
       {
         if (V_CLA_AHF__val$show_tab) {
-          dt <- inesss::V_CLA_AHF
+          dt <- DER.inesss::V_CLA_AHF
           # Classe AHFS
           if (input$V_CLA_AHF__ahfsCla != "") {
             dt <- search_value_chr(
@@ -1872,7 +1872,7 @@ domaine_valeurs <- function() {
       c(input$V_DENOM_COMNE_MED__go, V_DENOM_COMNE_MED__val$show_tab),
       {
         if (V_DENOM_COMNE_MED__val$show_tab) {
-          dt <- inesss::V_DENOM_COMNE_MED
+          dt <- DER.inesss::V_DENOM_COMNE_MED
           # DENOM
           if (input$V_DENOM_COMNE_MED__denom != "") {
             dt <- search_value_chr(
@@ -2077,7 +2077,7 @@ domaine_valeurs <- function() {
       c(input$V_PRODU_MED__go, V_PRODU_MED__val$show_tab),
       {
         if (V_PRODU_MED__val$show_tab) {
-          dt <- inesss::V_PRODU_MED[[input$V_PRODU_MED__data]]
+          dt <- DER.inesss::V_PRODU_MED[[input$V_PRODU_MED__data]]
           if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
             # DENOM
             if (input$V_PRODU_MED__denom != "") {

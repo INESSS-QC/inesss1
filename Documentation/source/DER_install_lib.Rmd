@@ -19,7 +19,7 @@ Si l'une ou l'autres des applications ci-dessous n'est pas disponible, veuillez 
 
 ## Première installation
 
-Pour installer une librairie R, il est préférable de redémarrer RStudio pour s'assurer qu'aucune librairie n'est utilisée.\newline Pour la première installation de la librairie R `inesss_DER`, inscrire le code ci-dessous dans la console (par défaut en bas à gauche de RStudio).
+Pour installer une librairie R, il est préférable de redémarrer RStudio pour s'assurer qu'aucune librairie n'est utilisée.\newline Pour la première installation de la librairie R `DER.inesss`, inscrire le code ci-dessous dans la console (par défaut en bas à gauche de RStudio).
 
 ```{r, eval=FALSE}
 install.packages("remotes")
@@ -29,6 +29,4 @@ remotes::install_local("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar
 
 ## Mise à jour
 
-Pour une mise à jour, il est préférable de redémarrer RStudio pour s'assurer qu'aucune librairie n'est utilisée.\newline Cliquer sur `Addins` dans la barre de menu du haut et sélectionner `DER - Mise à jour`.
-
-![DER - Mise à jour](images/DER-mise-a-jour.PNG){width="45%"}
+Pour une mise à jour, il est préférable de redémarrer RStudio pour s'assurer qu'aucune librairie n'est utilisée.\newline Cliquer sur `Addins` dans la barre de menu du haut et sélectionner `DER.inesss - Mise à jour`.

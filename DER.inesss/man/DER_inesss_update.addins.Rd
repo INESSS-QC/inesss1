@@ -12,3 +12,4 @@ DER_inesss_update.addins()
 \description{
 Installation ou mise à jour de la librairie selon la direction indiquée.
 }
+\keyword{internal}
