@@ -1360,7 +1360,7 @@ domaine_valeurs <- function() {
             if (input$V_DEM_PAIMT_MED_CM__din != "") {
               dt <- search_value_num(
                 dt, col = "DIN",
-                values = input$V_DEM_PAIMT_MED_CM_din
+                values = input$V_DEM_PAIMT_MED_CM__din
               )
             }
             # MARQ_COMRC
@@ -1575,32 +1575,32 @@ domaine_valeurs <- function() {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DEBUT))
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$FIN))
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomDenom", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DEBUT))
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$FIN))
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__marqComrc", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DEBUT))
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$FIN))
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DEBUT))
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$FIN))
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
@@ -1609,9 +1609,9 @@ domaine_valeurs <- function() {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__forme", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomForme", value = "")
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
-                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DEBUT))
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription))
         updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
-                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$FIN))
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription))
       } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ", value = "")
         updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc", value = "")
