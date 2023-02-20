@@ -471,11 +471,13 @@ domaine_valeurs <- function() {
 
         div(style = "margin-top:10px"),
 
+        p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
         menuItem("Médicaments d'exception", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
         menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
 
         div(style = "margin-top:30px"),
 
+        p(HTML("&nbsp;&nbsp;"), tags$u("Dictionnaire")),
         menuItem("Classes AHFS", tabName = "tabV_CLA_AHF"),
         menuItem("Dénomination commune", tabName = "tabV_DENOM_COMNE_MED"),
         menuItem("Produit médicament", tabName = "tabV_PRODU_MED")
