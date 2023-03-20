@@ -98,28 +98,6 @@ domaine_valeurs <- function() {
       return(NULL)
     }
   }
-  download_data <- function(input, datasave, dataname) {
-    ### Télécharge sur l'ordinateur le data affiché à l'écran
-    ### @param datasave Tableau à enregistrer.
-    ### @param dataname Nom du dataset, par exemple I_APME_DEM_AUTOR_CRITR_ETEN_CM
-
-    return(downloadHandler(
-      filename = function() {
-        paste0(
-          input[[paste0(dataname, "__savename")]],
-          ".",
-          input[[paste0(dataname, "__saveext")]]
-        )
-      },
-      content = function(file) {
-        if (input[[paste0(dataname, "__saveext")]] == "xlsx") {
-          writexl::write_xlsx(datasave, file)
-        } else if (input[[paste0(dataname, "__saveext")]] == "csv") {
-          write.csv(datasave, file)
-        }
-      }
-    ))
-  }
   header_MaJ_datas <- function(date_MaJ) {
     ### Indique la date à laquelle la table a été mise à jour : "Actualisé le JJ MM YYYY"
 
@@ -482,21 +460,6 @@ domaine_valeurs <- function() {
         menuItem("Dénomination commune", tabName = "tabV_DENOM_COMNE_MED"),
         menuItem("Produit médicament", tabName = "tabV_PRODU_MED")
 
-        ### ************************************************************************************** #
-        ### 2023-01-20  Version initiale où on indiquait le nom de la table plutôt que son contenu
-        # div(style = "margin-top:10px"),
-        #
-        # menuItem("I_APME_DEM_AUTOR_CRITR_ETEN_CM", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-        # menuItem("V_DEM_PAIMT_MED_CM", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        #
-        # div(style = "margin-top:30px"),
-        #
-        # menuItem("V_CLA_AHF", tabName = "tabV_CLA_AHF"),
-        # menuItem("V_DENOM_COMNE_MED", tabName = "tabV_DENOM_COMNE_MED"),
-        # # menuItem("V_DES_COD", tabName = "tabV_DES_COD"),
-        # menuItem("V_PRODU_MED", tabName = "tabV_PRODU_MED")
-        ### ************************************************************************************** #
-
       )
     ),
 
@@ -821,7 +784,10 @@ domaine_valeurs <- function() {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE
     }, ignoreInit = TRUE)
     I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
-      c(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab),
+      c(
+        input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go,
+        I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab
+      ),
       {
         if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
           dt <- inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
@@ -864,10 +830,21 @@ domaine_valeurs <- function() {
     }, options = renderDataTable_options())
 
     # * * Export ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- download_data(
-      input,
-      datasave = I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(),
-      dataname = "I_APME_DEM_AUTOR_CRITR_ETEN_CM"
+    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__savename, ".",
+          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext
+        )
+      },
+      content = function(file) {
+        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "xlsx") {
+          writexl::write_xlsx(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file)
+        } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "csv") {
+          write.csv2(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
     )
 
     # * * Update buttons ####
@@ -1558,10 +1535,21 @@ domaine_valeurs <- function() {
     }, options = renderDataTable_options())
 
     # * * Export ####
-    output$V_DEM_PAIMT_MED_CM__save <- download_data(
-      input,
-      datasave = V_DEM_PAIMT_MED_CM__dt(),
-      dataname = "V_DEM_PAIMT_MED_CM"
+    output$V_DEM_PAIMT_MED_CM__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_DEM_PAIMT_MED_CM__savename, ".",
+          input$V_DEM_PAIMT_MED_CM__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_DEM_PAIMT_MED_CM__saveext == "xlsx") {
+          writexl::write_xlsx(V_DEM_PAIMT_MED_CM__dt(), file)
+        } else if (input$V_DEM_PAIMT_MED_CM__saveext == "csv") {
+          write.csv2(V_DEM_PAIMT_MED_CM__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
     )
 
     # * * Update Buttons ####
@@ -1765,11 +1753,23 @@ domaine_valeurs <- function() {
     }, options = renderDataTable_options())
 
     # * * Export ####
-    output$V_CLA_AHF__save <- download_data(
-      input,
-      datasave = V_CLA_AHF__dt(),
-      dataname = "V_CLA_AHF"
+    output$V_CLA_AHF__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_CLA_AHF__savename, ".",
+          input$V_CLA_AHF__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_CLA_AHF__saveext == "xlsx") {
+          writexl::write_xlsx(V_CLA_AHF__dt(), file)
+        } else if (input$V_CLA_AHF__saveext == "csv") {
+          write.csv2(V_CLA_AHF__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
     )
+
 
     # * * Update Buttons ####
     observeEvent(input$V_CLA_AHF__reset, {
@@ -1961,10 +1961,21 @@ domaine_valeurs <- function() {
     }, options = renderDataTable_options())
 
     # * * Export ####
-    output$V_DENOM_COMNE_MED__save <- download_data(
-      input,
-      datasave = V_DENOM_COMNE_MED__dt(),
-      dataname = "V_DENOM_COMNE_MED"
+    output$V_DENOM_COMNE_MED__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_DENOM_COMNE_MED__savename, ".",
+          input$V_DENOM_COMNE_MED__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_DENOM_COMNE_MED__saveext == "xlsx") {
+          writexl::write_xlsx(V_DENOM_COMNE_MED__dt(), file)
+        } else if (input$V_DENOM_COMNE_MED__saveext == "csv") {
+          write.csv2(V_DENOM_COMNE_MED__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
     )
 
     # * * Update buttons ####
@@ -2119,10 +2130,21 @@ domaine_valeurs <- function() {
     }, options = renderDataTable_options())
 
     # * * Export ####
-    output$V_PRODU_MED__save <- download_data(
-      input,
-      datasave = V_PRODU_MED__dt(),
-      dataname = "V_PRODU_MED"
+    output$V_PRODU_MED__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_PRODU_MED__savename, ".",
+          input$V_PRODU_MED__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_PRODU_MED__saveext == "xlsx") {
+          writexl::write_xlsx(V_PRODU_MED__dt(), file)
+        } else if (input$V_PRODU_MED__saveext == "csv") {
+          write.csv2(V_PRODU_MED__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
     )
 
     # * * Update buttons ####
