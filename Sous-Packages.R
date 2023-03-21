@@ -12,7 +12,8 @@ writeLines(desc_file, "DER.inesss/DESCRIPTION")
 #* Fonction ####
 DER.inesss.fcts <- paste0(c(
   "date_ymd", "DER_inesss_update", "domaine_valeurs",
-  "SQL_connexion"
+  "SQL_connexion",
+  "unaccent"
 ),".R")
 for (fct in DER.inesss.fcts) {
   file.copy(paste0("R/",fct), paste0("DER.inesss/R/",fct), overwrite = TRUE)
@@ -31,6 +32,7 @@ writeLines(domaine_valeurs_script, "DER.inesss/R/domaine_valeurs.R")
 
 #* Datas ####
 DER.inesss.datas <- paste0(c(
+  "CIM_correspondance", "CIM9", "CIM10",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
   "V_CLA_AHF",
   "V_DEM_PAIMT_MED_CM", "V_DENOM_COMNE_MED",
