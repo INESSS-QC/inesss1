@@ -167,23 +167,36 @@ domaine_valeurs <- function() {
       searching = FALSE
     ))
   }
-  search_keyword <- function(dt, col, values, lower = TRUE) {
+  search_keyword <- function(dt, col, values, lower = TRUE, no_accent = TRUE) {
     ### Rechercher un ou des mots clés dans une colonne
     ### @param dt Data à modifier
     ### @param col Colonne à filtrer
     ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
     ###               aura plusieurs codes.
 
-    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    if (no_accent) {
+      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+    } else {
+      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    }
+    values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     values <- paste(values, collapse = "|")  # rechercher tous les mots dans une même chaîne de caractères
     if (lower) {
-      dt <- dt[stringr::str_detect(tolower(get(col)), tolower(values))]
+      if (no_accent) {
+        dt <- dt[stringr::str_detect(unaccent(tolower(get(col))), tolower(values))]
+      } else {
+        dt <- dt[stringr::str_detect(tolower(get(col))), tolower(values)]
+      }
     } else {
-      dt <- dt[stringr::str_detect(get(col), values)]
+      if (no_accent) {
+        dt <- dt[stringr::str_detect(unaccent(get(col)), values)]
+      } else {
+        dt <- dt[stringr::str_detect(get(col), values)]
+      }
     }
     return(dt)
   }
-  search_value_chr <- function(dt, col, values, lower = TRUE, pad = NULL) {
+  search_value_chr <- function(dt, col, values, lower = TRUE, pad = NULL, no_accent = TRUE) {
     ### Filtre les valeurs CHR dans la table dt
     ### @param dt Data à modifier
     ### @param col Colonne à filtrer
@@ -191,15 +204,27 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
     ### @param lower Si on doit convertir en minuscule ou chercher la valeur exacte.
 
-    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    if (no_accent) {
+      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+    } else {
+      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    }
     if (!is.null(pad)) {
       values <- stringr::str_pad(values, width = pad, pad = "0")
     }
     # Conserver les valeurs voulues
     if (lower) {
-      dt <- dt[tolower(get(col)) %in% tolower(values)]  # convertir en minuscule au besoin
+      if (no_accent) {
+        dt <- dt[unaccent(tolower(get(col))) %in% tolower(values)]  # convertir en minuscule au besoin
+      } else {
+        dt <- dt[tolower(get(col)) %in% tolower(values)]  # convertir en minuscule au besoin
+      }
     } else {
-      dt <- dt[get(col) %in% values]
+      if (no_accent) {
+        dt <- dt[unaccent(get(col)) %in% values]
+      } else {
+        dt <- dt[get(col) %in% values]
+      }
     }
     return(dt)
   }
@@ -456,6 +481,7 @@ domaine_valeurs <- function() {
         div(style = "margin-top:30px"),
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Dictionnaire")),
+        menuItem("CIM-9 et CIM-10", tabName = "tabCIM"),
         menuItem("Classes AHFS", tabName = "tabV_CLA_AHF"),
         menuItem("Dénomination commune", tabName = "tabV_DENOM_COMNE_MED"),
         menuItem("Produit médicament", tabName = "tabV_PRODU_MED")
@@ -563,6 +589,19 @@ domaine_valeurs <- function() {
                 em(fiches_techniques_list$V_DEM_PAIMT_MED_CM$MaJ)
               ),
               tableOutput("V_DEM_PAIMT_MED_CM__varDesc")
+            )
+          )
+        ),
+
+        # * * CIM ---------------------------------------------------------------------
+
+        tabItem(
+          tabName = "tabCIM",
+          fluidRow(
+            column(
+              width = 12,
+              strong("Répertoires des diagnostics"),
+              p("Les codes de diagnostic proviennent de la Classification statistique internationale des maladies et des problèmes de santé connexes (CIM) de l’Organisation mondiale de la santé. La RAMQ accepte les codes de diagnostic de la 9e et de la 10e révision de la CIM (CIM-9 et CIM-10).")
             )
           )
         ),
