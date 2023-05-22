@@ -16,22 +16,15 @@ MaJ <- as.Date("2023-03-20")
 CIM9 <- as.data.table(read_excel("inst/extdata/repertoire-diagnostics-cim10.xlsx",
                                   sheet = "CIM-9",
                                   skip = 1))
-CIM9 <- CIM9[, .(Code, Diagnostic)]
-setkey(CIM9)
-attr(CIM9, "MaJ") <- MaJ
+CIM9 <- CIM9[, .(CIM9 = Code, DIAGNOSTIC = Diagnostic)]
 
-use_data(CIM9)
 
 # CIM10 ---------------------------------------------------------------------------------------
 
 CIM10 <- as.data.table(read_excel("inst/extdata/repertoire-diagnostics-cim10.xlsx",
                                   sheet = "CIM-10",
                                   skip = 1))
-CIM10 <- CIM10[, .(Code, Diagnostic)]
-setkey(CIM10)
-attr(CIM10, "MaJ") <- MaJ
-
-use_data(CIM10)
+CIM10 <- CIM10[, .(CIM10 = Code, DIAGNOSTIC = Diagnostic)]
 
 
 # Tableau correspondance ----------------------------------------------------------------------
@@ -39,8 +32,20 @@ use_data(CIM10)
 CIM_correspondance <- as.data.table(read_excel("inst/extdata/Tableau_de_correspondance.xlsx",
                                      sheet = "Diagnostics",
                                      skip = 1))
-col_names <- c("CIM9", "Diagnostic CIM9", "CIM10", "Diagnostic CIM10")
+col_names <- c("CIM9", "DIAGNOSTIC_CIM9", "CIM10", "DIAGNOSTIC_CIM10")
 setnames(CIM_correspondance, names(CIM_correspondance), col_names)
-attr(CIM_correspondance, "MaJ") <- MaJ
 
-use_data(CIM_correspondance)
+
+# SAVE ----------------------------------------------------------------------------------------
+
+CIM <- list(
+  CIM9 = CIM9,
+  CIM10 = CIM10,
+  Correspondance = CIM_correspondance
+)
+attr(CIM, "MaJ") <- MaJ
+use_data(CIM, overwrite = TRUE)
+
+rm(CIM, CIM9, CIM10, CIM_correspondance,
+   col_names, MaJ)
+
