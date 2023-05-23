@@ -4,6 +4,7 @@ user <- askpass::askpass("User")
 pwd <- askpass::askpass("Mot de passe")
 
 files <- c(
+  # "CIM",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
   "V_CLA_AHF",
   "V_DEM_PAIMT_MED_CM",
