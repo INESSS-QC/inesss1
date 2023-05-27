@@ -30,7 +30,7 @@ for (i in 1:length(domaine_valeurs_script)) {
 writeLines(domaine_valeurs_script, "DER.inesss/R/domaine_valeurs.R")
 
 
-#* Datas ####
+# * Datas ####
 DER.inesss.datas <- paste0(c(
   "CIM_correspondance", "CIM9", "CIM10",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM",

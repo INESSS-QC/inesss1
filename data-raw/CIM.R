@@ -17,6 +17,7 @@ CIM9 <- as.data.table(read_excel("inst/extdata/repertoire-diagnostics-cim10.xlsx
                                   sheet = "CIM-9",
                                   skip = 1))
 CIM9 <- CIM9[, .(CIM9 = Code, DIAGNOSTIC = Diagnostic)]
+setkey(CIM9)
 
 
 # CIM10 ---------------------------------------------------------------------------------------
@@ -25,6 +26,7 @@ CIM10 <- as.data.table(read_excel("inst/extdata/repertoire-diagnostics-cim10.xls
                                   sheet = "CIM-10",
                                   skip = 1))
 CIM10 <- CIM10[, .(CIM10 = Code, DIAGNOSTIC = Diagnostic)]
+setkey(CIM10)
 
 
 # Tableau correspondance ----------------------------------------------------------------------
@@ -34,6 +36,7 @@ CIM_correspondance <- as.data.table(read_excel("inst/extdata/Tableau_de_correspo
                                      skip = 1))
 col_names <- c("CIM9", "DIAGNOSTIC_CIM9", "CIM10", "DIAGNOSTIC_CIM10")
 setnames(CIM_correspondance, names(CIM_correspondance), col_names)
+setkey(CIM_correspondance)
 
 
 # SAVE ----------------------------------------------------------------------------------------
