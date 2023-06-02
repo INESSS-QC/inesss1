@@ -517,7 +517,7 @@ domaine_valeurs <- function() {
             column(
               width = 12,
               strong("Vue : V_FORM_MED"),
-              p("Description à venir.")
+              p("Forme pharmaceutique que peut prendre un médicament. Cette structure contient l'information qui décrit un code de forme de médicament. Une forme pharmaceutique équivaut à une apparence, à un aspect visible par lequel est dispensé un médicament.")
             )
           ),
           tabsetPanel(
