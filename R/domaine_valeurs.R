@@ -138,27 +138,6 @@ domaine_valeurs <- function() {
       )
     ))
   }
-  mois_debut_fct <- function() {
-    ### Calcul le mois de début pour les valeurs initiales des tables lors de l'ouverture
-
-    # I_APME_DEM_AUTOR_CRITR_ETEN_CM
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU <- unique(
-      inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU[
-        ANNEE == min(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$ANNEE),
-        .(ANNEE, MOIS)
-      ]
-    )
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU <- unique(
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU[
-        MOIS == min(I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU$MOIS),
-        .(MOIS)
-      ]
-    )
-
-    return(list(
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU = I_APME_DEM_AUTOR_CRITR_ETEN_CM__DES_COURT_INDCN_RECNU$MOIS
-    ))
-  }
   renderDataTable_options <- function() {
     return(list(
       lengthMenu = list(c(25, 50, 100, -1), c("25", "50", "100", "Tout")),
@@ -277,11 +256,18 @@ domaine_valeurs <- function() {
       return(width)
     }
   }
+  V_FORM_MED_cod_typ_forme <- function() {
+    ### Valeurs uniques des codes et des descriptions de type de forme
+    ### @return Vecteur
+    cod_desc <- unique(inesss::V_FORME_MED[, .(COD_TYP_FORME, NOM_TYPE_FORME)])
+    setkey(cod_desc)
+    cod_desc[, MENU_TYP_FORME := paste0(COD_TYP_FORME, " - ", NOM_TYPE_FORME)]
+    return(cod_desc$MENU_TYP_FORME)
+  }
 
 
   # DATAS -------------------------------------------------------------------
-
-  # mois_debut <- mois_debut_fct()  # valeur initiales pour le début
+  V_FORM_MED__menuCodTypForme <- V_FORM_MED_cod_typ_forme()
 
 
   # USER INTERFACE ----------------------------------------------------------
@@ -2111,18 +2097,98 @@ domaine_valeurs <- function() {
         fluidRow(
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__code", "COD_FORME"),
-            textInput("V_FORM_MED__nom", "NOM_FORME"),
-            textInput("V_FORM_MED__nomAngl", "NOM_ANGL_FORME"),
+            textInput("V_FORM_MED__code", "COD_FORME")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_FORM_MED__codTypForme", "COD_TYP_FORME",
+              choices = V_FORM_MED__menuCodTypForme,
+              selected = NULL, multiple = TRUE
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_FORM_MED__nom", "NOM_FORME")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_FORM_MED__nomTypeRecherche", "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_FORM_MED__nomAngl", "NOM_ANGL_FORME")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_FORM_MED__nomAnglTypeRecherche", "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
             textInput("V_FORM_MED__nomAbr", "NOM_FORME_ABR")
           ),
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__type", "COD_TYP_FORME")
+            selectInput(
+              "V_FORM_MED__nomAbrTypeRecherche", "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
           )
         )
       ))
     })
+    output$V_FORM_MED__go_reset_button <- renderUI({
+      button_go_reset("V_FORM_MED")
+    })
+    output$V_FORM_MED__save_button <- renderUI({
+      button_save("V_FORM_MED", V_FORM_MED__dt())
+    })
+
+    # * Datatable ####
+    observeEvent(input$V_FORM_MED__go, {
+      V_FORM_MED__val$show_tab <- TRUE
+    }, ignoreInit = TRUE)
+    V_FORM_MED__dt <- eventReactive(
+      c(input$V_FORM_MED__go, V_FORM_MED__val$show_tab),
+      {
+        if (V_FORM_MED__val$show_tab) {
+          dt <- inesss::V_FORME_MED
+          if (input$V_FORM_MED__code != "") {
+            dt <- search_value_chr(
+              dt, col = "COD_FORME",
+              values = input$V_FORM_MED__code, pad = 5
+            )
+          }
+          if (input$V_FORM_MED__codTypForme != "") {
+            dt[paste0(COD_TYP_FORME, " - ", NOM_TYPE_FORME) %in% input$V_FORM_MED__codTypForme]
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }
+    )
+    output$V_FORM_MED__dt <- renderDataTable({
+      V_FORM_MED__dt()
+    }, options = renderDataTable_options())
 
 
 
