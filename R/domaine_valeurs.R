@@ -349,7 +349,7 @@ domaine_valeurs <- function() {
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss:::domaine_valeurs.fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MaJ)
               ),
               tableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc")
             )
@@ -399,7 +399,7 @@ domaine_valeurs <- function() {
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss:::domaine_valeurs.fiche_technique$V_DEM_PAIMT_MED_CM$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$MaJ)
               ),
               tableOutput("V_DEM_PAIMT_MED_CM__varDesc")
             )
@@ -467,7 +467,7 @@ domaine_valeurs <- function() {
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss:::domaine_valeurs.fiche_technique$V_CLA_AHF$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$V_CLA_AHF$MaJ)
               ),
               tableOutput("V_CLA_AHF__varDesc")
             )
@@ -501,7 +501,7 @@ domaine_valeurs <- function() {
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss:::domaine_valeurs.fiche_technique$V_DENOM_COMNE_MED$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$V_DENOM_COMNE_MED$MaJ)
               ),
               tableOutput("V_DENOM_COMNE_MED__varDesc")
             )
@@ -578,7 +578,7 @@ domaine_valeurs <- function() {
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss:::domaine_valeurs.fiche_technique$V_PRODU_MED$NOM_MARQ_COMRC$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$V_PRODU_MED$NOM_MARQ_COMRC$MaJ)
               ),
               tableOutput("V_PRODU_MED__varDesc"),
               column(
@@ -613,7 +613,7 @@ domaine_valeurs <- function() {
     # * Fiche Technique ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc <- renderTable({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(inesss:::domaine_valeurs.fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$tab_desc)
+        return(inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$tab_desc)
       } else {
         return(NULL)
       }
@@ -768,7 +768,7 @@ domaine_valeurs <- function() {
 
     # * Fiche Technique ####
     output$V_DEM_PAIMT_MED_CM__varDesc <- renderTable({
-      return(inesss:::domaine_valeurs.fiche_technique$V_DEM_PAIMT_MED_CM$tab_desc)
+      return(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$tab_desc)
     }, sanitize.text.function = identity)
 
     # * Descriptif Data ####
@@ -1716,7 +1716,7 @@ domaine_valeurs <- function() {
 
     # * Fiche Technique ####
     output$V_CLA_AHF__varDesc <- renderTable({
-      return(inesss:::domaine_valeurs.fiche_technique$V_CLA_AHF$tab_desc)
+      return(inesss::domaine_valeurs_fiche_technique$V_CLA_AHF$tab_desc)
     })
 
     # * UI ####
@@ -1865,7 +1865,7 @@ domaine_valeurs <- function() {
 
     # * Fiche Technique ####
     output$V_DENOM_COMNE_MED__varDesc <- renderTable({
-      return(inesss:::domaine_valeurs.fiche_technique$V_DENOM_COMNE_MED$tab_desc)
+      return(inesss::domaine_valeurs_fiche_technique$V_DENOM_COMNE_MED$tab_desc)
     })
 
     # * UI ####
@@ -2276,7 +2276,7 @@ domaine_valeurs <- function() {
     # * Fiche Technique ####
     output$V_PRODU_MED__varDesc <- renderTable({
       if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
-        return(inesss:::domaine_valeurs.fiche_technique$V_PRODU_MED$NOM_MARQ_COMRC$tab_desc)
+        return(inesss::domaine_valeurs_fiche_technique$V_PRODU_MED$NOM_MARQ_COMRC$tab_desc)
       } else {
         return(NULL)
       }

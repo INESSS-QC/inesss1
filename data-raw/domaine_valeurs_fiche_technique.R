@@ -1,9 +1,13 @@
+library(usethis)
+library(data.table)
+
 
 # domaine_valeurs.fiches_techniques -------------------------------------------------------------
 
 
-domaine_valeurs.fiche_technique <- list(
+domaine_valeurs_fiche_technique <- list(
 
+  ## I_APME_DEM_AUTOR_CRITR_ETEN_CM ####
   I_APME_DEM_AUTOR_CRITR_ETEN_CM = list(
     DES_COURT_INDCN_RECNU = list(
       MaJ = "2023-02-06",
@@ -28,6 +32,7 @@ domaine_valeurs.fiche_technique <- list(
     )
   ),
 
+  ## V_CLA_AHF ####
   V_CLA_AHF = list(
     MaJ = "2023-02-06",
     tab_desc = data.table(
@@ -49,6 +54,7 @@ domaine_valeurs.fiche_technique <- list(
     )
   ),
 
+  ## V_DEM_PAIMT_MED_CM ####
   V_DEM_PAIMT_MED_CM = list(
     MaJ = "2023-02-06",
     tab_desc = data.table(
@@ -125,6 +131,7 @@ domaine_valeurs.fiche_technique <- list(
     )
   ),
 
+  ## V_DENOM_COMNE_MED ####
   V_DENOM_COMNE_MED = list(
     MaJ = "2023-02-06",
     tab_desc = data.table(
@@ -150,6 +157,7 @@ domaine_valeurs.fiche_technique <- list(
     )
   ),
 
+  ## V_PRODU_MED ####
   V_PRODU_MED = list(
     NOM_MARQ_COMRC = list(
       MaJ = "2023-02-06",
@@ -184,9 +192,4 @@ domaine_valeurs.fiche_technique <- list(
 
 # SAVE ----------------------------------------------------------------------------------------
 
-use_data(
-  domaine_valeurs.fiche_technique,
-
-  internal = TRUE,
-  overwrite = TRUE
-)
+use_data(domaine_valeurs_fiche_technique, overwrite = TRUE)
