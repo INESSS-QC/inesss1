@@ -19,6 +19,8 @@ conn <- SQL_connexion(user, pwd)
 
 v_dem_paimt_med_cm <- function() {
 
+  cat(color_text("V_DEM_PAIMT_MED_CM\n"))
+
   ### Indiquer si la variable d'itération donne accès à la table complète ou partielle
   name_loop_var <- "SMED_DAT_SERV"
   verif_loop_var <- as.data.table(dbGetQuery(conn, statement = paste0(
@@ -85,25 +87,10 @@ v_dem_paimt_med_cm <- function() {
   setorderv(DT, names(DT), na.last = TRUE)
 
 }
-denom_desc <- function() {
-
-}
-
 
 # Créer dataset -----------------------------------------------------------
 
-t1 <- Sys.time()
-V_DEM_PAIMT_MED_CM <- list(
-  DEM_PAIMT = v_dem_paimt_med_cm(),
-  DENOM_DESC = "À venir",
-  DIN_DESC = "À venir",
-  AHFS_DESC = "À venir",
-  FORME_DESC = "À venir",
-  TENEUR_DESC = "À venir",
-  COD_SERV_DESC = "À venir",
-  COD_STA_DECIS = "À venir"
-)
-t2 <- Sys.time()
+V_DEM_PAIMT_MED_CM <- v_dem_paimt_med_cm()
 attr(V_DEM_PAIMT_MED_CM, "MaJ") <- Sys.Date()
 
 use_data(V_DEM_PAIMT_MED_CM, overwrite = TRUE)
