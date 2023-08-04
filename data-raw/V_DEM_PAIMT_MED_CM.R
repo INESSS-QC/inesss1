@@ -86,6 +86,8 @@ v_dem_paimt_med_cm <- function() {
   setcolorder(DT, cols)
   setorderv(DT, names(DT), na.last = TRUE)
 
+  return(DT)
+
 }
 
 # Créer dataset -----------------------------------------------------------
