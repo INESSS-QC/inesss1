@@ -357,7 +357,54 @@ domaine_valeurs <- function() {
         ),
 
         # * * V_DEM_PAIMT_MED_CM --------------------------------------------------
-
+        tabItem(
+          tabName = "tabV_DEM_PAIMT_MED_CM",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_DEM_PAIMT_MED_CM"),
+              p("Demandes de paiement de médicaments.")
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(  # sélection du domaine de valeur
+                inputId = "V_DEM_PAIMT_MED_CM__data",
+                label = "Élément",
+                choices = names(inesss::V_DEM_PAIMT_MED_CM)
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 12,
+              div(style = "margin-top:-10px"),
+              uiOutput("V_DEM_PAIMT_MED_CM__dataDesc"),
+              div(style = "margin-top:20px")
+            )
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              uiOutput("V_DEM_PAIMT_MED_CM__params"),
+              uiOutput("V_DEM_PAIMT_MED_CM__go_reset_button"),
+              uiOutput("V_DEM_PAIMT_MED_CM__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
+            ),
+            tabPanel(
+              title = "Fiche technique",
+              div(style = "margin-top:20px"),
+              column(
+                width = 12,
+                em(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$MaJ)
+              ),
+              tableOutput("V_DEM_PAIMT_MED_CM__varDesc")
+            )
+          )
+        ),
 
         # * * CIM ---------------------------------------------------------------------
 
@@ -723,6 +770,761 @@ domaine_valeurs <- function() {
     output$V_DEM_PAIMT_MED_CM__varDesc <- renderTable({
       return(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$tab_desc)
     }, sanitize.text.function = identity)
+
+    # * Descriptif Data ####
+    output$V_DEM_PAIMT_MED_CM__dataDesc <- renderUI({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM), identification du médicament (DIN), teneur et forme.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM), identification du médicament (DIN), et classe AHFS.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par dénomination commune (DENOM).")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par identification du médicament (DIN).")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par classe AHFS.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par code de service.")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = 12,
+              p("Combinaisons uniques par code de statut de décision.")
+            )
+          )
+        ))
+      }
+    })
+
+    # * UI ####
+    output$V_DEM_PAIMT_MED_CM__params <- renderUI({
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
+              textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
+              textInput("V_DEM_PAIMT_MED_CM__marqComrc", "MARQ_COMRC")
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__denomTypeRecherche",
+                "NOM_DENOM Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__marqTypeRecherche",
+                "MARQ_COMRC Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          ),
+          fluidRow(
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut",
+                "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription)
+              )
+            ),
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA"),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__ahfsTypeRecherche",
+                "AHFS_NOM_CLA Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              selectInput(  # Année Fin
+                "V_DEM_PAIMT_MED_CM__AnFin",
+                "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription)
+              )
+            ),
+            column(
+              width = 3,
+              textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__nomDenom", "NOM_DENOM"),
+              selectInput(  # Année fin
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__typeRecherche", "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__din", "DIN"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__marqComrc", "MARQ_COMRC"),
+              selectInput(  # Année fin
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__typeRecherche", "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA"),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsNomCla", "AHFS_NOM_CLA"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA"),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__typeRecherche", "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              selectInput(  # Année fin
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM"),
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__din", "DIN"),
+            )
+          ),
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR"),
+              textInput("V_DEM_PAIMT_MED_CM__forme", "FORME"),
+              selectInput(  # Année début
+                "V_DEM_PAIMT_MED_CM__AnDebut", "Période Prescription (Début)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription),
+                selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__nomTeneur", "NOM_TENEUR"),
+              textInput("V_DEM_PAIMT_MED_CM__nomForme", "NOM_FORME"),
+              selectInput(  # Année fin
+                "V_DEM_PAIMT_MED_CM__AnFin", "Période Prescription (Fin)",
+                choices = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription):min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription),
+                selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription)
+              )
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__teneurRecherche", "Teneur Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__formeRecherche", "Forme Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        return(tagList(
+          fluidRow(
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__codServ", "COD_SERV"),
+              textInput("V_DEM_PAIMT_MED_CM__serv1", "COD_SERV_1")
+            ),
+            column(
+              width = ui_col_width(),
+              textInput("V_DEM_PAIMT_MED_CM__codServDesc", "COD_SERV_DESC"),
+              textInput("V_DEM_PAIMT_MED_CM__serv2", "COD_SERV_2")
+            ),
+            column(
+              width = ui_col_width(),
+              selectInput(
+                "V_DEM_PAIMT_MED_CM__typeRecherche", "Type Recherche",
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              ),
+              textInput("V_DEM_PAIMT_MED_CM__serv3", "COD_SERV_3")
+            )
+          )
+        ))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        return(NULL)
+      }
+    })
+    output$V_DEM_PAIMT_MED_CM__go_reset_button <- renderUI({
+      if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        # Seulement une table à 3 obs, pas besoin de mettre un reset
+        return(NULL)
+      } else {
+        return(button_go_reset("V_DEM_PAIMT_MED_CM"))
+      }
+    })
+    output$V_DEM_PAIMT_MED_CM__save_button <- renderUI({
+      button_save("V_DEM_PAIMT_MED_CM", V_DEM_PAIMT_MED_CM__dt())
+    })
+
+    # * Datatable ####
+    observeEvent(input$V_DEM_PAIMT_MED_CM__go, {
+      V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
+    }, ignoreInit = TRUE)
+    observeEvent(input$V_DEM_PAIMT_MED_CM__data, {
+      if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+        V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE  # On veut faire apparaître le data, car petite table qui n'a pas d'input
+      } else {
+        V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE  # Faire disparaitre la table si on change le data
+      }
+    }, ignoreInit = TRUE)
+    V_DEM_PAIMT_MED_CM__dt <- eventReactive(
+      c(input$V_DEM_PAIMT_MED_CM__go, V_DEM_PAIMT_MED_CM__val$show_tab),
+      {
+        if (V_DEM_PAIMT_MED_CM__val$show_tab) {
+          dt <- inesss::V_DEM_PAIMT_MED_CM[[input$V_DEM_PAIMT_MED_CM__data]]
+
+          if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+
+            # DENOM
+            if (input$V_DEM_PAIMT_MED_CM__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_DEM_PAIMT_MED_CM__denom, pad = 5
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__nomDenom != "") {
+              if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              }
+            }
+            # DIN
+            if (input$V_DEM_PAIMT_MED_CM__din != "") {
+              dt <- search_value_num(
+                dt, col = "DIN",
+                values = input$V_DEM_PAIMT_MED_CM__din
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__marqComrc != "") {
+              if (input$V_DEM_PAIMT_MED_CM__marqTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__marqTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              }
+            }
+            # AHFS
+            if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_CLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsCla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsScla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsScla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsSscla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SSCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsSscla, pad = 2
+              )
+            }
+            if (input$V_DEM_PAIMT_MED_CM__ahfsNomCla != "") {
+              if (input$V_DEM_PAIMT_MED_CM__ahfsTypeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__ahfsTypeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              }
+            }
+            # Période d'étude demandée
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
+            ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+
+            # DENOM
+            if (input$V_DEM_PAIMT_MED_CM__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_DEM_PAIMT_MED_CM__denom, pad = 5
+              )
+            }
+            # NOM_DENOM
+            if (input$V_DEM_PAIMT_MED_CM__nomDenom != "") {
+              if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_DENOM",
+                  values = input$V_DEM_PAIMT_MED_CM__nomDenom
+                )
+              }
+            }
+            # Période d'étude demandée
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
+            ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+
+            # DIN
+            if (input$V_DEM_PAIMT_MED_CM__din != "") {
+              dt <- search_value_num(
+                dt, col = "DIN",
+                values = input$V_DEM_PAIMT_MED_CM__din
+              )
+            }
+            # MARQ_COMRC
+            if (input$V_DEM_PAIMT_MED_CM__marqComrc != "") {
+              if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "MARQ_COMRC",
+                  values = input$V_DEM_PAIMT_MED_CM__marqComrc
+                )
+              }
+            }
+            # Période d'étude demandée
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
+            ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+
+            # AHFS_CLA
+            if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_CLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsCla, pad = 2
+              )
+            }
+            # AHFS_SCLA
+            if (input$V_DEM_PAIMT_MED_CM__ahfsScla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsScla, pad = 2
+              )
+            }
+            # AHFS_SSCLA
+            if (input$V_DEM_PAIMT_MED_CM__ahfsSscla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SSCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsSscla, pad = 2
+              )
+            }
+            # AHFS_NOM_CLA
+            if (input$V_DEM_PAIMT_MED_CM__ahfsNomCla != "") {
+              if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "AHFS_NOM_CLA",
+                  values = input$V_DEM_PAIMT_MED_CM__ahfsNomCla
+                )
+              }
+            }
+            # Période d'étude demandée
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
+            ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+
+            # DENOM
+            if (input$V_DEM_PAIMT_MED_CM__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_DEM_PAIMT_MED_CM__denom, pad = 5
+              )
+            }
+            # DIN
+            if (input$V_DEM_PAIMT_MED_CM__din != "") {
+              dt <- search_value_num(
+                dt, col = "DIN",
+                values = input$V_DEM_PAIMT_MED_CM__din
+              )
+            }
+            # TENEUR
+            if (input$V_DEM_PAIMT_MED_CM__teneur != "") {
+              dt <- search_value_num(
+                dt, col = "TENEUR",
+                values = input$V_DEM_PAIMT_MED_CM__teneur
+              )
+            }
+            # NOM_TENEUR
+            if (input$V_DEM_PAIMT_MED_CM__nomTeneur != "") {
+              if (input$V_DEM_PAIMT_MED_CM__teneurRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_TENEUR",
+                  values = input$V_DEM_PAIMT_MED_CM__nomTeneur
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__teneurRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_TENEUR",
+                  values = input$V_DEM_PAIMT_MED_CM__nomTeneur
+                )
+              }
+            }
+            # FORME
+            if (input$V_DEM_PAIMT_MED_CM__forme != "") {
+              dt <- search_value_num(
+                dt, col = "FORME",
+                values = input$V_DEM_PAIMT_MED_CM__forme
+              )
+            }
+            # NOM_FORME
+            if (input$V_DEM_PAIMT_MED_CM__nomForme != "") {
+              if (input$V_DEM_PAIMT_MED_CM__formeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "NOM_FORME",
+                  values = input$V_DEM_PAIMT_MED_CM__nomForme
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__formeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "NOM_FORME",
+                  values = input$V_DEM_PAIMT_MED_CM__nomForme
+                )
+              }
+            }
+            # Période d'étude demandée
+            dt <- dt[
+              as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut) <= DernierePrescription &
+                as.integer(input$V_DEM_PAIMT_MED_CM__AnFin) >= PremierePrescription
+            ]
+            # Inscrire la période demandée
+            dt[
+              , `:=` (DebPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnDebut,
+                      FinPeriodPrescripDem = input$V_DEM_PAIMT_MED_CM__AnFin)
+            ]
+
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+
+            # COD_SERV
+            if (input$V_DEM_PAIMT_MED_CM__codServ != "") {
+              dt <- search_value_chr(
+                dt, col = "COD_SERV",
+                values = input$V_DEM_PAIMT_MED_CM__codServ
+              )
+            }
+            # COD_SERV_DESC
+            if (input$V_DEM_PAIMT_MED_CM__codServDesc != "") {
+              if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "keyword") {
+                dt <- search_keyword(
+                  dt, col = "COD_SERV_DESC",
+                  values = input$V_DEM_PAIMT_MED_CM__codServDesc
+                )
+              } else if (input$V_DEM_PAIMT_MED_CM__typeRecherche == "exactWord") {
+                dt <- search_value_chr(
+                  dt, col = "COD_SERV_DESC",
+                  values = input$V_DEM_PAIMT_MED_CM__codServDesc
+                )
+              }
+            }
+            # SERV_X
+            cols <- c(  # noms input = nom colonne
+              V_DEM_PAIMT_MED_CM__serv1 = "COD_SERV_1",
+              V_DEM_PAIMT_MED_CM__serv2 = "COD_SERV_2",
+              V_DEM_PAIMT_MED_CM__serv3 = "COD_SERV_3"
+            )
+            for (c in 1:length(cols)) {  # boucle pour filtrer toutes les colonnes
+              if (input[[names(cols)[c]]] != "") {
+                dt <- search_value_XXXX_YYYY(
+                  dt, col = cols[c],
+                  values = input[[names(cols)[c]]]
+                )
+              }
+            }
+          } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_STA_DECIS") {
+            return(dt)
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }, ignoreInit = TRUE
+    )
+    output$V_DEM_PAIMT_MED_CM__dt <- renderDataTable({
+      V_DEM_PAIMT_MED_CM__dt()
+    }, options = renderDataTable_options())
+
+    # * Export ####
+    output$V_DEM_PAIMT_MED_CM__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_DEM_PAIMT_MED_CM__savename, ".",
+          input$V_DEM_PAIMT_MED_CM__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_DEM_PAIMT_MED_CM__saveext == "xlsx") {
+          writexl::write_xlsx(V_DEM_PAIMT_MED_CM__dt(), file)
+        } else if (input$V_DEM_PAIMT_MED_CM__saveext == "csv") {
+          write.csv2(V_DEM_PAIMT_MED_CM__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
+    )
+
+    # * Update Buttons ####
+    observeEvent(input$V_DEM_PAIMT_MED_CM__reset, {
+      V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
+      if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_AHFS") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomDenom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__marqComrc", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$PremierePrescription))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_AHFS$DernierePrescription))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DENOM_COMNE") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomDenom", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$PremierePrescription))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DENOM_COMNE$DernierePrescription))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_DIN") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__marqComrc", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$PremierePrescription))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_DIN$DernierePrescription))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_AHFS") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsNomCla", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$PremierePrescription))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$COD_AHFS$DernierePrescription))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "DENOM_DIN_TENEUR_FORME") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneur", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomTeneur", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__forme", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__nomForme", value = "")
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut",
+                          selected = min(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$PremierePrescription))
+        updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnFin",
+                          selected = max(inesss::V_DEM_PAIMT_MED_CM$DENOM_DIN_TENEUR_FORME$DernierePrescription))
+      } else if (input$V_DEM_PAIMT_MED_CM__data == "COD_SERV") {
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__serv1", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__serv2", value = "")
+        updateTextInput(session, "V_DEM_PAIMT_MED_CM__serv3", value = "")
+      }
+    })
+
+    # * Erreurs possibles ####
+    observeEvent(
+      eventExpr = {
+        # modifier un des éléments déclenche la vérification
+        c(input$V_DEM_PAIMT_MED_CM__AnDebut, input$V_DEM_PAIMT_MED_CM__AnFin)
+      },
+      handlerExpr = {
+        annee_deb <- as.integer(input$V_DEM_PAIMT_MED_CM__AnDebut)
+        annee_fin <- as.integer(input$V_DEM_PAIMT_MED_CM__AnFin)
+        if (annee_deb >= annee_fin) {
+          updateSelectInput(session, "V_DEM_PAIMT_MED_CM__AnDebut", selected = annee_fin)
+        }
+      },
+      ignoreInit = TRUE
+    )
 
 
 
