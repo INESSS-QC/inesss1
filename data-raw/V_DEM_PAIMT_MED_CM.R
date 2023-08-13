@@ -74,7 +74,7 @@ v_dem_paimt_med_cm <- function() {
   }
   DT <- rbindlist(DT)
 
-  DT[, AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
+  DT[!is.na(AHFS_CLA), AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
 
   cols <- c(
     "DENOM", "DIN", "AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
@@ -83,8 +83,23 @@ v_dem_paimt_med_cm <- function() {
     "COD_STA_DECIS",
     "ANNEE", "MOIS"
   )
+  cols_by <- cols[!cols %in% c("ANNEE", "MOIS")]
   setcolorder(DT, cols)
   setorderv(DT, names(DT), na.last = TRUE)
+
+  DT[, DEBUT := as.integer(make_date(ANNEE, MOIS, 1L))]
+  DT[MOIS == 12, FIN := as.integer(make_date(ANNEE + 1L, 1L, 1L) - 1L)]
+  DT[MOIS < 12, FIN := as.integer(make_date(ANNEE, MOIS + 1L, 1L) - 1L)]
+
+  DT[, diff := DEBUT - shift(FIN) - 1L, by = cols_by][is.na(diff), diff := 0L]
+  DT[, per := 0L][diff > 0L, per := 1L]
+  DT[, per := cumsum(per) + 1L, by = cols_by]
+  DT <- DT[
+    , .(DEBUT = min(DEBUT),
+        FIN = max(FIN)),
+    keyby = c(cols_by, "per")
+  ][, per := NULL]
+  DT[, `:=` (DEBUT = format(as_date(DEBUT), "%Y-%m"), FIN = format(as_date(FIN), "%Y-%m"))]
 
   return(DT)
 
