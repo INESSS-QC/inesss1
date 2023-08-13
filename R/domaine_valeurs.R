@@ -275,11 +275,11 @@ domaine_valeurs <- function() {
   ui <- dashboardPage(
 
 
-    # * Header section ----------------------------------------------------------------------------
+    ## Header section ----------------------------------------------------------------------------
     dashboardHeader(title = "Domaine de valeur"),
 
 
-    # * Sidebar section ---------------------------------------------------------------------------
+    ## Sidebar section ---------------------------------------------------------------------------
     dashboardSidebar(
       width = 266,  # ajuster l'espace nécessaire selon le nom de la base de données
       sidebarMenu(
@@ -303,10 +303,11 @@ domaine_valeurs <- function() {
     ),
 
 
-    # * Body section ------------------------------------------------------------------------------
+    ## Body section ------------------------------------------------------------------------------
     dashboardBody(
       tabItems(
-        # * * I_APME_DEM_AUTOR_CRITR_ETEN_CM --------------------------------------------------------------
+
+        ### I_APME_DEM_AUTOR_CRITR_ETEN_CM --------------------------------------------------------------
         tabItem(
           tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
           fluidRow(
@@ -356,10 +357,82 @@ domaine_valeurs <- function() {
           )
         ),
 
-        # * * V_DEM_PAIMT_MED_CM --------------------------------------------------
+        ### V_DEM_PAIMT_MED_CM ------------------------------------------------------
+        tabItem(
+          tabName = "tabV_DEM_PAIMT_MED_CM",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_DEM_PAIMT_MED_CM"),
+              p("Demandes de paiement de médicaments."),
+              p("Combinaisons uniques des codes de médicaments ou autres variables utiles.")
+            )
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              fluidRow(
+                h4(HTML("&nbsp;&nbsp;"), "Variables à afficher"),
+                style = "color: #ffffff; background-color: #0086b3;"
+              ),
+              fluidRow(
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect1", "", choices = c("DENOM", "DIN", "AHFS"))
+                ),
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "", choices = c("AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
+                ),
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect3", "", choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
+                ),
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect4", "", choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3"))
+                )
+              ),
+              fluidRow(
+                h4(HTML("&nbsp;&nbsp;"), "Descriptif des variables"),
+                style = "color: #ffffff; background-color: #0086b3;"
+              ),
+              fluidRow(
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc1", "", choices = c("DENOM", "NOM_MARQ_COMRC", "AHFS"))
+                ),
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc2", "", choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
+                ),
+                column(
+                  width = 2,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc3", "", choices = c("COD_SERV"))
+                )
+              ),
+              fluidRow(
+                h4(HTML("&nbsp;&nbsp;"), "Paramètres de recherche"),
+                style = "color: #ffffff; background-color: #0086b3;"
+              ),
+              uiOutput("V_DEM_PAIMT_MED_CM__params")
+            ),
+            tabPanel(
+              title = "Fiche technique",
+              div(style = "margin-top:20px"),
+              column(
+                width = 12,
+                em(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$MaJ)
+              )#,
+              # tableOutput("V_DEM_PAIMT_MED_CM__varDesc")
+            )
+          )
+        ),
 
-
-        # * * CIM ---------------------------------------------------------------------
+        ### CIM ---------------------------------------------------------------------
 
         tabItem(
           tabName = "tabCIM",
@@ -393,7 +466,7 @@ domaine_valeurs <- function() {
           )
         ),
 
-        # * * V_CLA_AHF ---------------------------------------------------------------
+        ### V_CLA_AHF ---------------------------------------------------------------
         tabItem(
           tabName = "tabV_CLA_AHF",
           fluidRow(
@@ -427,7 +500,7 @@ domaine_valeurs <- function() {
           )
         ),
 
-        # * * V_DENOM_COMNE_MED --------------------------------------------------
+        ### V_DENOM_COMNE_MED --------------------------------------------------
         tabItem(
           tabName = "tabV_DENOM_COMNE_MED",
           fluidRow(
@@ -462,7 +535,7 @@ domaine_valeurs <- function() {
         ),
 
 
-        #  * * V_FORM_MED ----------------------------------------------------------
+        ### V_FORM_MED ----------------------------------------------------------
         tabItem(
           tabName = "tabV_FORM_MED",
           fluidRow(
@@ -488,7 +561,7 @@ domaine_valeurs <- function() {
         ),
 
 
-        # * * V_PRODU_MED ----------------------------------------------------------
+        ### V_PRODU_MED ----------------------------------------------------------
         tabItem(
           tabName = "tabV_PRODU_MED",
           fluidRow(
@@ -563,7 +636,7 @@ domaine_valeurs <- function() {
       show_tab = FALSE  # afficher la table ou pas
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc <- renderTable({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         return(inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$tab_desc)
@@ -572,7 +645,7 @@ domaine_valeurs <- function() {
       }
     })
 
-    # * Descriptif Data ####
+    ## Descriptif Data ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc <- renderUI({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         return(tagList(
@@ -586,7 +659,7 @@ domaine_valeurs <- function() {
       }
     })
 
-    # * UI ####
+    ## UI ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({
       if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
         return(tagList(
@@ -627,7 +700,7 @@ domaine_valeurs <- function() {
       button_save("I_APME_DEM_AUTOR_CRITR_ETEN_CM", I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
     })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
@@ -681,7 +754,7 @@ domaine_valeurs <- function() {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()
     }, options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- downloadHandler(
       filename = function() {
         paste0(
@@ -699,7 +772,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update buttons ####
+    ## Update buttons ####
     observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset, {
       I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
       # Remettre les valeurs initiales
@@ -719,10 +792,97 @@ domaine_valeurs <- function() {
       show_tab = FALSE
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
     output$V_DEM_PAIMT_MED_CM__varDesc <- renderTable({
       return(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$tab_desc)
     }, sanitize.text.function = identity)
+
+    ## UI ####
+    output$V_DEM_PAIMT_MED_CM__params <- renderUI({
+      varSelect <- c(
+        input$V_DEM_PAIMT_MED_CM__varSelect1,
+        input$V_DEM_PAIMT_MED_CM__varSelect2,
+        input$V_DEM_PAIMT_MED_CM__varSelect3,
+        input$V_DEM_PAIMT_MED_CM__varSelect4
+      )
+      varSelectDesc <- c(
+        input$V_DEM_PAIMT_MED_CM__varSelectDesc1,
+        input$V_DEM_PAIMT_MED_CM__varSelectDesc2,
+        input$V_DEM_PAIMT_MED_CM__varSelectDesc3
+      )
+
+      # DENOM
+      if ("DENOM" %in% varSelect && "DENOM" %in% varSelectDesc) {
+        denom <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__denomDesc", "NOM_DENOM")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__denomTypeRecherche",
+              "NOM_DENOM Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if ("DENOM" %in% varSelect) {
+        denom <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM")
+          )
+        )
+      } else {
+        denom <- NULL
+      }
+
+      # DIN
+      if ("DIN" %in% varSelect && "DIN" %in% varSelectDesc) {
+        din <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__dinDesc", "NOM_DIN")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__dinTypeRecherche",
+              "NOM_DIN Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if ("DIN" %in% varSelect) {
+        din <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+          )
+        )
+      } else {
+        din <- NULL
+      }
+
+
+      return(tagList(
+        denom,
+        din
+      ))
+    })
 
 
 
@@ -733,7 +893,7 @@ domaine_valeurs <- function() {
       show_tab = FALSE
     )
 
-    # * UI ####
+    ## UI ####
     output$CIM__params <- renderUI({
       if (input$CIM__data %in% c("CIM9", "CIM10")) {
         return(tagList(
@@ -792,7 +952,7 @@ domaine_valeurs <- function() {
     output$CIM__go_reset_button <- renderUI({ button_go_reset("CIM") })
     output$CIM__save_button <- renderUI({ button_save("CIM", CIM__dt()) })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$CIM__go, { CIM__val$show_tab <- TRUE })
     observeEvent(input$CIM__data, { CIM__val$show_tab <- FALSE })
     CIM__dt <- eventReactive(
@@ -874,7 +1034,7 @@ domaine_valeurs <- function() {
     )
     output$CIM__dt <- renderDataTable(CIM__dt(), options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$CIM__save <- downloadHandler(
       filename = function() {
         paste0(input$CIM__savename, ".", input$CIM__saveext)
@@ -889,7 +1049,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update Buttons ####
+    ## Update Buttons ####
     observeEvent(input$CIM__reset, {
       CIM__val$show_tab <- FALSE
       if (input$CIM__data %in% c("CIM9", "CIM10")) {
@@ -912,12 +1072,12 @@ domaine_valeurs <- function() {
       show_tab = FALSE  # afficher la table ou pas
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
     output$V_CLA_AHF__varDesc <- renderTable({
       return(inesss::domaine_valeurs_fiche_technique$V_CLA_AHF$tab_desc)
     })
 
-    # * UI ####
+    ## UI ####
     output$V_CLA_AHF__params <- renderUI({
       return(tagList(
         fluidRow(
@@ -959,7 +1119,7 @@ domaine_valeurs <- function() {
       button_save("V_CLA_AHF", V_CLA_AHF__dt())
     })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$V_CLA_AHF__go, {
       V_CLA_AHF__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
@@ -1027,7 +1187,7 @@ domaine_valeurs <- function() {
       V_CLA_AHF__dt()
     }, options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$V_CLA_AHF__save <- downloadHandler(
       filename = function() {
         paste0(
@@ -1045,7 +1205,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update Buttons ####
+    ## Update Buttons ####
     observeEvent(input$V_CLA_AHF__reset, {
       V_CLA_AHF__val$show_tab <- FALSE
       updateTextInput(session, "V_CLA_AHF__ahfsCla", value = "")
@@ -1061,12 +1221,12 @@ domaine_valeurs <- function() {
       show_tab = FALSE
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
     output$V_DENOM_COMNE_MED__varDesc <- renderTable({
       return(inesss::domaine_valeurs_fiche_technique$V_DENOM_COMNE_MED$tab_desc)
     })
 
-    # * UI ####
+    ## UI ####
     output$V_DENOM_COMNE_MED__params <- renderUI({
       return(tagList(
         fluidRow(
@@ -1140,7 +1300,7 @@ domaine_valeurs <- function() {
       button_save("V_DENOM_COMNE_MED", V_DENOM_COMNE_MED__dt())
     })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$V_DENOM_COMNE_MED__go, {
       V_DENOM_COMNE_MED__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
@@ -1234,7 +1394,7 @@ domaine_valeurs <- function() {
       V_DENOM_COMNE_MED__dt()
     }, options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$V_DENOM_COMNE_MED__save <- downloadHandler(
       filename = function() {
         paste0(
@@ -1252,7 +1412,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update Buttons ####
+    ## Update Buttons ####
     observeEvent(input$V_DENOM_COMNE_MED__reset, {
       V_DENOM_COMNE_MED__val$show_tab <- FALSE
       updateTextInput(session, "V_DENOM_COMNE_MED__denom", value = "")
@@ -1264,7 +1424,7 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_DENOM_COMNE_MED__fin", value = "")
     })
 
-    # * Erreurs possibles ####
+    ## Erreurs possibles ####
     observeEvent(
       eventExpr = c(input$V_DENOM_COMNE_MED__debut, input$V_DENOM_COMNE_MED__fin),
       handlerExpr = {
@@ -1287,9 +1447,9 @@ domaine_valeurs <- function() {
       show_tab = FALSE
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
 
-    # * UI ####
+    ## UI ####
     output$V_FORM_MED__params <- renderUI({
       return(tagList(
         fluidRow(
@@ -1360,7 +1520,7 @@ domaine_valeurs <- function() {
       button_save("V_FORM_MED", V_FORM_MED__dt())
     })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$V_FORM_MED__go, {
       V_FORM_MED__val$show_tab <- TRUE
     }, ignoreInit = TRUE)
@@ -1432,7 +1592,7 @@ domaine_valeurs <- function() {
       V_FORM_MED__dt()
     }, options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$V_FORM_MED__save <- downloadHandler(
       filename = function() {
         paste0(
@@ -1450,7 +1610,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update Buttons ####
+    ## Update Buttons ####
     observeEvent(input$V_FORM_MED__reset, {
       V_FORM_MED__val$show_tab <- FALSE
       updateTextInput(session, "V_FORM_MED__code", value = "")
@@ -1471,7 +1631,7 @@ domaine_valeurs <- function() {
       show_tab = FALSE
     )
 
-    # * Fiche Technique ####
+    ## Fiche Technique ####
     output$V_PRODU_MED__varDesc <- renderTable({
       if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
         return(inesss::domaine_valeurs_fiche_technique$V_PRODU_MED$NOM_MARQ_COMRC$tab_desc)
@@ -1487,7 +1647,7 @@ domaine_valeurs <- function() {
       }
     })
 
-    # * Descriptif Data ####
+    ## Descriptif Data ####
     output$V_PRODU_MED__dataDesc <- renderUI({
       if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
         return(tagList(
@@ -1501,7 +1661,7 @@ domaine_valeurs <- function() {
       }
     })
 
-    # * UI ####
+    ## UI ####
     output$V_PRODU_MED__params <- renderUI({
       if (input$V_PRODU_MED__data == "NOM_MARQ_COMRC") {
         return(tagList(
@@ -1541,7 +1701,7 @@ domaine_valeurs <- function() {
       button_save("V_PRODU_MED", V_PRODU_MED__dt())
     })
 
-    # * Datatable ####
+    ## Datatable ####
     observeEvent(input$V_PRODU_MED__go, {
       V_PRODU_MED__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
@@ -1591,7 +1751,7 @@ domaine_valeurs <- function() {
       V_PRODU_MED__dt()
     }, options = renderDataTable_options())
 
-    # * Export ####
+    ## Export ####
     output$V_PRODU_MED__save <- downloadHandler(
       filename = function() {
         paste0(
@@ -1609,7 +1769,7 @@ domaine_valeurs <- function() {
       }
     )
 
-    # * Update buttons ####
+    ## Update buttons ####
     observeEvent(input$V_PRODU_MED__reset, {
       V_PRODU_MED__val$show_tab <- FALSE
       updateTextInput(session, "V_PRODU_MED__denom", value = "")
