@@ -3,10 +3,10 @@ library(odbc)
 library(data.table)
 library(inesss)
 color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
-if (!exists("user")) {
+if (!exists("user") | is.null(user)) {
   user <- askpass::askpass("User")
 }
-if (!exists("pwd")) {
+if (!exists("pwd") | is.null("pwd")) {
   pwd <- askpass::askpass()
 }
 conn <- SQL_connexion(user, pwd)

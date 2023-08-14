@@ -5,10 +5,10 @@ library(stringr)
 library(lubridate)
 library(inesss)
 color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
-if (!exists("user")) {
+if (!exists("user") | is.null(user)) {
   user <- askpass::askpass("User")
 }
-if (!exists("pwd")) {
+if (!exists("pwd") | is.null("pwd")) {
   pwd <- askpass::askpass()
 }
 conn <- SQL_connexion(user, pwd)
@@ -87,19 +87,20 @@ v_dem_paimt_med_cm <- function() {
   setcolorder(DT, cols)
   setorderv(DT, names(DT), na.last = TRUE)
 
-  DT[, DEBUT := as.integer(make_date(ANNEE, MOIS, 1L))]
-  DT[MOIS == 12, FIN := as.integer(make_date(ANNEE + 1L, 1L, 1L) - 1L)]
-  DT[MOIS < 12, FIN := as.integer(make_date(ANNEE, MOIS + 1L, 1L) - 1L)]
+  DT[, DATE_DEBUT := as.integer(make_date(ANNEE, MOIS, 1L))]
+  DT[MOIS == 12, DATE_FIN := as.integer(make_date(ANNEE + 1L, 1L, 1L) - 1L)]
+  DT[MOIS < 12, DATE_FIN := as.integer(make_date(ANNEE, MOIS + 1L, 1L) - 1L)]
 
-  DT[, diff := DEBUT - shift(FIN) - 1L, by = cols_by][is.na(diff), diff := 0L]
+  DT[, diff := DATE_DEBUT - shift(DATE_FIN) - 1L, by = cols_by][is.na(diff), diff := 0L]
   DT[, per := 0L][diff > 0L, per := 1L]
   DT[, per := cumsum(per) + 1L, by = cols_by]
   DT <- DT[
-    , .(DEBUT = min(DEBUT),
-        FIN = max(FIN)),
+    , .(DATE_DEBUT = min(DATE_DEBUT),
+        DATE_FIN = max(DATE_FIN)),
     keyby = c(cols_by, "per")
   ][, per := NULL]
-  DT[, `:=` (DEBUT = format(as_date(DEBUT), "%Y-%m"), FIN = format(as_date(FIN), "%Y-%m"))]
+  DT[, `:=` (DATE_DEBUT = format(as_date(DATE_DEBUT), "%Y-%m"),
+             DATE_FIN = format(as_date(DATE_FIN), "%Y-%m"))]
 
   return(DT)
 
