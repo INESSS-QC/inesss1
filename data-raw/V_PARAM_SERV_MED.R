@@ -5,10 +5,10 @@ library(askpass)
 library(inesss)
 library(lubridate)
 color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
-if (!exists("user") | is.null(user)) {
+if (!exists("user")) {
   user <- askpass::askpass("User")
 }
-if (!exists("pwd") | is.null("pwd")) {
+if (!exists("pwd")) {
   pwd <- askpass::askpass()
 }
 conn <- SQL_connexion(user, pwd)
@@ -40,9 +40,9 @@ fct <- function() {
     .(COD_SERV, COD_SERV_DESC, per)
   ][, per := NULL]
 
-  DT[  # Cas où une seule ligne et DATE_DEBUT="2078-12-31"
-    DT[, .I[.N == 1], .(COD_SERV, COD_SERV_DESC)]$V1 &
-      DATE_DEBUT > today(),
+  DT[
+    intersect(DT[, .I[.N == 1], .(COD_SERV, COD_SERV_DESC)]$V1,
+              DATE_DEBUT > today()),
     DATE_DEBUT := as_date("1900-01-01")
   ]
 

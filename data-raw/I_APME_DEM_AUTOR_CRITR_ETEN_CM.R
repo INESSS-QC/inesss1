@@ -5,10 +5,10 @@ library(stringr)
 library(lubridate)
 library(inesss)
 color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
-if (!exists("user") | is.null(user)) {
+if (!exists("user")) {
   user <- askpass::askpass("User")
 }
-if (!exists("pwd") | is.null("pwd")) {
+if (!exists("pwd")) {
   pwd <- askpass::askpass()
 }
 conn <- SQL_connexion(user, pwd)
