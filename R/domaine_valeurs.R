@@ -381,11 +381,11 @@ domaine_valeurs <- function() {
               fluidRow(
                 column(
                   width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect1", "", choices = c("DENOM", "DIN", "AHFS"))
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect1", "", choices = c("DENOM", "DIN"))
                 ),
                 column(
                   width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "", choices = c("AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "", choices = c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
                 ),
                 column(
                   width = 2,
@@ -397,27 +397,26 @@ domaine_valeurs <- function() {
                 )
               ),
               fluidRow(
-                h4(HTML("&nbsp;&nbsp;"), "Descriptif des variables"),
+                column(
+                  width = 2,
+                  uiOutput("V_DEM_PAIMT_MED_CM__descChoices")
+                )
+              ),
+              fluidRow(
+                h4(HTML("&nbsp;&nbsp;"), "Paramètres"),
                 style = "color: #ffffff; background-color: #0086b3;"
               ),
               fluidRow(
                 column(
                   width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc1", "", choices = c("DENOM", "NOM_MARQ_COMRC", "AHFS"))
-                ),
-                column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc2", "", choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
-                ),
-                column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelectDesc3", "", choices = c("COD_SERV"))
+                  checkboxInput("V_DEM_PAIMT_MED_CM__periodDetail", "Périodes Détaillées")
                 )
               ),
               fluidRow(
                 h4(HTML("&nbsp;&nbsp;"), "Paramètres de recherche"),
                 style = "color: #ffffff; background-color: #0086b3;"
               ),
+              div(style = "margin-top:10px"),
               uiOutput("V_DEM_PAIMT_MED_CM__params")
             ),
             tabPanel(
@@ -798,6 +797,43 @@ domaine_valeurs <- function() {
     }, sanitize.text.function = identity)
 
     ## UI ####
+    output$V_DEM_PAIMT_MED_CM__descChoices <- renderUI({
+      varSelect <- c(
+        input$V_DEM_PAIMT_MED_CM__varSelect1,
+        input$V_DEM_PAIMT_MED_CM__varSelect2,
+        input$V_DEM_PAIMT_MED_CM__varSelect3,
+        input$V_DEM_PAIMT_MED_CM__varSelect4
+      )
+      choices_vec <- vector("character", 7)
+      if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
+        choices_vec[1] <- "AHFS"
+      }
+      if (any(paste0("COD_SERV_", 1:3) %in% varSelect)) {
+        choices_vec[2] <- "COD_SERV"
+      }
+      if (any("COD_STA_DECIS" == varSelect)) {
+        choices_vec[3] <- "COD_STA_DECIS"
+      }
+      if (any("DENOM" == varSelect)) {
+        choices_vec[4] <- "DENOM"
+      }
+      if (any("FORME" == varSelect)) {
+        choices_vec[5] <- "FORME"
+      }
+      if (any("DIN" == varSelect)) {
+        choices_vec[6] <- "MARQ_COMRC"
+      }
+      if (any("TENEUR" %in% varSelect)) {
+        choices_vec[7] <- "TENEUR"
+      }
+      return(tagList(
+        selectInput(
+          "V_DEM_PAIMT_MED_CM__varSelectDesc", "Variables Descriptives",
+          choices = choices_vec[choices_vec != ""],
+          multiple = TRUE
+        )
+      ))
+    })
     output$V_DEM_PAIMT_MED_CM__params <- renderUI({
       varSelect <- c(
         input$V_DEM_PAIMT_MED_CM__varSelect1,
@@ -806,9 +842,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect4
       )
       varSelectDesc <- c(
-        input$V_DEM_PAIMT_MED_CM__varSelectDesc1,
-        input$V_DEM_PAIMT_MED_CM__varSelectDesc2,
-        input$V_DEM_PAIMT_MED_CM__varSelectDesc3
+        input$V_DEM_PAIMT_MED_CM__varSelectDesc
       )
 
       # DENOM
@@ -845,7 +879,7 @@ domaine_valeurs <- function() {
       }
 
       # DIN
-      if ("DIN" %in% varSelect && "DIN" %in% varSelectDesc) {
+      if (any("DIN" == varSelect) && any("MARQ_COMRC" == varSelectDesc)) {
         din <- fluidRow(
           column(
             width = 3,
@@ -853,20 +887,20 @@ domaine_valeurs <- function() {
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__dinDesc", "NOM_DIN")
+            textInput("V_DEM_PAIMT_MED_CM__MarqComrc", "NOM_MARQ_COMRC")
           ),
           column(
             width = 3,
             selectInput(
-              "V_DEM_PAIMT_MED_CM__dinTypeRecherche",
-              "NOM_DIN Type Recherche",
+              "V_DEM_PAIMT_MED_CM__marqComrcTypeRecherche",
+              "NOM_MARQ_COMRC Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
               selected = "Mot-clé"
             )
           )
         )
-      } else if ("DIN" %in% varSelect) {
+      } else if (any("DIN" == varSelect)) {
         din <- fluidRow(
           column(
             width = 3,
@@ -877,10 +911,279 @@ domaine_valeurs <- function() {
         din <- NULL
       }
 
+      # AHFS
+      if (any("AHFS" == varSelect) && any("AHFS" == varSelectDesc)) {
+        ahfs <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche",
+              "NOM_AHFS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if (any("AHFS" == varSelect)) {
+        ahfs <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS")
+          )
+        )
+      } else {
+        ahfs <- NULL
+      }
+
+      # AHFS CLA
+      if (any("AHFS_CLA" == varSelect) && !any("AHFS" == varSelect) && any("AHFS" == varSelectDesc)) {
+        ahfs_cla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche",
+              "NOM_AHFS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if (any("AHFS_CLA" == varSelect)) {
+        ahfs_cla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA")
+          )
+        )
+      } else {
+        ahfs_cla <- NULL
+      }
+
+      # AHFS SCLA
+      if (any("AHFS_SCLA" == varSelect) && !any(c("AHFS", "AHFS_CLA") %in% varSelect) && any("AHFS" == varSelectDesc)) {
+        ahfs_scla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche",
+              "NOM_AHFS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if (any("AHFS_SCLA" == varSelect)) {
+        ahfs_scla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA")
+          )
+        )
+      } else {
+        ahfs_scla <- NULL
+      }
+
+      # AHFS SSCLA
+      if (any("AHFS_SSCLA" == varSelect) && !any(c("AHFS", "AHFS_CLA", "AHFS_SCLA") %in% varSelect) && any("AHFS" == varSelectDesc)) {
+        ahfs_sscla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche",
+              "NOM_AHFS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if (any("AHFS_SSCLA" == varSelect)) {
+        ahfs_sscla <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+          )
+        )
+      } else {
+        ahfs_sscla <- NULL
+      }
+
+      # FORME
+      if ("FORME" %in% varSelect && "FORME" %in% varSelectDesc) {
+        forme <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__formeDesc", "NOM_FORME")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomFormeTypeRecherche",
+              "NOM_FORME Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if ("FORME" %in% varSelect) {
+        forme <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME")
+          )
+        )
+      } else {
+        forme <- NULL
+      }
+
+      # TENEUR
+      if ("TENEUR" %in% varSelect && "TENEUR" %in% varSelectDesc) {
+        teneur <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__teneurDesc", "NOM_TENEUR")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__nomTeneurTypeRecherche",
+              "NOM_TENEUR Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if ("TENEUR" %in% varSelect) {
+        teneur <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR")
+          )
+        )
+      } else {
+        teneur <- NULL
+      }
+
+      # COD_SERV_[1:3]
+      for (i in 1:3) {
+        if (paste0("COD_SERV_", i) %in% varSelect && "COD_SERV" %in% varSelectDesc) {
+          cs <- fluidRow(
+            column(
+              width = 3,
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i))
+            ),
+            column(
+              width = 3,
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServDesc", i), paste0("NOM_COD_SERV_", i))
+            ),
+            column(
+              width = 3,
+              selectInput(
+                paste0("V_DEM_PAIMT_MED_CM__codServDesc", i),
+                paste0("NOM_COD_SERV_", i, " Type Recherche"),
+                choices = c("Mot-clé" = "keyword",
+                            "Valeur exacte" = "exactWord"),
+                selected = "Mot-clé"
+              )
+            )
+          )
+        } else if (paste0("COD_SERV_", i) %in% varSelect) {
+          cs <- fluidRow(
+            column(
+              width = 3,
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i))
+            )
+          )
+        } else {
+          cs <- NULL
+        }
+        assign(paste0("cod_serv_", i), cs)
+      }
+
+      # COD_STA_DECIS
+      if ("COD_STA_DECIS" %in% varSelect && "COD_STA_DECIS" %in% varSelectDesc) {
+        cod_sta_decis <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS")
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecisDesc", "NOM_COD_STA_DECIS")
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche",
+              "NOM_COD_STA_DECIS Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      } else if ("COD_STA_DECIS" %in% varSelect) {
+        cod_sta_decis <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS")
+          )
+        )
+      } else {
+        cod_sta_decis <- NULL
+      }
 
       return(tagList(
-        denom,
-        din
+        denom, din,
+        ahfs, ahfs_cla, ahfs_scla, ahfs_sscla,
+        forme, teneur,
+        cod_serv_1, cod_serv_2, cod_serv_3,
+        cod_sta_decis
       ))
     })
 
