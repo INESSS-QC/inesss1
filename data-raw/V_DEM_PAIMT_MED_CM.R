@@ -85,7 +85,7 @@ v_dem_paimt_med_cm <- function() {
   )
   cols_by <- cols[!cols %in% c("ANNEE", "MOIS")]
   setcolorder(DT, cols)
-  setorderv(DT, names(DT), na.last = TRUE)
+  setkey(DT)
 
   DT[, DATE_DEBUT := as.integer(make_date(ANNEE, MOIS, 1L))]
   DT[MOIS == 12, DATE_FIN := as.integer(make_date(ANNEE + 1L, 1L, 1L) - 1L)]
@@ -101,6 +101,8 @@ v_dem_paimt_med_cm <- function() {
   ][, per := NULL]
   DT[, `:=` (DATE_DEBUT = format(as_date(DATE_DEBUT), "%Y-%m"),
              DATE_FIN = format(as_date(DATE_FIN), "%Y-%m"))]
+
+  setorderv(DT, names(DT), na.last = TRUE)
 
   return(DT)
 
