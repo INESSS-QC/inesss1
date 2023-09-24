@@ -417,16 +417,24 @@ domaine_valeurs <- function() {
                 style = "color: #ffffff; background-color: #0086b3;"
               ),
               div(style = "margin-top:10px"),
-              uiOutput("V_DEM_PAIMT_MED_CM__params")
+              uiOutput("V_DEM_PAIMT_MED_CM__params"),
+              fluidRow(
+                h4(HTML("&nbsp;&nbsp;"), "Résultats"),
+                style = "color: #ffffff; background-color: #0086b3;"
+              ),
+              div(style = "margin-top:10px"),
+              uiOutput("V_DEM_PAIMT_MED_CM__go_reset_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
             ),
+
             tabPanel(
               title = "Fiche technique",
               div(style = "margin-top:20px"),
               column(
                 width = 12,
                 em(inesss::domaine_valeurs_fiche_technique$V_DEM_PAIMT_MED_CM$MaJ)
-              )#,
-              # tableOutput("V_DEM_PAIMT_MED_CM__varDesc")
+              )
             )
           )
         ),
@@ -783,6 +791,7 @@ domaine_valeurs <- function() {
                           selected = "keyword")
       }
     }, ignoreInit = TRUE)
+
 
 
 
@@ -1186,7 +1195,61 @@ domaine_valeurs <- function() {
         cod_sta_decis
       ))
     })
+    output$V_DEM_PAIMT_MED_CM__go_reset_button <- renderUI({
+      varSelect <- c(
+        input$V_DEM_PAIMT_MED_CM__varSelect1,
+        input$V_DEM_PAIMT_MED_CM__varSelect2,
+        input$V_DEM_PAIMT_MED_CM__varSelect3,
+        input$V_DEM_PAIMT_MED_CM__varSelect4
+      )
+      if (is.null(varSelect)) {
+        return(NULL)
+      } else {
+        return(button_go_reset("V_DEM_PAIMT_MED_CM"))
+      }
+    })
 
+    ## Datatable ####
+    observeEvent(input$V_DEM_PAIMT_MED_CM__go, { V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE })
+    V_DEM_PAIMT_MED_CM__dt <- eventReactive(
+      input$V_DEM_PAIMT_MED_CM__go,
+      {
+        if (V_DEM_PAIMT_MED_CM__val$show_tab) {
+          varSelect <- c(
+            input$V_DEM_PAIMT_MED_CM__varSelect1,
+            input$V_DEM_PAIMT_MED_CM__varSelect2,
+            input$V_DEM_PAIMT_MED_CM__varSelect3,
+            input$V_DEM_PAIMT_MED_CM__varSelect4,
+            "DATE_DEBUT", "DATE_FIN"
+          )
+          dt <- unique(inesss::V_DEM_PAIMT_MED_CM[, ..varSelect])
+          # Périodes détaillées
+          if (!input$V_DEM_PAIMT_MED_CM__periodDetail) {
+            by_vars <- varSelect[!varSelect %in% c("DATE_DEBUT", "DATE_FIN")]
+            dt <- dt[
+              , .(PremierePrescription = min(DATE_DEBUT),
+                  DernierePrescription = max(DATE_FIN)),
+              keyby = by_vars
+            ]
+          }
+          # DENOM
+          if (any("DENOM" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__denom != "") {
+              dt <- search_value_chr(
+                dt, col = "DENOM",
+                values = input$V_DEM_PAIMT_MED_CM__denom, pad = 5
+              )
+            }
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }
+    )
+    output$V_DEM_PAIMT_MED_CM__dt <- renderDataTable({
+      V_DEM_PAIMT_MED_CM__dt()
+    }, options = renderDataTable_options())
 
 
 
