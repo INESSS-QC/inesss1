@@ -13,6 +13,7 @@ domaine_valeurs.addins <- function() {
 #' @import data.table
 #' @import shiny
 #' @import shinydashboard
+#' @importFrom stringr str_sub str_pad
 #'
 #' @encoding UTF-8
 #' @keywords internal
@@ -255,6 +256,13 @@ domaine_valeurs <- function() {
     } else {
       return(width)
     }
+  }
+  V_DENOM_COMNE_MED_arrange <- function() {
+    dt <- inesss::V_DENOM_COMNE_MED
+    dt[DATE_FIN > Sys.Date(), DATE_FIN := Sys.Date()]
+
+    dt[, `:=` (DATE_DEBUT = NULL, DATE_FIN = NULL)]
+    return(dt)
   }
   V_FORM_MED_cod_typ_forme <- function() {
     ### Valeurs uniques des codes et des descriptions de type de forme
@@ -854,6 +862,50 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelectDesc
       )
 
+      # Périodes - Début & Fin
+      minDebut <- min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)
+      maxDebut <- max(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)
+      minFin <- min(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)
+      maxFin <- max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)
+      periods_debut_fin <- fluidRow(
+        column(
+          width = 3,
+          numericInput(
+            "V_DEM_PAIMT_MED_CM__debutAnnee", "Début Période - Année",
+            value = as.integer(str_sub(minDebut, 1, 4)),
+            min = as.integer(str_sub(minDebut, 1, 4)),
+            max = as.integer(str_sub(maxDebut, 1, 4))
+          )
+        ),
+        column(
+          width = 3,
+          numericInput(
+            "V_DEM_PAIMT_MED_CM__debutMois", "Début Période - Mois",
+            value = as.integer(str_sub(minDebut, 6, 7)),
+            min = as.integer(str_sub(minDebut, 6, 7)),
+            max = as.integer(str_sub(maxDebut, 6, 7))
+          )
+        ),
+        column(
+          width = 3,
+          numericInput(
+            "V_DEM_PAIMT_MED_CM__finAnnee", "Fin Période - Année",
+            value = as.integer(str_sub(maxFin, 1, 4)),
+            min = as.integer(str_sub(maxFin, 1, 4)),
+            max = as.integer(str_sub(maxFin, 1, 4))
+          )
+        ),
+        column(
+          width = 3,
+          numericInput(
+            "V_DEM_PAIMT_MED_CM__finMois", "Fin Période - Mois",
+            value = as.integer(str_sub(maxFin, 6, 7)),
+            min = as.integer(str_sub(maxFin, 6, 7)),
+            max = as.integer(str_sub(maxFin, 6, 7))
+          )
+        )
+      )
+
       # DENOM
       if ("DENOM" %in% varSelect && "DENOM" %in% varSelectDesc) {
         denom <- fluidRow(
@@ -1188,6 +1240,7 @@ domaine_valeurs <- function() {
       }
 
       return(tagList(
+        periods_debut_fin,
         denom, din,
         ahfs, ahfs_cla, ahfs_scla, ahfs_sscla,
         forme, teneur,
@@ -1232,6 +1285,7 @@ domaine_valeurs <- function() {
               keyby = by_vars
             ]
           }
+
           # DENOM
           if (any("DENOM" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__denom != "") {
@@ -1241,6 +1295,90 @@ domaine_valeurs <- function() {
               )
             }
           }
+          # DIN
+          if (any("DIN" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__din != "") {
+              dt <- search_value_chr(
+                dt, col = "DIN",
+                values = input$V_DEM_PAIMT_MED_CM__din
+              )
+            }
+          }
+          # AHFS
+          if (any("AHFS" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__ahfs != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS",
+                values = input$V_DEM_PAIMT_MED_CM__ahfs, pad = 6
+              )
+            }
+          }
+          # AHFS_CLA
+          if (any("AHFS_CLA" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_CLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsCla, pad = 2
+              )
+            }
+          }
+          # AHFS_SCLA
+          if (any("AHFS_SCLA" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__ahfsScla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsScla, pad = 2
+              )
+            }
+          }
+          # AHFS_SSCLA
+          if (any("AHFS_SSCLA" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__ahfsSscla != "") {
+              dt <- search_value_chr(
+                dt, col = "AHFS_SSCLA",
+                values = input$V_DEM_PAIMT_MED_CM__ahfsSscla, pad = 2
+              )
+            }
+          }
+          # FORME
+          if (any("FORME" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__forme != "") {
+              dt <- search_value_chr(
+                dt, col = "FORME",
+                values = input$V_DEM_PAIMT_MED_CM__forme, pad = 5
+              )
+            }
+          }
+          # TENEUR
+          if (any("TENEUR" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__teneur != "") {
+              dt <- search_value_chr(
+                dt, col = "TENEUR",
+                values = input$V_DEM_PAIMT_MED_CM__teneur, pad = 5
+              )
+            }
+          }
+          # COD_SERV_[1:3]
+          for (i in 1:3) {
+            if (any(paste0("COD_SERV_", i) == names(dt))) {
+              if (input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]] != "") {
+                dt <- search_value_chr(
+                  dt, col = paste0("COD_SERV_", i),
+                  values = input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]]
+                )
+              }
+            }
+          }
+          # COD_STA_DECIS
+          if (any("COD_STA_DECIS" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__codStaDecis != "") {
+              dt <- search_value_chr(
+                dt, col = "COD_STA_DECIS",
+                values = input$V_DEM_PAIMT_MED_CM__codStaDecis
+              )
+            }
+          }
+
           return(dt)
         } else {
           return(NULL)
