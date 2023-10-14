@@ -36,7 +36,7 @@ v_dem_paimt_med_cm <- function() {
     min_year <- dbGetQuery(conn, statement = paste0(
       "select min(extract(year from SMED_DAT_SERV)) as min_date\n",
       "from PROD.V_DEM_PAIMT_MED_CM\n",
-      "where SMED_DAT_SERV < '1997-12-31';"
+      "where SMED_DAT_SERV < '1997-12-31';"  # en théorie la date est en 1996
     ))$min_date
     years <- min_year:year(Sys.Date())
   }
@@ -62,7 +62,8 @@ v_dem_paimt_med_cm <- function() {
         "where smed_dat_serv between '",date_ymd(yr, mth, 1L),"' and '",date_ymd(yr, mth, "last"),"';"
       )))
       if (nrow(DT[[i]])) {
-        DT[[i]][, `:=` (ANNEE = yr, MOIS = mth)]
+        DT[[i]][, `:=` (DATE_DEBUT = make_date(yr, mth, 1),
+                        DATE_FIN = make_date(yr, mth, 1) %m+% months(1, FALSE) - 1)]
       } else {
         DT[[i]] <- NULL
       }
@@ -81,17 +82,13 @@ v_dem_paimt_med_cm <- function() {
     "FORME", "TENEUR",
     "COD_SERV_1", "COD_SERV_2", "COD_SERV_3",
     "COD_STA_DECIS",
-    "ANNEE", "MOIS"
+    "DATE_DEBUT", "DATE_FIN"
   )
-  cols_by <- cols[!cols %in% c("ANNEE", "MOIS")]
+  cols_by <- cols[!cols %in% c("DATE_DEBUT", "DATE_FIN")]
   setcolorder(DT, cols)
   setkey(DT)
 
-  DT[, DATE_DEBUT := as.integer(make_date(ANNEE, MOIS, 1L))]
-  DT[MOIS == 12, DATE_FIN := as.integer(make_date(ANNEE + 1L, 1L, 1L) - 1L)]
-  DT[MOIS < 12, DATE_FIN := as.integer(make_date(ANNEE, MOIS + 1L, 1L) - 1L)]
-
-  DT[, diff := DATE_DEBUT - shift(DATE_FIN) - 1L, by = cols_by][is.na(diff), diff := 0L]
+  DT[, diff := as.integer(DATE_DEBUT - shift(DATE_FIN) - 1L), by = cols_by][is.na(diff), diff := 0L]
   DT[, per := 0L][diff > 0L, per := 1L]
   DT[, per := cumsum(per) + 1L, by = cols_by]
   DT <- DT[
@@ -99,8 +96,6 @@ v_dem_paimt_med_cm <- function() {
         DATE_FIN = max(DATE_FIN)),
     keyby = c(cols_by, "per")
   ][, per := NULL]
-  DT[, `:=` (DATE_DEBUT = format(as_date(DATE_DEBUT), "%Y-%m"),
-             DATE_FIN = format(as_date(DATE_FIN), "%Y-%m"))]
 
   setorderv(DT, names(DT), na.last = TRUE)
 
