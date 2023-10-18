@@ -1276,15 +1276,16 @@ domaine_valeurs <- function() {
             "DATE_DEBUT", "DATE_FIN"
           )
           dt <- unique(inesss::V_DEM_PAIMT_MED_CM[, ..varSelect])
+          by_vars <- varSelect[!varSelect %in% c("DATE_DEBUT", "DATE_FIN")]
           # Périodes détaillées
           if (!input$V_DEM_PAIMT_MED_CM__periodDetail) {
-            by_vars <- varSelect[!varSelect %in% c("DATE_DEBUT", "DATE_FIN")]
             dt <- dt[
               , .(PremierePrescription = min(DATE_DEBUT),
                   DernierePrescription = max(DATE_FIN)),
               keyby = by_vars
             ]
           }
+          setkey(dt)
 
           # DENOM
           if (any("DENOM" == names(dt))) {
@@ -1377,6 +1378,11 @@ domaine_valeurs <- function() {
                 values = input$V_DEM_PAIMT_MED_CM__codStaDecis
               )
             }
+          }
+
+          # Regrouper les périodes qui se chevauchent dans le temps
+          if (input$V_DEM_PAIMT_MED_CM__periodDetail) {
+            dt <- fusion_periodes(dt, "DATE_DEBUT", "DATE_FIN", by_vars, 1L)
           }
 
           return(dt)
