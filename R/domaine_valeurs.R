@@ -295,8 +295,8 @@ domaine_valeurs <- function() {
         div(style = "margin-top:10px"),
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
-        menuItem("Médicaments d'exception", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
         menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("Médicaments d'exception", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
 
         div(style = "margin-top:30px"),
 
@@ -432,6 +432,7 @@ domaine_valeurs <- function() {
               ),
               div(style = "margin-top:10px"),
               uiOutput("V_DEM_PAIMT_MED_CM__go_reset_button"),
+              uiOutput("V_DEM_PAIMT_MED_CM__save_button"),
               div(style = "margin-top:10px"),
               dataTableOutput("V_DEM_PAIMT_MED_CM__dt")
             ),
@@ -821,7 +822,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect3,
         input$V_DEM_PAIMT_MED_CM__varSelect4
       )
-      choices_vec <- vector("character", 7)
+      choices_vec <- vector("character", 7L)
       if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
         choices_vec[1] <- "AHFS"
       }
@@ -847,7 +848,7 @@ domaine_valeurs <- function() {
         selectInput(
           "V_DEM_PAIMT_MED_CM__varSelectDesc", "Variables Descriptives",
           choices = choices_vec[choices_vec != ""],
-          multiple = TRUE
+          multiple = TRUE,
         )
       ))
     })
@@ -872,36 +873,32 @@ domaine_valeurs <- function() {
           width = 3,
           numericInput(
             "V_DEM_PAIMT_MED_CM__debutAnnee", "Début Période - Année",
-            value = as.integer(str_sub(minDebut, 1, 4)),
-            min = as.integer(str_sub(minDebut, 1, 4)),
-            max = as.integer(str_sub(maxDebut, 1, 4))
+            value = year(minDebut),
+            min = year(minDebut), max = year(maxDebut)
           )
         ),
         column(
           width = 3,
           numericInput(
             "V_DEM_PAIMT_MED_CM__debutMois", "Début Période - Mois",
-            value = as.integer(str_sub(minDebut, 6, 7)),
-            min = as.integer(str_sub(minDebut, 6, 7)),
-            max = as.integer(str_sub(maxDebut, 6, 7))
+            value = month(minDebut),
+            min = 1L, max = 12
           )
         ),
         column(
           width = 3,
           numericInput(
             "V_DEM_PAIMT_MED_CM__finAnnee", "Fin Période - Année",
-            value = as.integer(str_sub(maxFin, 1, 4)),
-            min = as.integer(str_sub(maxFin, 1, 4)),
-            max = as.integer(str_sub(maxFin, 1, 4))
+            value = year(maxFin),
+            min = year(minDebut), max = year(maxDebut)
           )
         ),
         column(
           width = 3,
           numericInput(
             "V_DEM_PAIMT_MED_CM__finMois", "Fin Période - Mois",
-            value = as.integer(str_sub(maxFin, 6, 7)),
-            min = as.integer(str_sub(maxFin, 6, 7)),
-            max = as.integer(str_sub(maxFin, 6, 7))
+            value = month(maxFin),
+            min = 1, max = 12
           )
         )
       )
@@ -1261,11 +1258,23 @@ domaine_valeurs <- function() {
         return(button_go_reset("V_DEM_PAIMT_MED_CM"))
       }
     })
+    output$V_DEM_PAIMT_MED_CM__save_button <- renderUI({
+      button_save("V_DEM_PAIMT_MED_CM", V_DEM_PAIMT_MED_CM__dt())
+    })
 
     ## Datatable ####
     observeEvent(input$V_DEM_PAIMT_MED_CM__go, { V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE })
+    observeEvent(
+      c(input$V_DEM_PAIMT_MED_CM__varSelect1, input$V_DEM_PAIMT_MED_CM__varSelect2,
+        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4),
+      { V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE }
+    )
     V_DEM_PAIMT_MED_CM__dt <- eventReactive(
-      input$V_DEM_PAIMT_MED_CM__go,
+      c(
+        input$V_DEM_PAIMT_MED_CM__go, V_DEM_PAIMT_MED_CM__val$show_tab,
+        input$V_DEM_PAIMT_MED_CM__varSelect1, input$V_DEM_PAIMT_MED_CM__varSelect2,
+        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4
+      ),
       {
         if (V_DEM_PAIMT_MED_CM__val$show_tab) {
           varSelect <- c(
@@ -1277,14 +1286,21 @@ domaine_valeurs <- function() {
           )
           dt <- unique(inesss::V_DEM_PAIMT_MED_CM[, ..varSelect])
           by_vars <- varSelect[!varSelect %in% c("DATE_DEBUT", "DATE_FIN")]
-          # Périodes détaillées
-          if (!input$V_DEM_PAIMT_MED_CM__periodDetail) {
+          # Dates demandées et périodes détaillées
+          debut_demande <- date_ymd(input$V_DEM_PAIMT_MED_CM__debutAnnee, input$V_DEM_PAIMT_MED_CM__debutMois, 1L)
+          fin_demande <- date_ymd(input$V_DEM_PAIMT_MED_CM__finAnnee, input$V_DEM_PAIMT_MED_CM__finMois, "last")
+          if (input$V_DEM_PAIMT_MED_CM__periodDetail) {
+            dt <- dt[debut_demande <= DATE_FIN & fin_demande >= DATE_DEBUT]
+          } else {
             dt <- dt[
               , .(PremierePrescription = min(DATE_DEBUT),
                   DernierePrescription = max(DATE_FIN)),
               keyby = by_vars
             ]
+            dt <- dt[debut_demande <= DernierePrescription & fin_demande >= PremierePrescription]
           }
+          dt[, `:=` (DebPeriodePrescripDem = debut_demande,
+                     FinPeriodePrescripDem = fin_demande)]
           setkey(dt)
 
           # DENOM
@@ -1382,6 +1398,7 @@ domaine_valeurs <- function() {
 
           # Regrouper les périodes qui se chevauchent dans le temps
           if (input$V_DEM_PAIMT_MED_CM__periodDetail) {
+            by_vars <- c(by_vars, "DebPeriodePrescripDem", "FinPeriodePrescripDem")
             dt <- fusion_periodes(dt, "DATE_DEBUT", "DATE_FIN", by_vars, 1L)
           }
 
@@ -1395,6 +1412,84 @@ domaine_valeurs <- function() {
       V_DEM_PAIMT_MED_CM__dt()
     }, options = renderDataTable_options())
 
+    ## Export ####
+    output$V_DEM_PAIMT_MED_CM__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_DEM_PAIMT_MED_CM__savename, ".",
+          input$V_DEM_PAIMT_MED_CM__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_DEM_PAIMT_MED_CM__saveext == "xlsx") {
+          writexl::write_xlsx(V_DEM_PAIMT_MED_CM__dt(), file)
+        } else if (input$V_DEM_PAIMT_MED_CM__saveext == "csv") {
+          write.csv2(V_DEM_PAIMT_MED_CM__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
+    )
+
+    ## Update Buttons ####
+    # Bouton Reset
+    observeEvent(input$V_DEM_PAIMT_MED_CM__reset, {
+      V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
+      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutAnnee", value = year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
+      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
+    })
+
+    ## Erreurs possible ####
+    # Périodes demandées
+    observeEvent(
+      eventExpr = {
+        c(input$V_DEM_PAIMT_MED_CM__debutAnnee, input$V_DEM_PAIMT_MED_CM__finAnnee,
+          input$V_DEM_PAIMT_MED_CM__debutMois, input$V_DEM_PAIMT_MED_CM__finMois)
+      },
+      handlerExpr = {
+        # Début > Fin
+        showError <- FALSE
+        if (input$V_DEM_PAIMT_MED_CM__debutAnnee > input$V_DEM_PAIMT_MED_CM__finAnnee) {
+          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = input$V_DEM_PAIMT_MED_CM__debutAnnee)
+          showError <- TRUE
+        }
+        if (input$V_DEM_PAIMT_MED_CM__debutMois > input$V_DEM_PAIMT_MED_CM__finMois) {
+          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finMois", value = input$V_DEM_PAIMT_MED_CM__debutMois)
+          showError <- TRUE
+        }
+        if (showError) {
+          showNotification("[Début Période] est plus grand que [Fin Période]", duration = 3, type = "error")
+        }
+
+        # Valeurs non permises
+        # Debut Annee
+        if (input$V_DEM_PAIMT_MED_CM__debutAnnee < year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT))) {
+          showNotification(paste0("Valeur non permise [",input$V_DEM_PAIMT_MED_CM__debutAnnee,"]"), duration = 3, type = "error")
+          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutAnnee", value = year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
+        }
+        # Fin Annee
+        if (input$V_DEM_PAIMT_MED_CM__finAnnee > year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN))) {
+          showNotification(paste0("Valeur non permise [",input$V_DEM_PAIMT_MED_CM__finAnnee,"]"), duration = 3, type = "error")
+          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
+        }
+        # Debut et Fin Mois
+        showError <- FALSE
+        for (numinput in c("V_DEM_PAIMT_MED_CM__debutMois", "V_DEM_PAIMT_MED_CM__finMois")) {
+          if (input[[numinput]] <= 0 || input[[numinput]] >= 13) {
+            showError <- TRUE
+            if (input[[numinput]] <= 0) {
+              updateNumericInput(session, numinput, value = 1L)
+            }
+            if (input[[numinput]] >= 13) {
+              updateNumericInput(session, numinput, value = 12L)
+            }
+          }
+        }
+        if (showError) {
+          showNotification("Le mois doit se situer entre 1 et 12", duration = 3, type = "error")
+        }
+      },
+      ignoreInit = TRUE
+    )
 
 
 
