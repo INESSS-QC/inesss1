@@ -868,12 +868,17 @@ domaine_valeurs <- function() {
       maxDebut <- max(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)
       minFin <- min(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)
       maxFin <- max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)
+      if (is.null(input$V_DEM_PAIMT_MED_CM__debutAnnee)) {
+        prev_val <- year(minDebut)
+      } else {
+        prev_val <- input$V_DEM_PAIMT_MED_CM__debutAnnee
+      }
       periods_debut_fin <- fluidRow(
         column(
           width = 3,
           numericInput(
             "V_DEM_PAIMT_MED_CM__debutAnnee", "Début Période - Année",
-            value = year(minDebut),
+            value = prev_val,
             min = year(minDebut), max = year(maxDebut)
           )
         ),
@@ -905,14 +910,32 @@ domaine_valeurs <- function() {
 
       # DENOM
       if ("DENOM" %in% varSelect && "DENOM" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__denom)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__denom
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__denomDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__denomDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__denomTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__denomTypeRecherche
+          }
+        })
         denom <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM")
+            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__denomDesc", "NOM_DENOM")
+            textInput("V_DEM_PAIMT_MED_CM__denomDesc", "NOM_DENOM", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -921,15 +944,22 @@ domaine_valeurs <- function() {
               "NOM_DENOM Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if ("DENOM" %in% varSelect) {
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__denom)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__denom
+          }
+        })
         denom <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM")
+            textInput("V_DEM_PAIMT_MED_CM__denom", "DENOM", value = prev_val)
           )
         )
       } else {
@@ -938,14 +968,32 @@ domaine_valeurs <- function() {
 
       # DIN
       if (any("DIN" == varSelect) && any("MARQ_COMRC" == varSelectDesc)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__din)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__din
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__MarqComrc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__MarqComrc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__marqComrcTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__marqComrcTypeRecherche
+          }
+        })
         din <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+            textInput("V_DEM_PAIMT_MED_CM__din", "DIN", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__MarqComrc", "NOM_MARQ_COMRC")
+            textInput("V_DEM_PAIMT_MED_CM__MarqComrc", "NOM_MARQ_COMRC", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -954,15 +1002,23 @@ domaine_valeurs <- function() {
               "NOM_MARQ_COMRC Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if (any("DIN" == varSelect)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__din)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__din
+          }
+        })
         din <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__din", "DIN")
+            textInput("V_DEM_PAIMT_MED_CM__din", "DIN", value = prev_val)
           )
         )
       } else {
@@ -971,14 +1027,32 @@ domaine_valeurs <- function() {
 
       # AHFS
       if (any("AHFS" == varSelect) && any("AHFS" == varSelectDesc)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfs)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfs
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__ahfsDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche
+          }
+        })
         ahfs <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -987,15 +1061,23 @@ domaine_valeurs <- function() {
               "NOM_AHFS Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if (any("AHFS" == varSelect)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfs)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfs
+          }
+        })
         ahfs <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfs", "AHFS", value = prev_val)
           )
         )
       } else {
@@ -1004,14 +1086,32 @@ domaine_valeurs <- function() {
 
       # AHFS CLA
       if (any("AHFS_CLA" == varSelect) && !any("AHFS" == varSelect) && any("AHFS" == varSelectDesc)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsCla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsCla
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__ahfsDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche
+          }
+        })
         ahfs_cla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -1020,15 +1120,23 @@ domaine_valeurs <- function() {
               "NOM_AHFS Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if (any("AHFS_CLA" == varSelect)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsCla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsCla
+          }
+        })
         ahfs_cla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsCla", "AHFS_CLA", value = prev_val)
           )
         )
       } else {
@@ -1037,14 +1145,32 @@ domaine_valeurs <- function() {
 
       # AHFS SCLA
       if (any("AHFS_SCLA" == varSelect) && !any(c("AHFS", "AHFS_CLA") %in% varSelect) && any("AHFS" == varSelectDesc)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsScla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsScla
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__ahfsDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche
+          }
+        })
         ahfs_scla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -1053,15 +1179,23 @@ domaine_valeurs <- function() {
               "NOM_AHFS Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if (any("AHFS_SCLA" == varSelect)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsScla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsScla
+          }
+        })
         ahfs_scla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsScla", "AHFS_SCLA", value = prev_val)
           )
         )
       } else {
@@ -1070,14 +1204,32 @@ domaine_valeurs <- function() {
 
       # AHFS SSCLA
       if (any("AHFS_SSCLA" == varSelect) && !any(c("AHFS", "AHFS_CLA", "AHFS_SCLA") %in% varSelect) && any("AHFS" == varSelectDesc)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsSscla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsSscla
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__ahfsDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche
+          }
+        })
         ahfs_sscla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsDesc", "NOM_AHFS", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -1086,15 +1238,23 @@ domaine_valeurs <- function() {
               "NOM_AHFS Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if (any("AHFS_SSCLA" == varSelect)) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__ahfsSscla)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__ahfsSscla
+          }
+        })
         ahfs_sscla <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA")
+            textInput("V_DEM_PAIMT_MED_CM__ahfsSscla", "AHFS_SSCLA", value = prev_val)
           )
         )
       } else {
@@ -1103,14 +1263,32 @@ domaine_valeurs <- function() {
 
       # FORME
       if ("FORME" %in% varSelect && "FORME" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__forme)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__forme
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__formeDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__formeDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomFormeTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomFormeTypeRecherche
+          }
+        })
         forme <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME")
+            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__formeDesc", "NOM_FORME")
+            textInput("V_DEM_PAIMT_MED_CM__formeDesc", "NOM_FORME", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -1119,15 +1297,23 @@ domaine_valeurs <- function() {
               "NOM_FORME Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if ("FORME" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__forme)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__forme
+          }
+        })
         forme <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME")
+            textInput("V_DEM_PAIMT_MED_CM__forme", "FORME", value = prev_val)
           )
         )
       } else {
@@ -1136,14 +1322,32 @@ domaine_valeurs <- function() {
 
       # TENEUR
       if ("TENEUR" %in% varSelect && "TENEUR" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__teneur)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__teneur
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__teneurDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__teneurDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__nomTeneurTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__nomTeneurTypeRecherche
+          }
+        })
         teneur <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR")
+            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__teneurDesc", "NOM_TENEUR")
+            textInput("V_DEM_PAIMT_MED_CM__teneurDesc", "NOM_TENEUR", value = prev_val_search)
           ),
           column(
             width = 3,
@@ -1152,15 +1356,23 @@ domaine_valeurs <- function() {
               "NOM_TENEUR Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if ("TENEUR" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__teneur)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__teneur
+          }
+        })
         teneur <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR")
+            textInput("V_DEM_PAIMT_MED_CM__teneur", "TENEUR", value = prev_val)
           )
         )
       } else {
@@ -1170,14 +1382,32 @@ domaine_valeurs <- function() {
       # COD_SERV_[1:3]
       for (i in 1:3) {
         if (paste0("COD_SERV_", i) %in% varSelect && "COD_SERV" %in% varSelectDesc) {
+          # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+          isolate({
+            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]])) {
+              prev_val <- ""
+            } else {
+              prev_val <- input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]]
+            }
+            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]])) {
+              prev_val_search <- ""
+            } else {
+              prev_val_search <- input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
+            }
+            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]])) {
+              prev_val_search_key <- "Mot-clé"
+            } else {
+              prev_val_search_key <- input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
+            }
+          })
           cs <- fluidRow(
             column(
               width = 3,
-              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i))
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i), value = prev_val)
             ),
             column(
               width = 3,
-              textInput(paste0("V_DEM_PAIMT_MED_CM__codServDesc", i), paste0("NOM_COD_SERV_", i))
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServDesc", i), paste0("NOM_COD_SERV_", i), value = prev_val_search)
             ),
             column(
               width = 3,
@@ -1186,15 +1416,23 @@ domaine_valeurs <- function() {
                 paste0("NOM_COD_SERV_", i, " Type Recherche"),
                 choices = c("Mot-clé" = "keyword",
                             "Valeur exacte" = "exactWord"),
-                selected = "Mot-clé"
+                selected = prev_val_search_key
               )
             )
           )
         } else if (paste0("COD_SERV_", i) %in% varSelect) {
+          # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+          isolate({
+            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]])) {
+              prev_val <- ""
+            } else {
+              prev_val <- input[[paste0("V_DEM_PAIMT_MED_CM__codServ", i)]]
+            }
+          })
           cs <- fluidRow(
             column(
               width = 3,
-              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i))
+              textInput(paste0("V_DEM_PAIMT_MED_CM__codServ", i), paste0("COD_SERV_", i), value = prev_val)
             )
           )
         } else {
@@ -1205,14 +1443,32 @@ domaine_valeurs <- function() {
 
       # COD_STA_DECIS
       if ("COD_STA_DECIS" %in% varSelect && "COD_STA_DECIS" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__codStaDecis)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__codStaDecis
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__codStaDecisDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__codStaDecisDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche
+          }
+        })
         cod_sta_decis <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS")
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS", value = prev_val)
           ),
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__codStaDecisDesc", "NOM_COD_STA_DECIS")
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecisDesc", "NOM_COD_STA_DECIS", value = prev_val)
           ),
           column(
             width = 3,
@@ -1221,15 +1477,23 @@ domaine_valeurs <- function() {
               "NOM_COD_STA_DECIS Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
-              selected = "Mot-clé"
+              selected = prev_val_search_key
             )
           )
         )
       } else if ("COD_STA_DECIS" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__codStaDecis)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__codStaDecis
+          }
+        })
         cod_sta_decis <- fluidRow(
           column(
             width = 3,
-            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS")
+            textInput("V_DEM_PAIMT_MED_CM__codStaDecis", "COD_STA_DECIS", value = prev_val)
           )
         )
       } else {
@@ -1436,6 +1700,12 @@ domaine_valeurs <- function() {
       V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
       updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutAnnee", value = year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
       updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
+      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutMois", value = month(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
+      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finMois", value = month(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect1", selected = character(0))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect2", selected = character(0))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect3", selected = character(0))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect4", selected = character(0))
     })
 
     ## Erreurs possible ####
