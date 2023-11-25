@@ -37,7 +37,7 @@ DER.inesss.datas <- paste0(c(
   "domaine_valeurs_fiche_technique",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
   "V_CLA_AHF",
-  "V_DEM_PAIMT_MED_CM", "V_DENOM_COMNE_MED",
+  "V_DEM_PAIMT_MED_CM", "V_DENOM_COMNE_MED", "V_DES_COD",
   "V_FORME_MED",
   "V_PRODU_MED",
   "V_TENR_MED"
