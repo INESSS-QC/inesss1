@@ -388,21 +388,25 @@ domaine_valeurs <- function() {
               ),
               fluidRow(
                 column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect1", "", choices = c("DENOM", "DIN"))
+                  width = 3,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect1", "",
+                                     choices = c("DENOM", "DIN"))
                 ),
                 column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "", choices = c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
+                  width = 3,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "",
+                                     choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
                 ),
                 column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect3", "", choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
+                  width = 3,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect3", "",
+                                     choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3"))
                 ),
                 column(
-                  width = 2,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect4", "", choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3"))
-                )
+                  width = 3,
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect4", "",
+                                     choices = c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
+                ),
               ),
               fluidRow(
                 column(
@@ -1394,10 +1398,10 @@ domaine_valeurs <- function() {
             } else {
               prev_val_search <- input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
             }
-            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]])) {
+            if (is.null(input[[paste0("V_DEM_PAIMT_MED_CM__codServTypeRecherche", i)]])) {
               prev_val_search_key <- "Mot-clé"
             } else {
-              prev_val_search_key <- input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
+              prev_val_search_key <- input[[paste0("V_DEM_PAIMT_MED_CM__codServTypeRecherche", i)]]
             }
           })
           cs <- fluidRow(
@@ -1412,7 +1416,7 @@ domaine_valeurs <- function() {
             column(
               width = 3,
               selectInput(
-                paste0("V_DEM_PAIMT_MED_CM__codServDesc", i),
+                paste0("V_DEM_PAIMT_MED_CM__codServTypeRecherche", i),
                 paste0("NOM_COD_SERV_", i, " Type Recherche"),
                 choices = c("Mot-clé" = "keyword",
                             "Valeur exacte" = "exactWord"),
@@ -1698,70 +1702,12 @@ domaine_valeurs <- function() {
     # Bouton Reset
     observeEvent(input$V_DEM_PAIMT_MED_CM__reset, {
       V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE
-      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutAnnee", value = year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
-      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
-      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutMois", value = month(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
-      updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finMois", value = month(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect1", selected = character(0))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect2", selected = character(0))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect3", selected = character(0))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect4", selected = character(0))
+      updateSelectInput(session, "V_DEM_PAIMT_MED_CM__varSelectDesc", selected = character(0))
     })
-
-    ## Erreurs possible ####
-    # Périodes demandées
-    observeEvent(
-      eventExpr = {
-        c(input$V_DEM_PAIMT_MED_CM__debutAnnee, input$V_DEM_PAIMT_MED_CM__finAnnee,
-          input$V_DEM_PAIMT_MED_CM__debutMois, input$V_DEM_PAIMT_MED_CM__finMois)
-      },
-      handlerExpr = {
-        # Début > Fin
-        showError <- FALSE
-        if (input$V_DEM_PAIMT_MED_CM__debutAnnee > input$V_DEM_PAIMT_MED_CM__finAnnee) {
-          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = input$V_DEM_PAIMT_MED_CM__debutAnnee)
-          showError <- TRUE
-        }
-        if (input$V_DEM_PAIMT_MED_CM__debutMois > input$V_DEM_PAIMT_MED_CM__finMois) {
-          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finMois", value = input$V_DEM_PAIMT_MED_CM__debutMois)
-          showError <- TRUE
-        }
-        if (showError) {
-          showNotification("[Début Période] est plus grand que [Fin Période]", duration = 3, type = "error")
-        }
-
-        # Valeurs non permises
-        # Debut Annee
-        if (input$V_DEM_PAIMT_MED_CM__debutAnnee < year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT))) {
-          showNotification(paste0("Valeur non permise [",input$V_DEM_PAIMT_MED_CM__debutAnnee,"]"), duration = 3, type = "error")
-          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__debutAnnee", value = year(min(inesss::V_DEM_PAIMT_MED_CM$DATE_DEBUT)))
-        }
-        # Fin Annee
-        if (input$V_DEM_PAIMT_MED_CM__finAnnee > year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN))) {
-          showNotification(paste0("Valeur non permise [",input$V_DEM_PAIMT_MED_CM__finAnnee,"]"), duration = 3, type = "error")
-          updateNumericInput(session, "V_DEM_PAIMT_MED_CM__finAnnee", value = year(max(inesss::V_DEM_PAIMT_MED_CM$DATE_FIN)))
-        }
-        # Debut et Fin Mois
-        showError <- FALSE
-        for (numinput in c("V_DEM_PAIMT_MED_CM__debutMois", "V_DEM_PAIMT_MED_CM__finMois")) {
-          if (input[[numinput]] <= 0 || input[[numinput]] >= 13) {
-            showError <- TRUE
-            if (input[[numinput]] <= 0) {
-              updateNumericInput(session, numinput, value = 1L)
-            }
-            if (input[[numinput]] >= 13) {
-              updateNumericInput(session, numinput, value = 12L)
-            }
-          }
-        }
-        if (showError) {
-          showNotification("Le mois doit se situer entre 1 et 12", duration = 3, type = "error")
-        }
-      },
-      ignoreInit = TRUE
-    )
-
-
 
     # CIM ------------------------------------------------------------------
     CIM__val <- reactiveValues(
