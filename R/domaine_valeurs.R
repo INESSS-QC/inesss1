@@ -258,6 +258,31 @@ domaine_valeurs <- function() {
       return(width)
     }
   }
+  V_DEM_PAIMT_MED_CM__colorder <- function(dt) {
+    ### Réorganiser l'order des colonnes qui est modifié à cause des jointures des descriptifs
+    col_order <- vector("character", length(names(dt)))
+    dtcols <- c(
+      "DENOM", "NOM_DENOM",
+      "DIN", "NOM_MARQ_COMRC",
+      "FORME", "NOM_FORME",
+      "TENEUR", "NOM_TENR",
+      "COD_STA_DECIS", "NOM_COD_STA_DECIS",
+      "COD_SERV_1", "NOM_COD_SERV_1", "COD_SERV_2", "NOM_COD_SERV_2", "COD_SERV_3", "NOM_COD_SERV_3",
+      "AHFS", "NOM_AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
+      "PremierePrescription",
+      "DernierePrescription",
+      "DebPeriodePrescripDem",
+      "FinPeriodePrescripDem"
+    )
+    i <- 1L
+    for (col in (dtcols)) {
+      if (any(col == names(dt))) {
+        col_order[i] <- col
+        i <- i + 1L
+      }
+    }
+    return(col_order)
+  }
   V_FORM_MED_cod_typ_forme <- function() {
     ### Valeurs uniques des codes et des descriptions de type de forme
     ### @return Vecteur
@@ -305,7 +330,7 @@ domaine_valeurs <- function() {
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
         menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        menuItem("Médicaments d'exception", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("Indication Reconnues", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
 
         div(style = "margin-top:30px"),
 
@@ -1729,7 +1754,7 @@ domaine_valeurs <- function() {
               din_desc <- unique(inesss::V_PRODU_MED$NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC,
                                                                         DEBUT_DESC = DATE_DEBUT,
                                                                         FIN_DESC = DATE_FIN)])
-              dt <- merge(dt, din_desc, by = "DIN", all.x = TRUE)
+              dt <- merge(dt, din_desc, by = "DIN", all.x = TRUE, allow.cartesian = TRUE)
               dt <- dt[
                 is.na(DEBUT_DESC)
                   | DEBUT_DESC <= get(var_fin) & FIN_DESC >= get(var_debut)
@@ -1792,7 +1817,7 @@ domaine_valeurs <- function() {
             if (any("AHFS" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
               ahfs_desc <- copy(inesss::V_CLA_AHF)
               ahfs_desc[, AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
-              dt <- merge(dt, ahfs_desc, by = "AHFS", all.x = TRUE)
+              dt <- merge(dt, ahfs_desc[, .(AHFS, NOM_AHFS)], by = "AHFS", all.x = TRUE)
               if (input$V_DEM_PAIMT_MED_CM__ahfsDesc != "") {
                 if (input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche == "keyword") {
                   dt <- search_keyword(
@@ -1845,18 +1870,18 @@ domaine_valeurs <- function() {
               decis_desc <- inesss::V_DES_COD[
                 TYPE_CODE == "COD_STA_DECIS",
                 .(COD_STA_DECIS = CODE,
-                  COD_STA_DECIS_DESC = CODE_DESC)
+                  NOM_COD_STA_DECIS = CODE_DESC)
               ]
               dt <- merge(dt, decis_desc, by = "COD_STA_DECIS", all.x = TRUE)
               if (input$V_DEM_PAIMT_MED_CM__codStaDecisDesc != "") {
                 if (input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche == "keyword") {
                   dt <- search_keyword(
-                    dt, col = "COD_STA_DECIS_DESC",
+                    dt, col = "NOM_COD_STA_DECIS",
                     values = input$V_DEM_PAIMT_MED_CM__codStaDecisDesc
                   )
                 } else if (input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche == "exactWord") {
                   dt <- search_value_chr(
-                    dt, col = "COD_STA_DECIS_DESC",
+                    dt, col = "NOM_COD_STA_DECIS",
                     values = input$V_DEM_PAIMT_MED_CM__codStaDecisDesc
                   )
                 }
@@ -1864,6 +1889,9 @@ domaine_valeurs <- function() {
             }
 
           }
+
+          # Ordre des colonnes
+          setcolorder(dt, V_DEM_PAIMT_MED_CM__colorder(dt))
           return(dt)
         } else {
           return(NULL)
