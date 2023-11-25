@@ -4,6 +4,7 @@ library(data.table)
 library(askpass)
 library(inesss)
 library(lubridate)
+library(stringr)
 color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
 if (!exists("user")) {
   user <- askpass::askpass("User")
@@ -27,6 +28,7 @@ fct <- function() {
   DT <- as.data.table(dbGetQuery(conn, query))
 
   ### Arrangement des données
+  DT[, COD_SERV := str_remove_all(COD_SERV, " ")]
   DT[, `:=` (DATE_DEBUT = as_date(DATE_DEBUT),  # s'assurer que c'est au format date
              DATE_FIN = as_date(DATE_FIN))]
   setkey(DT, COD_SERV, DATE_DEBUT)  # tri
