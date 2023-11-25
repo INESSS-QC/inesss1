@@ -14,6 +14,7 @@ domaine_valeurs.addins <- function() {
 #' @import shiny
 #' @import shinydashboard
 #' @importFrom stringr str_sub str_pad
+#' @importFrom lubridate as_date
 #'
 #' @encoding UTF-8
 #' @keywords internal
@@ -257,13 +258,6 @@ domaine_valeurs <- function() {
       return(width)
     }
   }
-  V_DENOM_COMNE_MED_arrange <- function() {
-    dt <- inesss::V_DENOM_COMNE_MED
-    dt[DATE_FIN > Sys.Date(), DATE_FIN := Sys.Date()]
-
-    dt[, `:=` (DATE_DEBUT = NULL, DATE_FIN = NULL)]
-    return(dt)
-  }
   V_FORM_MED_cod_typ_forme <- function() {
     ### Valeurs uniques des codes et des descriptions de type de forme
     ### @return Vecteur
@@ -271,6 +265,21 @@ domaine_valeurs <- function() {
     setkey(cod_desc)
     cod_desc[, MENU_TYP_FORME := paste0(COD_TYP_FORME, " - ", NOM_TYPE_FORME)]
     return(cod_desc$MENU_TYP_FORME)
+  }
+  V_PARAM_SERV_MED_arrange <- function() {
+    ### Les dates de début sont parfois plus grandes que celles dans V_DEM_PAIMT_MED_CM.
+    ### On se retrouve avec des codes de services sans description.
+    ### Amener le début à 1900-01-01 et la fin à aujour'hui.
+    dt <- copy(inesss::V_PARAM_SERV_MED)
+    dt[
+      dt[, .I[1], .(COD_SERV)]$V1,
+      DATE_DEBUT := as_date("1900-01-01")
+    ]
+    dt[
+      dt[, .I[.N], .(COD_SERV)]$V1,
+      DATE_FIN := Sys.Date()
+    ]
+    return(dt)
   }
 
 
@@ -404,7 +413,7 @@ domaine_valeurs <- function() {
                 ),
                 column(
                   width = 3,
-                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect4", "",
+                  checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect4_ahfs", "",
                                      choices = c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA"))
                 ),
               ),
@@ -824,7 +833,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect1,
         input$V_DEM_PAIMT_MED_CM__varSelect2,
         input$V_DEM_PAIMT_MED_CM__varSelect3,
-        input$V_DEM_PAIMT_MED_CM__varSelect4
+        input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
       choices_vec <- vector("character", 7L)
       if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
@@ -853,6 +862,7 @@ domaine_valeurs <- function() {
           "V_DEM_PAIMT_MED_CM__varSelectDesc", "Variables Descriptives",
           choices = choices_vec[choices_vec != ""],
           multiple = TRUE,
+          width = '100%'
         )
       ))
     })
@@ -861,7 +871,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect1,
         input$V_DEM_PAIMT_MED_CM__varSelect2,
         input$V_DEM_PAIMT_MED_CM__varSelect3,
-        input$V_DEM_PAIMT_MED_CM__varSelect4
+        input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
       varSelectDesc <- c(
         input$V_DEM_PAIMT_MED_CM__varSelectDesc
@@ -1518,7 +1528,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect1,
         input$V_DEM_PAIMT_MED_CM__varSelect2,
         input$V_DEM_PAIMT_MED_CM__varSelect3,
-        input$V_DEM_PAIMT_MED_CM__varSelect4
+        input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
       if (is.null(varSelect)) {
         return(NULL)
@@ -1534,14 +1544,14 @@ domaine_valeurs <- function() {
     observeEvent(input$V_DEM_PAIMT_MED_CM__go, { V_DEM_PAIMT_MED_CM__val$show_tab <- TRUE })
     observeEvent(
       c(input$V_DEM_PAIMT_MED_CM__varSelect1, input$V_DEM_PAIMT_MED_CM__varSelect2,
-        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4),
+        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs),
       { V_DEM_PAIMT_MED_CM__val$show_tab <- FALSE }
     )
     V_DEM_PAIMT_MED_CM__dt <- eventReactive(
       c(
         input$V_DEM_PAIMT_MED_CM__go, V_DEM_PAIMT_MED_CM__val$show_tab,
         input$V_DEM_PAIMT_MED_CM__varSelect1, input$V_DEM_PAIMT_MED_CM__varSelect2,
-        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4
+        input$V_DEM_PAIMT_MED_CM__varSelect3, input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       ),
       {
         if (V_DEM_PAIMT_MED_CM__val$show_tab) {
@@ -1549,7 +1559,7 @@ domaine_valeurs <- function() {
             input$V_DEM_PAIMT_MED_CM__varSelect1,
             input$V_DEM_PAIMT_MED_CM__varSelect2,
             input$V_DEM_PAIMT_MED_CM__varSelect3,
-            input$V_DEM_PAIMT_MED_CM__varSelect4,
+            input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs,
             "DATE_DEBUT", "DATE_FIN"
           )
           dt <- unique(inesss::V_DEM_PAIMT_MED_CM[, ..varSelect])
@@ -1580,6 +1590,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # DIN
           if (any("DIN" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__din != "") {
@@ -1589,6 +1600,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # AHFS
           if (any("AHFS" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__ahfs != "") {
@@ -1598,6 +1610,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # AHFS_CLA
           if (any("AHFS_CLA" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__ahfsCla != "") {
@@ -1607,6 +1620,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # AHFS_SCLA
           if (any("AHFS_SCLA" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__ahfsScla != "") {
@@ -1616,6 +1630,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # AHFS_SSCLA
           if (any("AHFS_SSCLA" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__ahfsSscla != "") {
@@ -1625,6 +1640,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # FORME
           if (any("FORME" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__forme != "") {
@@ -1634,6 +1650,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # TENEUR
           if (any("TENEUR" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__teneur != "") {
@@ -1643,6 +1660,7 @@ domaine_valeurs <- function() {
               )
             }
           }
+
           # COD_SERV_[1:3]
           for (i in 1:3) {
             if (any(paste0("COD_SERV_", i) == names(dt))) {
@@ -1654,6 +1672,7 @@ domaine_valeurs <- function() {
               }
             }
           }
+
           # COD_STA_DECIS
           if (any("COD_STA_DECIS" == names(dt))) {
             if (input$V_DEM_PAIMT_MED_CM__codStaDecis != "") {
@@ -1670,6 +1689,181 @@ domaine_valeurs <- function() {
             dt <- fusion_periodes(dt, "DATE_DEBUT", "DATE_FIN", by_vars, 1L)
           }
 
+          ### Ajouter les descriptifs ####
+          if (input$V_DEM_PAIMT_MED_CM__periodDetail) {
+            var_debut <- "DATE_DEBUT"
+            var_fin <- "DATE_FIN"
+          } else {
+            var_debut <- "PremierePrescription"
+            var_fin <- "DernierePrescription"
+          }
+          if (!is.null(input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+            # DENOM
+            if (any("DENOM" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              denom_desc <- inesss::V_DENOM_COMNE_MED[, .(DENOM, NOM_DENOM,
+                                                          DEBUT_DESC = DATE_DEBUT,
+                                                          FIN_DESC = DATE_FIN)]
+              dt <- merge(dt, denom_desc, by = "DENOM", all.x = TRUE)
+              dt <- dt[
+                is.na(DEBUT_DESC)
+                  | DEBUT_DESC <= get(var_fin) & FIN_DESC >= get(var_debut)
+              ]
+              dt[, `:=` (DEBUT_DESC = NULL, FIN_DESC = NULL)]
+              if (input$V_DEM_PAIMT_MED_CM__denomDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_DENOM",
+                    values = input$V_DEM_PAIMT_MED_CM__denomDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__denomTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_DENOM",
+                    values = input$V_DEM_PAIMT_MED_CM__denomDesc
+                  )
+                }
+              }
+            }
+
+            # DIN
+            if (any("MARQ_COMRC" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              din_desc <- unique(inesss::V_PRODU_MED$NOM_MARQ_COMRC[, .(DIN, NOM_MARQ_COMRC,
+                                                                        DEBUT_DESC = DATE_DEBUT,
+                                                                        FIN_DESC = DATE_FIN)])
+              dt <- merge(dt, din_desc, by = "DIN", all.x = TRUE)
+              dt <- dt[
+                is.na(DEBUT_DESC)
+                  | DEBUT_DESC <= get(var_fin) & FIN_DESC >= get(var_debut)
+              ]
+              dt[, `:=` (DEBUT_DESC = NULL, FIN_DESC = NULL)]
+              if (input$V_DEM_PAIMT_MED_CM__MarqComrc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__marqComrcTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_MARQ_COMRC",
+                    values = input$V_DEM_PAIMT_MED_CM__MarqComrc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__marqComrcTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_MARQ_COMRC",
+                    values = input$V_DEM_PAIMT_MED_CM__MarqComrc
+                  )
+                }
+              }
+            }
+
+            # FORME
+            if (any("FORME" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              forme_desc <- inesss::V_FORME_MED[, .(FORME = COD_FORME, NOM_FORME)]
+              dt <- merge(dt, forme_desc, by = "FORME", all.x = TRUE)
+              if (input$V_DEM_PAIMT_MED_CM__formeDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__nomFormeTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_FORME",
+                    values = input$V_DEM_PAIMT_MED_CM__formeDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__nomFormeTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_FORME",
+                    values = input$V_DEM_PAIMT_MED_CM__formeDesc
+                  )
+                }
+              }
+            }
+
+            # TENEUR
+            if (any("TENEUR" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              teneur_desc <- inesss::V_TENR_MED[, .(TENEUR = COD_TENR, NOM_TENR)]
+              dt <- merge(dt, teneur_desc, by = "TENEUR", all.x = TRUE)
+              if (input$V_DEM_PAIMT_MED_CM__teneurDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__nomTeneurTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_TENR",
+                    values = input$V_DEM_PAIMT_MED_CM__teneurDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__nomTeneurTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_TENR",
+                    values = input$V_DEM_PAIMT_MED_CM__teneurDesc
+                  )
+                }
+              }
+            }
+
+            # AHFS
+            if (any("AHFS" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              ahfs_desc <- copy(inesss::V_CLA_AHF)
+              ahfs_desc[, AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
+              dt <- merge(dt, ahfs_desc, by = "AHFS", all.x = TRUE)
+              if (input$V_DEM_PAIMT_MED_CM__ahfsDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_AHFS",
+                    values = input$V_DEM_PAIMT_MED_CM__ahfsDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__nomAhfsTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_AHFS",
+                    values = input$V_DEM_PAIMT_MED_CM__ahfsDesc
+                  )
+                }
+              }
+            }
+
+            # COD_SERV
+            if (any("COD_SERV" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              for (i in 1:3) {
+                if (any(paste0("COD_SERV_", i) == input$V_DEM_PAIMT_MED_CM__varSelect3)) {
+                  serv_desc <- V_PARAM_SERV_MED_arrange()[, .(COD_SERV, COD_SERV_DESC,
+                                                              DEBUT_DESC = DATE_DEBUT,
+                                                              FIN_DESC = DATE_FIN)]
+                  setnames(serv_desc, c("COD_SERV", "COD_SERV_DESC"),
+                           c(paste0("COD_SERV_", i), paste0("NOM_COD_SERV_", i)))
+                  dt <- merge(dt, serv_desc, by = paste0("COD_SERV_", i), all.x = TRUE, allow.cartesian = TRUE)
+                  dt <- dt[
+                    is.na(DEBUT_DESC)
+                      | DEBUT_DESC <= get(var_fin) & FIN_DESC >= get(var_debut)
+                  ]
+                  dt[, `:=` (DEBUT_DESC = NULL, FIN_DESC = NULL)]
+                  if (input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]] != "") {
+                    if (input[[paste0("V_DEM_PAIMT_MED_CM__codServTypeRecherche", i)]] == "keyword") {
+                      dt <- search_keyword(
+                        dt, col = paste0("NOM_COD_SERV_", i),
+                        values = input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
+                      )
+                    } else if (input[[paste0("V_DEM_PAIMT_MED_CM__codServTypeRecherche", i)]] == "exactWord") {
+                      dt <- search_value_chr(
+                        dt, col = paste0("NOM_COD_SERV_", i),
+                        values = input[[paste0("V_DEM_PAIMT_MED_CM__codServDesc", i)]]
+                      )
+                    }
+                  }
+                }
+              }
+            }
+
+            # COD_STA_DECIS
+            if (any("COD_STA_DECIS" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              decis_desc <- inesss::V_DES_COD[
+                TYPE_CODE == "COD_STA_DECIS",
+                .(COD_STA_DECIS = CODE,
+                  COD_STA_DECIS_DESC = CODE_DESC)
+              ]
+              dt <- merge(dt, decis_desc, by = "COD_STA_DECIS", all.x = TRUE)
+              if (input$V_DEM_PAIMT_MED_CM__codStaDecisDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "COD_STA_DECIS_DESC",
+                    values = input$V_DEM_PAIMT_MED_CM__codStaDecisDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__codStaDecisTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "COD_STA_DECIS_DESC",
+                    values = input$V_DEM_PAIMT_MED_CM__codStaDecisDesc
+                  )
+                }
+              }
+            }
+
+          }
           return(dt)
         } else {
           return(NULL)
@@ -1705,8 +1899,42 @@ domaine_valeurs <- function() {
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect1", selected = character(0))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect2", selected = character(0))
       updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect3", selected = character(0))
-      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect4", selected = character(0))
-      updateSelectInput(session, "V_DEM_PAIMT_MED_CM__varSelectDesc", selected = character(0))
+      updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect4_ahfs", selected = character(0))
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__denom", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__denomDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__din", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__MarqComrc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfs", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsCla", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsScla", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsSscla", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__ahfsDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__forme", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__formeDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneur", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneurDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ1", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc1", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ2", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc2", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ3", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc3", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codStaDecis", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__codStaDecisDesc", value = "")
+    })
+    # AHFS select colonnes
+    observeEvent(input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs, {
+      if (!any("AHFS" == input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs)
+            & (any("AHFS_CLA" == input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs)
+               | any("AHFS_SCLA" == input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs)
+               | any("AHFS_SSCLA" == input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs))) {
+        select_values <- input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
+        updateCheckboxGroupInput(session, "V_DEM_PAIMT_MED_CM__varSelect4_ahfs",
+                                 selected = c("AHFS", select_values))
+      }
     })
 
     # CIM ------------------------------------------------------------------
