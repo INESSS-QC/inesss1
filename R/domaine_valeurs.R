@@ -259,7 +259,7 @@ domaine_valeurs <- function() {
     }
   }
   V_DEM_PAIMT_MED_CM__colorder <- function(dt) {
-    ### Réorganiser l'order des colonnes qui est modifié à cause des jointures des descriptifs
+    ### Réorganiser l'ordre des colonnes qui est modifié à cause des jointures des descriptifs
     col_order <- vector("character", length(names(dt)))
     dtcols <- c(
       "DENOM", "NOM_DENOM",
@@ -269,8 +269,8 @@ domaine_valeurs <- function() {
       "COD_STA_DECIS", "NOM_COD_STA_DECIS",
       "COD_SERV_1", "NOM_COD_SERV_1", "COD_SERV_2", "NOM_COD_SERV_2", "COD_SERV_3", "NOM_COD_SERV_3",
       "AHFS", "NOM_AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
-      "PremierePrescription",
-      "DernierePrescription",
+      "PremierePrescription", "DATE_DEBUT",  # Un des deux choix
+      "DernierePrescription", "DATE_FIN",     # Un des deux choix
       "DebPeriodePrescripDem",
       "FinPeriodePrescripDem"
     )
