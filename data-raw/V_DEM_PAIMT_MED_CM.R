@@ -49,11 +49,12 @@ v_dem_paimt_med_cm <- function() {
         "select distinct\n",
         "    smed_cod_denom_comne as DENOM,\n",
         "    smed_cod_din as DIN,\n",
+        "    smed_cod_forme_med as FORME,\n",
+        "    smed_cod_tenr_med as TENEUR,\n",
+        "    smed_cod_indcn_thera as INDCN_THERA,\n",
         "    smed_cod_cla_ahf as AHFS_CLA,\n",
         "    smed_cod_scla_ahf as AHFS_SCLA,\n",
         "    smed_cod_sscla_ahf as AHFS_SSCLA,\n",
-        "    smed_cod_forme_med as FORME,\n",
-        "    smed_cod_tenr_med as TENEUR,\n",
         "    smed_cod_serv_1 as COD_SERV_1,\n",
         "    smed_cod_serv_2 as COD_SERV_2,\n",
         "    smed_cod_serv_3 as COD_SERV_3,\n",
@@ -81,8 +82,9 @@ v_dem_paimt_med_cm <- function() {
              COD_SERV_3 = str_remove_all(COD_SERV_3, " "))]
 
   cols <- c(
-    "DENOM", "DIN", "AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
-    "FORME", "TENEUR",
+    "DENOM", "DIN",
+    "FORME", "TENEUR", "INDCN_THERA",
+    "AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
     "COD_SERV_1", "COD_SERV_2", "COD_SERV_3",
     "COD_STA_DECIS",
     "DATE_DEBUT", "DATE_FIN"
