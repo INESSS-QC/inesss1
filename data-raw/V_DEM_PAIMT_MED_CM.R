@@ -76,6 +76,7 @@ v_dem_paimt_med_cm <- function() {
   }
   DT <- rbindlist(DT)
 
+  DT[, INDCN_THERA := str_trim(INDCN_THERA, side = "both")]
   DT[!is.na(AHFS_CLA), AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
   DT[, `:=` (COD_SERV_1 = str_remove_all(COD_SERV_1, " "),
              COD_SERV_2 = str_remove_all(COD_SERV_2, " "),
