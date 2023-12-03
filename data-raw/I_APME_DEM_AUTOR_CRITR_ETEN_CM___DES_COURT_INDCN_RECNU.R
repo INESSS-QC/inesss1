@@ -50,7 +50,7 @@ des_court_indcn_recnu <- function(loop_dates) {
       "select distinct\n",
       "    apme_cod_denom_comne_dem as DENOM_DEM,\n",
       "    apme_cod_din_dem as DIN_DEM,\n",
-      "    npme_des_court_indcn_recnu as DESC_COURT_INDCN_RECNU,\n",
+      "    npme_des_court_indcn_recnu as DES_COURT_INDCN_RECNU,\n",
       "    year(apme_dat_sta_dem_pme) as ANNEE,\n",
       "    month(apme_dat_sta_dem_pme) as MOIS\n",
       "from prod.i_apme_dem_autor_critr_eten_cm\n",
@@ -63,7 +63,7 @@ des_court_indcn_recnu <- function(loop_dates) {
              DATE_FIN = make_date(ANNEE, MOIS, 1) %m+% months(1, FALSE) - 1)]
 
   cols <- c(
-    "DENOM_DEM", "DIN_DEM", "DESC_COURT_INDCN_RECNU",
+    "DENOM_DEM", "DIN_DEM", "DES_COURT_INDCN_RECNU",
     "DATE_DEBUT", "DATE_FIN"
   )
   cols_by <- cols[!cols %in% c("DATE_DEBUT", "DATE_FIN")]

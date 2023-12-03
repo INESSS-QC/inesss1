@@ -330,7 +330,7 @@ domaine_valeurs <- function() {
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
         menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        menuItem("Indication Reconnues", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("Descriptions Indications reconnues", tabName = "tabDES_COURT_INDCN_RECNU"),
 
         div(style = "margin-top:30px"),
 
@@ -349,31 +349,16 @@ domaine_valeurs <- function() {
     dashboardBody(
       tabItems(
 
-        ### I_APME_DEM_AUTOR_CRITR_ETEN_CM --------------------------------------------------------------
+        ### DES_COURT_INDCN_RECNU --------------------------------------------------------------
         tabItem(
-          tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
+          tabName = "tabDES_COURT_INDCN_RECNU",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
+            header_MaJ_datas(attributes(inesss::DES_COURT_INDCN_RECNU)$MaJ),
             column(
               width = 12,
               strong("Vue : I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-              p("Demandes d'autorisation de Patient-Médicament d'exceptions.")
-            ),
-            column(
-              width = ui_col_width(),
-              selectInput(  # sélection du domaine de valeur
-                inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
-                label = "Élément",
-                choices = names(inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
-              )
-            )
-          ),
-          fluidRow(
-            column(
-              width = 12,
-              div(style = "margin-top:-10px"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc"),
-              div(style = "margin-top:20px")
+              p("Demandes d'autorisation de Patient-Médicament d'exceptions."),
+              p("Combinaisons des descriptions courtes complètes des indications reconnues de Patient-Médicament d'exceptions.")
             )
           ),
           tabsetPanel(
@@ -381,20 +366,20 @@ domaine_valeurs <- function() {
             tabPanel(
               title = "Domaine de valeur",
               div(style = "margin-top:10px"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
+              uiOutput("DES_COURT_INDCN_RECNU__params"),
+              uiOutput("DES_COURT_INDCN_RECNU__go_reset_button"),
+              uiOutput("DES_COURT_INDCN_RECNU__save_button"),
               div(style = "margin-top:10px"),
-              dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
+              dataTableOutput("DES_COURT_INDCN_RECNU__dt")
             ),
             tabPanel(
               title = "Fiche technique",
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MaJ)
+                em(inesss::domaine_valeurs_fiche_technique$DES_COURT_INDCN_RECNU$DES_COURT_INDCN_RECNU$MaJ)
               ),
-              tableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc")
+              tableOutput("DES_COURT_INDCN_RECNU__varDesc")
             )
           )
         ),
@@ -685,118 +670,91 @@ domaine_valeurs <- function() {
     session$onSessionEnded(function() {stopApp()})
 
 
-    # I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__val <- reactiveValues(
+    # DES_COURT_INDCN_RECNU ------------------------------------------
+    DES_COURT_INDCN_RECNU__val <- reactiveValues(
       show_tab = FALSE  # afficher la table ou pas
     )
 
     ## Fiche Technique ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc <- renderTable({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$tab_desc)
-      } else {
-        return(NULL)
-      }
-    })
-
-    ## Descriptif Data ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc <- renderUI({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(tagList(
-          fluidRow(
-            column(
-              width = 12,
-              p("Combinaisons des descriptions courtes complètes des indications reconnues de Patient-Médicament d'exceptions.")
-            )
-          )
-        ))
-      }
+    output$DES_COURT_INDCN_RECNU__varDesc <- renderTable({
+      return(inesss::domaine_valeurs_fiche_technique$DES_COURT_INDCN_RECNU$tab_desc)
     })
 
     ## UI ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(tagList(
-          fluidRow(
-            column(
-              width = ui_col_width(),
-              textInput(  # Code de DENOM
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
-                "DENOM_DEM"
-              ),
-              textInput(  # Recherche mot-clé
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search",
-                "DES_COURT_INDCN_RECNU"
-              )
+    output$DES_COURT_INDCN_RECNU__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput(  # Code de DENOM
+              "DES_COURT_INDCN_RECNU__denom",
+              "DENOM_DEM"
             ),
-            column(
-              width = ui_col_width(),
-              textInput(  # Code de DIN
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
-                "DIN_DEM"
-              ),
-              selectInput(
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
-                "Type Recherche",
-                choices = c("Mot-clé" = "keyword",
-                            "Valeur exacte" = "exactWord"),
-                selected = "Mot-clé"
-              )
+            textInput(  # Recherche mot-clé
+              "DES_COURT_INDCN_RECNU__search",
+              "DES_COURT_INDCN_RECNU"
+            )
+          ),
+          column(
+            width = ui_col_width(),
+            textInput(  # Code de DIN
+              "DES_COURT_INDCN_RECNU__din",
+              "DIN_DEM"
+            ),
+            selectInput(
+              "DES_COURT_INDCN_RECNU__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
             )
           )
-        ))
-      }
+        )
+      ))
     })
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button <- renderUI({
-      button_go_reset("I_APME_DEM_AUTOR_CRITR_ETEN_CM")
+    output$DES_COURT_INDCN_RECNU__go_reset_button <- renderUI({
+      button_go_reset("DES_COURT_INDCN_RECNU")
     })
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
-      button_save("I_APME_DEM_AUTOR_CRITR_ETEN_CM", I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
+    output$DES_COURT_INDCN_RECNU__save_button <- renderUI({
+      button_save("DES_COURT_INDCN_RECNU", DES_COURT_INDCN_RECNU__dt())
     })
 
     ## Datatable ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
+    observeEvent(input$DES_COURT_INDCN_RECNU__go, {
+      DES_COURT_INDCN_RECNU__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data, {
-      # Faire disparaitre la table si on change le data
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE
-    }, ignoreInit = TRUE)
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
+    DES_COURT_INDCN_RECNU__dt <- eventReactive(
       c(
-        input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go,
-        I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab
+        input$DES_COURT_INDCN_RECNU__go,
+        DES_COURT_INDCN_RECNU__val$show_tab
       ),
       {
-        if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
-          dt <- inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
-          if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
+        if (DES_COURT_INDCN_RECNU__val$show_tab) {
+          dt <- inesss::DES_COURT_INDCN_RECNU
+          if (input$DES_COURT_INDCN_RECNU__denom != "") {  # rechercher les DENOM
+            dt <- search_value_chr(
+              dt, col = "DENOM_DEM",
+              values = input$DES_COURT_INDCN_RECNU__denom, pad = 5
+            )
+          }
+          if (input$DES_COURT_INDCN_RECNU__din != "") {  # rechercher les DIN
+            dt <- search_value_num(
+              dt, col = "DIN_DEM",
+              values = input$DES_COURT_INDCN_RECNU__din
+            )
+          }
+          if (input$DES_COURT_INDCN_RECNU__search != "") {
+            if (input$DES_COURT_INDCN_RECNU__typeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "DES_COURT_INDCN_RECNU",
+                values = input$DES_COURT_INDCN_RECNU__search
+              )
+            } else if (input$DES_COURT_INDCN_RECNU__typeRecherche == "exactWord") {
               dt <- search_value_chr(
-                dt, col = "DENOM_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom, pad = 5
+                dt, col = "DES_COURT_INDCN_RECNU",
+                values = input$DES_COURT_INDCN_RECNU__search
               )
             }
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
-              dt <- search_value_num(
-                dt, col = "DIN_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din
-              )
-            }
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
-              if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "keyword") {
-                dt <- search_keyword(
-                  dt, col = "DES_COURT_INDCN_RECNU",
-                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-                )
-              } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "exactWord") {
-                dt <- search_value_chr(
-                  dt, col = "DES_COURT_INDCN_RECNU",
-                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-                )
-              }
-            }
-
           }
           return(dt)
         } else {
@@ -804,39 +762,37 @@ domaine_valeurs <- function() {
         }
       }, ignoreInit = TRUE
     )
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable({
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()
+    output$DES_COURT_INDCN_RECNU__dt <- renderDataTable({
+      DES_COURT_INDCN_RECNU__dt()
     }, options = renderDataTable_options())
 
     ## Export ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- downloadHandler(
+    output$DES_COURT_INDCN_RECNU__save <- downloadHandler(
       filename = function() {
         paste0(
-          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__savename, ".",
-          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext
+          input$DES_COURT_INDCN_RECNU__savename, ".",
+          input$DES_COURT_INDCN_RECNU__saveext
         )
       },
       content = function(file) {
-        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "xlsx") {
-          writexl::write_xlsx(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file)
-        } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "csv") {
-          write.csv2(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file, row.names = FALSE,
+        if (input$DES_COURT_INDCN_RECNU__saveext == "xlsx") {
+          writexl::write_xlsx(DES_COURT_INDCN_RECNU__dt(), file)
+        } else if (input$DES_COURT_INDCN_RECNU__saveext == "csv") {
+          write.csv2(DES_COURT_INDCN_RECNU__dt(), file, row.names = FALSE,
                      fileEncoding = "latin1")
         }
       }
     )
 
     ## Update buttons ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset, {
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
+    observeEvent(input$DES_COURT_INDCN_RECNU__reset, {
+      DES_COURT_INDCN_RECNU__val$show_tab <- FALSE  # faire disparaître la table
       # Remettre les valeurs initiales
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom", value = "")
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din", value = "")
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
-        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
-                          selected = "keyword")
-      }
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__denom", value = "")
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__din", value = "")
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__search", value = "")
+      updateSelectInput(session, "DES_COURT_INDCN_RECNU__typeRecherche",
+                        selected = "keyword")
     }, ignoreInit = TRUE)
 
 
