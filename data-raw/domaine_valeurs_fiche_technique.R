@@ -7,27 +7,24 @@ library(data.table)
 
 domaine_valeurs_fiche_technique <- list(
 
-  ## I_APME_DEM_AUTOR_CRITR_ETEN_CM ####
-  I_APME_DEM_AUTOR_CRITR_ETEN_CM = list(
-    DES_COURT_INDCN_RECNU = list(
-      MaJ = "2023-02-06",
-      tab_desc = data.table(
-        VARIABLE = c(
-          "DENOM_DEM", "DIN_DEM", "DES_COURT_INDCN_RECNU",
-          "DebPeriodeDesc", "FinPeriodeDesc"
-        ),
-        `VARIABLE RAMQ` = c(
-          "APME_COD_DENOM_COMNE_DEM", "APME_COD_DIN_DEM", "NPME_DES_COURT_INDCN_RECNU",
-          "-",
-          "-"
-        ),
-        DESCRIPTION = c(
-          "Ce code identifie de façon unique toutes les dénominations communes qui existent dans les listes de médicaments.",
-          "Ce code différencie chaque produit. Ce dernier pouvant varier selon la forme pharmaceutique, la marque de commerce, etc.",
-          "Description courte complète de l'indication reconnue de PME. Note: Elle peut être dérivée de la fusion de description entre la description qui lui est directement reliée et celle de niveau supérieur (le cas échéant).",
-          "Début d'une période continue où la combinaison existe. Format ANNÉE-MOIS.",
-          "Fin d'une période continue où la combinaison existe. Format ANNÉE-MOIS."
-        )
+  ## DES_COURT_INDCN_RECNU ####
+  DES_COURT_INDCN_RECNU = list(
+    MaJ = "2023-02-06",
+    tab_desc = data.table(
+      VARIABLE = c(
+        "DENOM_DEM", "DIN_DEM", "DES_COURT_INDCN_RECNU",
+        "DATE_DEBUT", "DATE_FIN"
+      ),
+      `VARIABLE RAMQ` = c(
+        "APME_COD_DENOM_COMNE_DEM", "APME_COD_DIN_DEM", "NPME_DES_COURT_INDCN_RECNU",
+        "-", "-"
+      ),
+      DESCRIPTION = c(
+        "Ce code identifie de façon unique toutes les dénominations communes qui existent dans les listes de médicaments.",
+        "Ce code différencie chaque produit. Ce dernier pouvant varier selon la forme pharmaceutique, la marque de commerce, etc.",
+        "Description courte complète de l'indication reconnue de PME. Note: Elle peut être dérivée de la fusion de description entre la description qui lui est directement reliée et celle de niveau supérieur (le cas échéant).",
+        "Début d'une période continue où la combinaison existe.",
+        "Fin d'une période continue où la combinaison existe."
       )
     )
   ),
