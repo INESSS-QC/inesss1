@@ -756,6 +756,9 @@ domaine_valeurs <- function() {
               )
             }
           }
+
+          dt[, `:=` (DATE_DEBUT = format(DATE_DEBUT, "%Y-%m"),
+                     DATE_FIN = format(DATE_FIN, "%Y-%m"))]
           return(dt)
         } else {
           return(NULL)
@@ -1558,8 +1561,8 @@ domaine_valeurs <- function() {
             ]
             dt <- dt[debut_demande <= DernierePrescription & fin_demande >= PremierePrescription]
           }
-          dt[, `:=` (DebPeriodePrescripDem = debut_demande,
-                     FinPeriodePrescripDem = fin_demande)]
+          dt[, `:=` (DebPeriodePrescripDem = format(debut_demande, "%Y-%m"),
+                     FinPeriodePrescripDem = format(fin_demande, "%Y-%m"))]
           setkey(dt)
 
           # DENOM
@@ -1846,8 +1849,15 @@ domaine_valeurs <- function() {
 
           }
 
-          # Ordre des colonnes
+          # Arranger colonnes
           setcolorder(dt, V_DEM_PAIMT_MED_CM__colorder(dt))
+          if (any("DATE_DEBUT" == names(dt))) {
+            dt[, `:=` (DATE_DEBUT = format(DATE_DEBUT, "%Y-%m"),
+                       DATE_FIN = format(DATE_FIN, "%Y-%m"))]
+          } else {
+            dt[, `:=` (PremierePrescription = format(PremierePrescription, "%Y-%m"),
+                       DernierePrescription = format(DernierePrescription, "%Y-%m"))]
+          }
           return(dt)
         } else {
           return(NULL)
