@@ -329,8 +329,8 @@ domaine_valeurs <- function() {
         div(style = "margin-top:10px"),
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
-        menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        menuItem("Descriptions Indications reconnues", tabName = "tabDES_COURT_INDCN_RECNU"),
+        menuItem("Demandes Paiement Médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("Descriptions Indications Reconnues", tabName = "tabDES_COURT_INDCN_RECNU"),
 
         div(style = "margin-top:30px"),
 
@@ -414,12 +414,12 @@ domaine_valeurs <- function() {
                 column(
                   width = 3,
                   checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "",
-                                     choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
+                                     choices = c("FORME", "TENEUR", "INDCN_THERA"))
                 ),
                 column(
                   width = 3,
                   checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect3", "",
-                                     choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3"))
+                                     choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3", "COD_STA_DECIS"))
                 ),
                 column(
                   width = 3,
@@ -819,7 +819,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect3,
         input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
-      choices_vec <- vector("character", 7L)
+      choices_vec <- vector("character", 8L)
       if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
         choices_vec[1] <- "AHFS"
       }
@@ -835,11 +835,14 @@ domaine_valeurs <- function() {
       if (any("FORME" == varSelect)) {
         choices_vec[5] <- "FORME"
       }
+      if (any("INDCN_THERA" == varSelect)) {
+        choices_vec[6] <- "INDCN_THERA"
+      }
       if (any("DIN" == varSelect)) {
-        choices_vec[6] <- "MARQ_COMRC"
+        choices_vec[7] <- "MARQ_COMRC"
       }
       if (any("TENEUR" %in% varSelect)) {
-        choices_vec[7] <- "TENEUR"
+        choices_vec[8] <- "TENEUR"
       }
       return(tagList(
         selectInput(
@@ -1377,6 +1380,65 @@ domaine_valeurs <- function() {
         teneur <- NULL
       }
 
+      # INDCN_THERA
+      if ("INDCN_THERA" %in% varSelect && "INDCN_THERA" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnThera)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__indcnThera
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnTheraDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche
+          }
+        })
+        indcnThera <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnThera", "INDCN_THERA", value = prev_val)
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnTheraDesc", "NOM_ANATOM_INDCN_THERA", value = prev_val_search)
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche",
+              "NOM_ANATOM_INDCN_THERA Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = prev_val_search_key
+            )
+          )
+        )
+      } else if ("INDCN_THERA" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnThera)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__indcnThera
+          }
+        })
+        indcnThera <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnThera", "INDCN_THERA", value = prev_val)
+          )
+        )
+      } else {
+        indcnThera <- NULL
+      }
+
       # COD_SERV_[1:3]
       for (i in 1:3) {
         if (paste0("COD_SERV_", i) %in% varSelect && "COD_SERV" %in% varSelectDesc) {
@@ -1502,7 +1564,7 @@ domaine_valeurs <- function() {
         periods_debut_fin,
         denom, din,
         ahfs, ahfs_cla, ahfs_scla, ahfs_sscla,
-        forme, teneur,
+        forme, teneur, indcnThera,
         cod_serv_1, cod_serv_2, cod_serv_3,
         cod_sta_decis
       ))
@@ -1644,6 +1706,9 @@ domaine_valeurs <- function() {
               )
             }
           }
+
+          # INDCN_THERA
+
 
           # COD_SERV_[1:3]
           for (i in 1:3) {
