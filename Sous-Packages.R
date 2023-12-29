@@ -36,8 +36,7 @@ writeLines(domaine_valeurs_script, "DER.inesss/R/domaine_valeurs.R")
 ## Datas ####
 DER.inesss.datas <- paste0(c(
   "CIM",
-  "domaine_valeurs_fiche_technique",
-  "I_APME_DEM_AUTOR_CRITR_ETEN_CM",
+  "DES_COURT_INDCN_RECNU", "domaine_valeurs_fiche_technique",
   "V_CLA_AHF", "V_COD_STA_DECIS",
   "V_DEM_PAIMT_MED_CM", "V_DENOM_COMNE_MED", "V_DES_COD",
   "V_FORME_MED",

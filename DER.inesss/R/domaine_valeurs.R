@@ -13,7 +13,7 @@ domaine_valeurs.addins <- function() {
 #' @import data.table
 #' @import shiny
 #' @import shinydashboard
-#' @importFrom stringr str_sub str_pad
+#' @importFrom stringr str_sub str_pad str_remove str_detect str_split
 #' @importFrom lubridate as_date
 #'
 #' @encoding UTF-8
@@ -156,23 +156,23 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
 
     if (no_accent) {
-      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+      values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     } else {
-      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+      values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     }
-    values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+    values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     values <- paste(values, collapse = "|")  # rechercher tous les mots dans une même chaîne de caractères
     if (lower) {
       if (no_accent) {
-        dt <- dt[stringr::str_detect(unaccent(tolower(get(col))), tolower(values))]
+        dt <- dt[str_detect(unaccent(tolower(get(col))), tolower(values))]
       } else {
-        dt <- dt[stringr::str_detect(tolower(get(col))), tolower(values)]
+        dt <- dt[str_detect(tolower(get(col))), tolower(values)]
       }
     } else {
       if (no_accent) {
-        dt <- dt[stringr::str_detect(unaccent(get(col)), values)]
+        dt <- dt[str_detect(unaccent(get(col)), values)]
       } else {
-        dt <- dt[stringr::str_detect(get(col), values)]
+        dt <- dt[str_detect(get(col), values)]
       }
     }
     return(dt)
@@ -186,12 +186,12 @@ domaine_valeurs <- function() {
     ### @param lower Si on doit convertir en minuscule ou chercher la valeur exacte.
 
     if (no_accent) {
-      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+      values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     } else {
-      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+      values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     }
     if (!is.null(pad)) {
-      values <- stringr::str_pad(values, width = pad, pad = "0")
+      values <- str_pad(values, width = pad, pad = "0")
     }
     # Conserver les valeurs voulues
     if (lower) {
@@ -217,7 +217,7 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
     ### @param type "int" pour integer ou "num" pour "numeric"
 
-    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     if (type == "int") {
       values <- as.integer(values)
     } else if (type == "num") {
@@ -235,11 +235,11 @@ domaine_valeurs <- function() {
     ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
     ###               aura plusieurs codes.
 
-    values <- unlist(stringr::str_split(values, "\\+"))
+    values <- unlist(str_split(values, "\\+"))
     for (val in values) {
       dt <- dt[
-        stringr::str_sub(get(col), 1, 4) <= val &
-          val <= stringr::str_sub(get(col), 6, 9)
+        str_sub(get(col), 1, 4) <= val &
+          val <= str_sub(get(col), 6, 9)
       ]
     }
     return(dt)
@@ -266,6 +266,7 @@ domaine_valeurs <- function() {
       "DIN", "NOM_MARQ_COMRC",
       "FORME", "NOM_FORME",
       "TENEUR", "NOM_TENR",
+      "INDCN_THERA", "NOM_ANATOM_INDCN_THERA",
       "COD_STA_DECIS", "NOM_COD_STA_DECIS",
       "COD_SERV_1", "NOM_COD_SERV_1", "COD_SERV_2", "NOM_COD_SERV_2", "COD_SERV_3", "NOM_COD_SERV_3",
       "AHFS", "NOM_AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
@@ -275,7 +276,7 @@ domaine_valeurs <- function() {
       "FinPeriodePrescripDem"
     )
     i <- 1L
-    for (col in (dtcols)) {
+    for (col in dtcols) {
       if (any(col == names(dt))) {
         col_order[i] <- col
         i <- i + 1L
@@ -329,8 +330,8 @@ domaine_valeurs <- function() {
         div(style = "margin-top:10px"),
 
         p(HTML("&nbsp;&nbsp;"), tags$u("Combinaisons uniques")),
-        menuItem("Demandes de paiement de médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
-        menuItem("Indication Reconnues", tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM"),
+        menuItem("Demandes Paiement Médicaments", tabName = "tabV_DEM_PAIMT_MED_CM"),
+        menuItem("Descriptions Indications Reconnues", tabName = "tabDES_COURT_INDCN_RECNU"),
 
         div(style = "margin-top:30px"),
 
@@ -349,31 +350,16 @@ domaine_valeurs <- function() {
     dashboardBody(
       tabItems(
 
-        ### I_APME_DEM_AUTOR_CRITR_ETEN_CM --------------------------------------------------------------
+        ### DES_COURT_INDCN_RECNU --------------------------------------------------------------
         tabItem(
-          tabName = "tabI_APME_DEM_AUTOR_CRITR_ETEN_CM",
+          tabName = "tabDES_COURT_INDCN_RECNU",
           fluidRow(
-            header_MaJ_datas(attributes(DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)$MaJ),
+            header_MaJ_datas(attributes(DER.inesss::DES_COURT_INDCN_RECNU)$MaJ),
             column(
               width = 12,
               strong("Vue : I_APME_DEM_AUTOR_CRITR_ETEN_CM"),
-              p("Demandes d'autorisation de Patient-Médicament d'exceptions.")
-            ),
-            column(
-              width = ui_col_width(),
-              selectInput(  # sélection du domaine de valeur
-                inputId = "I_APME_DEM_AUTOR_CRITR_ETEN_CM__data",
-                label = "Élément",
-                choices = names(DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM)
-              )
-            )
-          ),
-          fluidRow(
-            column(
-              width = 12,
-              div(style = "margin-top:-10px"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc"),
-              div(style = "margin-top:20px")
+              p("Demandes d'autorisation de Patient-Médicament d'exceptions."),
+              p("Combinaisons des descriptions courtes complètes des indications reconnues de Patient-Médicament d'exceptions.")
             )
           ),
           tabsetPanel(
@@ -381,20 +367,20 @@ domaine_valeurs <- function() {
             tabPanel(
               title = "Domaine de valeur",
               div(style = "margin-top:10px"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__params"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button"),
-              uiOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button"),
+              uiOutput("DES_COURT_INDCN_RECNU__params"),
+              uiOutput("DES_COURT_INDCN_RECNU__go_reset_button"),
+              uiOutput("DES_COURT_INDCN_RECNU__save_button"),
               div(style = "margin-top:10px"),
-              dataTableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt")
+              dataTableOutput("DES_COURT_INDCN_RECNU__dt")
             ),
             tabPanel(
               title = "Fiche technique",
               div(style = "margin-top:20px"),
               column(
                 width = 12,
-                em(DER.inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$MaJ)
+                em(DER.inesss::domaine_valeurs_fiche_technique$DES_COURT_INDCN_RECNU$DES_COURT_INDCN_RECNU$MaJ)
               ),
-              tableOutput("I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc")
+              tableOutput("DES_COURT_INDCN_RECNU__varDesc")
             )
           )
         ),
@@ -429,12 +415,12 @@ domaine_valeurs <- function() {
                 column(
                   width = 3,
                   checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "",
-                                     choices = c("FORME", "TENEUR", "COD_STA_DECIS"))
+                                     choices = c("FORME", "TENEUR", "INDCN_THERA"))
                 ),
                 column(
                   width = 3,
                   checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect3", "",
-                                     choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3"))
+                                     choices = c("COD_SERV_1", "COD_SERV_2", "COD_SERV_3", "COD_STA_DECIS"))
                 ),
                 column(
                   width = 3,
@@ -685,158 +671,132 @@ domaine_valeurs <- function() {
     session$onSessionEnded(function() {stopApp()})
 
 
-    # I_APME_DEM_AUTOR_CRITR_ETEN_CM ------------------------------------------
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__val <- reactiveValues(
+    # DES_COURT_INDCN_RECNU ------------------------------------------
+    DES_COURT_INDCN_RECNU__val <- reactiveValues(
       show_tab = FALSE  # afficher la table ou pas
     )
 
     ## Fiche Technique ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__varDesc <- renderTable({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(DER.inesss::domaine_valeurs_fiche_technique$I_APME_DEM_AUTOR_CRITR_ETEN_CM$DES_COURT_INDCN_RECNU$tab_desc)
-      } else {
-        return(NULL)
-      }
-    })
-
-    ## Descriptif Data ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dataDesc <- renderUI({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(tagList(
-          fluidRow(
-            column(
-              width = 12,
-              p("Combinaisons des descriptions courtes complètes des indications reconnues de Patient-Médicament d'exceptions.")
-            )
-          )
-        ))
-      }
+    output$DES_COURT_INDCN_RECNU__varDesc <- renderTable({
+      return(DER.inesss::domaine_valeurs_fiche_technique$DES_COURT_INDCN_RECNU$tab_desc)
     })
 
     ## UI ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__params <- renderUI({
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        return(tagList(
-          fluidRow(
-            column(
-              width = ui_col_width(),
-              textInput(  # Code de DENOM
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom",
-                "DENOM_DEM"
-              ),
-              textInput(  # Recherche mot-clé
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search",
-                "DES_COURT_INDCN_RECNU"
-              )
+    output$DES_COURT_INDCN_RECNU__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput(  # Code de DENOM
+              "DES_COURT_INDCN_RECNU__denom",
+              "DENOM_DEM"
             ),
-            column(
-              width = ui_col_width(),
-              textInput(  # Code de DIN
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din",
-                "DIN_DEM"
-              ),
-              selectInput(
-                "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
-                "Type Recherche",
-                choices = c("Mot-clé" = "keyword",
-                            "Valeur exacte" = "exactWord"),
-                selected = "Mot-clé"
-              )
+            textInput(  # Recherche mot-clé
+              "DES_COURT_INDCN_RECNU__search",
+              "DES_COURT_INDCN_RECNU"
+            )
+          ),
+          column(
+            width = ui_col_width(),
+            textInput(  # Code de DIN
+              "DES_COURT_INDCN_RECNU__din",
+              "DIN_DEM"
+            ),
+            selectInput(
+              "DES_COURT_INDCN_RECNU__typeRecherche",
+              "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
             )
           )
-        ))
-      }
+        )
+      ))
     })
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go_reset_button <- renderUI({
-      button_go_reset("I_APME_DEM_AUTOR_CRITR_ETEN_CM")
+    output$DES_COURT_INDCN_RECNU__go_reset_button <- renderUI({
+      button_go_reset("DES_COURT_INDCN_RECNU")
     })
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save_button <- renderUI({
-      button_save("I_APME_DEM_AUTOR_CRITR_ETEN_CM", I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt())
+    output$DES_COURT_INDCN_RECNU__save_button <- renderUI({
+      button_save("DES_COURT_INDCN_RECNU", DES_COURT_INDCN_RECNU__dt())
     })
 
     ## Datatable ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go, {
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
+    observeEvent(input$DES_COURT_INDCN_RECNU__go, {
+      DES_COURT_INDCN_RECNU__val$show_tab <- TRUE  # Afficher la table si on clique sur Exécuter
     }, ignoreInit = TRUE)
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data, {
-      # Faire disparaitre la table si on change le data
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE
-    }, ignoreInit = TRUE)
-    I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- eventReactive(
+    DES_COURT_INDCN_RECNU__dt <- eventReactive(
       c(
-        input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__go,
-        I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab
+        input$DES_COURT_INDCN_RECNU__go,
+        DES_COURT_INDCN_RECNU__val$show_tab
       ),
       {
-        if (I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab) {
-          dt <- DER.inesss::I_APME_DEM_AUTOR_CRITR_ETEN_CM[[input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data]]
-          if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom != "") {  # rechercher les DENOM
-              dt <- search_value_chr(
-                dt, col = "DENOM_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom, pad = 5
-              )
-            }
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din != "") {  # rechercher les DIN
-              dt <- search_value_num(
-                dt, col = "DIN_DEM",
-                values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__din
-              )
-            }
-            if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search != "") {
-              if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "keyword") {
-                dt <- search_keyword(
-                  dt, col = "DES_COURT_INDCN_RECNU",
-                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-                )
-              } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche == "exactWord") {
-                dt <- search_value_chr(
-                  dt, col = "DES_COURT_INDCN_RECNU",
-                  values = input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__search
-                )
-              }
-            }
-
+        if (DES_COURT_INDCN_RECNU__val$show_tab) {
+          dt <- DER.inesss::DES_COURT_INDCN_RECNU
+          if (input$DES_COURT_INDCN_RECNU__denom != "") {  # rechercher les DENOM
+            dt <- search_value_chr(
+              dt, col = "DENOM_DEM",
+              values = input$DES_COURT_INDCN_RECNU__denom, pad = 5
+            )
           }
+          if (input$DES_COURT_INDCN_RECNU__din != "") {  # rechercher les DIN
+            dt <- search_value_num(
+              dt, col = "DIN_DEM",
+              values = input$DES_COURT_INDCN_RECNU__din
+            )
+          }
+          if (input$DES_COURT_INDCN_RECNU__search != "") {
+            if (input$DES_COURT_INDCN_RECNU__typeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "DES_COURT_INDCN_RECNU",
+                values = input$DES_COURT_INDCN_RECNU__search
+              )
+            } else if (input$DES_COURT_INDCN_RECNU__typeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "DES_COURT_INDCN_RECNU",
+                values = input$DES_COURT_INDCN_RECNU__search
+              )
+            }
+          }
+
+          dt[, `:=` (DATE_DEBUT = format(DATE_DEBUT, "%Y-%m"),
+                     DATE_FIN = format(DATE_FIN, "%Y-%m"))]
           return(dt)
         } else {
           return(NULL)
         }
       }, ignoreInit = TRUE
     )
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt <- renderDataTable({
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt()
+    output$DES_COURT_INDCN_RECNU__dt <- renderDataTable({
+      DES_COURT_INDCN_RECNU__dt()
     }, options = renderDataTable_options())
 
     ## Export ####
-    output$I_APME_DEM_AUTOR_CRITR_ETEN_CM__save <- downloadHandler(
+    output$DES_COURT_INDCN_RECNU__save <- downloadHandler(
       filename = function() {
         paste0(
-          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__savename, ".",
-          input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext
+          input$DES_COURT_INDCN_RECNU__savename, ".",
+          input$DES_COURT_INDCN_RECNU__saveext
         )
       },
       content = function(file) {
-        if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "xlsx") {
-          writexl::write_xlsx(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file)
-        } else if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__saveext == "csv") {
-          write.csv2(I_APME_DEM_AUTOR_CRITR_ETEN_CM__dt(), file, row.names = FALSE,
+        if (input$DES_COURT_INDCN_RECNU__saveext == "xlsx") {
+          writexl::write_xlsx(DES_COURT_INDCN_RECNU__dt(), file)
+        } else if (input$DES_COURT_INDCN_RECNU__saveext == "csv") {
+          write.csv2(DES_COURT_INDCN_RECNU__dt(), file, row.names = FALSE,
                      fileEncoding = "latin1")
         }
       }
     )
 
     ## Update buttons ####
-    observeEvent(input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__reset, {
-      I_APME_DEM_AUTOR_CRITR_ETEN_CM__val$show_tab <- FALSE  # faire disparaître la table
+    observeEvent(input$DES_COURT_INDCN_RECNU__reset, {
+      DES_COURT_INDCN_RECNU__val$show_tab <- FALSE  # faire disparaître la table
       # Remettre les valeurs initiales
-      if (input$I_APME_DEM_AUTOR_CRITR_ETEN_CM__data == "DES_COURT_INDCN_RECNU") {
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__denom", value = "")
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__din", value = "")
-        updateTextInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__search", value = "")
-        updateSelectInput(session, "I_APME_DEM_AUTOR_CRITR_ETEN_CM__typeRecherche",
-                          selected = "keyword")
-      }
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__denom", value = "")
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__din", value = "")
+      updateTextInput(session, "DES_COURT_INDCN_RECNU__search", value = "")
+      updateSelectInput(session, "DES_COURT_INDCN_RECNU__typeRecherche",
+                        selected = "keyword")
     }, ignoreInit = TRUE)
 
 
@@ -860,7 +820,7 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect3,
         input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
-      choices_vec <- vector("character", 7L)
+      choices_vec <- vector("character", 8L)
       if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
         choices_vec[1] <- "AHFS"
       }
@@ -876,11 +836,14 @@ domaine_valeurs <- function() {
       if (any("FORME" == varSelect)) {
         choices_vec[5] <- "FORME"
       }
+      if (any("INDCN_THERA" == varSelect)) {
+        choices_vec[6] <- "INDCN_THERA"
+      }
       if (any("DIN" == varSelect)) {
-        choices_vec[6] <- "MARQ_COMRC"
+        choices_vec[7] <- "MARQ_COMRC"
       }
       if (any("TENEUR" %in% varSelect)) {
-        choices_vec[7] <- "TENEUR"
+        choices_vec[8] <- "TENEUR"
       }
       return(tagList(
         selectInput(
@@ -1418,6 +1381,65 @@ domaine_valeurs <- function() {
         teneur <- NULL
       }
 
+      # INDCN_THERA
+      if ("INDCN_THERA" %in% varSelect && "INDCN_THERA" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnThera)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__indcnThera
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnTheraDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche
+          }
+        })
+        indcnThera <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnThera", "INDCN_THERA", value = prev_val)
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnTheraDesc", "NOM_ANATOM_INDCN_THERA", value = prev_val_search)
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche",
+              "NOM_ANATOM_INDCN_THERA Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = prev_val_search_key
+            )
+          )
+        )
+      } else if ("INDCN_THERA" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__indcnThera)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__indcnThera
+          }
+        })
+        indcnThera <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__indcnThera", "INDCN_THERA", value = prev_val)
+          )
+        )
+      } else {
+        indcnThera <- NULL
+      }
+
       # COD_SERV_[1:3]
       for (i in 1:3) {
         if (paste0("COD_SERV_", i) %in% varSelect && "COD_SERV" %in% varSelectDesc) {
@@ -1543,7 +1565,7 @@ domaine_valeurs <- function() {
         periods_debut_fin,
         denom, din,
         ahfs, ahfs_cla, ahfs_scla, ahfs_sscla,
-        forme, teneur,
+        forme, teneur, indcnThera,
         cod_serv_1, cod_serv_2, cod_serv_3,
         cod_sta_decis
       ))
@@ -1602,8 +1624,8 @@ domaine_valeurs <- function() {
             ]
             dt <- dt[debut_demande <= DernierePrescription & fin_demande >= PremierePrescription]
           }
-          dt[, `:=` (DebPeriodePrescripDem = debut_demande,
-                     FinPeriodePrescripDem = fin_demande)]
+          dt[, `:=` (DebPeriodePrescripDem = format(debut_demande, "%Y-%m"),
+                     FinPeriodePrescripDem = format(fin_demande, "%Y-%m"))]
           setkey(dt)
 
           # DENOM
@@ -1682,6 +1704,16 @@ domaine_valeurs <- function() {
               dt <- search_value_chr(
                 dt, col = "TENEUR",
                 values = input$V_DEM_PAIMT_MED_CM__teneur, pad = 5
+              )
+            }
+          }
+
+          # INDCN_THERA
+          if (any("INDCN_THERA" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__indcnThera != "") {
+              dt <- search_keyword(  # ne pas chercher valeur exacte car trop de possibilités
+                dt, col = "INDCN_THERA",
+                values = input$V_DEM_PAIMT_MED_CM__indcnThera
               )
             }
           }
@@ -1813,6 +1845,32 @@ domaine_valeurs <- function() {
               }
             }
 
+            # INDCN_THERA
+            if (any("INDCN_THERA" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              indcnthera_desc <- DER.inesss::V_DES_COD[
+                TYPE_CODE == "COD_ANAT_INDCN_THERA",
+                . (mergeINDCNTHERA = CODE, NOM_ANATOM_INDCN_THERA = CODE_DESC)
+              ]
+              dt[, mergeINDCNTHERA := INDCN_THERA]
+              dt[str_detect(mergeINDCNTHERA, "^\\."), mergeINDCNTHERA := str_remove(mergeINDCNTHERA, "\\.")]
+              dt[, mergeINDCNTHERA := str_sub(mergeINDCNTHERA, 1, 2)]
+              dt <- merge(dt, indcnthera_desc, by = "mergeINDCNTHERA", all.x = TRUE)
+              dt[, mergeINDCNTHERA := NULL]
+              if (input$V_DEM_PAIMT_MED_CM__indcnTheraDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_ANATOM_INDCN_THERA",
+                    values = input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
+                  )
+                } else {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_ANATOM_INDCN_THERA",
+                    values = input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
+                  )
+                }
+              }
+            }
+
             # AHFS
             if (any("AHFS" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
               ahfs_desc <- copy(DER.inesss::V_CLA_AHF)
@@ -1890,8 +1948,15 @@ domaine_valeurs <- function() {
 
           }
 
-          # Ordre des colonnes
+          # Arranger colonnes
           setcolorder(dt, V_DEM_PAIMT_MED_CM__colorder(dt))
+          if (any("DATE_DEBUT" == names(dt))) {
+            dt[, `:=` (DATE_DEBUT = format(DATE_DEBUT, "%Y-%m"),
+                       DATE_FIN = format(DATE_FIN, "%Y-%m"))]
+          } else {
+            dt[, `:=` (PremierePrescription = format(PremierePrescription, "%Y-%m"),
+                       DernierePrescription = format(DernierePrescription, "%Y-%m"))]
+          }
           return(dt)
         } else {
           return(NULL)
@@ -1944,6 +2009,8 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__formeDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneur", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneurDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnThera", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnTheraDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ2", value = "")
