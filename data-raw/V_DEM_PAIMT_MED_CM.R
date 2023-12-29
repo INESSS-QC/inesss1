@@ -74,7 +74,6 @@ v_dem_paimt_med_cm <- function(loop_dates) {
   DT[, `:=` (DATE_DEBUT = make_date(ANNEE, MOIS, 1),
              DATE_FIN = make_date(ANNEE, MOIS, 1) %m+% months(1, FALSE) - 1)]
   DT[, INDCN_THERA := str_trim(INDCN_THERA, side = "both")]
-  DT[str_detect(INDCN_THERA, "^\\."), INDCN_THERA := str_remove(INDCN_THERA, "\\.")]
   DT[!is.na(AHFS_CLA), AHFS := paste0(AHFS_CLA, AHFS_SCLA, AHFS_SSCLA)]
   DT[, `:=` (COD_SERV_1 = str_remove_all(COD_SERV_1, " "),
              COD_SERV_2 = str_remove_all(COD_SERV_2, " "),
