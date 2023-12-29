@@ -20,7 +20,7 @@ fct <- function() {
     "select\n",
     "    NMED_COD_TENR_MED as COD_TENR,\n",
     "    NMED_NOM_TENR as NOM_TENR,\n",
-    "    NMED_NOM_ANGL_TENR\n",
+    "    NMED_NOM_ANGL_TENR as NOM_ANGL_TENR\n",
     "from PROD.V_TENR_MED\n",
     "order by COD_TENR;"
   )))

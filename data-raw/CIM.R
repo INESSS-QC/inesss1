@@ -9,7 +9,7 @@ library(readxl)
 library(data.table)
 library(usethis)
 
-MaJ <- as.Date("2023-03-20")
+MaJ <- as.Date("2023-12-29")
 
 # CIM9 ----------------------------------------------------------------------------------------
 
