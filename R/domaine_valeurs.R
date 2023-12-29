@@ -13,7 +13,7 @@ domaine_valeurs.addins <- function() {
 #' @import data.table
 #' @import shiny
 #' @import shinydashboard
-#' @importFrom stringr str_sub str_pad
+#' @importFrom stringr str_sub str_pad str_remove str_detect str_split
 #' @importFrom lubridate as_date
 #'
 #' @encoding UTF-8
@@ -156,23 +156,23 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
 
     if (no_accent) {
-      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+      values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     } else {
-      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+      values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     }
-    values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+    values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     values <- paste(values, collapse = "|")  # rechercher tous les mots dans une même chaîne de caractères
     if (lower) {
       if (no_accent) {
-        dt <- dt[stringr::str_detect(unaccent(tolower(get(col))), tolower(values))]
+        dt <- dt[str_detect(unaccent(tolower(get(col))), tolower(values))]
       } else {
-        dt <- dt[stringr::str_detect(tolower(get(col))), tolower(values)]
+        dt <- dt[str_detect(tolower(get(col))), tolower(values)]
       }
     } else {
       if (no_accent) {
-        dt <- dt[stringr::str_detect(unaccent(get(col)), values)]
+        dt <- dt[str_detect(unaccent(get(col)), values)]
       } else {
-        dt <- dt[stringr::str_detect(get(col), values)]
+        dt <- dt[str_detect(get(col), values)]
       }
     }
     return(dt)
@@ -186,12 +186,12 @@ domaine_valeurs <- function() {
     ### @param lower Si on doit convertir en minuscule ou chercher la valeur exacte.
 
     if (no_accent) {
-      values <- unaccent(unlist(stringr::str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
+      values <- unaccent(unlist(str_split(values, "\\+")))  # séparer les valeurs dans un vecteur
     } else {
-      values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+      values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     }
     if (!is.null(pad)) {
-      values <- stringr::str_pad(values, width = pad, pad = "0")
+      values <- str_pad(values, width = pad, pad = "0")
     }
     # Conserver les valeurs voulues
     if (lower) {
@@ -217,7 +217,7 @@ domaine_valeurs <- function() {
     ###               aura plusieurs codes.
     ### @param type "int" pour integer ou "num" pour "numeric"
 
-    values <- unlist(stringr::str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
+    values <- unlist(str_split(values, "\\+"))  # séparer les valeurs dans un vecteur
     if (type == "int") {
       values <- as.integer(values)
     } else if (type == "num") {
@@ -235,11 +235,11 @@ domaine_valeurs <- function() {
     ### @param values La ou les valeurs à conserver. Chaîne de caractères, un "+"  indique qu'il y
     ###               aura plusieurs codes.
 
-    values <- unlist(stringr::str_split(values, "\\+"))
+    values <- unlist(str_split(values, "\\+"))
     for (val in values) {
       dt <- dt[
-        stringr::str_sub(get(col), 1, 4) <= val &
-          val <= stringr::str_sub(get(col), 6, 9)
+        str_sub(get(col), 1, 4) <= val &
+          val <= str_sub(get(col), 6, 9)
       ]
     }
     return(dt)
@@ -266,6 +266,7 @@ domaine_valeurs <- function() {
       "DIN", "NOM_MARQ_COMRC",
       "FORME", "NOM_FORME",
       "TENEUR", "NOM_TENR",
+      "INDCN_THERA", "NOM_ANATOM_INDCN_THERA",
       "COD_STA_DECIS", "NOM_COD_STA_DECIS",
       "COD_SERV_1", "NOM_COD_SERV_1", "COD_SERV_2", "NOM_COD_SERV_2", "COD_SERV_3", "NOM_COD_SERV_3",
       "AHFS", "NOM_AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
@@ -275,7 +276,7 @@ domaine_valeurs <- function() {
       "FinPeriodePrescripDem"
     )
     i <- 1L
-    for (col in (dtcols)) {
+    for (col in dtcols) {
       if (any(col == names(dt))) {
         col_order[i] <- col
         i <- i + 1L
@@ -1708,7 +1709,14 @@ domaine_valeurs <- function() {
           }
 
           # INDCN_THERA
-
+          if (any("INDCN_THERA" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__indcnThera != "") {
+              dt <- search_keyword(  # ne pas chercher valeur exacte car trop de possibilités
+                dt, col = "INDCN_THERA",
+                values = input$V_DEM_PAIMT_MED_CM__indcnThera
+              )
+            }
+          }
 
           # COD_SERV_[1:3]
           for (i in 1:3) {
@@ -1832,6 +1840,32 @@ domaine_valeurs <- function() {
                   dt <- search_value_chr(
                     dt, col = "NOM_TENR",
                     values = input$V_DEM_PAIMT_MED_CM__teneurDesc
+                  )
+                }
+              }
+            }
+
+            # INDCN_THERA
+            if (any("INDCN_THERA" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              indcnthera_desc <- inesss::V_DES_COD[
+                TYPE_CODE == "COD_ANAT_INDCN_THERA",
+                . (mergeINDCNTHERA = CODE, NOM_ANATOM_INDCN_THERA = CODE_DESC)
+              ]
+              dt[, mergeINDCNTHERA := INDCN_THERA]
+              dt[str_detect(mergeINDCNTHERA, "^\\."), mergeINDCNTHERA := str_remove(mergeINDCNTHERA, "\\.")]
+              dt[, mergeINDCNTHERA := str_sub(mergeINDCNTHERA, 1, 2)]
+              dt <- merge(dt, indcnthera_desc, by = "mergeINDCNTHERA", all.x = TRUE)
+              dt[, mergeINDCNTHERA := NULL]
+              if (input$V_DEM_PAIMT_MED_CM__indcnTheraDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__indcnTheraTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_ANATOM_INDCN_THERA",
+                    values = input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
+                  )
+                } else {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_ANATOM_INDCN_THERA",
+                    values = input$V_DEM_PAIMT_MED_CM__indcnTheraDesc
                   )
                 }
               }
@@ -1975,6 +2009,8 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__formeDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneur", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneurDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnThera", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnTheraDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ2", value = "")
