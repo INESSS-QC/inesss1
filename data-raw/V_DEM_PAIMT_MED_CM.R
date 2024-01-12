@@ -125,11 +125,12 @@ new_codes <- FALSE
 new_denom <- V_DEM_PAIMT_MED_CM[
   !DENOM %in% sort(unique(inesss::V_DEM_PAIMT_MED_CM$DENOM)) & !is.na(DENOM),
   .(MIN_DAT_SERV = format(min(DATE_DEBUT), "%Y-%m")),
-  .(DENOM)
+  keyby = .(DENOM)
 ]
 if (nrow(new_denom)) {
   attr_new_denom <- attr(V_DEM_PAIMT_MED_CM, "nouveau_denom")
-  attr_new_denom[[paste0("MaJ_", Sys.Date())]] <- new_denom
+  attr_new_denom[[paste0("MaJ_", str_remove_all(Sys.Date(), "-"))]] <- new_denom
+  attr(V_DEM_PAIMT_MED_CM, "nouveau_denom") <- attr_new_denom
   new_codes <- TRUE
   new_tab[["DENOM"]] <- new_denom
 }
@@ -137,11 +138,12 @@ if (nrow(new_denom)) {
 new_din <- V_DEM_PAIMT_MED_CM[
   !DIN %in% sort(unique(inesss::V_DEM_PAIMT_MED_CM$DIN)) & !is.na(DIN),
   .(MIN_DAT_SERV = format(min(DATE_DEBUT), "%Y-%m")),
-  .(DIN)
+  keyby =  .(DIN)
 ]
 if (nrow(new_din)) {
   attr_new_din <- attr(V_DEM_PAIMT_MED_CM, "nouveau_din")
-  attr_new_din[[paste0("MaJ", Sys.Date())]] <- new_din
+  attr_new_din[[paste0("MaJ_", str_remove_all(Sys.Date(), "-"))]] <- new_din
+  attr(V_DEM_PAIMT_MED_CM, "nouveau_din") <- attr_new_din
   new_codes <- TRUE
   new_tab[["DIN"]] <- new_din
 }

@@ -1,6 +1,6 @@
 Package: inesss
 Title: Institut National Excellence Sante Services Sociaux
-Version: 2.0.0.9005
+Version: 2.0.0.20240112
 Authors@R: 
     person(given = "Guillaume",
            family = "Boucher",
