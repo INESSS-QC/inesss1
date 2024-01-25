@@ -14,7 +14,7 @@ files <- c(
   # "CIM",
   "I_APME_DEM_AUTOR_CRITR_ETEN_CM___DES_COURT_INDCN_RECNU",
   "V_CLA_AHF", "V_COD_STA_DECIS",
-  # "V_DEM_PAIMT_MED_CM",
+  "V_DEM_PAIMT_MED_CM",
   "V_DENOM_COMNE_MED",
   "V_DES_COD",
   "V_FORME_MED",
@@ -35,3 +35,4 @@ if (is.null(conn)) {
   t2 <- Sys.time()
   difftime(t2, t1)
 }
+○
