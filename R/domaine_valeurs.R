@@ -133,10 +133,19 @@ domaine_valeurs <- function() {
     }
     txt_date <- paste(lubridate::day(date_MaJ), mois, lubridate::year(date_MaJ))  # JJ MM AAAA
 
+    # Indiquer s'il y a une mise à jour de disponible pour la DER
+    if (any("DER.inesss.tar.gz" == list.files("J:/GRP/A/5/A/Commun/0 Outils/Librairies R"))) {
+      if (date_MaJ < as.Date(file.info("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar.gz")$mtime)) {
+        update_msg <- " (MaJ disponible)"
+      } else {
+        update_msg <- ""
+      }
+    }
+
     return(tagList(
       h4(  # header size 4
         HTML("&nbsp;&nbsp;&nbsp;"),  # espaces
-        "Actualisé le ",txt_date  # Actualisé le JJ MM AAAA
+        "Actualisé le ",txt_date, update_msg  # Actualisé le JJ MM AAAA
       )
     ))
   }
