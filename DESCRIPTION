@@ -20,6 +20,7 @@ Imports:
     miniUI,
     odbc,
     shiny,
+    shinyAce,
     shinydashboard,
     stringr,
     usethis,
