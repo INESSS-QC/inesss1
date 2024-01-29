@@ -35,4 +35,4 @@ if (is.null(conn)) {
   t2 <- Sys.time()
   difftime(t2, t1)
 }
-○
+☺○
