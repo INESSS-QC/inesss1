@@ -15,14 +15,17 @@ DER_SQL_generateur <- function() {
   UI <- pageWithSidebar(
     headerPanel("DEV - SQL générateur"),
     sidebarPanel(
+      width = 4,
       actionButton("ajouterMethod", "Ajouter"),
       selectInput("method", "Méthode", choices = "Statistique Générale"),
-      selectInput("sousMethod", "Sous-Méthode", choices = c("Denom", "Din"))
+      selectInput("sousMethod", "Sous-Méthode", choices = c("DENOM", "DIN")),
+      uiOutput("methodVars")
     ),
     mainPanel(
+      width = 8,
       aceEditor(
         outputId = "sqlEditor",
-        value = "select ValeurInitiale from dual;",
+        value = "",
         mode = "sql",
         theme = "sqlserver",
         height = "600px",
@@ -36,25 +39,35 @@ DER_SQL_generateur <- function() {
     observeEvent(input$ajouterMethod, {
 
       sql_code <- input$sqlEditor
-
-      if (input$sousMethod == "Denom") {
-        add_code <- paste0(
-          "select *\n",
-          "from v_dem_paimt_med_cm\n",
-          "where smed_dat_serv between '2020-01-01' and '2020-12-31'\n",
-          "    and smed_cod_denom_comne = 123456\n",
-          "order by smed_cod_denom_comne, smed_dat_serv;"
-        )
-      } else if (input$sousMethod == "Din") {
-        add_code <- paste0(
-          "select *\n",
-          "from v_dem_paimt_med_cm\n",
-          "where smed_dat_serv between '2020-01-01' and '2020-12-31'\n",
-          "    and smed_cod_din = 123456\n",
-          "order by smed_cod_din, smed_dat_serv;"
-        )
-      }
+      add_code <- query.statistiques_generales.method(
+        debut, fin,
+        type_Rx, codes = NULL,
+        code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
+        group_by = NULL,
+        cohort = FALSE
+      )
       updateAceEditor(session, "sqlEditor", value = paste0(sql_code, "\n", add_code))
+    })
+
+    output$methodVars <- renderUI({
+      # Statistiques générales ####
+      if (input$method == "Statistique Générale") {
+        ## DENOM ####
+        if (input$sousMethod == "DENOM") {
+          return(tagList(
+            fluidRow(
+              column(
+                width = 6,
+                textInput("debut", "Date Début")
+              ),
+              column(
+                width = 6,
+                textInput("fin", "Date Fin")
+              )
+            )
+          ))
+        }
+      }
     })
 
   }

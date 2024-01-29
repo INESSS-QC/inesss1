@@ -16,7 +16,7 @@ DER.inesss.fcts <- paste0(c(
   "fusion_periodes",
   "rmNA",
   "SQL_connexion",
-  "unaccent"
+  "unaccent", "utils-sql"
 ),".R")
 for (fct in DER.inesss.fcts) {
   file.copy(paste0("R/",fct), paste0("DER.inesss/R/",fct), overwrite = TRUE)
