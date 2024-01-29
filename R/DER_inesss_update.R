@@ -4,6 +4,7 @@
 #'
 #' @param direction Nom de la direction.
 #'
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 DER_inesss_update.addins <- function() {
@@ -21,6 +22,8 @@ DER_inesss_update.addins <- function() {
 #' Installation ou mise à jour de la librairie selon la direction indiquée.
 #'
 #' @param direction Nom de la direction.
+#'
+#' @encoding UTF-8
 #'
 #' @export
 DER_inesss_update <- function() {

@@ -3,6 +3,7 @@
 #' Create an environment where to put errors, messages or warnings.
 #'
 #' @return environment
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 newArgCheck <- function() {
@@ -24,6 +25,7 @@ newArgCheck <- function() {
 #' @param argcheck Environment created by \code{\link{newArgCheck}}.
 #'
 #' @return Messages, warnings or errors inserted in \code{\link{newArgCheck}}.
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 finishArgCheck <- function(argcheck) {
@@ -56,6 +58,7 @@ finishArgCheck <- function(argcheck) {
 #' @param argcheck Environment created by \code{\link{newArgCheck}}.
 #'
 #' @return Add an error in the environment `argcheck`.
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 addError <- function(msg, argcheck) {
@@ -74,6 +77,7 @@ addError <- function(msg, argcheck) {
 #' @param argcheck Environment created by \code{\link{newArgCheck}}.
 #'
 #' @return Add a message in the environment `argcheck`.
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 addMessage <- function(msg, argcheck) {
@@ -93,6 +97,7 @@ addMessage <- function(msg, argcheck) {
 #' @param argcheck Environment created by \code{\link{newArgCheck}}.
 #'
 #' @return Add a warning in the environment `argcheck`.
+#' @encoding UTF-8
 #' @keywords internal
 #' @export
 addWarning <- function(msg, argcheck) {

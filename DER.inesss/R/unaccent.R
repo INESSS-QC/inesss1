@@ -4,9 +4,11 @@
 #'
 #' @param text Chaîne de caractères à convertir, où l'on veut supprimer les accents.
 #'
+#' @importFrom stringr str_replace_all
+#'
 #' @return \code{text} sans accent.
 #' @encoding UTF-8
-#' @importFrom stringr str_replace_all
+#'
 #' @export
 #' @examples
 #' unaccent("âàéèïì")

@@ -7,6 +7,7 @@
 #' @param dd Nombre compris entre 1 et 31 selon les mois. Pour remplacer le dernier jour du mois (28, 29, 30, 31), il est possible d'inscrire `dd = 'last'`.
 #'
 #' @return lubridate::as_date
+#' @encoding UTF-8
 #' @export
 #'
 #' @examples

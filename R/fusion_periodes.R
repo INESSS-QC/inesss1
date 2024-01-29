@@ -13,6 +13,7 @@
 #' @import data.table
 #'
 #' @return `data.table`
+#' @encoding UTF-8
 #' @export
 #' @examples
 #' require(data.table)

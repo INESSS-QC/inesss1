@@ -7,8 +7,8 @@
 #' @param dsn **D**ata **S**ource **N**ame. Par défaut `'PEI_PRD'`.
 #' @param encoding `'latin1'` ou `'UTF-8'`. Encodage de la base de données. Par défaut `'latin1'`.
 #'
-#' @encoding UTF-8
 #' @return Connexion Teradata, sinon `NULL`.
+#' @encoding UTF-8
 #' @export
 #' @examples
 #' \dontrun{

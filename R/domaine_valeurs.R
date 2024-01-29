@@ -1,6 +1,6 @@
 #' Démarrer domaine de valeurs
-#' @keywords internal
 #' @encoding UTF-8
+#' @keywords internal
 domaine_valeurs.addins <- function() {
   inesss::domaine_valeurs()
 }
