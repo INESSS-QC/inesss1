@@ -16,20 +16,39 @@ DER_SQL_generateur <- function() {
     headerPanel("DEV - SQL générateur"),
     sidebarPanel(
       width = 4,
-      actionButton("ajouterMethod", "Ajouter"),
+      fluidRow(
+        column(
+          width = 6,
+          actionButton("ajouterMethod", "Ajouter")
+        ),
+        column(
+          width = 6,
+          actionButton("reset", "Réinitialiser")
+        )
+      ),
       selectInput("method", "Méthode", choices = "Statistique Générale"),
       selectInput("sousMethod", "Sous-Méthode", choices = c("DENOM", "DIN")),
       uiOutput("methodVars")
     ),
     mainPanel(
       width = 8,
-      aceEditor(
-        outputId = "sqlEditor",
-        value = "",
-        mode = "sql",
-        theme = "sqlserver",
-        height = "600px",
-        showPrintMargin = FALSE
+      tabsetPanel(
+        type = "tabs",
+        tabPanel(
+          title = "Requêtes SQL",
+          aceEditor(
+            outputId = "sqlEditor",
+            value = "",
+            mode = "sql",
+            theme = "sqlserver",
+            height = "600px",
+            showPrintMargin = FALSE
+          )
+        ),
+        tabPanel(
+          title = "Documentation",
+          p("En développement")
+        )
       )
     )
   )
@@ -37,16 +56,22 @@ DER_SQL_generateur <- function() {
   SERVER <- function(input, output, session) {
 
     observeEvent(input$ajouterMethod, {
-
       sql_code <- input$sqlEditor
       add_code <- query.statistiques_generales.method(
-        debut, fin,
-        type_Rx, codes = NULL,
-        code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
-        group_by = NULL,
-        cohort = FALSE
+        debut = input$debut,
+        fin = input$fin,
+        type_Rx = input$sousMethod,
+        codes = { if (input$codes == "") NULL else input$codes },
+        code_serv = { if (input$codeServ == "") NULL else input$codeServ },
+        code_serv_filtre = input$codeServFiltre,
+        group_by = { if (input$groupby == "") NULL else input$groupby},
+        cohort = input$cohort
       )
       updateAceEditor(session, "sqlEditor", value = paste0(sql_code, "\n", add_code))
+    })
+
+    observeEvent(input$reset, {
+      updateAceEditor(session, "sqlEditor", value = "")
     })
 
     output$methodVars <- renderUI({
@@ -58,11 +83,49 @@ DER_SQL_generateur <- function() {
             fluidRow(
               column(
                 width = 6,
-                textInput("debut", "Date Début")
+                textInput("debut", "Date Début", value = "2022-01-01")
               ),
               column(
                 width = 6,
-                textInput("fin", "Date Fin")
+                textInput("fin", "Date Fin", value = "2022-12-31")
+              )
+            ),
+            fluidRow(
+              column(
+                width = 12,
+                textInput("codes", paste0("Codes ", input$sousMethod), value = "48135")
+              )
+            ),
+            fluidRow(
+              column(
+                width = 6,
+                selectInput(
+                  "codeServ", "Codes de service",
+                  choices = c("1", "AD"), selected = "1",
+                  multiple = TRUE
+                )
+              ),
+              column(
+                width = 6,
+                selectInput(
+                  "codeServFiltre", "Filtre Codes Service",
+                  choices = c("Exclusion", "Inclusion"), selected = "Exclusion"
+                )
+              )
+            ),
+            fluidRow(
+              column(
+                width = 12,
+                selectInput("groupby", "Grouper Par",
+                            choices = c("DENOM", "AGE"),
+                            selected = "DENOM",
+                            multiple = TRUE)
+              )
+            ),
+            fluidRow(
+              column(
+                width = 12,
+                checkboxInput("cohort", "Cohorte")
               )
             )
           ))

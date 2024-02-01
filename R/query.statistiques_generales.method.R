@@ -25,34 +25,72 @@ query.statistiques_generales.method <- function(
     cohort = FALSE
 ) {
 
+  # PREFIX
+  if (cohort) {
+    p.cohort <- "C."
+    p.v_dem <- "V."
+  } else {
+    p.cohort <- ""
+    p.v_dem <- ""
+  }
+
+  # WITH
+  with.cohort <- function(cohort, debut, fin, codes) {
+    if (cohort) {
+      return(paste0(
+        "with COHORT_STATGEN1 as (\n",
+        "    select SMED_NO_INDIV_BEN_BANLS\n",
+        "    from PROD.V_DEM_PAIMT_MED_CM\n",
+        "    where SMED_DAT_SERV between '",debut,"' and '",fin,"'\n",
+        paste0("        and SMED_COD_DENOM_COMNE in (",qu(str_pad(codes, 5, "left", "0")),")\n"),
+        "),\n"
+      ))
+    } else {
+      return("")
+    }
+  }
+
   # SELECT
-  select.group_by.type_Rx <- function(group_by) {
+  select.group_by.type_Rx <- function(group_by, p.v_dem) {
     if (is.null(group_by)) {
       return("")
     } else if (group_by == "DENOM") {
-      return("    SMED_COD_DENOM_COMNE as DENOM,\n")
+      return(paste0("    ",p.v_dem,"SMED_COD_DENOM_COMNE as DENOM,\n"))
     } else if (group_by == "DIN") {
-      return("    SMED_COD_DIN as DIN,\n")
+      return(paste0("    ",p.v_dem,"SMED_COD_DIN as DIN,\n"))
+    }
+  }
+
+  # FROM
+  from <- function(cohort, p.cohort, p.v_dem) {
+    if (cohort) {
+      return(paste0(
+        "from PROD.V_DEM_PAIMT_MED_CM as ",p.v_dem,"\n",
+        "    inner join COHORT_STATGEN1 as ",p.cohort,"\n",
+        "        on ",p.cohort,".SMED_NO_INDIV_BEN_BANLS = ",p.v_dem,".SMED_NO_INDIV_BEN_BANLS\n"
+      ))
+    } else {
+      return("from PROD.V_DEM_PAIMT_MED_CM\n")
     }
   }
 
   # WHERE
-  where.codes <- function(type_Rx, codes) {
+  where.codes <- function(type_Rx, codes, p.v_dem) {
     if (is.null(codes)) {
       return("")
     } else if (type_Rx == "DENOM") {
-      return(paste0("    and SMED_COD_DENOM_COMNE in (",qu(str_pad(codes, 5, "left", "0")),")\n"))
+      return(paste0("    and ",p.v_dem,"SMED_COD_DENOM_COMNE in (",qu(str_pad(codes, 5, "left", "0")),")\n"))
     } else if (type_Rx == "DIN") {
-      return(paste0("    and SMED_COD_DIN in (",paste(codes, collapse = ", "),")\n"))
+      return(paste0("    and ",p.v_dem,"SMED_COD_DIN in (",paste(codes, collapse = ", "),")\n"))
     }
   }
-  where.code_serv <- function(code_serv, code_serv_filtre) {
+  where.code_serv <- function(code_serv, code_serv_filtre, p.v_dem) {
     if (is.null(code_serv)) {
       return("")
     } else if (code_serv_filtre == "Exclusion") {
-      return(paste0("    and (SMED_COD_SERV_1 not in (",qu(code_serv),") or SMED_COD_SERV_1 is null)\n"))
+      return(paste0("    and (",p.v_dem,"SMED_COD_SERV_1 not in (",qu(code_serv),") or ",p.v_dem,"SMED_COD_SERV_1 is null)\n"))
     } else if (code_serv_filtre == "Inclusion") {
-      return(paste0("and SMED_COD_SERV_1 in (",qu(code_serv),")\n"))
+      return(paste0("and ",p.v_dem,"SMED_COD_SERV_1 in (",qu(code_serv),")\n"))
     }
   }
 
@@ -81,20 +119,21 @@ query.statistiques_generales.method <- function(
 
   # REQUÊTE
   query <- paste0(
+    with.cohort(cohort, debut, fin, codes),
     "select\n",
     "    '",debut,"' as DATE_DEBUT,\n",
     "    '",fin,"' as DATE_FIN,\n",
-    select.group_by.type_Rx(group_by),
-    "    sum(SMED_MNT_AUTOR_MED) as MNT_MED,\n",
-    "    sum(SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n",
-    "    sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n",
-    "    count(distinct SMED_NO_INDIV_BEN_BANLS) as COHORTE,\n",
-    "    count(*) as NBRE_RX,\n",
-    "    sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n",
-    "from PROD.V_DEM_PAIMT_MED_CM\n",
-    "where SMED_DAT_SERV between '",debut,"' and '",fin,"'\n",
-    where.codes(type_Rx, codes),
-    where.code_serv(code_serv, code_serv_filtre),
+    select.group_by.type_Rx(group_by, p.v_dem),
+    paste0("    sum(",p.v_dem,"SMED_MNT_AUTOR_MED) as MNT_MED,\n"),
+    paste0("    sum(",p.v_dem,"SMED_MNT_AUTOR_FRAIS_SERV) as MNT_SERV,\n"),
+    paste0("    sum(",p.v_dem,"SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as MNT_TOT,\n"),
+    paste0("    count(distinct ",p.v_dem,"SMED_NO_INDIV_BEN_BANLS) as COHORTE,\n"),
+    paste0("    count(",p.v_dem,"*) as NBRE_RX,\n"),
+    paste0("    sum(",p.v_dem,"SMED_NBR_JR_DUREE_TRAIT) as DUREE_TX\n"),
+    from(cohort, p.cohort, p.v_dem),
+    paste0("where ",p.v_dem,"SMED_DAT_SERV between '",debut,"' and '",fin,"'\n"),
+    where.codes(type_Rx, codes, p.v_dem),
+    where.code_serv(code_serv, code_serv_filtre, p.v_dem),
     group_by.type_Rx(group_by),
     order_by(group_by)
   )
