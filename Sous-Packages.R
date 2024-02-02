@@ -12,7 +12,7 @@ writeLines(desc_file, "DER.inesss/DESCRIPTION")
 ## Fonction ####
 DER.inesss.fcts <- paste0(c(
   "ArgCheck",
-  "date_ymd", "DER_inesss_update", "domaine_valeurs",
+  "date_ymd", "DER_inesss_update", "DER_SQL_generateur", "domaine_valeurs",
   "fusion_periodes",
   "rmNA",
   "SQL_connexion",
