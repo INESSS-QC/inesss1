@@ -11,21 +11,21 @@
 #' @param group_by Variables dont on doit aggréger les résultats. `string`.
 #' @param cohort Vrai ou Faux. Si la requête est dépendante d'une cohorte. `logical`.
 #'
-#' @importFrom stringr str_pad
+#' @importFrom stringr str_pad str_remove
 #'
 #' @return `string`
 #' @encoding UTF-8
 #' @keywords internal
 #' @export
 query.statistiques_generales.method <- function(
-    debut, fin,
-    type_Rx, codes = NULL,
+    debut = NULL, fin = NULL,
+    type_Rx = NULL, codes = NULL,
     code_serv = c('1', 'AD'), code_serv_filtre = 'Exclusion',
     group_by = NULL,
     cohort = FALSE
 ) {
 
-  # PREFIX
+  # PREFIX - JOINTURE FROM+COHORTE
   if (cohort) {
     p.cohort <- "C."
     p.v_dem <- "V."
@@ -65,9 +65,9 @@ query.statistiques_generales.method <- function(
   from <- function(cohort, p.cohort, p.v_dem) {
     if (cohort) {
       return(paste0(
-        "from PROD.V_DEM_PAIMT_MED_CM as ",p.v_dem,"\n",
-        "    inner join COHORT_STATGEN1 as ",p.cohort,"\n",
-        "        on ",p.cohort,".SMED_NO_INDIV_BEN_BANLS = ",p.v_dem,".SMED_NO_INDIV_BEN_BANLS\n"
+        "from PROD.V_DEM_PAIMT_MED_CM as ",str_remove(p.v_dem, "\."),"\n",
+        "    inner join COHORT_STATGEN1 as ",str_remove(p.cohort, "\."),"\n",
+        "        on ",p.cohort,"SMED_NO_INDIV_BEN_BANLS = ",p.v_dem,"SMED_NO_INDIV_BEN_BANLS\n"
       ))
     } else {
       return("from PROD.V_DEM_PAIMT_MED_CM\n")
@@ -108,14 +108,21 @@ query.statistiques_generales.method <- function(
   # ORDER BY
   order_by <- function(group_by) {
     if (is.null(group_by)) {
-      return("order by DATE_DEBUT;")
+      return("order by DATE_DEBUT")
     } else if (group_by == "DENOM") {
-      return("order by DATE_DEBUT, DENOM;")
+      return("order by DATE_DEBUT, DENOM")
     } else if (group_by == "DIN") {
-      return("order by DATE_DEBUT, DIN;")
+      return("order by DATE_DEBUT, DIN")
     }
   }
 
+
+  # Remplacer les valeurs NULL par un texte disant d'insérer une valeur
+  for (i in c("codes", "debut", "fin", "group_by", "type_Rx")) {
+    if (is.null(get(i))) {
+      assign(i, "[<Insérer Valeur(s)>]")
+    }
+  }
 
   # REQUÊTE
   query <- paste0(
@@ -135,7 +142,7 @@ query.statistiques_generales.method <- function(
     where.codes(type_Rx, codes, p.v_dem),
     where.code_serv(code_serv, code_serv_filtre, p.v_dem),
     group_by.type_Rx(group_by),
-    order_by(group_by)
+    order_by(group_by), ";"
   )
 
   return(query)
