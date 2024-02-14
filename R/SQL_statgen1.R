@@ -22,7 +22,7 @@ statgen1 <- function(
     grp_age = "Mineur-Majeur"
 ) {
 
-  statgen1_functions <- list(
+  sg1_fcts <- list(
     with.date = function(debut) {
       return(paste0(
         "with DAT as (\n",
@@ -55,7 +55,7 @@ statgen1 <- function(
           }
         }
         return(paste0(
-          "CAT as (\n",
+          "CATG as (\n",
           indent(),"select LISTE\n",
           indent(),"from    (   ",select_from,"\n",
           indent(3),") as T\n",
@@ -78,13 +78,19 @@ statgen1 <- function(
       return(paste0(
         indent(2),"case when (extract month from SMED_DAT_SERV) >= (extract month from DAT.MIN_DATE) then SMED_AN_CIVIL_DAT + 1\n",
         indent(2),"     else SMED_AN_CIVIL_DAT\n",
-        indent(2),"     end as PERIODE_REF"
+        indent(2),"     end as PERIODE_REF,\n"
       ))
+    },
+    with.temp.select.typeRx = function(typeRx) {
+      if (typeRx == "DENOM") {
+        select_var <- "SMED_COD_DENOM_COMNE as COD_DENOM_COMNE"
+      }
+      return(paste0(indent(2),select_var,",\n"))
     },
     with.temp.from = function(typeRx, cat_list_med) {
       from <- paste0(indent(),"from V_DEM_PAIMT_MED_CM, DAT, ",typeRx)
       if (!is.null(cat_list_med)) {
-        from <- paste0(from,", CAT")
+        from <- paste0(from,", CATG")
       }
       return(paste0(from,"\n"))
     },
@@ -111,7 +117,7 @@ statgen1 <- function(
       if (is.null(cat_list_med)) {
         return(NULL)
       } else {
-        return(paste0(indent(2),"and SMED_COD_CATG_LISTE_MED in CAT.LISTE\n"))
+        return(paste0(indent(2),"and SMED_COD_CATG_LISTE_MED in CATG.LISTE\n"))
       }
     },
     with.temp.groupby = function(cat_list_med) {
@@ -130,22 +136,38 @@ statgen1 <- function(
       return(paste(grpby[grpby != ""], collapse = ", "))
     }
   )
-  statgen1_functions <- c(statgen1_functions, list(
-    with.ben.select.groupe_age = statgen1_functions$with.temp.select.groupe_age,
-    with.ben.select.periode_ref = statgen1_functions$with.temp.select.periode_ref,
-    with.ben.from = statgen1_functions$with.temp.from,
-    with.ben.where.typeRx = statgen1_functions$with.temp.where.typeRx,
-    with.ben.where.cod_serv = statgen1_functions$with.temp.where.cod_serv,
-    with.ben.where.cat_liste_med =  statgen1_functions$with.temp.where.cat_liste_med,
+  sg1_fcts <- c(sg1_fcts, list(
+    with.ben.select.groupe_age = sg1_fcts$with.temp.select.groupe_age,
+    with.ben.select.periode_ref = sg1_fcts$with.temp.select.periode_ref,
+    with.ben.from = sg1_fcts$with.temp.from,
+    with.ben.where.typeRx = sg1_fcts$with.temp.where.typeRx,
+    with.ben.where.cod_serv = sg1_fcts$with.temp.where.cod_serv,
+    with.ben.where.cat_liste_med =  sg1_fcts$with.temp.where.cat_liste_med
   ))
 
   query <- paste0(
-    statgen1_functions$with.date(debut),
-    statgen1_functions$with.codesRx(typeRx, codesRx)
+    sg1_fcts$with.date(debut),
+    sg1_fcts$with.codesRx(typeRx, codesRx),
+    sg1_fcts$with.cat_liste_med(cat_list_med),
+    "TEMP as (\n",
+    indent(),"select\n",
+    sg1_fcts$with.temp.select.groupe_age(grp_age),
+    sg1_fcts$with.temp.select.periode_ref(),
+    indent(2),"extract(year from SMED_DAT_SERV) as ANNEE_CIVILE,\n",
+    indent(2),"extract(month from SMED_DAT_SERV) as MOIS,\n",
+    indent(2),"SMED_COD_CATG_LISTE_MED as COD_CATG_LISTE_MED,\n",
+    sg1_fcts$with.temp.select.typeRx(typeRx),
+    indent(2),"SMED_COD_TENR_MED as COD_TENR_MED,\n"
   )
 
 }
 
+cat(query)
+debut = "2022-01-01"
+typeRx = "DENOM"
+codesRx = c(39, 48135)
+cat_list_med = c(3, 40, 41)
+grp_age = "Mineur-Majeur"
 
 
 

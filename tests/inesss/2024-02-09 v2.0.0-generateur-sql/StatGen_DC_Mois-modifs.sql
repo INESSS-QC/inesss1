@@ -65,19 +65,18 @@ ben AS (
 	GROUP BY 1,2,3,4
 ),
 nom AS (
-SELECT
-	temp.*,
-	deco.DES AS PRODUIT,
-	t.DES AS TENEUR,
-	ben.BEN AS ben_unique_mois
-
-FROM temp
-LEFT JOIN cod_denom_comne AS deco ON temp.SMED_COD_DENOM_COMNE = deco.VAL_COD
-LEFT JOIN cod_tenr_med AS t ON temp.SMED_COD_TENR_MED = t.VAL_COD
-LEFT JOIN ben ON temp.periode_ref = ben.periode_ref
-			  AND temp.groupe_age = ben.groupe_age
-			  AND temp.annee_civile = ben.annee_civile
-			  AND temp.mois = ben.mois
+	SELECT
+		temp.*,
+		deco.DES AS PRODUIT,
+		t.DES AS TENEUR,
+		ben.BEN AS ben_unique_mois
+	FROM temp
+		LEFT JOIN cod_denom_comne AS deco ON temp.SMED_COD_DENOM_COMNE = deco.VAL_COD
+		LEFT JOIN cod_tenr_med AS t ON temp.SMED_COD_TENR_MED = t.VAL_COD
+		LEFT JOIN ben ON temp.periode_ref = ben.periode_ref
+					  AND temp.groupe_age = ben.groupe_age
+					  AND temp.annee_civile = ben.annee_civile
+					  AND temp.mois = ben.mois
 )
 SELECT
 	groupe_age,
