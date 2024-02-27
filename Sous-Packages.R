@@ -11,26 +11,30 @@ writeLines(desc_file, "DER.inesss/DESCRIPTION")
 
 ## Fonction ####
 DER.inesss.fcts <- paste0(c(
-  "ArgCheck",
+  "abrev_mois", "ArgCheck",
   "date_ymd", "DER_inesss_update", "DER_SQL_generateur", "domaine_valeurs",
-  "fusion_periodes",
+  "from_bd.vue", "fusion_periodes",
+  "indent",
+  "qu",
   "rmNA",
   "SQL_connexion",
-  "unaccent", "utils-sql"
+  "stat_generales_1",
+  "unaccent"
 ),".R")
 for (fct in DER.inesss.fcts) {
   file.copy(paste0("R/",fct), paste0("DER.inesss/R/",fct), overwrite = TRUE)
 }
-# domaine_valeurs
-domaine_valeurs_script <- readLines("DER.inesss/R/domaine_valeurs.R")
-for (i in 1:length(domaine_valeurs_script)) {
-  domaine_valeurs_script[[i]] <- str_replace_all(
-    domaine_valeurs_script[[i]],
-    "inesss\\:\\:",
-    "DER.inesss\\:\\:"
-  )
+# Remplacer l'appel du package inesss par DER.inesss
+for (fil in list.files("DER.inesss/R")) {
+  script <- readLines(paste0("DER.inesss/R/",fil))
+  if (any(str_detect(script, "inesss\\:\\:"))) {
+    for (i in 1:length(script)) {
+      script[[i]] <- str_replace_all(script[[i]], "inesss\\:\\:", "DER.inesss\\:\\:")
+      script[[i]] <- str_replace_all(script[[i]], "inesss\\:\\:\\:", "DER.inesss\\:\\:\\:")
+    }
+    writeLines(script, paste0("DER.inesss/R/",fil))
+  }
 }
-writeLines(domaine_valeurs_script, "DER.inesss/R/domaine_valeurs.R")
 
 
 ## Datas ####

@@ -1,6 +1,6 @@
 Package: DER.inesss
 Title: Institut National Excellence Sante Services Sociaux
-Version: 2.0.0.20240128
+Version: 2.0.0.20240227
 Authors@R: 
     person(given = "Guillaume",
            family = "Boucher",
@@ -20,6 +20,7 @@ Imports:
     miniUI,
     odbc,
     shiny,
+    shinyAce,
     shinydashboard,
     stringr,
     usethis,
