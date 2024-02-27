@@ -8,7 +8,7 @@
 #' @param catg_liste_med Codes de catégorie de liste de médicament.
 #' @param code_serv Codes de service à inclure ou exclure.
 #' @param code_serv_filtre Inclusion ou Exclusion des codes de services.
-#' @param grp_age
+#' @param grp_age Mineur-Majeur, 5ans ou 10ans.
 #'
 #' @return `string`
 #' @importFrom stringr str_pad
@@ -49,12 +49,12 @@ stat_generales_1 <- function(
       if (is.null(catg_liste_med)) {
         return(NULL)
       } else {
-        select_from <- paste0("select ",catg_liste_med[1]," as LISTE from (select 1 as T) as T")
+        select_from <- paste0("select ",qu(str_pad(catg_liste_med[1], 2, pad = "0"))," as LISTE from (select 1 as T) as T")
         if (length(catg_liste_med) > 1) {
           for (i in 2:length(catg_liste_med)) {
             select_from <- paste0(
               select_from," union\n",
-              indent(4),"select ",catg_liste_med[i]," as LISTE from (select 1 as T) as T"
+              indent(4),"select ",qu(str_pad(catg_liste_med[i], 2, pad = "0"))," as LISTE from (select 1 as T) as T"
             )
           }
         }

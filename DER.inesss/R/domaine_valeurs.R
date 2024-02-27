@@ -134,11 +134,10 @@ domaine_valeurs <- function() {
     txt_date <- paste(lubridate::day(date_MaJ), mois, lubridate::year(date_MaJ))  # JJ MM AAAA
 
     # Indiquer s'il y a une mise à jour de disponible pour la DER
+    update_msg <- ""
     if (any("DER.inesss.tar.gz" == list.files("J:/GRP/A/5/A/Commun/0 Outils/Librairies R"))) {
       if (date_MaJ < as.Date(file.info("J:/GRP/A/5/A/Commun/0 Outils/Librairies R/DER.inesss.tar.gz")$mtime)) {
         update_msg <- " (MaJ disponible)"
-      } else {
-        update_msg <- ""
       }
     }
 

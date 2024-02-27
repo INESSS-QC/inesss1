@@ -1507,9 +1507,9 @@ DENOM as (
 ),
 CATG as (
     select LISTE
-    from    (   select 3 as LISTE from (select 1 as T) as T union
-                select 40 as LISTE from (select 1 as T) as T union
-                select 41 as LISTE from (select 1 as T) as T
+    from    (   select &#39;03&#39; as LISTE from (select 1 as T) as T union
+                select &#39;40&#39; as LISTE from (select 1 as T) as T union
+                select &#39;41&#39; as LISTE from (select 1 as T) as T
             ) as T
 ),
 TEMP as (
@@ -1677,8 +1677,8 @@ détaillées</h1>
         &quot;),\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f5025960&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705755440&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.codesrx" class="section level2" number="3.2">
 <h2><span class="header-section-number">3.2</span> with.codesRx</h2>
@@ -1693,8 +1693,8 @@ détaillées</h1>
         ))
       }
     }
-&lt;bytecode: 0x000001e5f50342f8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705765d08&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.catg_liste_med" class="section level2" number="3.3">
 <h2><span class="header-section-number">3.3</span>
@@ -1703,12 +1703,12 @@ with.catg_liste_med</h2>
       if (is.null(catg_liste_med)) {
         return(NULL)
       } else {
-        select_from &lt;- paste0(&quot;select &quot;,catg_liste_med[1],&quot; as LISTE from (select 1 as T) as T&quot;)
+        select_from &lt;- paste0(&quot;select &quot;,qu(str_pad(catg_liste_med[1], 2, pad = &quot;0&quot;)),&quot; as LISTE from (select 1 as T) as T&quot;)
         if (length(catg_liste_med) &gt; 1) {
           for (i in 2:length(catg_liste_med)) {
             select_from &lt;- paste0(
               select_from,&quot; union\n&quot;,
-              indent(4),&quot;select &quot;,catg_liste_med[i],&quot; as LISTE from (select 1 as T) as T&quot;
+              indent(4),&quot;select &quot;,qu(str_pad(catg_liste_med[i], 2, pad = &quot;0&quot;)),&quot; as LISTE from (select 1 as T) as T&quot;
             )
           }
         }
@@ -1721,24 +1721,24 @@ with.catg_liste_med</h2>
         ))
       }
     }
-&lt;bytecode: 0x000001e5f503e770&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705774bb0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.as" class="section level2" number="3.4">
 <h2><span class="header-section-number">3.4</span> with.temp.as</h2>
 <pre><code>function() {
       return(&quot;TEMP as (\n&quot;)
     }
-&lt;bytecode: 0x000001e5f5049880&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70577b3e0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select" class="section level2" number="3.5">
 <h2><span class="header-section-number">3.5</span> with.temp.select</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;select\n&quot;))
     }
-&lt;bytecode: 0x000001e5f504d910&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057792b8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.groupe_age" class="section level2" number="3.6">
 <h2><span class="header-section-number">3.6</span>
@@ -1786,8 +1786,8 @@ with.temp.select.groupe_age</h2>
         stop(&quot;statgen1.with.temp.select.groupe_age(): grp_age valeur non permise.&quot;)
       }
     }
-&lt;bytecode: 0x000001e5f50432a0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70578a9c0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.periode_ref" class="section level2" number="3.7">
 <h2><span class="header-section-number">3.7</span>
@@ -1799,8 +1799,8 @@ with.temp.select.periode_ref</h2>
         indent(2),&quot;     end as PERIODE_REF,\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f5081cf0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057f2090&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.annee_civile" class="section level2" number="3.8">
 <h2><span class="header-section-number">3.8</span>
@@ -1808,8 +1808,8 @@ with.temp.select.annee_civile</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;year(SMED_DAT_SERV) as ANNEE_CIVILE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50794d0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057f57b8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.mois" class="section level2" number="3.9">
 <h2><span class="header-section-number">3.9</span>
@@ -1817,8 +1817,8 @@ with.temp.select.mois</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;month(SMED_DAT_SERV) as MOIS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5074d90&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057fc930&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.catg_liste_med" class="section level2" number="3.10">
 <h2><span class="header-section-number">3.10</span>
@@ -1830,8 +1830,8 @@ with.temp.select.catg_liste_med</h2>
         return(paste0(indent(2),&quot;SMED_COD_CATG_LISTE_MED as COD_CATG_LISTE,\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f50867c8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705810030&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.typerx" class="section level2" number="3.11">
 <h2><span class="header-section-number">3.11</span>
@@ -1842,8 +1842,8 @@ with.temp.select.typeRx</h2>
       }
       return(paste0(indent(2),select_var,&quot; as COD_PRODUIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f508eca0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705823c10&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.tenr_med" class="section level2" number="3.12">
 <h2><span class="header-section-number">3.12</span>
@@ -1851,8 +1851,8 @@ with.temp.select.tenr_med</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;SMED_COD_TENR_MED as COD_TENR,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5093b88&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70584cfe8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.ben" class="section level2" number="3.13">
 <h2><span class="header-section-number">3.13</span>
@@ -1860,8 +1860,8 @@ with.temp.select.ben</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;count(distinct SMED_NO_INDIV_BEN_BANLS) as BEN,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5097588&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70584a328&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.qte_med" class="section level2" number="3.14">
 <h2><span class="header-section-number">3.14</span>
@@ -1869,8 +1869,8 @@ with.temp.select.qte_med</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;sum(SMED_QTE_MED) as QTE_MED,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f509ae88&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705856c80&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.couts" class="section level2" number="3.15">
 <h2><span class="header-section-number">3.15</span>
@@ -1878,8 +1878,8 @@ with.temp.select.couts</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;sum(SMED_MNT_AUTOR_MED) as COUTS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f508c7f8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705852c60&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.rx" class="section level2" number="3.16">
 <h2><span class="header-section-number">3.16</span>
@@ -1887,8 +1887,8 @@ with.temp.select.rx</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;count(*) as RX,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f509e268&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705865a60&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.honoraire" class="section level2" number="3.17">
 <h2><span class="header-section-number">3.17</span>
@@ -1896,8 +1896,8 @@ with.temp.select.honoraire</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;sum(SMED_MNT_AUTOR_FRAIS_SERV) as HONORAIRE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f509bc38&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705864a80&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.duree_trait" class="section level2" number="3.18">
 <h2><span class="header-section-number">3.18</span>
@@ -1905,8 +1905,8 @@ with.temp.select.duree_trait</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TRAIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50a3658&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705877f88&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.select.couts_tot" class="section level2" number="3.19">
 <h2><span class="header-section-number">3.19</span>
@@ -1914,8 +1914,8 @@ with.temp.select.couts_tot</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as COUTS_TOT\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50a6f58&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70587b4f0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.from" class="section level2" number="3.20">
 <h2><span class="header-section-number">3.20</span> with.temp.from</h2>
@@ -1926,8 +1926,8 @@ with.temp.select.couts_tot</h2>
       }
       return(paste0(from,&quot;\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ae908&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705882b00&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.dat_serv" class="section level2" number="3.21">
 <h2><span class="header-section-number">3.21</span>
@@ -1935,8 +1935,8 @@ with.temp.where.dat_serv</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;where SMED_DAT_SERV between DAT.MIN_DATE and DAT.MAX_DATE\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50b05d0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705892720&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.typerx" class="section level2" number="3.22">
 <h2><span class="header-section-number">3.22</span>
@@ -1949,8 +1949,8 @@ with.temp.where.typeRx</h2>
         indent(2),&quot;and &quot;,varname,&quot; in PRODUIT.COD_PROD\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f50bbe10&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058a0fa8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.catg_liste_med" class="section level2" number="3.23">
 <h2><span class="header-section-number">3.23</span>
@@ -1962,8 +1962,8 @@ with.temp.where.catg_liste_med</h2>
         return(paste0(indent(2),&quot;and SMED_COD_CATG_LISTE_MED in CATG.LISTE\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f50c4ba8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058aa6a0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.cod_serv" class="section level2" number="3.24">
 <h2><span class="header-section-number">3.24</span>
@@ -1979,8 +1979,8 @@ with.temp.where.cod_serv</h2>
         ))
       }
     }
-&lt;bytecode: 0x000001e5f50bf0d8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058c9d20&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.duree_trait" class="section level2" number="3.25">
 <h2><span class="header-section-number">3.25</span>
@@ -1988,8 +1988,8 @@ with.temp.where.duree_trait</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;and SMED_NBR_JR_DUREE_TRAIT &gt; 0\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ca7b0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058e1718&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.where.sta_decis" class="section level2" number="3.26">
 <h2><span class="header-section-number">3.26</span>
@@ -1997,8 +1997,8 @@ with.temp.where.sta_decis</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;and SMED_COD_STA_DECIS not in (&#39;ANN&#39;, &#39;REF&#39;)\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50d01c0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058e7dd0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.temp.groupby" class="section level2" number="3.27">
 <h2><span class="header-section-number">3.27</span>
@@ -2017,24 +2017,24 @@ with.temp.groupby</h2>
         &quot;),\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f50d1b78&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058ffb48&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.as" class="section level2" number="3.28">
 <h2><span class="header-section-number">3.28</span> with.ben.as</h2>
 <pre><code>function() {
       return(&quot;BEN as (\n&quot;)
     }
-&lt;bytecode: 0x000001e5f50d8890&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058f7788&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select" class="section level2" number="3.29">
 <h2><span class="header-section-number">3.29</span> with.ben.select</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;select\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50de930&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059250c0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select.groupe_age" class="section level2" number="3.30">
 <h2><span class="header-section-number">3.30</span>
@@ -2082,8 +2082,8 @@ with.ben.select.groupe_age</h2>
         stop(&quot;statgen1.with.temp.select.groupe_age(): grp_age valeur non permise.&quot;)
       }
     }
-&lt;bytecode: 0x000001e5f50432a0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70578a9c0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select.periode_ref" class="section level2" number="3.31">
 <h2><span class="header-section-number">3.31</span>
@@ -2095,8 +2095,8 @@ with.ben.select.periode_ref</h2>
         indent(2),&quot;     end as PERIODE_REF,\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f5081cf0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057f2090&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select.annee_civile" class="section level2" number="3.32">
 <h2><span class="header-section-number">3.32</span>
@@ -2104,8 +2104,8 @@ with.ben.select.annee_civile</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;year(SMED_DAT_SERV) as ANNEE_CIVILE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50794d0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057f57b8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select.mois" class="section level2" number="3.33">
 <h2><span class="header-section-number">3.33</span>
@@ -2113,8 +2113,8 @@ with.ben.select.mois</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;month(SMED_DAT_SERV) as MOIS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5074d90&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7057fc930&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.select.ben" class="section level2" number="3.34">
 <h2><span class="header-section-number">3.34</span>
@@ -2122,8 +2122,8 @@ with.ben.select.ben</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;count(distinct SMED_NO_INDIV_BEN_BANLS) as BEN_UNIQUE_MOIS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50e5eb8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70593e1e0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.from" class="section level2" number="3.35">
 <h2><span class="header-section-number">3.35</span> with.ben.from</h2>
@@ -2134,8 +2134,8 @@ with.ben.select.ben</h2>
       }
       return(paste0(from,&quot;\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ae908&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705882b00&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.dat_serv" class="section level2" number="3.36">
 <h2><span class="header-section-number">3.36</span>
@@ -2143,8 +2143,8 @@ with.ben.where.dat_serv</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;where SMED_DAT_SERV between DAT.MIN_DATE and DAT.MAX_DATE\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50b05d0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705892720&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.catg_liste_med" class="section level2" number="3.37">
 <h2><span class="header-section-number">3.37</span>
@@ -2156,8 +2156,8 @@ with.ben.where.catg_liste_med</h2>
         return(paste0(indent(2),&quot;and SMED_COD_CATG_LISTE_MED in CATG.LISTE\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f50c4ba8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058aa6a0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.typerx" class="section level2" number="3.38">
 <h2><span class="header-section-number">3.38</span>
@@ -2170,8 +2170,8 @@ with.ben.where.typeRx</h2>
         indent(2),&quot;and &quot;,varname,&quot; in PRODUIT.COD_PROD\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f50bbe10&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058a0fa8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.cod_serv" class="section level2" number="3.39">
 <h2><span class="header-section-number">3.39</span>
@@ -2187,8 +2187,8 @@ with.ben.where.cod_serv</h2>
         ))
       }
     }
-&lt;bytecode: 0x000001e5f50bf0d8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058c9d20&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.duree_trait" class="section level2" number="3.40">
 <h2><span class="header-section-number">3.40</span>
@@ -2196,8 +2196,8 @@ with.ben.where.duree_trait</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;and SMED_NBR_JR_DUREE_TRAIT &gt; 0\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ca7b0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058e1718&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.where.sta_decis" class="section level2" number="3.41">
 <h2><span class="header-section-number">3.41</span>
@@ -2205,8 +2205,8 @@ with.ben.where.sta_decis</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;and SMED_COD_STA_DECIS not in (&#39;ANN&#39;, &#39;REF&#39;)\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50d01c0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7058e7dd0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.ben.groupby" class="section level2" number="3.42">
 <h2><span class="header-section-number">3.42</span>
@@ -2217,24 +2217,24 @@ with.ben.groupby</h2>
         &quot;),\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f50e1878&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705945810&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.as" class="section level2" number="3.43">
 <h2><span class="header-section-number">3.43</span> with.nom.as</h2>
 <pre><code>function() {
       return(&quot;NOM as (\n&quot;)
     }
-&lt;bytecode: 0x000001e5f50d9218&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705955c48&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select" class="section level2" number="3.44">
 <h2><span class="header-section-number">3.44</span> with.nom.select</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;select\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ef338&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a70594dab8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select.temp" class="section level2" number="3.45">
 <h2><span class="header-section-number">3.45</span>
@@ -2242,8 +2242,8 @@ with.nom.select.temp</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;T.*,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50eec50&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705973278&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select.produit" class="section level2" number="3.46">
 <h2><span class="header-section-number">3.46</span>
@@ -2251,8 +2251,8 @@ with.nom.select.produit</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;DC.DES as PRODUIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50f2650&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705982510&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select.tenr" class="section level2" number="3.47">
 <h2><span class="header-section-number">3.47</span>
@@ -2260,8 +2260,8 @@ with.nom.select.tenr</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;TENR.DES as TENR,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50f7e40&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059bafa0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select.catg_liste" class="section level2" number="3.48">
 <h2><span class="header-section-number">3.48</span>
@@ -2273,8 +2273,8 @@ with.nom.select.catg_liste</h2>
         return(paste0(indent(2),&quot;CATG.CODE_DES as CATG_LISTE,\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f50f97f8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059cafe8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.select.ben_unique_mois" class="section level2" number="3.49">
 <h2><span class="header-section-number">3.49</span>
@@ -2282,16 +2282,16 @@ with.nom.select.ben_unique_mois</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;B.BEN_UNIQUE_MOIS\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50fdce8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059d7a08&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.from" class="section level2" number="3.50">
 <h2><span class="header-section-number">3.50</span> with.nom.from</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;from TEMP as T\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5107718&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059e19e8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.leftjoin.produit" class="section level2" number="3.51">
 <h2><span class="header-section-number">3.51</span>
@@ -2299,8 +2299,8 @@ with.nom.leftjoin.produit</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;left join COD_DENOM_COMNE as DC on DC.VAL_COD = T.COD_PRODUIT\n&quot;))
     }
-&lt;bytecode: 0x000001e5f50ff0f0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059de4b8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.leftjoin.tenr" class="section level2" number="3.52">
 <h2><span class="header-section-number">3.52</span>
@@ -2308,8 +2308,8 @@ with.nom.leftjoin.tenr</h2>
 <pre><code>function() {
       return(paste0(indent(2),&quot;left join COD_TENR_MED as TENR on TENR.VAL_COD = T.COD_TENR\n&quot;))
     }
-&lt;bytecode: 0x000001e5f510ea50&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059f7518&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.leftjoin.catg_list" class="section level2" number="3.53">
 <h2><span class="header-section-number">3.53</span>
@@ -2324,8 +2324,8 @@ with.nom.leftjoin.catg_list</h2>
         ))
       }
     }
-&lt;bytecode: 0x000001e5f5112418&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a7059f01c0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="with.nom.leftjoin.ben_unique_mois" class="section level2" number="3.54">
 <h2><span class="header-section-number">3.54</span>
@@ -2339,16 +2339,16 @@ with.nom.leftjoin.ben_unique_mois</h2>
         &quot;)\n&quot;
       ))
     }
-&lt;bytecode: 0x000001e5f5104798&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705a0ff08&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select" class="section level2" number="3.55">
 <h2><span class="header-section-number">3.55</span> select</h2>
 <pre><code>function() {
       return(&quot;select\n&quot;)
     }
-&lt;bytecode: 0x000001e5f5119f50&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705a1b8a0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.groupe_age" class="section level2" number="3.56">
 <h2><span class="header-section-number">3.56</span>
@@ -2356,8 +2356,8 @@ select.groupe_age</h2>
 <pre><code>function() {
       return(paste0(indent(),&quot;GROUPE_AGE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f511fff0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705a17500&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.annee" class="section level2" number="3.57">
 <h2><span class="header-section-number">3.57</span> select.annee</h2>
@@ -2380,8 +2380,8 @@ select.groupe_age</h2>
       var_annee &lt;- paste0(var_annee, indent(2),&quot; end as ANNEE,\n&quot;)
       return(var_annee)
     }
-&lt;bytecode: 0x000001e5f511b9e8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705a2cec8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.annee_civile" class="section level2" number="3.58">
 <h2><span class="header-section-number">3.58</span>
@@ -2389,16 +2389,16 @@ select.annee_civile</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;ANNEE_CIVILE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5128490&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705abb840&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.mois" class="section level2" number="3.59">
 <h2><span class="header-section-number">3.59</span> select.mois</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;MOIS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5129eb8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705ac83c8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.ben_unique_mois" class="section level2" number="3.60">
 <h2><span class="header-section-number">3.60</span>
@@ -2406,8 +2406,8 @@ select.ben_unique_mois</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;BEN_UNIQUE_MOIS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5131910&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705ae29a0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.cod_catg_liste" class="section level2" number="3.61">
 <h2><span class="header-section-number">3.61</span>
@@ -2419,8 +2419,8 @@ select.cod_catg_liste</h2>
         return(paste0(indent(), &quot;COD_CATG_LISTE,\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f512d2d0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705ad9a48&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.catg_liste" class="section level2" number="3.62">
 <h2><span class="header-section-number">3.62</span>
@@ -2432,8 +2432,8 @@ select.catg_liste</h2>
         return(paste0(indent(), &quot;CATG_LISTE,\n&quot;))
       }
     }
-&lt;bytecode: 0x000001e5f5143650&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705ae87d8&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.cod_produit" class="section level2" number="3.63">
 <h2><span class="header-section-number">3.63</span>
@@ -2441,64 +2441,64 @@ select.cod_produit</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;COD_PRODUIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5147b78&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b02130&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.produit" class="section level2" number="3.64">
 <h2><span class="header-section-number">3.64</span> select.produit</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;PRODUIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f513f550&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b05890&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.cod_tenr" class="section level2" number="3.65">
 <h2><span class="header-section-number">3.65</span> select.cod_tenr</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;COD_TENR,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f514aec8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705af8b60&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.tenr" class="section level2" number="3.66">
 <h2><span class="header-section-number">3.66</span> select.tenr</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;TENR,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f513c870&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b04300&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.ben" class="section level2" number="3.67">
 <h2><span class="header-section-number">3.67</span> select.ben</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;BEN,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5150328&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b07a60&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.qte_med" class="section level2" number="3.68">
 <h2><span class="header-section-number">3.68</span> select.qte_med</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;QTE_MED,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f515bda0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b0af70&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.couts" class="section level2" number="3.69">
 <h2><span class="header-section-number">3.69</span> select.couts</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;COUTS,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5151768&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b0fd78&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.rx" class="section level2" number="3.70">
 <h2><span class="header-section-number">3.70</span> select.rx</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;RX,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5153190&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b304d0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.honoraire" class="section level2" number="3.71">
 <h2><span class="header-section-number">3.71</span>
@@ -2506,8 +2506,8 @@ select.honoraire</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;HONORAIRE,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5160b18&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b2ed80&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.duree_trait" class="section level2" number="3.72">
 <h2><span class="header-section-number">3.72</span>
@@ -2515,8 +2515,8 @@ select.duree_trait</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;DUREE_TRAIT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f51564e0&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b223f0&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="select.couts_tot" class="section level2" number="3.73">
 <h2><span class="header-section-number">3.73</span>
@@ -2524,16 +2524,16 @@ select.couts_tot</h2>
 <pre><code>function() {
       return(paste0(indent(), &quot;COUTS_TOT,\n&quot;))
     }
-&lt;bytecode: 0x000001e5f5161f58&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b31a60&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="from" class="section level2" number="3.74">
 <h2><span class="header-section-number">3.74</span> from</h2>
 <pre><code>function() {
       return(&quot;from NOM, DAT\n&quot;)
     }
-&lt;bytecode: 0x000001e5f5157920&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b36f48&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 <div id="order_by" class="section level2" number="3.75">
 <h2><span class="header-section-number">3.75</span> order_by</h2>
@@ -2546,8 +2546,8 @@ select.couts_tot</h2>
 
       return(paste0(&quot;order by &quot;, paste(orderby[orderby != &quot;&quot;], collapse = &quot;, &quot;),&quot;;&quot;))
     }
-&lt;bytecode: 0x000001e5f51659c8&gt;
-&lt;environment: 0x000001e5f5191b70&gt;</code></pre>
+&lt;bytecode: 0x000001a705b34d40&gt;
+&lt;environment: 0x000001a70af971b0&gt;</code></pre>
 </div>
 </div>
 

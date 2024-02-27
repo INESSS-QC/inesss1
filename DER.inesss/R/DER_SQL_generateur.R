@@ -1,3 +1,10 @@
+#' Démarrer DER SQL Générateur
+#' @encoding UTF-8
+#' @keywords internal
+DER_SQL_generateur.addins <- function() {
+  DER.inesss::DER_SQL_generateur()
+}
+
 #' SQL générateur
 #'
 #' Générateur de requêtes SQL pour la DER.

@@ -20,8 +20,8 @@ knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, comment = '')
 library(inesss)
 library(stringr)
 library(knitr)
-sg1_fcts <- attr(stat_generales_1(), 'internal_fcts')
-group_age <- sg1_fcts$with.temp.select.groupe_age
+sg1 <- attr(stat_generales_1(), 'internal_fcts')
+group_age <- sg1$with.temp.select.groupe_age
 ```
 
 "

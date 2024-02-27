@@ -28,7 +28,7 @@ stat_generales_1(
 
 \item{code_serv_filtre}{Inclusion ou Exclusion des codes de services.}
 
-\item{grp_age}{}
+\item{grp_age}{Mineur-Majeur, 5ans ou 10ans.}
 }
 \value{
 \code{string}
