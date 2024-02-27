@@ -2,3 +2,13 @@ Name: Domaine Valeurs
 Description: Démarrage du domaine de valeurs.
 Binding: domaine_valeurs.addins
 Interactive: true
+
+Name: DER.inesss - Mise à Jour
+Description: Mettre à jour la librairie DER.inesss.
+Binding: DER_inesss_update.addins
+Interactive: true
+
+Name: DER SQL Générateur
+Description: Démarrage de DER SQL Générateur.
+Binding: DER_SQL_generateur.addins
+Interactive: true

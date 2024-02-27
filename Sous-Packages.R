@@ -52,5 +52,14 @@ for (tab in DER.inesss.datas) {
 }
 
 ## Documentation ####
-file.copy("Documentation/Installations/DER - Installation librairie R.pdf", "DER.inesss/Documentation",
-          overwrite = TRUE)
+file.copy(
+  "Documentation/Installations/DER - Installation librairie R.pdf",
+  "DER.inesss/Documentation", overwrite = TRUE
+)
+
+## Addins ####
+file.copy(
+  "inst/rstudio/addins.dcf", "DER.inesss/inst/rstudio",
+  overwrite = TRUE
+)
+
