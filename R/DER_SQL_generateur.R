@@ -57,17 +57,20 @@ DER_SQL_generateur <- function() {
 
     observeEvent(input$ajouterMethod, {
       sql_code <- input$sqlEditor
-      add_code <- query.statistiques_generales.method(
-        debut = input$debut,
-        fin = input$fin,
-        type_Rx = input$sousMethod,
-        codes = { if (input$codes == "") NULL else input$codes },
-        code_serv = { if (input$codeServ == "") NULL else input$codeServ },
+      add_code <- stat_generales_1(
+        fin = { if (input$fin == "") "<Insérer Valeur>" else input$fin },
+        typeRx = input$sousMethod,
+        codesRx = { if (input$codes == "") "'<Insérer Valeur(s)>'" else input$codes },
+        catg_liste_med = { if (length(input$catg_liste_med)) input$catg_liste_med else rep("'<Insérer Valeur>'", 2) },
+        code_serv = { if (length(input$codeServ)) input$codeServ else "'<Insérer Valeur(s)'" },
         code_serv_filtre = input$codeServFiltre,
-        group_by = { if (input$groupby == "") NULL else input$groupby},
-        cohort = input$cohort
+        grp_age = { if (input$grp_age == "NULL") NULL else input$grp_age }
       )
-      updateAceEditor(session, "sqlEditor", value = paste0(sql_code, "\n", add_code))
+      if (input$sqlEditor == "") {
+        updateAceEditor(session, "sqlEditor", value = add_code)
+      } else {
+        updateAceEditor(session, "sqlEditor", value = paste0(sql_code, "\n", add_code))
+      }
     })
 
     observeEvent(input$reset, {
@@ -83,17 +86,23 @@ DER_SQL_generateur <- function() {
             fluidRow(
               column(
                 width = 6,
-                textInput("debut", "Date Début", value = "2022-01-01")
-              ),
-              column(
-                width = 6,
                 textInput("fin", "Date Fin", value = "2022-12-31")
               )
             ),
             fluidRow(
               column(
                 width = 12,
-                textInput("codes", paste0("Codes ", input$sousMethod), value = "48135")
+                textInput("codes", paste0("Codes ", input$sousMethod))
+              )
+            ),
+            fluidRow(
+              column(
+                width = 12,
+                selectInput(
+                  "catg_liste_med", "Catégorie de liste de médicament",
+                  choices = inesss::V_DES_COD[TYPE_CODE == "COD_CATG_LISTE_MED"]$CODE,
+                  selected = c("03", "40", "41"), multiple = TRUE
+                )
               )
             ),
             fluidRow(
@@ -101,8 +110,8 @@ DER_SQL_generateur <- function() {
                 width = 6,
                 selectInput(
                   "codeServ", "Codes de service",
-                  choices = c("1", "AD"), selected = "1",
-                  multiple = TRUE
+                  choices = unique(inesss::V_PARAM_SERV_MED$COD_SERV),
+                  selected = "1", multiple = TRUE
                 )
               ),
               column(
@@ -116,16 +125,11 @@ DER_SQL_generateur <- function() {
             fluidRow(
               column(
                 width = 12,
-                selectInput("groupby", "Grouper Par",
-                            choices = c("DENOM", "AGE"),
-                            selected = "DENOM",
-                            multiple = TRUE)
-              )
-            ),
-            fluidRow(
-              column(
-                width = 12,
-                checkboxInput("cohort", "Cohorte")
+                selectInput(
+                  "grp_age", "Groupe Âge",
+                  choices = list(`Mineur-Majeur` = "Mineur-Majeur", `10ans` = 10, `5ans` = 5, Aucun = "NULL"),
+                  selected = "Mineur-Majeur"
+                )
               )
             )
           ))
