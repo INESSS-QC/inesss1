@@ -19,8 +19,8 @@ loop_dates <- sort(c(
   # Dates de début pour l'extraction SQL
   # À modifier en fonction de l'utilisateur qui exécute et son SPOOL disponible.
   paste0(seq(1996, 2000, 2), "-01-01"),  # deux ans
-  paste0(2002:2007, "-01-01"),  # une année
-  c(  # 6 mois - deux extractions par année
+  paste0(2001:2007, "-01-01"),  # une année
+  c(  # 6 mois -> deux extractions par année
     paste0(2008:year(Sys.Date()), "-01-01"),
     paste0(2008:year(Sys.Date()), "-07-01")
   ),
@@ -57,6 +57,7 @@ v_dem_paimt_med_cm <- function(loop_dates) {
       "    smed_cod_forme_med as FORME,\n",
       "    smed_cod_tenr_med as TENEUR,\n",
       "    smed_cod_indcn_thera as INDCN_THERA,\n",
+      "    smed_cod_catg_liste_med as CATG_LISTE,\n",
       "    smed_cod_cla_ahf as AHFS_CLA,\n",
       "    smed_cod_scla_ahf as AHFS_SCLA,\n",
       "    smed_cod_sscla_ahf as AHFS_SSCLA,\n",
@@ -81,7 +82,7 @@ v_dem_paimt_med_cm <- function(loop_dates) {
 
   cols <- c(
     "DENOM", "DIN",
-    "FORME", "TENEUR", "INDCN_THERA",
+    "FORME", "TENEUR", "INDCN_THERA", "CTAG_LISTE",
     "AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
     "COD_SERV_1", "COD_SERV_2", "COD_SERV_3",
     "COD_STA_DECIS",
