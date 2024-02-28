@@ -1,4 +1,0 @@
-Répertoire où déposer le fichier PERSONAL.XLSB pour avoir accès
-en tout temps aux macros VBA :
-
-C:\Users\msXXX\AppData\Roaming\Microsoft\Excel\XLSTART

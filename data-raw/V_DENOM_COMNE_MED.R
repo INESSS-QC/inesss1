@@ -1,12 +1,20 @@
 library(usethis)
 library(odbc)
 library(data.table)
-library(askpass)
-library(inesss)
 library(lubridate)
+library(inesss)
+color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
+if (!exists("user")) {
+  user <- askpass::askpass("User")
+}
+if (!exists("pwd")) {
+  pwd <- askpass::askpass()
+}
 conn <- SQL_connexion(user, pwd)
 
 fct <- function() {
+
+  cat(color_text("V_DENOM_COMNE_MED\n"))
 
   ### Tableau des codes DENOM
   query <-
@@ -33,6 +41,3 @@ fct <- function() {
 V_DENOM_COMNE_MED <- fct()
 use_data(V_DENOM_COMNE_MED, overwrite = TRUE)
 rm(V_DENOM_COMNE_MED)
-
-# Fermer la connexion
-conn <- odbc::dbDisconnect(conn)

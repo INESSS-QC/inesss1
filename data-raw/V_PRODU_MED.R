@@ -1,12 +1,24 @@
 library(usethis)
 library(odbc)
 library(data.table)
-library(askpass)
-library(inesss)
 library(lubridate)
+library(inesss)
+color_text <- function(x) {return(crayon::italic(crayon::green(x)))}
+if (!exists("user")) {
+  user <- askpass::askpass("User")
+}
+if (!exists("pwd")) {
+  pwd <- askpass::askpass()
+}
 conn <- SQL_connexion(user, pwd)
 
+
+
+# FONCTIONS -----------------------------------------------------------------------------------
+
 nom_marq_comrc <- function() {
+
+  cat(color_text("V_PRODU_MED - NOM_MARQ_COMRC\n"))
 
   ### Extraction SQL
   query <-
@@ -43,12 +55,12 @@ nom_marq_comrc <- function() {
 
 }
 
+
+# SAVE DATASET --------------------------------------------------------------------------------
+
 V_PRODU_MED <- list(
   NOM_MARQ_COMRC = nom_marq_comrc()
 )
 attr(V_PRODU_MED, "MaJ") <- Sys.Date()
 use_data(V_PRODU_MED, overwrite = TRUE)
 rm(V_PRODU_MED)
-
-# Fermer la connexion
-conn <- odbc::dbDisconnect(conn)

@@ -1,0 +1,553 @@
+---
+title: 'Test'
+date: '`r Sys.Date()`'
+output:
+  html_document:
+    toc: true
+    toc_depth: 3
+    toc_float: true
+    number_sections: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, eval = TRUE, message = FALSE, comment = '')
+library(inesss)
+library(stringr)
+library(knitr)
+sg1 <- attr(stat_generales_1(), 'internal_fcts')
+group_age <- sg1$with.temp.select.groupe_age
+```
+
+# Requêtes Complètes - Exemples
+
+## DENOM
+```{sql, echo=TRUE, eval=FALSE}
+with DAT as (
+    select
+        date '2023-12-31' as MAX_DATE,
+        -interval '12' month + (MAX_DATE + interval '1' day) as MIN_DATE
+),
+DENOM as (
+    select distinct(VAL_COD) as COD_PROD
+    from COD_DENOM_COMNE
+    where VAL_COD in (46088, 46342, 46454, 46488, 46580, 47017, 47226, 47284, 47300, 47338, 47483, 47548, 47736)
+),
+CATG as (
+    select LISTE
+    from    (   select '03' as LISTE from (select 1 as T) as T union
+                select '40' as LISTE from (select 1 as T) as T union
+                select '41' as LISTE from (select 1 as T) as T
+            ) as T
+),
+TEMP as (
+    select
+        case when SMED_AGE_BEN_AN_SERV between 0 and 17 then '0-17'
+             else '18+'
+             end as GROUPE_AGE,
+        case when month(SMED_DAT_SERV) >= month(DAT.MIN_DATE) then SMED_AN_CIVIL_DAT + 1
+             else SMED_AN_CIVIL_DAT
+             end as PERIODE_REF,
+        year(SMED_DAT_SERV) as ANNEE_CIVILE,
+        month(SMED_DAT_SERV) as MOIS,
+        SMED_COD_CATG_LISTE_MED as COD_CATG_LISTE,
+        SMED_COD_DENOM_COMNE as COD_PRODUIT,
+        SMED_COD_TENR_MED as COD_TENR,
+        count(distinct SMED_NO_INDIV_BEN_BANLS) as BEN,
+        sum(SMED_QTE_MED) as QTE_MED,
+        sum(SMED_MNT_AUTOR_MED) as COUTS,
+        count(*) as RX,
+        sum(SMED_MNT_AUTOR_FRAIS_SERV) as HONORAIRE,
+        sum(SMED_NBR_JR_DUREE_TRAIT) as DUREE_TRAIT,
+        sum(SMED_MNT_AUTOR_FRAIS_SERV + SMED_MNT_AUTOR_MED) as COUTS_TOT
+    from V_DEM_PAIMT_MED_CM, DAT, PRODUIT, CATG
+    where SMED_DAT_SERV between DAT.MIN_DATE and DAT.MAX_DATE
+        and SMED_COD_CATG_LISTE_MED in CATG.LISTE
+        and SMED_COD_DENOM_COMNE in PRODUIT.COD_PROD
+        and (SMED_COD_SERV_1 not in ('01') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+        and SMED_COD_STA_DECIS not in ('ANN', 'REF')
+    group by GROUPE_AGE, PERIODE_REF, ANNEE_CIVILE, MOIS, COD_CATG_LISTE, COD_PRODUIT, COD_TENR
+),
+BEN as (
+    select
+        case when SMED_AGE_BEN_AN_SERV between 0 and 17 then '0-17'
+             else '18+'
+             end as GROUPE_AGE,
+        case when month(SMED_DAT_SERV) >= month(DAT.MIN_DATE) then SMED_AN_CIVIL_DAT + 1
+             else SMED_AN_CIVIL_DAT
+             end as PERIODE_REF,
+        year(SMED_DAT_SERV) as ANNEE_CIVILE,
+        month(SMED_DAT_SERV) as MOIS,
+        count(distinct SMED_NO_INDIV_BEN_BANLS) as BEN_UNIQUE_MOIS,
+    from V_DEM_PAIMT_MED_CM, DAT, PRODUIT, CATG
+    where SMED_DAT_SERV between DAT.MIN_DATE and DAT.MAX_DATE
+        and SMED_COD_CATG_LISTE_MED in CATG.LISTE
+        and SMED_COD_DENOM_COMNE in PRODUIT.COD_PROD
+        and (SMED_COD_SERV_1 not in ('01') or SMED_COD_SERV_1 is null)
+        and SMED_NBR_JR_DUREE_TRAIT > 0
+        and SMED_COD_STA_DECIS not in ('ANN', 'REF')
+    group by GROUPE_AGE, PERIODE_REF, ANNEE_CIVILE, MOIS
+),
+NOM as (
+    select
+        T.*,
+        DC.DES as PRODUIT,
+        TENR.DES as TENR,
+        CATG.CODE_DES as CATG_LISTE,
+        B.BEN_UNIQUE_MOIS
+    from TEMP as T
+        left join COD_DENOM_COMNE as DC on DC.VAL_COD = T.COD_PRODUIT
+        left join COD_TENR_MED as TENR on TENR.VAL_COD = T.COD_TENR
+        left join V_DES_COD as CATG on CATG.CODE_VAL_COD = T.COD_CATG_LISTE
+                                    and CATG.CODE_NOM_COD = 'COD_CATG_LISTE_MED'
+        left join BEN as B on B.GROUPE_AGE = T.GROUPE_AGE
+                           and B.PERIODE_REF = T.PERIODE_REF
+                           and B.ANNEE_CIVILE = T.ANNEE_CIVILE
+                           and B.MOIS = T.MOIS
+)
+select
+    GROUPE_AGE,
+    case when month(MIN_DATE) = 1 then concat('JAN',trim(PERIODE_REF-1),'-','DEC',trim(PERIODE_REF-1))
+         when month(MIN_Date) = 2 then concat('FEV',trim(PERIODE_REF-1),'-','JAN',trim(PERIODE_REF))
+         when month(MIN_Date) = 3 then concat('MAR',trim(PERIODE_REF-1),'-','FEV',trim(PERIODE_REF))
+         when month(MIN_Date) = 4 then concat('AVR',trim(PERIODE_REF-1),'-','MAR',trim(PERIODE_REF))
+         when month(MIN_Date) = 5 then concat('MAI',trim(PERIODE_REF-1),'-','AVR',trim(PERIODE_REF))
+         when month(MIN_Date) = 6 then concat('JUN',trim(PERIODE_REF-1),'-','MAI',trim(PERIODE_REF))
+         when month(MIN_Date) = 7 then concat('JUI',trim(PERIODE_REF-1),'-','JUN',trim(PERIODE_REF))
+         when month(MIN_Date) = 8 then concat('AOU',trim(PERIODE_REF-1),'-','JUI',trim(PERIODE_REF))
+         when month(MIN_Date) = 9 then concat('SEP',trim(PERIODE_REF-1),'-','AOU',trim(PERIODE_REF))
+         when month(MIN_Date) = 10 then concat('OCT',trim(PERIODE_REF-1),'-','SEP',trim(PERIODE_REF))
+         when month(MIN_Date) = 11 then concat('NOV',trim(PERIODE_REF-1),'-','OCT',trim(PERIODE_REF))
+         when month(MIN_Date) = 12 then concat('DEC',trim(PERIODE_REF-1),'-','NOV',trim(PERIODE_REF))
+         end as ANNEE,
+    ANNEE_CIVILE,
+    MOIS,
+    BEN_UNIQUE_MOIS,
+    COD_CATG_LISTE,
+    CATG_LISTE,
+    COD_PRODUIT,
+    PRODUIT,
+    COD_TENR,
+    TENR,
+    BEN,
+    QTE_MED,
+    COUTS,
+    RX,
+    HONORAIRE,
+    DUREE_TRAIT,
+    COUTS_TOT,
+from NOM, DAT
+order by GROUPE_AGE, ANNEE, ANNEE_CIVILE, MOIS, COD_CATG_LISTE, COD_PRODUIT;
+```
+
+# Détails
+
+## Groupe Âge
+
+### Mineur-Majeur
+```{r}
+printcode <- group_age('Mineur-Majeur')
+printcode <- str_replace(printcode, '        case','case')
+printcode <- str_replace(printcode, '             else', '     else')
+printcode <- str_replace(printcode, '             end', '     end')
+cat(printcode)
+```
+
+### 5 ans
+```{r}
+printcode <- group_age(5)
+printcode <- str_replace(printcode, '        case','case')
+printcode <- str_replace_all(printcode, '             when', '     when')
+printcode <- str_replace(printcode, '             else', '     else')
+printcode <- str_replace(printcode, '             end', '     end')
+cat(printcode)
+```
+
+### 10 ans
+```{r}
+printcode <- group_age(10)
+printcode <- str_replace(printcode, '        case','case')
+printcode <- str_replace_all(printcode, '             when', '     when')
+printcode <- str_replace(printcode, '             else', '     else')
+printcode <- str_replace(printcode, '             end', '     end')
+cat(printcode)
+```
+
+# Requêtes détaillées
+
+## with.date
+```{r}
+sg1[['with.date']]
+```
+
+## with.codesRx
+```{r}
+sg1[['with.codesRx']]
+```
+
+## with.catg_liste_med
+```{r}
+sg1[['with.catg_liste_med']]
+```
+
+## with.temp.as
+```{r}
+sg1[['with.temp.as']]
+```
+
+## with.temp.select
+```{r}
+sg1[['with.temp.select']]
+```
+
+## with.temp.select.groupe_age
+```{r}
+sg1[['with.temp.select.groupe_age']]
+```
+
+## with.temp.select.periode_ref
+```{r}
+sg1[['with.temp.select.periode_ref']]
+```
+
+## with.temp.select.annee_civile
+```{r}
+sg1[['with.temp.select.annee_civile']]
+```
+
+## with.temp.select.mois
+```{r}
+sg1[['with.temp.select.mois']]
+```
+
+## with.temp.select.catg_liste_med
+```{r}
+sg1[['with.temp.select.catg_liste_med']]
+```
+
+## with.temp.select.typeRx
+```{r}
+sg1[['with.temp.select.typeRx']]
+```
+
+## with.temp.select.tenr_med
+```{r}
+sg1[['with.temp.select.tenr_med']]
+```
+
+## with.temp.select.ben
+```{r}
+sg1[['with.temp.select.ben']]
+```
+
+## with.temp.select.qte_med
+```{r}
+sg1[['with.temp.select.qte_med']]
+```
+
+## with.temp.select.couts
+```{r}
+sg1[['with.temp.select.couts']]
+```
+
+## with.temp.select.rx
+```{r}
+sg1[['with.temp.select.rx']]
+```
+
+## with.temp.select.honoraire
+```{r}
+sg1[['with.temp.select.honoraire']]
+```
+
+## with.temp.select.duree_trait
+```{r}
+sg1[['with.temp.select.duree_trait']]
+```
+
+## with.temp.select.couts_tot
+```{r}
+sg1[['with.temp.select.couts_tot']]
+```
+
+## with.temp.from
+```{r}
+sg1[['with.temp.from']]
+```
+
+## with.temp.where.dat_serv
+```{r}
+sg1[['with.temp.where.dat_serv']]
+```
+
+## with.temp.where.typeRx
+```{r}
+sg1[['with.temp.where.typeRx']]
+```
+
+## with.temp.where.catg_liste_med
+```{r}
+sg1[['with.temp.where.catg_liste_med']]
+```
+
+## with.temp.where.cod_serv
+```{r}
+sg1[['with.temp.where.cod_serv']]
+```
+
+## with.temp.where.duree_trait
+```{r}
+sg1[['with.temp.where.duree_trait']]
+```
+
+## with.temp.where.sta_decis
+```{r}
+sg1[['with.temp.where.sta_decis']]
+```
+
+## with.temp.groupby
+```{r}
+sg1[['with.temp.groupby']]
+```
+
+## with.ben.as
+```{r}
+sg1[['with.ben.as']]
+```
+
+## with.ben.select
+```{r}
+sg1[['with.ben.select']]
+```
+
+## with.ben.select.groupe_age
+```{r}
+sg1[['with.ben.select.groupe_age']]
+```
+
+## with.ben.select.periode_ref
+```{r}
+sg1[['with.ben.select.periode_ref']]
+```
+
+## with.ben.select.annee_civile
+```{r}
+sg1[['with.ben.select.annee_civile']]
+```
+
+## with.ben.select.mois
+```{r}
+sg1[['with.ben.select.mois']]
+```
+
+## with.ben.select.ben
+```{r}
+sg1[['with.ben.select.ben']]
+```
+
+## with.ben.from
+```{r}
+sg1[['with.ben.from']]
+```
+
+## with.ben.where.dat_serv
+```{r}
+sg1[['with.ben.where.dat_serv']]
+```
+
+## with.ben.where.catg_liste_med
+```{r}
+sg1[['with.ben.where.catg_liste_med']]
+```
+
+## with.ben.where.typeRx
+```{r}
+sg1[['with.ben.where.typeRx']]
+```
+
+## with.ben.where.cod_serv
+```{r}
+sg1[['with.ben.where.cod_serv']]
+```
+
+## with.ben.where.duree_trait
+```{r}
+sg1[['with.ben.where.duree_trait']]
+```
+
+## with.ben.where.sta_decis
+```{r}
+sg1[['with.ben.where.sta_decis']]
+```
+
+## with.ben.groupby
+```{r}
+sg1[['with.ben.groupby']]
+```
+
+## with.nom.as
+```{r}
+sg1[['with.nom.as']]
+```
+
+## with.nom.select
+```{r}
+sg1[['with.nom.select']]
+```
+
+## with.nom.select.temp
+```{r}
+sg1[['with.nom.select.temp']]
+```
+
+## with.nom.select.produit
+```{r}
+sg1[['with.nom.select.produit']]
+```
+
+## with.nom.select.tenr
+```{r}
+sg1[['with.nom.select.tenr']]
+```
+
+## with.nom.select.catg_liste
+```{r}
+sg1[['with.nom.select.catg_liste']]
+```
+
+## with.nom.select.ben_unique_mois
+```{r}
+sg1[['with.nom.select.ben_unique_mois']]
+```
+
+## with.nom.from
+```{r}
+sg1[['with.nom.from']]
+```
+
+## with.nom.leftjoin.produit
+```{r}
+sg1[['with.nom.leftjoin.produit']]
+```
+
+## with.nom.leftjoin.tenr
+```{r}
+sg1[['with.nom.leftjoin.tenr']]
+```
+
+## with.nom.leftjoin.catg_list
+```{r}
+sg1[['with.nom.leftjoin.catg_list']]
+```
+
+## with.nom.leftjoin.ben_unique_mois
+```{r}
+sg1[['with.nom.leftjoin.ben_unique_mois']]
+```
+
+## select
+```{r}
+sg1[['select']]
+```
+
+## select.groupe_age
+```{r}
+sg1[['select.groupe_age']]
+```
+
+## select.annee
+```{r}
+sg1[['select.annee']]
+```
+
+## select.annee_civile
+```{r}
+sg1[['select.annee_civile']]
+```
+
+## select.mois
+```{r}
+sg1[['select.mois']]
+```
+
+## select.ben_unique_mois
+```{r}
+sg1[['select.ben_unique_mois']]
+```
+
+## select.cod_catg_liste
+```{r}
+sg1[['select.cod_catg_liste']]
+```
+
+## select.catg_liste
+```{r}
+sg1[['select.catg_liste']]
+```
+
+## select.cod_produit
+```{r}
+sg1[['select.cod_produit']]
+```
+
+## select.produit
+```{r}
+sg1[['select.produit']]
+```
+
+## select.cod_tenr
+```{r}
+sg1[['select.cod_tenr']]
+```
+
+## select.tenr
+```{r}
+sg1[['select.tenr']]
+```
+
+## select.ben
+```{r}
+sg1[['select.ben']]
+```
+
+## select.qte_med
+```{r}
+sg1[['select.qte_med']]
+```
+
+## select.couts
+```{r}
+sg1[['select.couts']]
+```
+
+## select.rx
+```{r}
+sg1[['select.rx']]
+```
+
+## select.honoraire
+```{r}
+sg1[['select.honoraire']]
+```
+
+## select.duree_trait
+```{r}
+sg1[['select.duree_trait']]
+```
+
+## select.couts_tot
+```{r}
+sg1[['select.couts_tot']]
+```
+
+## from
+```{r}
+sg1[['from']]
+```
+
+## order_by
+```{r}
+sg1[['order_by']]
+```
+
+

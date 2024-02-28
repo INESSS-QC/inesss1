@@ -1,37 +1,29 @@
 Package: inesss
 Title: Institut National Excellence Sante Services Sociaux
-Version: 1.1.0
+Version: 2.0.0.20240227
 Authors@R: 
     person(given = "Guillaume",
            family = "Boucher",
            role = c("aut", "cre"),
            email = "guillaume.boucher@inesss.qc.ca")
-Description: Cette librairie fournit des fonctionnalités pour une variété de tâches propices au domaine de la santé et des outils pour visualiser les résultats.
+Description: Outils pour la BDCA de l'INESSS
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.2
+RoxygenNote: 7.3.1
 Imports:
     askpass,
+    crayon,
     data.table,
-    DBI,
-    fs,
-    kableExtra,
-    knitr,
     lubridate,
     miniUI,
-    parallel,
     odbc,
-    Rd2md,
-    readxl,
-    rmarkdown,
-    rstudioapi,
     shiny,
+    shinyAce,
     shinydashboard,
-    shinyFiles,
     stringr,
-    testthat,
+    usethis,
     writexl
 VignetteBuilder: knitr
 Depends: 

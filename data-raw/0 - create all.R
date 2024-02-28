@@ -1,40 +1,37 @@
+################################################################################# #
+############################### ATTENTION #########################################
+# S'assurer d'installer la dernière version du package avant d'exécuter le code.
+# Nécessaire pour analyser les nouveaux codes de médicaments qui apparaissent dans
+# la base de données V_DEM_PAIMT_MED_CM (peut-être d'autres aussi)
+# ############################################################################### #
+
 library(inesss)
 
 user <- askpass::askpass("User")
 pwd <- askpass::askpass("Mot de passe")
 
-# send_mail <- TRUE
-# mail_to <- c(
-#   "guillaume.boucher@inesss.qc.ca"
-#   # "françois-xavier.houde@inesss.qc.ca"
-# )
-
 files <- c(
-  "CIM.R",
-  "Comorbidity_Dx.R",
-  "ComorbidityWeights.R",
-  "DBC_TablesV.R",
-  # "I_APME_DEM_AUTOR_CRITR_ETEN_CM.R",
-  "internal_datas.R",
-  "Obstetrics_Dx.R",
-  "Pop_QC.R",
-  "RLS_list.R",
-  "RLS_tab_convert.R",
-  "V_DEM_PAIMT_MED_CM.R",
-  "V_DENOM_COMNE_MED.R",
-  "V_DES_COD.R",
-  "V_PRODU_MED.R"
+  "CIM",
+  "I_APME_DEM_AUTOR_CRITR_ETEN_CM___DES_COURT_INDCN_RECNU",
+  "V_CLA_AHF", "V_COD_STA_DECIS",
+  "V_DEM_PAIMT_MED_CM",
+  "V_DENOM_COMNE_MED",
+  "V_DES_COD",
+  "V_FORME_MED",
+  "V_PARAM_SERV_MED",
+  "V_PRODU_MED",
+  "V_TENR_MED"
 )
-files <- paste0("data-raw/", files)
+files <- paste0("data-raw/", files, ".R")
 
 conn <- SQL_connexion(user, pwd)
 if (is.null(conn)) {
   stop("User ou Mot de passe erroné.")
 } else if (class(conn)[1] == "Teradata") {
-  rm(conn)
   t1 <- Sys.time()
   for (f in files) {
     source(f, local = TRUE, encoding = "UTF-8")
   }
-  t2 <- Sys.time(); difftime(t2, t1)
+  t2 <- Sys.time()
+  difftime(t2, t1)
 }

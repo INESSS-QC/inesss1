@@ -1,0 +1,30 @@
+Package: DER.inesss
+Title: Institut National Excellence Sante Services Sociaux
+Version: 2.0.0.20240227
+Authors@R: 
+    person(given = "Guillaume",
+           family = "Boucher",
+           role = c("aut", "cre"),
+           email = "guillaume.boucher@inesss.qc.ca")
+Description: Outils pour la DER de l'INESSS
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.2.3
+Imports:
+    askpass,
+    crayon,
+    data.table,
+    lubridate,
+    miniUI,
+    odbc,
+    shiny,
+    shinyAce,
+    shinydashboard,
+    stringr,
+    usethis,
+    writexl
+VignetteBuilder: knitr
+Depends: 
+    R (>= 4.0.3)
