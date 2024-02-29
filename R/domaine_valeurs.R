@@ -293,7 +293,7 @@ domaine_valeurs <- function() {
     }
     return(col_order)
   }
-  V_FORM_MED_cod_typ_forme <- function() {
+  V_FORME_MED_cod_typ_forme <- function() {
     ### Valeurs uniques des codes et des descriptions de type de forme
     ### @return Vecteur
     cod_desc <- unique(inesss::V_FORME_MED[, .(COD_TYP_FORME, NOM_TYPE_FORME)])
@@ -319,7 +319,7 @@ domaine_valeurs <- function() {
 
 
   # DATAS -------------------------------------------------------------------
-  V_FORM_MED__menuCodTypForme <- V_FORM_MED_cod_typ_forme()
+  V_FORME_MED__menuCodTypForme <- V_FORME_MED_cod_typ_forme()
 
 
   # USER INTERFACE ----------------------------------------------------------
@@ -348,8 +348,9 @@ domaine_valeurs <- function() {
         menuItem("CIM-9 et CIM-10", tabName = "tabCIM"),
         menuItem("Classes AHFS", tabName = "tabV_CLA_AHF"),
         menuItem("Dénomination commune", tabName = "tabV_DENOM_COMNE_MED"),
-        menuItem("Forme", tabName = "tabV_FORM_MED"),
-        menuItem("Produit médicament", tabName = "tabV_PRODU_MED")
+        menuItem("Forme", tabName = "tabV_FORME_MED"),
+        menuItem("Produit médicament", tabName = "tabV_PRODU_MED"),
+        menuItem("Teneur", tabName = "tabV_TENR_MED")
 
       )
     ),
@@ -553,7 +554,7 @@ domaine_valeurs <- function() {
         tabItem(
           tabName = "tabV_DENOM_COMNE_MED",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_DEM_PAIMT_MED_CM)$MaJ),
+            header_MaJ_datas(attributes(inesss::V_DENOM_COMNE_MED)$MaJ),
             column(
               width = 12,
               strong("Vue : V_DENOM_COMNE_MED"),
@@ -584,14 +585,14 @@ domaine_valeurs <- function() {
         ),
 
 
-        ### V_FORM_MED ----------------------------------------------------------
+        ### V_FORME_MED ----------------------------------------------------------
         tabItem(
-          tabName = "tabV_FORM_MED",
+          tabName = "tabV_FORME_MED",
           fluidRow(
-            header_MaJ_datas(attributes(inesss::V_PRODU_MED)$MaJ),
+            header_MaJ_datas(attributes(inesss::V_FORME_MED)$MaJ),
             column(
               width = 12,
-              strong("Vue : V_FORM_MED"),
+              strong("Vue : V_FORME_MED"),
               p("Forme pharmaceutique que peut prendre un médicament. Cette structure contient l'information qui décrit un code de forme de médicament. Une forme pharmaceutique équivaut à une apparence, à un aspect visible par lequel est dispensé un médicament.")
             )
           ),
@@ -600,11 +601,11 @@ domaine_valeurs <- function() {
             tabPanel(
               title = "Domaine de valeur",
               div(style = "margin-top:10px"),
-              uiOutput("V_FORM_MED__params"),
-              uiOutput("V_FORM_MED__go_reset_button"),
-              uiOutput("V_FORM_MED__save_button"),
+              uiOutput("V_FORME_MED__params"),
+              uiOutput("V_FORME_MED__go_reset_button"),
+              uiOutput("V_FORME_MED__save_button"),
               div(style = "margin-top:10px"),
-              dataTableOutput("V_FORM_MED__dt")
+              dataTableOutput("V_FORME_MED__dt")
             )
           )
         ),
@@ -662,8 +663,32 @@ domaine_valeurs <- function() {
               )
             )
           )
-        )
+        ),
 
+        ### V_TENR_MED ----------------------------------------------------------
+        tabItem(
+          tabName = "tabV_TENR_MED",
+          fluidRow(
+            header_MaJ_datas(attributes(inesss::V_TENR_MED)$MaJ),
+            column(
+              width = 12,
+              strong("Vue : V_TENR_MED"),
+              p("")
+            )
+          ),
+          tabsetPanel(
+            type = "tabs",
+            tabPanel(
+              title = "Domaine de valeur",
+              div(style = "margin-top:10px"),
+              uiOutput("V_TENR_MED__params"),
+              uiOutput("V_TENR_MED__go_reset_button"),
+              uiOutput("V_TENR_MED__save_button"),
+              div(style = "margin-top:10px"),
+              dataTableOutput("V_TENR_MED__dt")
+            )
+          )
+        )
       )
     )
   )
@@ -1956,9 +1981,11 @@ domaine_valeurs <- function() {
             if (any("CATG_LISTE" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
               catgliste_desc <- inesss::V_DES_COD[
                 TYPE_CODE == "COD_CATG_LISTE_MED",
-                .(CATG_LISTE = CODE, NOM_CATG_LISTE = CODE_DESC)
+                .(mergeCATG_LISTE = as.integer(CODE), NOM_CATG_LISTE = CODE_DESC)
               ]
-              dt <- merge(dt, catgliste_desc, by = "CATG_LISTE", all.x = TRUE)
+              dt[, mergeCATG_LISTE := as.integer(CATG_LISTE)]  # il y a des valeurs à un CHR : '3' au lieu de '03'
+              dt <- merge(dt, catgliste_desc, by = "mergeCATG_LISTE", all.x = TRUE)
+              dt[, mergeCATG_LISTE := NULL]
               if (input$V_DEM_PAIMT_MED_CM__catgListeDesc != "") {
                 if (input$V_DEM_PAIMT_MED_CM__catgListeTypeRecherche == "keyword") {
                   dt <- search_keyword(
@@ -2691,26 +2718,26 @@ domaine_valeurs <- function() {
 
 
 
-    # V_FORM_MED ####
-    V_FORM_MED__val <- reactiveValues(
+    # V_FORME_MED ####
+    V_FORME_MED__val <- reactiveValues(
       show_tab = FALSE
     )
 
     ## Fiche Technique ####
 
     ## UI ####
-    output$V_FORM_MED__params <- renderUI({
+    output$V_FORME_MED__params <- renderUI({
       return(tagList(
         fluidRow(
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__code", "COD_FORME")
+            textInput("V_FORME_MED__code", "COD_FORME")
           ),
           column(
             width = ui_col_width(),
             selectInput(
-              "V_FORM_MED__codTypForme", "COD_TYP_FORME",
-              choices = V_FORM_MED__menuCodTypForme,
+              "V_FORME_MED__codTypForme", "COD_TYP_FORME",
+              choices = V_FORME_MED__menuCodTypForme,
               selected = NULL, multiple = TRUE
             )
           )
@@ -2718,12 +2745,12 @@ domaine_valeurs <- function() {
         fluidRow(
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__nom", "NOM_FORME")
+            textInput("V_FORME_MED__nom", "NOM_FORME")
           ),
           column(
             width = ui_col_width(),
             selectInput(
-              "V_FORM_MED__nomTypeRecherche", "Type Recherche",
+              "V_FORME_MED__nomTypeRecherche", "Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
               selected = "Mot-clé"
@@ -2733,12 +2760,12 @@ domaine_valeurs <- function() {
         fluidRow(
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__nomAbr", "NOM_FORME_ABR")
+            textInput("V_FORME_MED__nomAbr", "NOM_FORME_ABR")
           ),
           column(
             width = ui_col_width(),
             selectInput(
-              "V_FORM_MED__nomAbrTypeRecherche", "Type Recherche",
+              "V_FORME_MED__nomAbrTypeRecherche", "Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
               selected = "Mot-clé"
@@ -2748,12 +2775,12 @@ domaine_valeurs <- function() {
         fluidRow(
           column(
             width = ui_col_width(),
-            textInput("V_FORM_MED__nomAngl", "NOM_ANGL_FORME")
+            textInput("V_FORME_MED__nomAngl", "NOM_ANGL_FORME")
           ),
           column(
             width = ui_col_width(),
             selectInput(
-              "V_FORM_MED__nomAnglTypeRecherche", "Type Recherche",
+              "V_FORME_MED__nomAnglTypeRecherche", "Type Recherche",
               choices = c("Mot-clé" = "keyword",
                           "Valeur exacte" = "exactWord"),
               selected = "Mot-clé"
@@ -2762,72 +2789,72 @@ domaine_valeurs <- function() {
         )
       ))
     })
-    output$V_FORM_MED__go_reset_button <- renderUI({
-      button_go_reset("V_FORM_MED")
+    output$V_FORME_MED__go_reset_button <- renderUI({
+      button_go_reset("V_FORME_MED")
     })
-    output$V_FORM_MED__save_button <- renderUI({
-      button_save("V_FORM_MED", V_FORM_MED__dt())
+    output$V_FORME_MED__save_button <- renderUI({
+      button_save("V_FORME_MED", V_FORME_MED__dt())
     })
 
     ## Datatable ####
-    observeEvent(input$V_FORM_MED__go, {
-      V_FORM_MED__val$show_tab <- TRUE
+    observeEvent(input$V_FORME_MED__go, {
+      V_FORME_MED__val$show_tab <- TRUE
     }, ignoreInit = TRUE)
-    V_FORM_MED__dt <- eventReactive(
-      c(input$V_FORM_MED__go, V_FORM_MED__val$show_tab),
+    V_FORME_MED__dt <- eventReactive(
+      c(input$V_FORME_MED__go, V_FORME_MED__val$show_tab),
       {
-        if (V_FORM_MED__val$show_tab) {
+        if (V_FORME_MED__val$show_tab) {
           dt <- inesss::V_FORME_MED
           # Code Forme
-          if (input$V_FORM_MED__code != "") {
+          if (input$V_FORME_MED__code != "") {
             dt <- search_value_chr(
               dt, col = "COD_FORME",
-              values = input$V_FORM_MED__code, pad = 5
+              values = input$V_FORME_MED__code, pad = 5
             )
           }
           # Code Type Forme
-          if (!is.null(input$V_FORM_MED__codTypForme)) {
-            dt <- dt[paste0(COD_TYP_FORME, " - ", NOM_TYPE_FORME) %in% input$V_FORM_MED__codTypForme]
+          if (!is.null(input$V_FORME_MED__codTypForme)) {
+            dt <- dt[paste0(COD_TYP_FORME, " - ", NOM_TYPE_FORME) %in% input$V_FORME_MED__codTypForme]
           }
           # Nom Forme
-          if (input$V_FORM_MED__nom != "") {
-            if (input$V_FORM_MED__nomTypeRecherche == "keyword") {
+          if (input$V_FORME_MED__nom != "") {
+            if (input$V_FORME_MED__nomTypeRecherche == "keyword") {
               dt <- search_keyword(
                 dt, col = "NOM_FORME",
-                values = input$V_FORM_MED__nom
+                values = input$V_FORME_MED__nom
               )
-            } else if (input$V_FORM_MED__nomTypeRecherche == "exactWord") {
+            } else if (input$V_FORME_MED__nomTypeRecherche == "exactWord") {
               dt <- search_value_chr(
                 dt, col = "NOM_FORME",
-                values = input$V_FORM_MED__nom
+                values = input$V_FORME_MED__nom
               )
             }
           }
           # Nom Forme Abbrégé
-          if (input$V_FORM_MED__nomAbr != "") {
-            if (input$V_FORM_MED__nomAbrTypeRecherche == "keyword") {
+          if (input$V_FORME_MED__nomAbr != "") {
+            if (input$V_FORME_MED__nomAbrTypeRecherche == "keyword") {
               dt <- search_keyword(
                 dt, col = "NOM_FORME_ABR",
-                values = input$V_FORM_MED__nomAbr
+                values = input$V_FORME_MED__nomAbr
               )
-            } else if (input$V_FORM_MED__nomAbrTypeRecherche == "exactWord") {
+            } else if (input$V_FORME_MED__nomAbrTypeRecherche == "exactWord") {
               dt <- search_value_chr(
                 dt, col = "NOM_FORME_ABR",
-                values = input$V_FORM_MED__nomAbr
+                values = input$V_FORME_MED__nomAbr
               )
             }
           }
           # Nom Forme Anglais
-          if (input$V_FORM_MED__nomAngl != "") {
-            if (input$V_FORM_MED__nomAnglTypeRecherche == "keyword") {
+          if (input$V_FORME_MED__nomAngl != "") {
+            if (input$V_FORME_MED__nomAnglTypeRecherche == "keyword") {
               dt <- search_keyword(
                 dt, col = "NOM_ANGL_FORME",
-                values = input$V_FORM_MED__nomAngl
+                values = input$V_FORME_MED__nomAngl
               )
-            } else if (input$V_FORM_MED__nomAnglTypeRecherche == "exactWord") {
+            } else if (input$V_FORME_MED__nomAnglTypeRecherche == "exactWord") {
               dt <- search_value_chr(
                 dt, col = "NOM_ANGL_FORME",
-                values = input$V_FORM_MED__nomAngl
+                values = input$V_FORME_MED__nomAngl
               )
             }
           }
@@ -2837,38 +2864,38 @@ domaine_valeurs <- function() {
         }
       }
     )
-    output$V_FORM_MED__dt <- renderDataTable({
-      V_FORM_MED__dt()
+    output$V_FORME_MED__dt <- renderDataTable({
+      V_FORME_MED__dt()
     }, options = renderDataTable_options())
 
     ## Export ####
-    output$V_FORM_MED__save <- downloadHandler(
+    output$V_FORME_MED__save <- downloadHandler(
       filename = function() {
         paste0(
-          input$V_FORM_MED__savename, ".",
-          input$V_FORM_MED__saveext
+          input$V_FORME_MED__savename, ".",
+          input$V_FORME_MED__saveext
         )
       },
       content = function(file) {
-        if (input$V_FORM_MED__saveext == "xlsx") {
-          writexl::write_xlsx(V_FORM_MED__dt(), file)
-        } else if (input$V_FORM_MED__saveext == "csv") {
-          write.csv2(V_FORM_MED__dt(), file, row.names = FALSE,
+        if (input$V_FORME_MED__saveext == "xlsx") {
+          writexl::write_xlsx(V_FORME_MED__dt(), file)
+        } else if (input$V_FORME_MED__saveext == "csv") {
+          write.csv2(V_FORME_MED__dt(), file, row.names = FALSE,
                      fileEncoding = "latin1")
         }
       }
     )
 
     ## Update Buttons ####
-    observeEvent(input$V_FORM_MED__reset, {
-      V_FORM_MED__val$show_tab <- FALSE
-      updateTextInput(session, "V_FORM_MED__code", value = "")
-      updateSelectInput(session, "V_FORM_MED__codTypForme",
-                        choices = V_FORM_MED__menuCodTypForme,
+    observeEvent(input$V_FORME_MED__reset, {
+      V_FORME_MED__val$show_tab <- FALSE
+      updateTextInput(session, "V_FORME_MED__code", value = "")
+      updateSelectInput(session, "V_FORME_MED__codTypForme",
+                        choices = V_FORME_MED__menuCodTypForme,
                         selected = NULL)
-      updateTextInput(session, "V_FORM_MED__nom", value = "")
-      updateTextInput(session, "V_FORM_MED__nomAngl", value = "")
-      updateTextInput(session, "V_FORM_MED__nomAbr", value = "")
+      updateTextInput(session, "V_FORME_MED__nom", value = "")
+      updateTextInput(session, "V_FORME_MED__nomAngl", value = "")
+      updateTextInput(session, "V_FORME_MED__nomAbr", value = "")
     })
 
 
@@ -3024,6 +3051,145 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_PRODU_MED__denom", value = "")
       updateTextInput(session, "V_PRODU_MED__din", value = "")
       updateTextInput(session, "V_PRODU_MED__nomMarqComrc", value = "")
+    })
+
+
+
+
+
+    # V_TENR_MED ####
+    V_TENR_MED__val <- reactiveValues(
+      show_tab = FALSE
+    )
+
+    ## Fiche Technique ####
+
+    ## UI ####
+    output$V_TENR_MED__params <- renderUI({
+      return(tagList(
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_TENR_MED__code", "COD_TENR")
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_TENR_MED__nom", "NOM_TENR")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_TENR_MED__nomTypeRecherche", "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        ),
+        fluidRow(
+          column(
+            width = ui_col_width(),
+            textInput("V_TENR_MED__nomAngl", "NOM_ANGL_TENR")
+          ),
+          column(
+            width = ui_col_width(),
+            selectInput(
+              "V_TENR_MED__nomAnglTypeRecherche", "Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = "Mot-clé"
+            )
+          )
+        )
+      ))
+    })
+    output$V_TENR_MED__go_reset_button <- renderUI({
+      button_go_reset("V_TENR_MED")
+    })
+    output$V_TENR_MED__save_button <- renderUI({
+      button_save("V_TENR_MED", V_TENR_MED__dt())
+    })
+
+    ## Datatable ####
+    observeEvent(input$V_TENR_MED__go, {
+      V_TENR_MED__val$show_tab <- TRUE
+    }, ignoreInit = TRUE)
+    V_TENR_MED__dt <- eventReactive(
+      c(input$V_TENR_MED__go, V_TENR_MED__val$show_tab),
+      {
+        if (V_TENR_MED__val$show_tab) {
+          dt <- inesss::V_TENR_MED
+          # Code Teneur
+          if (input$V_TENR_MED__code != "") {
+            dt <- search_value_chr(
+              dt, col = "COD_TENR",
+              values = input$V_TENR_MED__code, pad = 5
+            )
+          }
+          # Nom Teneur
+          if (input$V_TENR_MED__nom != "") {
+            if (input$V_TENR_MED__nomTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_TENR",
+                values = input$V_TENR_MED__nom
+              )
+            } else if (input$V_TENR_MED__nomTypeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "NOM_TENR",
+                values = input$V_TENR_MED__nom
+              )
+            }
+          }
+          # Nom Teneur Anglais
+          if (input$V_TENR_MED__nomAngl != "") {
+            if (input$V_TENR_MED__nomAnglTypeRecherche == "keyword") {
+              dt <- search_keyword(
+                dt, col = "NOM_ANGL_TENR",
+                values = input$V_TENR_MED__nomAngl
+              )
+            } else if (input$V_TENR_MED__nomAnglTypeRecherche == "exactWord") {
+              dt <- search_value_chr(
+                dt, col = "NOM_ANGL_TENR",
+                values = input$V_TENR_MED__nomAngl
+              )
+            }
+          }
+          return(dt)
+        } else {
+          return(NULL)
+        }
+      }
+    )
+    output$V_TENR_MED__dt <- renderDataTable({
+      V_TENR_MED__dt()
+    }, options = renderDataTable_options())
+
+    ## Export ####
+    output$V_TENR_MED__save <- downloadHandler(
+      filename = function() {
+        paste0(
+          input$V_TENR_MED__savename, ".",
+          input$V_TENR_MED__saveext
+        )
+      },
+      content = function(file) {
+        if (input$V_TENR_MED__saveext == "xlsx") {
+          writexl::write_xlsx(V_TENR_MED__dt(), file)
+        } else if (input$V_TENR_MED__saveext == "csv") {
+          write.csv2(V_TENR_MED__dt(), file, row.names = FALSE,
+                     fileEncoding = "latin1")
+        }
+      }
+    )
+
+    ## Update Buttons ####
+    observeEvent(input$V_TENR_MED__reset, {
+      V_TENR_MED__val$show_tab <- FALSE
+      updateTextInput(session, "V_TENR_MED__code", value = "")
+      updateTextInput(session, "V_TENR_MED__nom", value = "")
+      updateTextInput(session, "V_TENR_MED__nomAngl", value = "")
     })
   }
 

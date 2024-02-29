@@ -24,7 +24,7 @@ DER.inesss.fcts <- paste0(c(
 for (fct in DER.inesss.fcts) {
   file.copy(paste0("R/",fct), paste0("DER.inesss/R/",fct), overwrite = TRUE)
 }
-# Remplacer l'appel du package inesss par DER.inesss
+# Remplacer les appels {inesss::, inesss:::} par {DER.inesss::, DER.inesss:::}
 for (fil in list.files("DER.inesss/R")) {
   script <- readLines(paste0("DER.inesss/R/",fil))
   if (any(str_detect(script, "inesss\\:\\:"))) {
