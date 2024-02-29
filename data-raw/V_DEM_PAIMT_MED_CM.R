@@ -82,7 +82,7 @@ v_dem_paimt_med_cm <- function(loop_dates) {
 
   cols <- c(
     "DENOM", "DIN",
-    "FORME", "TENEUR", "INDCN_THERA", "CTAG_LISTE",
+    "FORME", "TENEUR", "INDCN_THERA", "CATG_LISTE",
     "AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
     "COD_SERV_1", "COD_SERV_2", "COD_SERV_3",
     "COD_STA_DECIS",

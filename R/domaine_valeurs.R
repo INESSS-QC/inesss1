@@ -275,6 +275,7 @@ domaine_valeurs <- function() {
       "FORME", "NOM_FORME",
       "TENEUR", "NOM_TENR",
       "INDCN_THERA", "NOM_ANATOM_INDCN_THERA",
+      "CATG_LISTE", "NOM_CATG_LISTE",
       "COD_STA_DECIS", "NOM_COD_STA_DECIS",
       "COD_SERV_1", "NOM_COD_SERV_1", "COD_SERV_2", "NOM_COD_SERV_2", "COD_SERV_3", "NOM_COD_SERV_3",
       "AHFS", "NOM_AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA",
@@ -423,7 +424,7 @@ domaine_valeurs <- function() {
                 column(
                   width = 3,
                   checkboxGroupInput("V_DEM_PAIMT_MED_CM__varSelect2", "",
-                                     choices = c("FORME", "TENEUR", "INDCN_THERA"))
+                                     choices = c("FORME", "TENEUR", "INDCN_THERA", "CATG_LISTE"))
                 ),
                 column(
                   width = 3,
@@ -828,30 +829,33 @@ domaine_valeurs <- function() {
         input$V_DEM_PAIMT_MED_CM__varSelect3,
         input$V_DEM_PAIMT_MED_CM__varSelect4_ahfs
       )
-      choices_vec <- vector("character", 8L)
+      choices_vec <- vector("character", 9L)
       if (any(c("AHFS", "AHFS_CLA", "AHFS_SCLA", "AHFS_SSCLA") %in% varSelect)) {
         choices_vec[1] <- "AHFS"
       }
+      if (any("CATG_LISTE" == varSelect)) {
+        choices_vec[2] <- "CATG_LISTE"
+      }
       if (any(paste0("COD_SERV_", 1:3) %in% varSelect)) {
-        choices_vec[2] <- "COD_SERV"
+        choices_vec[3] <- "COD_SERV"
       }
       if (any("COD_STA_DECIS" == varSelect)) {
-        choices_vec[3] <- "COD_STA_DECIS"
+        choices_vec[4] <- "COD_STA_DECIS"
       }
       if (any("DENOM" == varSelect)) {
-        choices_vec[4] <- "DENOM"
+        choices_vec[5] <- "DENOM"
       }
       if (any("FORME" == varSelect)) {
-        choices_vec[5] <- "FORME"
+        choices_vec[6] <- "FORME"
       }
       if (any("INDCN_THERA" == varSelect)) {
-        choices_vec[6] <- "INDCN_THERA"
+        choices_vec[7] <- "INDCN_THERA"
       }
       if (any("DIN" == varSelect)) {
-        choices_vec[7] <- "MARQ_COMRC"
+        choices_vec[8] <- "MARQ_COMRC"
       }
       if (any("TENEUR" %in% varSelect)) {
-        choices_vec[8] <- "TENEUR"
+        choices_vec[9] <- "TENEUR"
       }
       return(tagList(
         selectInput(
@@ -1448,6 +1452,65 @@ domaine_valeurs <- function() {
         indcnThera <- NULL
       }
 
+      # CATG_LISTE
+      if ("CATG_LISTE" %in% varSelect && "CATG_LISTE" %in% varSelectDesc) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__catgListe)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__catgListe
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__catgListeDesc)) {
+            prev_val_search <- ""
+          } else {
+            prev_val_search <- input$V_DEM_PAIMT_MED_CM__catgListeDesc
+          }
+          if (is.null(input$V_DEM_PAIMT_MED_CM__catgListeTypeRecherche)) {
+            prev_val_search_key <- "Mot-clé"
+          } else {
+            prev_val_search_key <- input$V_DEM_PAIMT_MED_CM__catgListeTypeRecherche
+          }
+        })
+        catgListe <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__catgListe", "CATG_LISTE", value = prev_val)
+          ),
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__catgListeDesc", "NOM_CATG_LISTE", value = prev_val_search)
+          ),
+          column(
+            width = 3,
+            selectInput(
+              "V_DEM_PAIMT_MED_CM__catgListeTypeRecherche",
+              "NOM_CATG_LISTE Type Recherche",
+              choices = c("Mot-clé" = "keyword",
+                          "Valeur exacte" = "exactWord"),
+              selected = prev_val_search_key
+            )
+          )
+        )
+      } else if ("CATG_LISTE" %in% varSelect) {
+        # Conserver les valeurs inscrites si on ajoute ou supprime des colonnes
+        isolate({
+          if (is.null(input$V_DEM_PAIMT_MED_CM__catgListe)) {
+            prev_val <- ""
+          } else {
+            prev_val <- input$V_DEM_PAIMT_MED_CM__catgListe
+          }
+        })
+        catgListe <- fluidRow(
+          column(
+            width = 3,
+            textInput("V_DEM_PAIMT_MED_CM__catgListe", "CATG_LISTE", value = prev_val)
+          )
+        )
+      } else {
+        catgListe <- NULL
+      }
+
       # COD_SERV_[1:3]
       for (i in 1:3) {
         if (paste0("COD_SERV_", i) %in% varSelect && "COD_SERV" %in% varSelectDesc) {
@@ -1573,7 +1636,7 @@ domaine_valeurs <- function() {
         periods_debut_fin,
         denom, din,
         ahfs, ahfs_cla, ahfs_scla, ahfs_sscla,
-        forme, teneur, indcnThera,
+        forme, teneur, indcnThera, catgListe,
         cod_serv_1, cod_serv_2, cod_serv_3,
         cod_sta_decis
       ))
@@ -1722,6 +1785,16 @@ domaine_valeurs <- function() {
               dt <- search_keyword(  # ne pas chercher valeur exacte car trop de possibilités
                 dt, col = "INDCN_THERA",
                 values = input$V_DEM_PAIMT_MED_CM__indcnThera
+              )
+            }
+          }
+
+          # CATG_LISTE
+          if (any("CATG_LISTE" == names(dt))) {
+            if (input$V_DEM_PAIMT_MED_CM__catgListe != "") {
+              dt <- search_keyword(  # ne pas chercher valeur exacte car trop de possibilités
+                dt, col = "CATG_LISTE",
+                values = input$V_DEM_PAIMT_MED_CM__catgListe
               )
             }
           }
@@ -1879,6 +1952,28 @@ domaine_valeurs <- function() {
               }
             }
 
+            # CATG_LISTE
+            if (any("CATG_LISTE" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
+              catgliste_desc <- inesss::V_DES_COD[
+                TYPE_CODE == "COD_CATG_LISTE_MED",
+                .(CATG_LISTE = CODE, NOM_CATG_LISTE = CODE_DESC)
+              ]
+              dt <- merge(dt, catgliste_desc, by = "CATG_LISTE", all.x = TRUE)
+              if (input$V_DEM_PAIMT_MED_CM__catgListeDesc != "") {
+                if (input$V_DEM_PAIMT_MED_CM__catgListeTypeRecherche == "keyword") {
+                  dt <- search_keyword(
+                    dt, col = "NOM_CATG_LISTE",
+                    values = input$V_DEM_PAIMT_MED_CM__catgListeDesc
+                  )
+                } else if (input$V_DEM_PAIMT_MED_CM__catgListeTypeRecherche == "exactWord") {
+                  dt <- search_value_chr(
+                    dt, col = "NOM_CATG_LISTE",
+                    values = input$V_DEM_PAIMT_MED_CM__catgListeDesc
+                  )
+                }
+              }
+            }
+
             # AHFS
             if (any("AHFS" == input$V_DEM_PAIMT_MED_CM__varSelectDesc)) {
               ahfs_desc <- copy(inesss::V_CLA_AHF)
@@ -2019,6 +2114,8 @@ domaine_valeurs <- function() {
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__teneurDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnThera", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__indcnTheraDesc", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__catgListe", value = "")
+      updateTextInput(session, "V_DEM_PAIMT_MED_CM__catgListeDesc", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServDesc1", value = "")
       updateTextInput(session, "V_DEM_PAIMT_MED_CM__codServ2", value = "")
