@@ -3196,6 +3196,6 @@ domaine_valeurs <- function() {
 
   # APPLICATION -------------------------------------------------------------
 
-  shinyApp(ui, server)
+  shinyApp(ui, server(input, output, session), options = list(launch.browser = TRUE))
 
 }
