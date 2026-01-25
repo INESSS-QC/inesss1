@@ -16,7 +16,7 @@
 #' @encoding UTF-8
 #' @export
 #' @examples
-#' require(data.table)
+#' library(inesss)
 #' ex1 <- data.frame(
 #'   ID = c(1, 1, 1, 2, 2),
 #'   DATE_DEBUT = as.Date(c("2020-03-01", "2020-04-01", "2020-05-02",
@@ -24,7 +24,7 @@
 #'   DATE_FIN = as.Date(c("2020-03-31", "2020-04-30", "2020-05-31",
 #'                        "2020-06-25", "2020-06-30"))
 #' )
-#' ex1_1 <- fusion_periodes(ex1, debut = "DATE_DEBUT", fin = "DATE_FIN", cols = "ID", njours = 1L)
+#' ex1_1 <- fusion_periodes(ex1, debut = "DATE_DEBUT", fin = "DATE_FIN", cols = "ID", njours = 1)
 fusion_periodes <- function(dt, debut, fin, cols, njours = 1L) {
 
   if (!is.data.table(dt)) {
